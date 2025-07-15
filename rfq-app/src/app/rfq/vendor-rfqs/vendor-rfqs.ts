@@ -283,6 +283,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.isUpdating = false;
           this.successMessage = `RFQ status updated!`;
           this.loadStatistics(); 
+          this.loadRfqs();
 
           // Clear success message after 3 seconds
           setTimeout(() => {
@@ -384,19 +385,21 @@ export class VendorRfqs implements OnInit, OnDestroy {
     });
   }
 
-  getRelativeTime(date: Date | string): string {
-    const now = new Date();
-    const d = new Date(date);
-    const diffMs = now.getTime() - d.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
+getRelativeTime(date: Date | string): string {
+  const now = new Date();
+  const d = new Date(date);
+  const diffMs = now.getTime() - d.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
 
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMinutes < 1) return 'Just now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
 
-    return this.formatDate(date);
-  }
+  return this.formatDate(date);
+}
 
   truncateText(text: string, length: number = 100): string {
     if (text.length <= length) return text;
