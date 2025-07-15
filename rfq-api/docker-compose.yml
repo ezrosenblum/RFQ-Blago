@@ -1,0 +1,143 @@
+version: '3.4'
+
+volumes:
+  rfqsubmission_media_data:
+  rfqsubmission_documents_data:
+  rfqsubmission_kibana_config:
+  rfqsubmission_elasticsearch_data:
+  postgres_data:
+
+services:
+
+  postgres:
+    image: postgres:14
+    container_name: rfqsubmission_postgres
+    hostname: rfqsubmission-postgres-host
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=passw123
+      - POSTGRES_DB=rfqsubmission
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3.11-management 
+    container_name: rfqsubmission_rabbitmq
+    hostname: rfqsubmission-rabbitmq-host
+    restart: always
+    ports:
+      - 5674:5674
+      - 15674:15672 
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=passw123
+      - RABBITMQ_DEFAULT_VHOST=/
+      - RABBITMQ_NODE_PORT=5674
+    volumes:
+      - /docker_conf/rabbitmq/data/:/var/lib/rabbitmq/
+
+  api:
+    image: rfqsubmission/api
+    container_name: rfqsubmission_api
+    hostname: api
+    restart: always
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    ports:
+      - "8090:80"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - elasticsearch
+      - redis
+    volumes:
+      - rfqsubmission_media_data:/app/media
+      - rfqsubmission_documents_data:/app/documents
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - DB_HOST=rfqsubmission-postgres-host
+      - DB_PORT=5432
+      - DB_USER=admin
+      - DB_PASS=passw123
+      - DB_NAME=rfqsubmission
+
+  emailservice:
+    image: rfqsubmission/emailservice
+    container_name: rfqsubmission_emailservice
+    restart: always
+    build:
+      context: .
+      dockerfile: src/EmailService/Dockerfile
+    depends_on:
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  worker:
+    image: rfqsubmission/worker
+    container_name: rfqsubmission_worker
+    restart: always
+    build:
+      context: .
+      dockerfile: src/Worker/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+      - elasticsearch
+      - redis
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  notificationservice:
+    image: rfqsubmission/notificationservice
+    container_name: rfqsubmission_notificationservice
+    hostname: notificationservice
+    restart: always
+    build:
+      context: .
+      dockerfile: src/NotificationService/Dockerfile
+    ports:
+      - "8091:80"
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+
+  redis:
+    container_name: rfqsubmission_redis
+    image: "redis:latest"
+    restart: always
+    ports:
+      - 6379:6379
+    expose:
+      - 6379
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.4
+    container_name: rfqsubmission_elasticsearch
+    restart: always
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - rfqsubmission_elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.4
+    container_name: rfqsubmission_kibana
+    restart: always
+    ports:
+      - 5605:5601
+    depends_on:
+      - elasticsearch
+    volumes:
+      - rfqsubmission_kibana_config:/usr/share/kibana/config
