@@ -13,32 +13,22 @@ public sealed class SubmissionGetAllQueryHandler : IQueryHandler<SubmissionGetAl
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly ICacheService _cacheService;
-
+ 
     public SubmissionGetAllQueryHandler(
         IApplicationDbContext dbContext, 
-        IMapper mapper,
-        ICacheService cacheService)
+        IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _cacheService = cacheService;
     }
     public async Task<IReadOnlyCollection<SubmissionResponse>> Handle(SubmissionGetAllQuery request, CancellationToken cancellationToken)
     {
-        var cachedSubmissions = await _cacheService.GetAsync<IReadOnlyCollection<SubmissionResponse>>(CacheKeys.AllSubmissions, cancellationToken);
-
-        if (cachedSubmissions is not null)
-            return cachedSubmissions;
-
         var submissions = await _dbContext.Submission
             .AsNoTracking()
             .Include(s => s.User)
             .ToListAsync(cancellationToken);
 
         var response = _mapper.Map<IReadOnlyCollection<SubmissionResponse>>(submissions);
-
-        await _cacheService.AddAsync(CacheKeys.AllSubmissions, response, cancellationToken);
 
         return response;
     }

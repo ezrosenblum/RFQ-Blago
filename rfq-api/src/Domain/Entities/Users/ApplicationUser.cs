@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.Medias;
-using Domain.Entities.Notifications;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.Users;
@@ -51,7 +50,6 @@ namespace Domain.Entities.User
         public string? SuspensionReason { get; private set; }
 
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 
         public static ApplicationUser Create(
