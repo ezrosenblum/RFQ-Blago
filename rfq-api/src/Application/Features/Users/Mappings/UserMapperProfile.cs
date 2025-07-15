@@ -27,8 +27,6 @@ public sealed class UserMapperProfile : Profile
             .ForMember(d => d.Picture, opt => opt.MapFrom(s => s.Media.GetMainImageUrl()))
             .ForMember(d => d.DateCreated, opt => opt.MapFrom(s => s.Created));
 
-        CreateMap<UserUpdateRequest, UserUpdateCommand>();
-
         CreateMap<UserResponse, UserSearchable>();
 
         CreateMap<UserInfoResponse, UserSearchable>();

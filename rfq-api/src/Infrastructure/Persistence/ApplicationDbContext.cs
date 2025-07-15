@@ -1,6 +1,5 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Entities.Languages;
-using Domain.Entities.Notifications;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.User;
@@ -23,7 +22,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         where TEntity : class => base.Entry(entity);
     public DbSet<ApplicationUser> User => Set<ApplicationUser>();
     public DbSet<RefreshToken> RefreshToken => Set<RefreshToken>();
-    public DbSet<Notification> Notification => Set<Notification>();
     public DbSet<Language> Language => Set<Language>();
     public DbSet<Submission> Submission => Set<Submission>();
 
