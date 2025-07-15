@@ -37,22 +37,6 @@ export class RfqService {
     return this.http.post<TableResponse<Rfq>>(`${this.API_URL}Submission/search`, request);
   }
 
-  getRfqById(id: number): Observable<Rfq> {
-    if (this.DEMO_MODE) {
-      return this.demoGetRfqById(id);
-    }
-
-    return this.http.get<ApiResponse<Rfq>>(`${this.API_URL}/rfq/${id}`)
-      .pipe(
-        map(response => {
-          if (response.success && response.data) {
-            return response.data;
-          }
-          throw new Error(response.message || 'RFQ not found');
-        })
-      );
-  }
-
   getRfqUnits(): Observable<LookupValue[]> {
     return this.http.get<LookupValue[]>(`${this.API_URL}Submission/units`)
       .pipe(
@@ -70,20 +54,6 @@ export class RfqService {
         })
       );
   }
-
-  private demoGetRfqById(id: number): Observable<Rfq> {
-    return of(null).pipe(
-      delay(500),
-      map(() => {
-        const rfq = this.demoRfqs.find(r => r.id === id);
-        if (!rfq) {
-          throw new Error('RFQ not found');
-        }
-        return rfq;
-      })
-    );
-  }
-
   updateRfqStatus(id: number, status: number): Observable<boolean> {
     return this.http.put<ApiResponse<Rfq>>(`${this.API_URL}Submission/status/${id}?status=${status}`, null)
       .pipe(
@@ -91,35 +61,6 @@ export class RfqService {
           return true;
         })
       );
-  }
-
-  deleteRfq(id: number): Observable<void> {
-    if (this.DEMO_MODE) {
-      return this.demoDeleteRfq(id);
-    }
-
-    return this.http.delete<ApiResponse<void>>(`${this.API_URL}/rfq/${id}`)
-      .pipe(
-        map(response => {
-          if (!response.success) {
-            throw new Error(response.message || 'Failed to delete RFQ');
-          }
-        })
-      );
-  }
-
-  private demoDeleteRfq(id: number): Observable<void> {
-    return of(null).pipe(
-      delay(800),
-      map(() => {
-        const rfqIndex = this.demoRfqs.findIndex(r => r.id === id);
-        if (rfqIndex === -1) {
-          throw new Error('RFQ not found');
-        }
-
-        this.demoRfqs.splice(rfqIndex, 1);
-      })
-    );
   }
 
   // Get statistics about RFQs
@@ -164,15 +105,5 @@ getStatusColor(status: LookupValue): string {
       [UnitType.EA]: 'Each'
     };
     return unitNames[unit];
-  }
-
-  // Method to get demo RFQs for testing (demo mode only)
-  getDemoRfqs(): Rfq[] {
-    return this.DEMO_MODE ? [...this.demoRfqs] : [];
-  }
-
-  // Method to switch between demo and real API mode
-  setDemoMode(enabled: boolean): void {
-    console.log(`RFQ Service demo mode ${enabled ? 'enabled' : 'disabled'}`);
   }
 }

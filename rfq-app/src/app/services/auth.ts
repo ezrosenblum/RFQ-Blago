@@ -1,13 +1,12 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { map, tap, delay, catchError } from 'rxjs/operators';
+import { map, tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 import { User, UserRole } from '../models/user.model';
-import { LoginRequest, SignupRequest, AuthResponse, TokenPayload, Token } from '../models/auth.model';
+import { LoginRequest, SignupRequest, TokenPayload, Token } from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
 
 @Injectable({
@@ -15,7 +14,6 @@ import { ApiResponse } from '../models/api-response';
 })
 export class Auth {
   private readonly API_URL = environment.apiUrl;
-  private readonly DEMO_MODE = true; // Set to false when connecting to real API
 
   public currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -24,9 +22,6 @@ export class Auth {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   public redirectUrl: string | null = null;
-
-  // Demo accounts database
-  private demoUsers: User[] = [];
 
   constructor(
     private http: HttpClient,
@@ -49,9 +44,6 @@ export class Auth {
   }
 
   login(credentials: LoginRequest): Observable<Token> {
-    // if (this.DEMO_MODE) {
-    //   return this.demoLogin(credentials);
-    // }
     return this.http.post<Token>(`${this.API_URL}Authenticate/login`, credentials)
       .pipe(
       catchError(err => {
@@ -69,9 +61,6 @@ export class Auth {
   }
 
   signup(userData: SignupRequest): Observable<User> {
-    // if (this.DEMO_MODE) {
-    //   return this.demoSignup(userData);
-    // }
     return this.http.post<User>(`${this.API_URL}User`, userData)
       .pipe(
         map(response => {
@@ -84,21 +73,6 @@ export class Auth {
           this.router.navigate(['/auth/login']);
         })
       );
-  }
-
-  private generateDemoToken(user: User): string {
-    // Create a demo JWT-like token (not cryptographically secure, just for demo)
-    const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'HS256' }));
-    const payload = btoa(JSON.stringify({
-      userId: user.id,
-      email: user.email,
-      role: user.type,
-      iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 86400 // 24 hours
-    }));
-    const signature = btoa('demo-signature');
-
-    return `${header}.${payload}.${signature}`;
   }
 
   logout(): void {
@@ -164,48 +138,8 @@ export class Auth {
     return this.hasRole(UserRole.CLIENT);
   }
 
-  // Method to get all demo users (for testing purposes)
-  getDemoUsers(): User[] {
-    return this.DEMO_MODE ? [...this.demoUsers] : [];
-  }
-
-  // Method to switch between demo and real API mode
-  setDemoMode(enabled: boolean): void {
-    // This would typically be set via environment variables
-    console.log(`Demo mode ${enabled ? 'enabled' : 'disabled'}`);
-  }
-
   // Update user profile
   updateProfile(updates: Partial<User>): Observable<User> {
-    if (this.DEMO_MODE) {
-      return of(null).pipe(
-        delay(500),
-        map(() => {
-          const currentUser = this.getCurrentUser();
-          if (!currentUser) {
-            throw new Error('No user logged in');
-          }
-
-          const updatedUser: User = {
-            ...currentUser,
-            ...updates,
-            updatedAt: new Date()
-          };
-
-          // Update in demo database
-          const index = this.demoUsers.findIndex(u => u.id === currentUser.id);
-          if (index !== -1) {
-            this.demoUsers[index] = updatedUser;
-          }
-
-          // Update localStorage and subjects
-          this.currentUserSubject.next(updatedUser);
-
-          return updatedUser;
-        })
-      );
-    }
-
     return this.http.put<ApiResponse<User>>(`${this.API_URL}/auth/profile`, updates)
       .pipe(
         map(response => {
