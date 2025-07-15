@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
-import { RfqRequest, UnitType } from '../../models/rfq.model';
+import { LookupValue, RfqRequest, UnitType } from '../../models/rfq.model';
 import { User } from '../../models/user.model';
 import { RfqService } from '../../services/rfq';
 
@@ -25,11 +25,7 @@ export class RequestQuote implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Unit options for dropdown
-  unitOptions = [
-    { value: UnitType.LF, label: 'Linear Feet (LF)', description: 'For measuring length' },
-    { value: UnitType.SF, label: 'Square Feet (SF)', description: 'For measuring area' },
-    { value: UnitType.EA, label: 'Each (EA)', description: 'For counting individual items' }
-  ];
+  unitOptions: LookupValue[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -47,6 +43,16 @@ export class RequestQuote implements OnInit, OnDestroy {
       .subscribe(user => {
         this.currentUser = user;
       });
+
+    this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (units) => {
+        this.unitOptions = units;
+      },
+      error: (error) => {
+        console.error('Failed to load RFQ units:', error);
+        this.errorMessage = 'Failed to load unit options. Please try again later.';
+      }
+    });
 
     // Auto-focus first field
     setTimeout(() => {
@@ -85,15 +91,6 @@ export class RequestQuote implements OnInit, OnDestroy {
       ]]
     });
 
-    // Watch for form changes to clear messages
-    this.rfqForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        if (this.successMessage || this.errorMessage) {
-          this.successMessage = '';
-          this.errorMessage = '';
-        }
-      });
   }
 
   // Custom validator for positive numbers
@@ -123,7 +120,7 @@ export class RequestQuote implements OnInit, OnDestroy {
       const rfqData: RfqRequest = {
         description: this.rfqForm.value.description.trim(),
         quantity: parseFloat(this.rfqForm.value.quantity),
-        unit: this.rfqForm.value.unit,
+        unit: Number(this.rfqForm.value.unit),
         jobLocation: this.rfqForm.value.jobLocation.trim()
       };
 
@@ -137,6 +134,7 @@ export class RequestQuote implements OnInit, OnDestroy {
 
             // Auto-scroll to success message
             setTimeout(() => {
+              console.log(this.successMessage)
               const successElement = document.querySelector('.alert-success');
               if (successElement) {
                 successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -283,7 +281,7 @@ export class RequestQuote implements OnInit, OnDestroy {
 
   getUnitDescription(): string {
     const selectedUnit = this.rfqForm.get('unit')?.value;
-    const unitOption = this.unitOptions.find(option => option.value === selectedUnit);
-    return unitOption?.description || '';
+    const unitOption = this.unitOptions.find(option => option.id === selectedUnit);
+    return unitOption?.name || '';
   }
 }

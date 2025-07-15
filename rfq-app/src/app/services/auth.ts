@@ -2,12 +2,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { map, tap, delay } from 'rxjs/operators';
+import { map, tap, delay, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 import { User, UserRole } from '../models/user.model';
-import { LoginRequest, SignupRequest, AuthResponse, TokenPayload } from '../models/auth.model';
+import { LoginRequest, SignupRequest, AuthResponse, TokenPayload, Token } from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
 
 @Injectable({
@@ -15,44 +15,18 @@ import { ApiResponse } from '../models/api-response';
 })
 export class Auth {
   private readonly API_URL = environment.apiUrl;
-  private readonly TOKEN_KEY = 'rfq_auth_token';
-  private readonly USER_KEY = 'rfq_current_user';
   private readonly DEMO_MODE = true; // Set to false when connecting to real API
 
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  public isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   public redirectUrl: string | null = null;
 
   // Demo accounts database
-  private demoUsers: User[] = [
-    {
-      id: 'demo-vendor-1',
-      email: 'vendor@demo.com',
-      firstName: 'John',
-      lastName: 'Vendor',
-      role: UserRole.VENDOR,
-      createdAt: new Date('2024-01-01'),
-      updatedAt: new Date()
-    },
-    {
-      id: 'demo-client-1',
-      email: 'client@demo.com',
-      firstName: 'Jane',
-      lastName: 'Client',
-      role: UserRole.CLIENT,
-      createdAt: new Date('2024-01-01'),
-      updatedAt: new Date()
-    }
-  ];
-
-  private demoPasswords: { [email: string]: string } = {
-    'vendor@demo.com': 'demo123',
-    'client@demo.com': 'demo123'
-  };
+  private demoUsers: User[] = [];
 
   constructor(
     private http: HttpClient,
@@ -63,118 +37,53 @@ export class Auth {
 
   private initializeAuthState(): void {
     const token = this.getToken();
-    const user = this.getStoredUser();
+    if(token) {
+      this.getUserData().pipe(
+        map(user => {
+          this.currentUserSubject.next(user);
+          this.isAuthenticatedSubject.next(true);
 
-    if (token && user && !this.isTokenExpired(token)) {
-      this.currentUserSubject.next(user);
-      this.isAuthenticatedSubject.next(true);
-    } else {
-      this.clearAuthData();
+          return user;
+        }))
     }
   }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    if (this.DEMO_MODE) {
-      return this.demoLogin(credentials);
-    }
-
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/auth/login`, credentials)
+  login(credentials: LoginRequest): Observable<Token> {
+    // if (this.DEMO_MODE) {
+    //   return this.demoLogin(credentials);
+    // }
+    return this.http.post<Token>(`${this.API_URL}Authenticate/login`, credentials)
       .pipe(
-        map(response => {
-          if (response.success && response.data) {
-            return response.data;
-          }
-          throw new Error(response.message || 'Login failed');
-        }),
-        tap(authResponse => {
-          this.handleAuthSuccess(authResponse);
-        })
-      );
-  }
-
-  private demoLogin(credentials: LoginRequest): Observable<AuthResponse> {
-    return of(null).pipe(
-      delay(1000), // Simulate network delay
-      map(() => {
-        const user = this.demoUsers.find(u => u.email === credentials.email.toLowerCase());
-        const expectedPassword = this.demoPasswords[credentials.email.toLowerCase()];
-
-        if (!user || expectedPassword !== credentials.password) {
-          throw new Error('Invalid email or password');
-        }
-
-        // Generate demo JWT token
-        const token = this.generateDemoToken(user);
-
-        const authResponse: AuthResponse = {
-          token,
-          user,
-          expiresIn: 86400 // 24 hours
-        };
-
-        this.handleAuthSuccess(authResponse);
-        return authResponse;
+      catchError(err => {
+        return throwError(() => err);
       })
     );
   }
 
-  signup(userData: SignupRequest): Observable<AuthResponse> {
-    if (this.DEMO_MODE) {
-      return this.demoSignup(userData);
-    }
-
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/auth/signup`, userData)
-      .pipe(
-        map(response => {
-          if (response.success && response.data) {
-            return response.data;
-          }
-          throw new Error(response.message || 'Signup failed');
-        }),
-        tap(authResponse => {
-          this.handleAuthSuccess(authResponse);
-        })
-      );
+  getUserData(): Observable<User> {
+    return this.http.get<User>(`${this.API_URL}User/me`).pipe(
+      catchError(err => {
+        return throwError(() => err);
+      })
+    );;
   }
 
-  private demoSignup(userData: SignupRequest): Observable<AuthResponse> {
-    return of(null).pipe(
-      delay(1500), // Simulate network delay
-      map(() => {
-        // Check if user already exists
-        const existingUser = this.demoUsers.find(u => u.email === userData.email.toLowerCase());
-        if (existingUser) {
-          throw new Error('User with this email already exists');
-        }
-
-        // Create new demo user
-        const newUser: User = {
-          id: `demo-${userData.role}-${Date.now()}`,
-          email: userData.email.toLowerCase(),
-          firstName: userData.firstName || '',
-          lastName: userData.lastName || '',
-          role: userData.role || UserRole.CLIENT,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-
-        // Add to demo database
-        this.demoUsers.push(newUser);
-        this.demoPasswords[newUser.email] = userData.password;
-
-        // Generate demo JWT token
-        const token = this.generateDemoToken(newUser);
-
-        const authResponse: AuthResponse = {
-          token,
-          user: newUser,
-          expiresIn: 86400 // 24 hours
-        };
-
-        this.handleAuthSuccess(authResponse);
-        return authResponse;
-      })
-    );
+  signup(userData: SignupRequest): Observable<User> {
+    // if (this.DEMO_MODE) {
+    //   return this.demoSignup(userData);
+    // }
+    return this.http.post<User>(`${this.API_URL}User`, userData)
+      .pipe(
+        map(response => {
+          if (response && response.id) {
+            return response;
+          }
+          throw new Error('Signup failed');
+        }),
+        tap(response => {
+          this.router.navigate(['/auth/login']);
+        })
+      );
   }
 
   private generateDemoToken(user: User): string {
@@ -183,7 +92,7 @@ export class Auth {
     const payload = btoa(JSON.stringify({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: user.type,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 86400 // 24 hours
     }));
@@ -197,35 +106,20 @@ export class Auth {
     this.router.navigate(['/auth/login']);
   }
 
-  private handleAuthSuccess(authResponse: AuthResponse): void {
-    // Store token and user data in localStorage
-    localStorage.setItem(this.TOKEN_KEY, authResponse.token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.user));
-
-    // Update subjects
-    this.currentUserSubject.next(authResponse.user);
-    this.isAuthenticatedSubject.next(true);
-
-    // Redirect to intended page or default
-    const redirectUrl = this.redirectUrl || '/request-quote';
-    this.redirectUrl = null;
-    this.router.navigate([redirectUrl]);
+  saveTokens(authTokens: Token): void {
+    localStorage.setItem('rfqTokenAcc', authTokens.accessToken);
+    localStorage.setItem('rfqTokenRef', authTokens.refreshToken);
   }
 
   private clearAuthData(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem('rfqTokenAcc');
+    localStorage.removeItem('rfqTokenRef');
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  private getStoredUser(): User | null {
-    const userData = localStorage.getItem(this.USER_KEY);
-    return userData ? JSON.parse(userData) : null;
+    return localStorage.getItem('rfqTokenAcc');
   }
 
   isAuthenticated(): boolean {
@@ -259,7 +153,7 @@ export class Auth {
 
   hasRole(role: UserRole): boolean {
     const user = this.getCurrentUser();
-    return user?.role === role;
+    return user?.type === role;
   }
 
   isVendor(): boolean {
@@ -268,43 +162,6 @@ export class Auth {
 
   isClient(): boolean {
     return this.hasRole(UserRole.CLIENT);
-  }
-
-  isAdmin(): boolean {
-    return this.hasRole(UserRole.ADMIN);
-  }
-
-  refreshToken(): Observable<AuthResponse> {
-    if (this.DEMO_MODE) {
-      // In demo mode, just refresh the current token
-      const currentUser = this.getCurrentUser();
-      if (currentUser) {
-        const newToken = this.generateDemoToken(currentUser);
-        const authResponse: AuthResponse = {
-          token: newToken,
-          user: currentUser,
-          expiresIn: 86400
-        };
-
-        localStorage.setItem(this.TOKEN_KEY, newToken);
-        return of(authResponse);
-      }
-      return throwError(() => new Error('No user to refresh token for'));
-    }
-
-    return this.http.post<ApiResponse<AuthResponse>>(`${this.API_URL}/auth/refresh`, {})
-      .pipe(
-        map(response => {
-          if (response.success && response.data) {
-            return response.data;
-          }
-          throw new Error(response.message || 'Token refresh failed');
-        }),
-        tap(authResponse => {
-          localStorage.setItem(this.TOKEN_KEY, authResponse.token);
-          this.currentUserSubject.next(authResponse.user);
-        })
-      );
   }
 
   // Method to get all demo users (for testing purposes)
@@ -342,7 +199,6 @@ export class Auth {
           }
 
           // Update localStorage and subjects
-          localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
           this.currentUserSubject.next(updatedUser);
 
           return updatedUser;
@@ -359,7 +215,6 @@ export class Auth {
           throw new Error(response.message || 'Profile update failed');
         }),
         tap(user => {
-          localStorage.setItem(this.USER_KEY, JSON.stringify(user));
           this.currentUserSubject.next(user);
         })
       );

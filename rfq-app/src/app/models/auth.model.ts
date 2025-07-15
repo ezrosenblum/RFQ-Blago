@@ -1,7 +1,7 @@
 import { User, UserRole } from "./user.model";
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -25,4 +25,11 @@ export interface TokenPayload {
   role: UserRole;
   exp: number;
   iat: number;
+}
+
+export class Token {
+    constructor(
+        public accessToken: string,
+        public refreshToken: string
+    ) { }
 }

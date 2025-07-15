@@ -5,9 +5,8 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { RfqService } from '../../services/rfq';
-import { Rfq, RfqStatus, UnitType } from '../../models/rfq.model';
+import { LookupValue, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, UnitType } from '../../models/rfq.model';
 import { User, UserRole } from '../../models/user.model';
-import { PaginatedResponse } from '../../models/api-response';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -16,6 +15,7 @@ import { PaginatedResponse } from '../../models/api-response';
   styleUrls: ['./vendor-rfqs.scss']
 })
 export class VendorRfqs implements OnInit, OnDestroy {
+
   rfqs: Rfq[] = [];
   filteredRfqs: Rfq[] = [];
   currentUser: User | null = null;
@@ -23,6 +23,16 @@ export class VendorRfqs implements OnInit, OnDestroy {
   isUpdating = false;
   errorMessage = '';
   successMessage = '';
+  submissionListRequest: SubmissionTableRequest = {
+    paging: {
+      pageNumber: 1,
+      pageSize: 10
+    },
+    sorting: {
+      field: 1,
+      direction: 1
+    }
+  };
 
   // Filter form
   filterForm!: FormGroup;
@@ -35,18 +45,17 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   // View options
   viewMode: 'card' | 'table' = 'card';
-  sortBy: 'newest' | 'oldest' | 'status' | 'quantity' = 'newest';
+  sortBy: 1 | 2 | 3 | 4 = 1;
   sortDirection: 'asc' | 'desc' = 'desc';
 
   // Statistics
-  statistics = {
-    total: 0,
-    pending: 0,
-    reviewed: 0,
-    quoted: 0,
-    rejected: 0,
-    recentCount: 0
-  };
+  statistics: RfqStatistics = {
+    submissionsCount: 0,
+    pendingSubmissionsCount: 0,
+    reviewedSubmissionsCount: 0,  
+    acceptedSubmissionsCount: 0,
+    rejectedSubmissionsCount: 0,
+    last24HoursSubmissionsCount: 0}
 
   private destroy$ = new Subject<void>();
 
@@ -56,26 +65,14 @@ export class VendorRfqs implements OnInit, OnDestroy {
   UserRole = UserRole;
 
   // Filter options
-  statusOptions = [
-    { value: '', label: 'All Statuses' },
-    { value: RfqStatus.PENDING, label: 'Pending Review' },
-    { value: RfqStatus.REVIEWED, label: 'Under Review' },
-    { value: RfqStatus.QUOTED, label: 'Quoted' },
-    { value: RfqStatus.REJECTED, label: 'Rejected' }
-  ];
-
-  unitOptions = [
-    { value: '', label: 'All Units' },
-    { value: UnitType.LF, label: 'Linear Feet (LF)' },
-    { value: UnitType.SF, label: 'Square Feet (SF)' },
-    { value: UnitType.EA, label: 'Each (EA)' }
-  ];
+  statusOptions: LookupValue[] = [];
+  unitOptions: LookupValue[] = [];
 
   sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
-    { value: 'status', label: 'By Status' },
-    { value: 'quantity', label: 'By Quantity' }
+    { value: 1, label: 'Submission Date' },
+    { value: 2, label: 'Description' },
+    { value: 3, label: 'Quantity' },
+    { value: 4, label: 'JobLocation' }
   ];
 
   constructor(
@@ -93,22 +90,16 @@ export class VendorRfqs implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
-        if (!user) {
-          this.router.navigate(['/auth/login']);
-          return;
+        if (this.currentUser?.type == UserRole.CLIENT) {
+          this.submissionListRequest.userId = this.currentUser.id;
         }
 
-        // Check if user has access (vendor or admin)
-        if (user.role !== UserRole.VENDOR && user.role !== UserRole.ADMIN) {
-          this.errorMessage = 'Access denied. This page is only available to vendors and administrators.';
-          setTimeout(() => {
-            this.router.navigate(['/request-quote']);
-          }, 3000);
-          return;
+        if (user) {
+          this.loadRfqs();
+          this.loadStatistics();
+          this.loadStatuses();
+          this.leadUnits();
         }
-
-        this.loadRfqs();
-        this.loadStatistics();
       });
 
     // Watch for filter changes
@@ -118,6 +109,31 @@ export class VendorRfqs implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  loadStatuses() {
+    this.rfqService.getRfqStatuses().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (units) => {
+        this.statusOptions = units;
+      },
+      error: (error) => {
+        console.error('Failed to load RFQ units:', error);
+        this.errorMessage = 'Failed to load unit options. Please try again later.';
+      }
+    });
+  }
+
+
+  leadUnits() {
+    this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (units) => {
+        this.unitOptions = units;
+      },
+      error: (error) => {
+        console.error('Failed to load RFQ units:', error);
+        this.errorMessage = 'Failed to load unit options. Please try again later.';
+      }
+    });
   }
 
   private initializeFilterForm(): void {
@@ -177,13 +193,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.rfqService.getAllRfqs(this.currentPage, this.pageSize)
+    this.rfqService.getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: PaginatedResponse<Rfq>) => {
-          this.rfqs = response.data;
-          this.totalItems = response.pagination.total;
-          this.totalPages = response.pagination.totalPages;
+        next: (response: TableResponse<Rfq>) => {
+        this.rfqs = Array.isArray(response.items) ? response.items : response.items ? [response.items] : [];
+          this.totalItems = response.totalCount!;
+          this.totalPages = response.totalPages!;
           this.applyFilters();
           this.isLoading = false;
         },
@@ -208,21 +224,24 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    const filters = this.filterForm.value;
+    this.submissionListRequest.query = this.filterForm.get('search')?.value.trim() || undefined;
+    this.submissionListRequest.userId = undefined;
+    this.submissionListRequest.status = this.filterForm.get('status')?.value.trim() || undefined;
+    this.submissionListRequest.unit = this.filterForm.get('unit')?.value.trim() || undefined;
+    this.submissionListRequest.dateFrom = this.filterForm.get('dateFrom')?.value.trim() || undefined;
+    this.submissionListRequest.dateTo = this.filterForm.get('dateTo')?.value.trim() || undefined;
+    this.submissionListRequest.paging.pageNumber = this.currentPage;
+    this.submissionListRequest.paging.pageSize = this.pageSize;
 
-    this.rfqService.getFilteredRfqs({
-      status: filters.status || undefined,
-      unit: filters.unit || undefined,
-      search: filters.search || undefined,
-      dateFrom: filters.dateFrom ? new Date(filters.dateFrom) : undefined,
-      dateTo: filters.dateTo ? new Date(filters.dateTo) : undefined
-    }, this.currentPage, this.pageSize)
+    this.rfqService.getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: PaginatedResponse<Rfq>) => {
-          this.filteredRfqs = this.sortRfqs(response.data);
-          this.totalItems = response.pagination.total;
-          this.totalPages = response.pagination.totalPages;
+        next: (response: TableResponse<Rfq>) => {
+        this.filteredRfqs = this.sortRfqs(
+          Array.isArray(response.items) ? response.items : response.items ? [response.items] : []
+        );
+          this.totalItems = response.totalCount!;
+          this.totalPages = response.totalPages!;
         },
         error: (error) => {
           this.handleError(error);
@@ -235,17 +254,17 @@ export class VendorRfqs implements OnInit, OnDestroy {
       let comparison = 0;
 
       switch (this.sortBy) {
-        case 'newest':
-          comparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 1:
+          comparison = new Date(b.submissionDate!).getTime() - new Date(a.submissionDate!).getTime();
           break;
-        case 'oldest':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 2:
+          comparison = new Date(a.submissionDate!).getTime() - new Date(b.submissionDate!).getTime();
           break;
-        case 'status':
-          comparison = a.status.localeCompare(b.status);
+        case 3:
+          // comparison = a.status!.localeCompare(b.status);
           break;
-        case 'quantity':
-          comparison = a.quantity - b.quantity;
+        case 4:
+          comparison = a.quantity! - b.quantity!;
           break;
       }
 
@@ -253,30 +272,17 @@ export class VendorRfqs implements OnInit, OnDestroy {
     });
   }
 
-  updateRfqStatus(rfqId: string, newStatus: RfqStatus): void {
+  updateRfqStatus(rfqId: number, newStatus: any): void {
     this.isUpdating = true;
     this.errorMessage = '';
     this.successMessage = '';
-
     this.rfqService.updateRfqStatus(rfqId, newStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedRfq) => {
           this.isUpdating = false;
-
-          // Update the RFQ in both arrays
-          const updateArrays = (array: Rfq[]) => {
-            const index = array.findIndex(rfq => rfq.id === rfqId);
-            if (index !== -1) {
-              array[index] = updatedRfq;
-            }
-          };
-
-          updateArrays(this.rfqs);
-          updateArrays(this.filteredRfqs);
-
-          this.successMessage = `RFQ status updated to ${this.rfqService.getStatusDisplayName(newStatus)}`;
-          this.loadStatistics(); // Refresh statistics
+          this.successMessage = `RFQ status updated!`;
+          this.loadStatistics(); 
 
           // Clear success message after 3 seconds
           setTimeout(() => {
@@ -328,14 +334,14 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.viewMode = mode;
   }
 
-  setSorting(sortBy: string): void {
+  setSorting(sortBy: number): void {
     if (this.sortBy === sortBy) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.sortBy = sortBy as any;
       this.sortDirection = 'desc';
     }
-    this.filteredRfqs = this.sortRfqs(this.filteredRfqs);
+    this.applyFilters();
   }
 
   clearFilters(): void {
@@ -359,12 +365,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.router.navigate(['/request-quote']);
   }
 
-  // Utility methods for template
-  getStatusDisplayName(status: RfqStatus): string {
-    return this.rfqService.getStatusDisplayName(status);
-  }
-
-  getStatusColor(status: RfqStatus): string {
+  getStatusColor(status: LookupValue): string {
     return this.rfqService.getStatusColor(status);
   }
 
@@ -444,8 +445,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   // Track by function for ngFor performance
-  trackByRfqId(index: number, rfq: Rfq): string {
-    return rfq.id;
+  trackByRfqId(index: number, rfq: Rfq): number {
+    return rfq.id!;
   }
 
   // Expose Math to template

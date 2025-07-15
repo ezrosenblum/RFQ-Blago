@@ -3,13 +3,12 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
-  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
+  type: string;
 }
 
 export enum UserRole {
-  ADMIN = 'admin',
-  VENDOR = 'vendor',
-  CLIENT = 'client'
+  VENDOR = 'Vendor',
+  CLIENT = 'Customer'
 }

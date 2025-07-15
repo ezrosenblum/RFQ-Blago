@@ -19,6 +19,7 @@
       <nav class="hidden md:flex items-center space-x-6">
         <!-- Public Navigation -->
         <button
+          *ngIf="canAccessRequestQuote()"
           (click)="navigateToRequestQuote()"
           [class.text-primary-600]="isCurrentRoute('/request-quote')"
           [class.dark:text-primary-400]="isCurrentRoute('/request-quote')"

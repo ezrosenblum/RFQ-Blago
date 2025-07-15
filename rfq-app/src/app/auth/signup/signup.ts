@@ -38,9 +38,9 @@ export class Signup implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Check if already logged in
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/request-quote']);
-    }
+    // if (this.authService.isAuthenticated()) {
+    //   this.router.navigate(['/request-quote']);
+    // }
   }
 
   ngOnDestroy(): void {
@@ -146,7 +146,6 @@ export class Signup implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             this.successMessage = 'Account created successfully! You will be redirected shortly.';
-            // Success - user will be redirected by auth service after a short delay
             setTimeout(() => {
               console.log('Signup successful:', response);
             }, 1500);
