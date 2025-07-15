@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    image: rfq/angular
+    container_name: rfq-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7090:90"
+    restart: always
