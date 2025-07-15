@@ -24,7 +24,7 @@ export interface TableResponse<T> {
 
 export interface SubmissionTableRequest {
   query?: string;
-  userId?: string;
+  userId?: number;
   status?: number;
   unit?: number;
   dateFrom?: Date;
@@ -35,7 +35,7 @@ export interface SubmissionTableRequest {
   },
   sorting?: {
     field: number;
-    direction: number;
+    sortOrder: number;
   };
 }
 
