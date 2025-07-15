@@ -1,0 +1,174 @@
+<!-- src/app/auth/login/login.component.html -->
+<div class="min-h-screen flex items-center justify-center bg-secondary-50 dark:bg-dark-900 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <!-- Header -->
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100">
+        RFQ System
+      </h1>
+      <h2 class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200">
+        Sign in to your account
+      </h2>
+      <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
+        Enter your credentials to access the RFQ system
+      </p>
+    </div>
+
+    <!-- Demo Accounts -->
+    <div class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4">
+      <h3 class="text-sm font-medium text-primary-800 dark:text-primary-200 mb-3">
+        Demo Accounts (Click to use):
+      </h3>
+      <div class="space-y-2">
+        <button
+          *ngFor="let account of demoAccounts"
+          type="button"
+          (click)="useDemoAccount(account.email, account.password)"
+          class="w-full text-left px-3 py-2 text-xs bg-white dark:bg-dark-800 border border-primary-300 dark:border-primary-600 rounded-md hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors duration-200"
+        >
+          <div class="font-medium text-primary-900 dark:text-primary-100">{{ account.role }}</div>
+          <div class="text-primary-600 dark:text-primary-300">{{ account.email }}</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Error Message -->
+      <div
+        *ngIf="errorMessage"
+        class="alert alert-error fade-in"
+        role="alert"
+      >
+        <div class="flex">
+          <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <span>{{ errorMessage }}</span>
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="form-label">
+          Email Address *
+        </label>
+        <div class="relative">
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            formControlName="email"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('email')"
+            placeholder="Enter your email address"
+          >
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <svg *ngIf="!isFieldInvalid('email')" class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+            </svg>
+            <svg *ngIf="isFieldInvalid('email')" class="h-5 w-5 text-error-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+        </div>
+        <div *ngIf="isFieldInvalid('email')" class="form-error">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label for="password" class="form-label">
+          Password *
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            name="password"
+            [type]="showPassword ? 'text' : 'password'"
+            autocomplete="current-password"
+            formControlName="password"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('password')"
+            placeholder="Enter your password"
+          >
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            <svg *ngIf="!showPassword" class="h-5 w-5 text-secondary-400 hover:text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <svg *ngIf="showPassword" class="h-5 w-5 text-secondary-400 hover:text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="isFieldInvalid('password')" class="form-error">
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <!-- Remember Me -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <input
+            id="rememberMe"
+            name="rememberMe"
+            type="checkbox"
+            formControlName="rememberMe"
+            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-secondary-300 dark:border-secondary-600 rounded"
+          >
+          <label for="rememberMe" class="ml-2 block text-sm text-secondary-700 dark:text-secondary-300">
+            Remember me
+          </label>
+        </div>
+        <div class="text-sm">
+          <a href="#" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+            Forgot password?
+          </a>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div>
+        <button
+          type="submit"
+          [disabled]="isLoading || loginForm.invalid"
+          class="btn btn-primary w-full flex justify-center py-3 px-4"
+        >
+          <span *ngIf="!isLoading">Sign In</span>
+          <div *ngIf="isLoading" class="flex items-center">
+            <div class="spinner mr-2"></div>
+            <span>Signing in...</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Sign Up Link -->
+      <div class="text-center">
+        <p class="text-sm text-secondary-600 dark:text-secondary-400">
+          Don't have an account?
+          <button
+            type="button"
+            (click)="navigateToSignup()"
+            class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 ml-1"
+          >
+            Sign up here
+          </button>
+        </p>
+      </div>
+    </form>
+
+    <!-- Additional Info -->
+    <div class="mt-8 text-center">
+      <p class="text-xs text-secondary-500 dark:text-secondary-400">
+        By signing in, you agree to our Terms of Service and Privacy Policy
+      </p>
+    </div>
+  </div>
+</div>

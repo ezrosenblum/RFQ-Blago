@@ -1,0 +1,451 @@
+
+// Main container animation
+.vendor-rfqs-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Statistics cards hover effects
+.stats-card {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+
+    .dark & {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// Filter section animations
+.filter-section {
+  .card {
+    transition: all 0.3s ease;
+  }
+
+  .form-input,
+  .form-select {
+    transition: all 0.2s ease;
+
+    &:focus {
+      transform: scale(1.02);
+    }
+  }
+}
+
+// RFQ cards enhanced styling
+.rfq-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+    .dark & {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  // Status indicators with glow effects
+  .status-badge {
+    position: relative;
+
+    &.status-pending {
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    }
+
+    &.status-reviewed {
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    &.status-quoted {
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+    }
+
+    &.status-rejected {
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    }
+  }
+}
+
+// Table enhancements
+.rfq-table {
+  .table {
+    th {
+      position: sticky;
+      top: 0;
+      background: inherit;
+      z-index: 10;
+
+      button {
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: #3b82f6;
+          transform: translateY(-1px);
+        }
+      }
+    }
+
+    tr {
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.01);
+        z-index: 5;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        .dark & {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// View mode toggle styling
+.view-toggle {
+  .view-button {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &.active {
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        animation: slideInWidth 0.3s ease-out;
+      }
+    }
+
+    &:not(.active):hover {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+@keyframes slideInWidth {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+// Pagination enhancements
+.pagination {
+  .page-button {
+    transition: all 0.2s ease;
+    position: relative;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active {
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        border-radius: inherit;
+        z-index: -1;
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+// Loading states
+.loading-overlay {
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.8);
+
+  .dark & {
+    background: rgba(15, 23, 42, 0.8);
+  }
+}
+
+// Search input enhancements
+.search-input {
+  position: relative;
+
+  input {
+    transition: all 0.3s ease;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+    }
+  }
+
+  .search-icon {
+    transition: color 0.2s ease;
+  }
+
+  &:focus-within .search-icon {
+    color: #3b82f6;
+  }
+}
+
+// Status dropdown enhancements
+.status-dropdown {
+  select {
+    transition: all 0.2s ease;
+
+    &:focus {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    option {
+      padding: 0.5rem;
+
+      &:hover {
+        background-color: #f3f4f6;
+
+        .dark & {
+          background-color: #374151;
+        }
+      }
+    }
+  }
+}
+
+// Alert animations
+.alert {
+  animation: slideInDown 0.4s ease-out;
+
+  &.fade-out {
+    animation: slideOutUp 0.4s ease-out forwards;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutUp {
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+// Empty state styling
+.empty-state {
+  .empty-icon {
+    transition: transform 0.3s ease;
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+// Filter badges
+.filter-badge {
+  animation: bounceIn 0.4s ease-out;
+
+  &.removing {
+    animation: bounceOut 0.3s ease-out forwards;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceOut {
+  20% {
+    transform: scale(0.9);
+  }
+  50%, 55% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+// Responsive improvements
+@media (max-width: 640px) {
+  .rfq-card {
+    .card-body {
+      padding: 1rem;
+    }
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .view-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    font-size: 0.875rem;
+
+    th, td {
+      padding: 0.5rem;
+    }
+  }
+}
+
+// Dark mode specific enhancements
+@media (prefers-color-scheme: dark) {
+  .rfq-card {
+    &:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+  }
+
+  .table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .status-badge {
+    border: 2px solid currentColor;
+    font-weight: bold;
+  }
+
+  .rfq-card {
+    border: 2px solid;
+  }
+
+  .table {
+    border: 2px solid;
+
+    th, td {
+      border: 1px solid;
+    }
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .rfq-card,
+  .table {
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+
+  .status-badge {
+    border: 1px solid #000;
+    color: #000 !important;
+    background: transparent !important;
+  }
+
+  .filter-section,
+  .pagination {
+    display: none;
+  }
+}

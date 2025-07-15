@@ -1,0 +1,549 @@
+<!-- src/app/rfq/vendor-rfqs/vendor-rfqs.component.html -->
+<div class="min-h-screen bg-secondary-50 dark:bg-dark-900 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100 mb-2">
+            RFQ Management
+          </h1>
+          <p class="text-lg text-secondary-600 dark:text-secondary-400">
+            Review and manage quote requests from clients
+          </p>
+        </div>
+        <div class="mt-4 sm:mt-0 flex space-x-3">
+          <button
+            (click)="refreshData()"
+            [disabled]="isLoading"
+            class="btn btn-outline"
+            title="Refresh data"
+          >
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh
+          </button>
+          <button
+            (click)="navigateToRequestQuote()"
+            class="btn btn-primary"
+          >
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            New Request
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+            {{ statistics.total }}
+          </div>
+          <div class="text-sm text-secondary-600 dark:text-secondary-400">
+            Total RFQs
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">
+            {{ statistics.pending }}
+          </div>
+          <div class="text-sm text-secondary-600 dark:text-secondary-400">
+            Pending
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
+            {{ statistics.reviewed }}
+          </div>
+          <div class="text-sm text-secondary-600 dark:text-secondary-400">
+            Reviewed
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="text-2xl font-bold text-success-600 dark:text-success-400">
+            {{ statistics.quoted }}
+          </div>
+          <div class="text-sm text-secondary-600 dark:text-secondary-400">
+            Quoted
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="text-2xl font-bold text-error-600 dark:text-error-400">
+            {{ statistics.rejected }}
+          </div>
+          <div class="text-sm text-secondary-600 dark:text-secondary-400">
+            Rejected
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="text-2xl font-bold text-success-600 dark:text-success-400">
+            {{ statistics.recentCount }}
+          </div>
+          <div class="text-sm text-secondary-600 dark:text-secondary-400">
+            Last 24h
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div
+      *ngIf="errorMessage"
+      class="alert alert-error mb-6 fade-in"
+      role="alert"
+    >
+      <div class="flex">
+        <svg class="h-5 w-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div
+      *ngIf="successMessage"
+      class="alert alert-success mb-6 fade-in"
+      role="alert"
+    >
+      <div class="flex">
+        <svg class="h-5 w-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+    </div>
+
+    <!-- Filters and Controls -->
+    <div class="card mb-6">
+      <div class="card-header">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h2 class="text-lg font-medium text-secondary-900 dark:text-secondary-100">
+            Filters & Search
+            <span *ngIf="hasActiveFilters()" class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+              {{ getFilterCount() }} active
+            </span>
+          </h2>
+          <button
+            *ngIf="hasActiveFilters()"
+            (click)="clearFilters()"
+            class="btn btn-ghost text-sm mt-2 sm:mt-0"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      </div>
+
+      <form [formGroup]="filterForm" class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Search -->
+          <div class="lg:col-span-2">
+            <label for="search" class="form-label">Search</label>
+            <div class="relative">
+              <input
+                id="search"
+                type="text"
+                formControlName="search"
+                class="form-input pl-10"
+                placeholder="Search descriptions, locations, emails..."
+              >
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label for="status" class="form-label">Status</label>
+            <select id="status" formControlName="status" class="form-select">
+              <option *ngFor="let option of statusOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Unit Filter -->
+          <div>
+            <label for="unit" class="form-label">Unit</label>
+            <select id="unit" formControlName="unit" class="form-select">
+              <option *ngFor="let option of unitOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Date Range -->
+          <div class="lg:col-span-1">
+            <label for="dateFrom" class="form-label">Date From</label>
+            <input
+              id="dateFrom"
+              type="date"
+              formControlName="dateFrom"
+              class="form-input"
+            >
+            <label for="dateTo" class="form-label mt-2">Date To</label>
+            <input
+              id="dateTo"
+              type="date"
+              formControlName="dateTo"
+              class="form-input"
+            >
+          </div>
+        </div>
+
+        <!-- View Controls -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 pt-6 border-t border-secondary-200 dark:border-secondary-700">
+          <!-- View Mode Toggle -->
+          <div class="flex items-center space-x-3">
+            <span class="text-sm font-medium text-secondary-700 dark:text-secondary-300">View:</span>
+            <div class="flex rounded-md shadow-sm">
+              <button
+                type="button"
+                (click)="setViewMode('card')"
+                [class.bg-primary-600]="viewMode === 'card'"
+                [class.text-white]="viewMode === 'card'"
+                [class.bg-white]="viewMode !== 'card'"
+                [class.text-secondary-700]="viewMode !== 'card'"
+                [class.dark:bg-primary-600]="viewMode === 'card'"
+                [class.dark:bg-dark-800]="viewMode !== 'card'"
+                [class.dark:text-secondary-200]="viewMode !== 'card'"
+                class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/>
+                </svg>
+                <span class="ml-2">Cards</span>
+              </button>
+              <button
+                type="button"
+                (click)="setViewMode('table')"
+                [class.bg-primary-600]="viewMode === 'table'"
+                [class.text-white]="viewMode === 'table'"
+                [class.bg-white]="viewMode !== 'table'"
+                [class.text-secondary-700]="viewMode !== 'table'"
+                [class.dark:bg-primary-600]="viewMode === 'table'"
+                [class.dark:bg-dark-800]="viewMode !== 'table'"
+                [class.dark:text-secondary-200]="viewMode !== 'table'"
+                class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-l-0 border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+                <span class="ml-2">Table</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sort Controls -->
+          <div class="flex items-center space-x-3 mt-4 sm:mt-0">
+            <span class="text-sm font-medium text-secondary-700 dark:text-secondary-300">Sort by:</span>
+            <select
+              (change)="setSorting($any($event.target).value)"
+              class="form-select text-sm"
+            >
+              <option *ngFor="let option of sortOptions" [value]="option.value" [selected]="sortBy === option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <button
+              type="button"
+              (click)="setSorting(sortBy)"
+              class="btn btn-ghost p-2"
+              [title]="sortDirection === 'asc' ? 'Sort Descending' : 'Sort Ascending'"
+            >
+              <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+              </svg>
+              <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="flex flex-col items-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <p class="mt-4 text-secondary-600 dark:text-secondary-400">Loading RFQs...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredRfqs.length === 0" class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-secondary-900 dark:text-secondary-100">
+        {{ hasActiveFilters() ? 'No RFQs match your filters' : 'No RFQs found' }}
+      </h3>
+      <p class="mt-1 text-secondary-500 dark:text-secondary-400">
+        {{ hasActiveFilters() ? 'Try adjusting your search criteria.' : 'No quote requests have been submitted yet.' }}
+      </p>
+      <div class="mt-6">
+        <button
+          *ngIf="hasActiveFilters()"
+          (click)="clearFilters()"
+          class="btn btn-primary"
+        >
+          Clear Filters
+        </button>
+        <button
+          *ngIf="!hasActiveFilters()"
+          (click)="navigateToRequestQuote()"
+          class="btn btn-primary"
+        >
+          Submit First Request
+        </button>
+      </div>
+    </div>
+
+    <!-- RFQ List - Card View -->
+    <div *ngIf="!isLoading && filteredRfqs.length > 0 && viewMode === 'card'" class="space-y-6">
+      <div *ngFor="let rfq of filteredRfqs; trackBy: trackByRfqId" class="card hover:shadow-lg transition-shadow duration-200">
+        <div class="card-body">
+          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+            <!-- Main Content -->
+            <div class="flex-1 min-w-0">
+              <!-- Header -->
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <span
+                    [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status)"
+                  >
+                    {{ getStatusDisplayName(rfq.status) }}
+                  </span>
+                  <span class="text-sm text-secondary-500 dark:text-secondary-400">
+                    {{ getRelativeTime(rfq.createdAt) }}
+                  </span>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-semibold text-secondary-900 dark:text-secondary-100">
+                    {{ rfq.quantity | number:'1.0-2' }} {{ getUnitDisplayName(rfq.unit) }}
+                  </div>
+                  <div class="text-sm text-secondary-500 dark:text-secondary-400">
+                    ID: {{ rfq.id }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="mb-4">
+                <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 mb-2">
+                  Project Description
+                </h3>
+                <p class="text-secondary-700 dark:text-secondary-300 leading-relaxed">
+                  {{ truncateText(rfq.description, 200) }}
+                </p>
+              </div>
+
+              <!-- Details -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400">Location</div>
+                  <div class="text-secondary-900 dark:text-secondary-100">{{ rfq.jobLocation }}</div>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400">Submitted By</div>
+                  <div class="text-secondary-900 dark:text-secondary-100">{{ rfq.submittedByEmail }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 lg:mt-0 lg:ml-6 flex-shrink-0">
+              <div class="flex flex-col space-y-2">
+                <label for="status-{{ rfq.id }}" class="text-sm font-medium text-secondary-700 dark:text-secondary-300">
+                  Update Status
+                </label>
+                <select
+                  id="status-{{ rfq.id }}"
+                  [value]="rfq.status"
+                  (change)="updateRfqStatus(rfq.id, $any($event.target).value)"
+                  [disabled]="isUpdating"
+                  class="form-select text-sm min-w-[140px]"
+                >
+                  <option [value]="RfqStatus.PENDING">Pending Review</option>
+                  <option [value]="RfqStatus.REVIEWED">Under Review</option>
+                  <option [value]="RfqStatus.QUOTED">Quoted</option>
+                  <option [value]="RfqStatus.REJECTED">Rejected</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RFQ List - Table View -->
+    <div *ngIf="!isLoading && filteredRfqs.length > 0 && viewMode === 'table'" class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr class="bg-secondary-50 dark:bg-dark-700">
+              <th class="px-6 py-3 text-left">
+                <button (click)="setSorting('status')" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                  <span>Status</span>
+                  <svg *ngIf="sortBy === 'status'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+                  </svg>
+                </button>
+              </th>
+              <th class="px-6 py-3 text-left">Description</th>
+              <th class="px-6 py-3 text-left">
+                <button (click)="setSorting('quantity')" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                  <span>Quantity</span>
+                  <svg *ngIf="sortBy === 'quantity'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+                  </svg>
+                </button>
+              </th>
+              <th class="px-6 py-3 text-left">Location</th>
+              <th class="px-6 py-3 text-left">Submitted By</th>
+              <th class="px-6 py-3 text-left">
+                <button (click)="setSorting('newest')" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                  <span>Date</span>
+                  <svg *ngIf="sortBy === 'newest' || sortBy === 'oldest'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+                  </svg>
+                </button>
+              </th>
+              <th class="px-6 py-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-secondary-200 dark:divide-secondary-700">
+            <tr *ngFor="let rfq of filteredRfqs; trackBy: trackByRfqId" class="hover:bg-secondary-50 dark:hover:bg-dark-700">
+              <td class="px-6 py-4">
+                <span
+                  [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status)"
+                >
+                  {{ getStatusDisplayName(rfq.status) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 max-w-xs">
+                <div class="text-sm text-secondary-900 dark:text-secondary-100">
+                  {{ truncateText(rfq.description, 80) }}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-secondary-900 dark:text-secondary-100">
+                  {{ rfq.quantity | number:'1.0-2' }}
+                </div>
+                <div class="text-xs text-secondary-500 dark:text-secondary-400">
+                  {{ getUnitDisplayName(rfq.unit) }}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-secondary-900 dark:text-secondary-100 max-w-xs">
+                  {{ truncateText(rfq.jobLocation, 40) }}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-secondary-900 dark:text-secondary-100">
+                  {{ rfq.submittedByEmail }}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-secondary-900 dark:text-secondary-100">
+                  {{ formatDate(rfq.createdAt) }}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <select
+                  [value]="rfq.status"
+                  (change)="updateRfqStatus(rfq.id, $any($event.target).value)"
+                  [disabled]="isUpdating"
+                  class="form-select text-sm w-full"
+                >
+                  <option [value]="RfqStatus.PENDING">Pending</option>
+                  <option [value]="RfqStatus.REVIEWED">Reviewed</option>
+                  <option [value]="RfqStatus.QUOTED">Quoted</option>
+                  <option [value]="RfqStatus.REJECTED">Rejected</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!isLoading && filteredRfqs.length > 0 && totalPages > 1" class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-8">
+      <div class="text-sm text-secondary-700 dark:text-secondary-300 mb-4 sm:mb-0">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} results
+      </div>
+
+      <nav class="flex items-center space-x-2">
+        <!-- Previous Button -->
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="btn btn-outline px-3 py-2 text-sm"
+          [class.opacity-50]="currentPage === 1"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Previous
+        </button>
+
+        <!-- Page Numbers -->
+        <div class="hidden sm:flex items-center space-x-1">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            (click)="goToPage(page)"
+            [class.bg-primary-600]="page === currentPage"
+            [class.text-white]="page === currentPage"
+            [class.dark:bg-primary-600]="page === currentPage"
+            class="px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary-100 dark:hover:bg-secondary-700"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <!-- Mobile Page Indicator -->
+        <div class="sm:hidden px-3 py-2 text-sm text-secondary-700 dark:text-secondary-300">
+          {{ currentPage }} / {{ totalPages }}
+        </div>
+
+        <!-- Next Button -->
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="btn btn-outline px-3 py-2 text-sm"
+          [class.opacity-50]="currentPage === totalPages"
+        >
+          Next
+          <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </div>
+</div>

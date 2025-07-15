@@ -1,0 +1,283 @@
+
+// Custom styles for the request quote component
+.request-quote-container {
+  // Animation for smooth page entrance
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Enhanced form styles
+.form-field-wrapper {
+  position: relative;
+
+  &.has-error {
+    .form-input,
+    .form-textarea,
+    .form-select {
+      @apply border-error-500 focus:border-error-500 focus:ring-error-500;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+
+  &.has-success {
+    .form-input,
+    .form-textarea,
+    .form-select {
+      @apply border-success-500 focus:border-success-500 focus:ring-success-500;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+      }
+    }
+  }
+}
+
+// Progress bar animation
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Character counter styling
+.character-counter {
+  font-size: 0.75rem;
+  transition: color 0.2s ease;
+
+  &.warning {
+    @apply text-warning-600 dark:text-warning-400;
+  }
+
+  &.danger {
+    @apply text-error-600 dark:text-error-400;
+  }
+}
+
+// Enhanced button hover effects
+.btn-submit {
+  position: relative;
+  overflow: hidden;
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(0);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// Alert animations
+.alert-enter {
+  animation: alertSlideIn 0.4s ease-out;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Form validation summary styling
+.validation-summary {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+
+  &.show {
+    max-height: 200px;
+  }
+}
+
+// Enhanced loading states
+.form-loading {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+}
+
+// Improved spinner animation
+.submit-spinner {
+  @apply inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Unit selector enhancements
+.unit-option {
+  position: relative;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    @apply bg-primary-50 dark:bg-primary-900/20;
+  }
+
+  &.selected {
+    @apply bg-primary-100 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100;
+
+    &::after {
+      content: '✓';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: currentColor;
+      font-weight: bold;
+    }
+  }
+}
+
+// Responsive improvements
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+// Dark mode specific enhancements
+@media (prefers-color-scheme: dark) {
+  .form-input:focus,
+  .form-textarea:focus,
+  .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .card {
+    backdrop-filter: blur(10px);
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .form-input,
+  .form-textarea,
+  .form-select {
+    border-width: 2px;
+  }
+
+  .btn {
+    border-width: 2px;
+    font-weight: 700;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    border: 1px solid #000;
+    background: transparent;
+  }
+}
