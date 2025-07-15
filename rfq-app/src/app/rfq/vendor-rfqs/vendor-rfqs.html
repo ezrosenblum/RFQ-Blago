@@ -24,15 +24,6 @@
             </svg>
             Refresh
           </button>
-          <button
-            (click)="navigateToRequestQuote()"
-            class="btn btn-primary"
-          >
-            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-            </svg>
-            New Request
-          </button>
         </div>
       </div>
     </div>
@@ -42,7 +33,7 @@
       <div class="card">
         <div class="card-body text-center">
           <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            {{ statistics.total }}
+            {{ statistics.submissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
             Total RFQs
@@ -53,7 +44,7 @@
       <div class="card">
         <div class="card-body text-center">
           <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">
-            {{ statistics.pending }}
+            {{ statistics.pendingSubmissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
             Pending
@@ -64,7 +55,7 @@
       <div class="card">
         <div class="card-body text-center">
           <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            {{ statistics.reviewed }}
+            {{ statistics.reviewedSubmissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
             Reviewed
@@ -75,7 +66,7 @@
       <div class="card">
         <div class="card-body text-center">
           <div class="text-2xl font-bold text-success-600 dark:text-success-400">
-            {{ statistics.quoted }}
+            {{ statistics.acceptedSubmissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
             Quoted
@@ -86,7 +77,7 @@
       <div class="card">
         <div class="card-body text-center">
           <div class="text-2xl font-bold text-error-600 dark:text-error-400">
-            {{ statistics.rejected }}
+            {{ statistics.rejectedSubmissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
             Rejected
@@ -97,7 +88,7 @@
       <div class="card">
         <div class="card-body text-center">
           <div class="text-2xl font-bold text-success-600 dark:text-success-400">
-            {{ statistics.recentCount }}
+            {{ statistics.last24HoursSubmissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
             Last 24h
@@ -157,7 +148,7 @@
       <form [formGroup]="filterForm" class="card-body">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <!-- Search -->
-          <div class="lg:col-span-2">
+          <div class="lg:col-span-1">
             <label for="search" class="form-label">Search</label>
             <div class="relative">
               <input
@@ -179,8 +170,8 @@
           <div>
             <label for="status" class="form-label">Status</label>
             <select id="status" formControlName="status" class="form-select">
-              <option *ngFor="let option of statusOptions" [value]="option.value">
-                {{ option.label }}
+              <option *ngFor="let option of statusOptions" [value]="option.id">
+                {{ option.name }}
               </option>
             </select>
           </div>
@@ -189,14 +180,14 @@
           <div>
             <label for="unit" class="form-label">Unit</label>
             <select id="unit" formControlName="unit" class="form-select">
-              <option *ngFor="let option of unitOptions" [value]="option.value">
-                {{ option.label }}
+              <option *ngFor="let option of unitOptions" [value]="option.id">
+                {{ option.name }}
               </option>
             </select>
           </div>
 
           <!-- Date Range -->
-          <div class="lg:col-span-1">
+          <div>
             <label for="dateFrom" class="form-label">Date From</label>
             <input
               id="dateFrom"
@@ -204,6 +195,9 @@
               formControlName="dateFrom"
               class="form-input"
             >
+          </div>
+
+          <div>
             <label for="dateTo" class="form-label mt-2">Date To</label>
             <input
               id="dateTo"
@@ -334,17 +328,17 @@
               <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center space-x-3">
                   <span
-                    [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status)"
+                    [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status!)"
                   >
-                    {{ getStatusDisplayName(rfq.status) }}
+                    {{ rfq!.status!.name }}
                   </span>
                   <span class="text-sm text-secondary-500 dark:text-secondary-400">
-                    {{ getRelativeTime(rfq.createdAt) }}
+                    {{ getRelativeTime(rfq.submissionDate!) }}
                   </span>
                 </div>
                 <div class="text-right">
                   <div class="text-lg font-semibold text-secondary-900 dark:text-secondary-100">
-                    {{ rfq.quantity | number:'1.0-2' }} {{ getUnitDisplayName(rfq.unit) }}
+                    {{ rfq.quantity | number:'1.0-2' }} {{ rfq.unit!.name! }}
                   </div>
                   <div class="text-sm text-secondary-500 dark:text-secondary-400">
                     ID: {{ rfq.id }}
@@ -358,7 +352,7 @@
                   Project Description
                 </h3>
                 <p class="text-secondary-700 dark:text-secondary-300 leading-relaxed">
-                  {{ truncateText(rfq.description, 200) }}
+                  {{ truncateText(rfq.description!, 200) }}
                 </p>
               </div>
 
@@ -366,11 +360,11 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400">Location</div>
-                  <div class="text-secondary-900 dark:text-secondary-100">{{ rfq.jobLocation }}</div>
+                  <div class="text-secondary-900 dark:text-secondary-100">{{ rfq.jobLocation! }}</div>
                 </div>
                 <div>
                   <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400">Submitted By</div>
-                  <div class="text-secondary-900 dark:text-secondary-100">{{ rfq.submittedByEmail }}</div>
+                  <div class="text-secondary-900 dark:text-secondary-100">{{rfq.user?.email}}</div>
                 </div>
               </div>
             </div>
@@ -382,16 +376,15 @@
                   Update Status
                 </label>
                 <select
-                  id="status-{{ rfq.id }}"
-                  [value]="rfq.status"
-                  (change)="updateRfqStatus(rfq.id, $any($event.target).value)"
-                  [disabled]="isUpdating"
-                  class="form-select text-sm min-w-[140px]"
+                id="status-{{ rfq.id }}"
+                [ngModel]="rfq.status!.id!"
+                (change)="updateRfqStatus(rfq.id!, $any($event.target).value)"
+                [disabled]="isUpdating"
+                class="form-select text-sm min-w-[140px]"
                 >
-                  <option [value]="RfqStatus.PENDING">Pending Review</option>
-                  <option [value]="RfqStatus.REVIEWED">Under Review</option>
-                  <option [value]="RfqStatus.QUOTED">Quoted</option>
-                  <option [value]="RfqStatus.REJECTED">Rejected</option>
+                  <option *ngFor="let item of statusOptions" [value]="item.id">
+                    {{ item.name }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -407,18 +400,18 @@
           <thead>
             <tr class="bg-secondary-50 dark:bg-dark-700">
               <th class="px-6 py-3 text-left">
-                <button (click)="setSorting('status')" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                <button (click)="setSorting(4)" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
                   <span>Status</span>
-                  <svg *ngIf="sortBy === 'status'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg *ngIf="sortBy === 4" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
                   </svg>
                 </button>
               </th>
               <th class="px-6 py-3 text-left">Description</th>
               <th class="px-6 py-3 text-left">
-                <button (click)="setSorting('quantity')" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                <button (click)="setSorting(3)" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
                   <span>Quantity</span>
-                  <svg *ngIf="sortBy === 'quantity'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg *ngIf="sortBy === 3" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
                   </svg>
                 </button>
@@ -426,9 +419,9 @@
               <th class="px-6 py-3 text-left">Location</th>
               <th class="px-6 py-3 text-left">Submitted By</th>
               <th class="px-6 py-3 text-left">
-                <button (click)="setSorting('newest')" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                <button (click)="setSorting(1)" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
                   <span>Date</span>
-                  <svg *ngIf="sortBy === 'newest' || sortBy === 'oldest'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg *ngIf="sortBy === 1 || sortBy === 2" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
                   </svg>
                 </button>
@@ -440,14 +433,14 @@
             <tr *ngFor="let rfq of filteredRfqs; trackBy: trackByRfqId" class="hover:bg-secondary-50 dark:hover:bg-dark-700">
               <td class="px-6 py-4">
                 <span
-                  [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status)"
+                  [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status!)"
                 >
-                  {{ getStatusDisplayName(rfq.status) }}
+                  {{ rfq!.status!.name }}
                 </span>
               </td>
               <td class="px-6 py-4 max-w-xs">
                 <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{ truncateText(rfq.description, 80) }}
+                  {{ truncateText(rfq.description!, 80) }}
                 </div>
               </td>
               <td class="px-6 py-4">
@@ -455,36 +448,36 @@
                   {{ rfq.quantity | number:'1.0-2' }}
                 </div>
                 <div class="text-xs text-secondary-500 dark:text-secondary-400">
-                  {{ getUnitDisplayName(rfq.unit) }}
+                  {{ rfq.unit!.name! }}
                 </div>
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-secondary-900 dark:text-secondary-100 max-w-xs">
-                  {{ truncateText(rfq.jobLocation, 40) }}
+                  {{ truncateText(rfq.jobLocation!, 40) }}
                 </div>
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{ rfq.submittedByEmail }}
+                  {{rfq.user?.email}}
                 </div>
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{ formatDate(rfq.createdAt) }}
+                  {{ formatDate(rfq.submissionDate!) }}
                 </div>
               </td>
               <td class="px-6 py-4">
                 <select
-                  [value]="rfq.status"
-                  (change)="updateRfqStatus(rfq.id, $any($event.target).value)"
-                  [disabled]="isUpdating"
-                  class="form-select text-sm w-full"
-                >
-                  <option [value]="RfqStatus.PENDING">Pending</option>
-                  <option [value]="RfqStatus.REVIEWED">Reviewed</option>
-                  <option [value]="RfqStatus.QUOTED">Quoted</option>
-                  <option [value]="RfqStatus.REJECTED">Rejected</option>
-                </select>
+                id="status-{{ rfq.id }}"
+                [ngModel]="rfq.status!.id!"
+                (change)="updateRfqStatus(rfq.id!, $any($event.target).value)"
+                [disabled]="isUpdating"
+                class="form-select text-sm min-w-[140px]"
+              >
+                <option *ngFor="let item of statusOptions" [value]="item.id">
+                  {{ item.name }}
+                </option>
+              </select>
               </td>
             </tr>
           </tbody>

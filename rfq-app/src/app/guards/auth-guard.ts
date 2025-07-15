@@ -18,9 +18,25 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
-
     if (this.authService.isAuthenticated()) {
       return true;
+    } else
+    if (localStorage.getItem('rfqTokenAcc')) {
+      this.authService.getUserData().subscribe({
+        next: (user) => {
+          this.authService.currentUserSubject.next(user);
+          this.authService.isAuthenticatedSubject.next(true);
+          return true;
+        }, 
+        error: (err) => {
+          this.authService.logout();
+          this.router.navigate(['/auth/login']);
+          return false;
+        }
+      });
+    } else {
+      this.router.navigate(['/auth/login']);
+      return false;
     }
 
     // Store the attempted URL for redirecting after login

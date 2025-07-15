@@ -140,9 +140,7 @@ export class Header implements OnInit, OnDestroy {
   getRoleDisplayName(): string {
     if (!this.currentUser) return '';
 
-    switch (this.currentUser.role) {
-      case UserRole.ADMIN:
-        return 'Administrator';
+    switch (this.currentUser.type) {
       case UserRole.VENDOR:
         return 'Vendor';
       case UserRole.CLIENT:
@@ -153,11 +151,13 @@ export class Header implements OnInit, OnDestroy {
   }
 
   canAccessVendorRfqs(): boolean {
-    return this.isAuthenticated && (
-      this.currentUser?.role === UserRole.VENDOR ||
-      this.currentUser?.role === UserRole.ADMIN
-    );
+    return this.isAuthenticated;
   }
+
+  canAccessRequestQuote(): boolean {
+    return !this.currentUser || (this.isAuthenticated && this.currentUser?.type === UserRole.CLIENT)
+  }
+
 
   isCurrentRoute(route: string): boolean {
     return this.router.url === route;

@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import { LoginRequest } from '../../models/auth.model';
 import { Auth } from '../../services/auth';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -21,8 +22,8 @@ export class Login implements OnInit, OnDestroy {
 
   // Demo accounts for testing
   demoAccounts = [
-    { email: 'vendor@demo.com', password: 'demo123', role: 'Vendor' },
-    { email: 'client@demo.com', password: 'demo123', role: 'Client' }
+    { email: 'vendor@demo.com', password: 'Test12345!', role: 'Vendor' },
+    { email: 'client@demo.com', password: 'Test12345!', role: 'Customer' }
   ];
 
   constructor(
@@ -34,10 +35,6 @@ export class Login implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Check if already logged in
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/request-quote']);
-    }
   }
 
   ngOnDestroy(): void {
@@ -68,7 +65,7 @@ export class Login implements OnInit, OnDestroy {
       this.errorMessage = '';
 
       const loginData: LoginRequest = {
-        email: this.loginForm.value.email.trim().toLowerCase(),
+        username: this.loginForm.value.email.trim().toLowerCase(),
         password: this.loginForm.value.password
       };
 
@@ -76,8 +73,17 @@ export class Login implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
-            // Success - user will be redirected by auth service
-            console.log('Login successful:', response);
+            this.authService.saveTokens(response);
+            this.authService.getUserData().pipe(take(1)).subscribe((data: User) => {
+              this.authService.currentUserSubject.next(data);
+              this.authService.isAuthenticatedSubject.next(true);
+              
+              if (data.type === 'Vendor' ){
+                this.router.navigate(['/vendor-rfqs']);
+              } else {
+                this.router.navigate(['/request-quote']);
+              }
+            });
           },
           error: (error) => {
             this.isLoading = false;
