@@ -1,4 +1,5 @@
 ﻿using Application.Common.Behaviours;
+using Application.Common.Helpers;
 using Application.Common.Localization;
 using Application.Features.Users.Providers;
 using AutoMapper;
@@ -68,6 +69,6 @@ public static class DependencyInjection
 
         cfg.CreateMap<TEnum, ListItemBaseResponse>()
             .ForMember(d => d.Id, opt => opt.MapFrom(s => Convert.ToInt32(s)))
-            .ForMember(d => d.Name, opt => opt.MapFrom(s => localizationService.GetValue(s)));
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => EnumHelper.ToReadableString(s)));
     }
 }

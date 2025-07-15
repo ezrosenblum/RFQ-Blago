@@ -85,7 +85,7 @@ public sealed class ResetPasswordCommandValidator : AbstractValidator<ResetPassw
                     {
                         RuleFor(cmd => new NewPasswordValidatorData(cmd.Password))
                             .SetValidator(newPasswordValidator)
-                            .OverridePropertyName(nameof(PasswordChangeCommand.NewPassword));
+                            .OverridePropertyName(nameof(ResetPasswordCommand.Password));
                     });
 
         RuleFor(cmd => cmd.Uid)

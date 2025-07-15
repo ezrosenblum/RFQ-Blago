@@ -1,7 +1,4 @@
-﻿using Application.Features.Notifications.Search;
-using Application.Features.Submissions.Search;
-using Application.Features.Users.Search;
-using Domain.Entities.Submissions;
+﻿using Application.Features.Submissions.Search;
 using DTO.Pagination;
 
 namespace Application.Common.Search;
@@ -18,7 +15,5 @@ public interface ISearchClient<T> where T: class, ISearchable
     Task DeleteManyAsync(IEnumerable<T> data, CancellationToken cancellationToken = default);
     Task<bool> IndexExist(string index);
     Task<bool> CreateIndexIfNotExist(string index);
-    Task<PaginatedList<UserSearchable>> SearchUsersAsync(IUserFullSearchCriteria criteria);
     Task<PaginatedList<SubmissionSearchable>> SearchSubmissionsAsync(ISubmissionFullSearchCriteria criteria);
-    Task<PaginatedList<NotificationSearchable>> SearchNotificationsForUserAsync(INotificationForUserFullSearchCriteria criteria);
 }
