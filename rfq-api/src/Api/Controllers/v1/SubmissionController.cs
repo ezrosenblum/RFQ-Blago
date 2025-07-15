@@ -37,7 +37,6 @@ namespace Api.Controllers.v1
             return await Mediator.Send(new SubmissionGetAllQuery());
         }
 
-        [Authorize(Policy = AuthorizationPolicies.Vendor)]
         [HttpPost("search")]
         public async Task<PaginatedList<SubmissionSearchable>> FullSearch([FromBody] SubmissionFullSearchQuery request)
         {
@@ -53,7 +52,6 @@ namespace Api.Controllers.v1
             return Ok();
         }
 
-        [Authorize(Policy = AuthorizationPolicies.Vendor)]
         [HttpGet("count/report")]
         public async Task<SubmissionReportResponse> GetCountReport()
         {
