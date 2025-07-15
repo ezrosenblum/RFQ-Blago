@@ -30,7 +30,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
     },
     sorting: {
       field: 1,
-      direction: 1
+      sortOrder: 2
     }
   };
 
@@ -63,6 +63,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   RfqStatus = RfqStatus;
   UnitType = UnitType;
   UserRole = UserRole;
+  userId: number | null = null;
 
   // Filter options
   statusOptions: LookupValue[] = [];
@@ -95,7 +96,10 @@ export class VendorRfqs implements OnInit, OnDestroy {
         }
 
         if (user) {
-          this.loadRfqs();
+          if (user.type === UserRole.CLIENT) {
+          this.userId = user.id;
+          }
+          this.applyFilters();
           this.loadStatistics();
           this.loadStatuses();
           this.leadUnits();
@@ -192,7 +196,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
   loadRfqs(): void {
     this.isLoading = true;
     this.errorMessage = '';
-
     this.rfqService.getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -225,21 +228,18 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   applyFilters(): void {
     this.submissionListRequest.query = this.filterForm.get('search')?.value.trim() || undefined;
-    this.submissionListRequest.userId = undefined;
+    this.submissionListRequest.userId = this.userId!;
     this.submissionListRequest.status = this.filterForm.get('status')?.value.trim() || undefined;
     this.submissionListRequest.unit = this.filterForm.get('unit')?.value.trim() || undefined;
     this.submissionListRequest.dateFrom = this.filterForm.get('dateFrom')?.value.trim() || undefined;
     this.submissionListRequest.dateTo = this.filterForm.get('dateTo')?.value.trim() || undefined;
     this.submissionListRequest.paging.pageNumber = this.currentPage;
     this.submissionListRequest.paging.pageSize = this.pageSize;
-
     this.rfqService.getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: TableResponse<Rfq>) => {
-        this.filteredRfqs = this.sortRfqs(
-          Array.isArray(response.items) ? response.items : response.items ? [response.items] : []
-        );
+          this.filteredRfqs = Array.isArray(response.items) ? response.items : response.items ? [response.items] : [];
           this.totalItems = response.totalCount!;
           this.totalPages = response.totalPages!;
         },
