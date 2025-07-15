@@ -60,7 +60,7 @@ public static class ApplicationDbContextSeeder
         };
 
         var existedCustomer = userManager.Users.FirstOrDefault(u => u.UserName == customer.UserName);
-        if (existedCustomer != null)
+        if (existedCustomer == null)
         {
             await userManager.CreateAsync(customer, "Test12345!");
             await userManager.AddClaimAsync(customer, new Claim("scope", "default"));
@@ -71,7 +71,7 @@ public static class ApplicationDbContextSeeder
         }
 
         var existedVendor = userManager.Users.FirstOrDefault(u => u.UserName == vendor.UserName);
-        if (existedVendor != null)
+        if (existedVendor == null)
         {
             await userManager.CreateAsync(vendor, "Test12345!");
             await userManager.AddClaimAsync(vendor, new Claim("scope", "default"));

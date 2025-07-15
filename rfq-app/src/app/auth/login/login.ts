@@ -77,7 +77,6 @@ export class Login implements OnInit, OnDestroy {
             this.authService.getUserData().pipe(take(1)).subscribe((data: User) => {
               this.authService.currentUserSubject.next(data);
               this.authService.isAuthenticatedSubject.next(true);
-              
               if (data.type === 'Vendor' ){
                 this.router.navigate(['/vendor-rfqs']);
               } else {

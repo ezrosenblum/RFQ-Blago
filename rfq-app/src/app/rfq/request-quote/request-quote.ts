@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { LookupValue, RfqRequest, UnitType } from '../../models/rfq.model';
-import { User } from '../../models/user.model';
+import { User, UserRole } from '../../models/user.model';
 import { RfqService } from '../../services/rfq';
 
 @Component({
@@ -42,17 +42,19 @@ export class RequestQuote implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
-      });
 
-    this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (units) => {
-        this.unitOptions = units;
-      },
-      error: (error) => {
-        console.error('Failed to load RFQ units:', error);
-        this.errorMessage = 'Failed to load unit options. Please try again later.';
-      }
-    });
+        if (this.currentUser?.type === UserRole.CLIENT) {
+           this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
+            next: (units) => {
+              this.unitOptions = units;
+            },
+            error: (error) => {
+              console.error('Failed to load RFQ units:', error);
+              this.errorMessage = 'Failed to load unit options. Please try again later.';
+            }
+          });
+        }
+      });
 
     // Auto-focus first field
     setTimeout(() => {
