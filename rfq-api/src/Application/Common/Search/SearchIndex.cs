@@ -3,7 +3,5 @@
 public static class SearchIndex
 {
     public const string Default = "rfqsubmission-default";
-    public const string User = "user";
-    public const string Notification = "notification";
     public const string Submission = "submission";
 }

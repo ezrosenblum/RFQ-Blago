@@ -1,4 +1,5 @@
 ﻿using DTO.Response;
+using System.Text.RegularExpressions;
 
 namespace Application.Common.Helpers
 {
@@ -11,8 +12,12 @@ namespace Application.Common.Helpers
             return enumValues.Select(e => new ListItemBaseResponse
             {
                 Id = (int)Convert.ChangeType(e, typeof(int)),
-                Name = e.ToString()
+                Name = ToReadableString(e)
             }).ToList();
+        }
+        public static string ToReadableString(this Enum value)
+        {
+            return Regex.Replace(value.ToString(), "(\\B[A-Z])", " $1");
         }
     }
 }
