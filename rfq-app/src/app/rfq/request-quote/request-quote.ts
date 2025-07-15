@@ -140,6 +140,10 @@ export class RequestQuote implements OnInit, OnDestroy {
                 successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
             }, 1000);
+
+            setTimeout(() => {
+              this.successMessage = '';
+            }, 5000);
           },
           error: (error) => {
             this.isSubmitting = false;

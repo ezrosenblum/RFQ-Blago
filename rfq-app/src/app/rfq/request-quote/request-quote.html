@@ -1,6 +1,23 @@
 <!-- src/app/rfq/request-quote/request-quote.component.html -->
 <div class="min-h-screen bg-secondary-50 dark:bg-dark-900 py-8 px-4 sm:px-6 lg:px-8">
   <div class="max-w-3xl mx-auto">
+    <!-- User Welcome Banner (if logged in) -->
+    <div *ngIf="currentUser" class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-6 mb-8">
+      <div class="flex items-center space-x-3">
+        <svg class="h-6 w-6 text-success-600 dark:text-success-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <h3 class="text-lg font-medium text-success-900 dark:text-success-100">
+            Welcome back, {{ currentUser.firstName || currentUser.email }}!
+          </h3>
+          <p class="text-success-700 dark:text-success-300">
+            Your quote request will be tracked and you'll receive notifications about responses.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Header Section -->
     <div class="text-center mb-8">
       <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100 mb-4">
@@ -31,23 +48,6 @@
           >
             Sign In to Track Requests
           </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- User Welcome Banner (if logged in) -->
-    <div *ngIf="currentUser" class="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-6 mb-8">
-      <div class="flex items-center space-x-3">
-        <svg class="h-6 w-6 text-success-600 dark:text-success-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <div>
-          <h3 class="text-lg font-medium text-success-900 dark:text-success-100">
-            Welcome back, {{ currentUser.firstName || currentUser.email }}!
-          </h3>
-          <p class="text-success-700 dark:text-success-300">
-            Your quote request will be tracked and you'll receive notifications about responses.
-          </p>
         </div>
       </div>
     </div>

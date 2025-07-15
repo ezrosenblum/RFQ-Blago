@@ -75,8 +75,7 @@ export class Signup implements OnInit, OnDestroy {
         this.passwordStrengthValidator
       ]],
       confirmPassword: ['', [Validators.required]],
-      role: [UserRole.CLIENT, [Validators.required]],
-      agreeToTerms: [false, [Validators.requiredTrue]]
+      role: [UserRole.CLIENT, [Validators.required]]
     }, {
       validators: this.passwordMatchValidator
     });
