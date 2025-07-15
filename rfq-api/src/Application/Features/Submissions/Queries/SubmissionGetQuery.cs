@@ -16,42 +16,28 @@ public sealed class SubmissionGetQueryHandler : IQueryHandler<SubmissionGetQuery
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly ICacheService _cacheService;
     private readonly ILocalizationService _localizationService;
 
     public SubmissionGetQueryHandler(
         IApplicationDbContext dbContext,
         IMapper mapper,
-        ICacheService cacheService,
         ILocalizationService localizationService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _cacheService = cacheService;
         _localizationService = localizationService;
     }
     public async Task<SubmissionResponse> Handle(SubmissionGetQuery query, CancellationToken cancellationToken)
     {
-        var cacheKey = $"{CacheKeys.Submission}-{query.SubmissionId}";
+        var submission = await _dbContext.Submission.Include(s => s.User)
+                             .AsNoTracking()
+                             .FirstOrDefaultAsync(s => s.Id == query.SubmissionId, cancellationToken);
 
-        var cachedSubmission = await _cacheService.GetAsync<SubmissionResponse>(cacheKey, cancellationToken);
+        if (submission == null)
+            throw new NotFoundException(_localizationService.GetValue("submission.notFound.error.message"));
 
-        if (cachedSubmission == null)
-        {
-            var submission = await _dbContext.Submission.Include(s => s.User)
-                                 .AsNoTracking()
-                                 .FirstOrDefaultAsync(s => s.Id == query.SubmissionId, cancellationToken);
+        var response = _mapper.Map<SubmissionResponse>(submission);
 
-            if (submission == null)
-                throw new NotFoundException(_localizationService.GetValue("submission.notFound.error.message"));
-
-            var response = _mapper.Map<SubmissionResponse>(submission);
-
-            await _cacheService.AddAsync(cacheKey, response, cancellationToken);
-
-            return response;
-        }
-
-        return cachedSubmission;
+        return response;
     }
 }
