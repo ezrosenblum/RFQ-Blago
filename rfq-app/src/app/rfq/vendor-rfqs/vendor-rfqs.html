@@ -344,8 +344,8 @@
                 <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 mb-2">
                   Project Description
                 </h3>
-                <p class="text-secondary-700 dark:text-secondary-300 leading-relaxed">
-                  {{ truncateText(rfq.description!, 200) }}
+                <p class="text-secondary-700 dark:text-secondary-300 leading-relaxed" [title]="rfq.description">
+                  {{ truncateText(rfq.description!, 300) }}
                 </p>
               </div>
 
@@ -364,7 +364,7 @@
 
             <!-- Actions -->
             <div class="mt-4 lg:mt-0 lg:ml-6 flex-shrink-0">
-              <div class="flex flex-col space-y-2">
+              <div class="flex flex-col space-y-2" *ngIf="!userId">
                 <label for="status-{{ rfq.id }}" class="text-sm font-medium text-secondary-700 dark:text-secondary-300">
                   Update Status
                 </label>
@@ -419,7 +419,7 @@
                   </svg>
                 </button>
               </th>
-              <th class="px-6 py-3 text-left">Actions</th>
+              <th class="px-6 py-3 text-left" *ngIf="!userId">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-secondary-200 dark:divide-secondary-700">
@@ -431,11 +431,12 @@
                   {{ rfq!.status!.name }}
                 </span>
               </td>
-              <td class="px-6 py-4 max-w-xs">
-                <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{ truncateText(rfq.description!, 80) }}
-                </div>
-              </td>
+            <td class="px-6 py-4 max-w-xs">
+              <div>
+                <p class="text-sm text-secondary-900 dark:text-secondary-100 truncate-text m-0" [title]="rfq.description">{{rfq.description}}</p>
+                
+              </div>
+            </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-secondary-900 dark:text-secondary-100">
                   {{ rfq.quantity | number:'1.0-2' }}
@@ -459,7 +460,7 @@
                   {{ formatDate(rfq.submissionDate!) }}
                 </div>
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4" *ngIf="!userId">
                 <select
                 id="status-{{ rfq.id }}"
                 [ngModel]="rfq.status!.id!"
