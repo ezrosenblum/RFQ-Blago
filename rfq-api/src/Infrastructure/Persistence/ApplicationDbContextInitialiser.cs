@@ -61,6 +61,7 @@ public class ApplicationDbContextInitialiser
                 var defaultApplicationUser = await ApplicationDbContextSeeder.SeedDefaultRolesAndUsersAsync(_userManager, _roleManager);
 
                 var identityContextSetter = services.GetRequiredService<IIdentityContextAccessor>();
+
                 identityContextSetter.IdentityContext = new IdentityContextCustom(new DefaultUserInfo(defaultApplicationUser));
 
                 await ApplicationDbContextSeeder.SeedDefaultLanguages(_mediatr, _dbContext);

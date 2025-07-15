@@ -37,18 +37,60 @@ public static class ApplicationDbContextSeeder
             Status = UserStatus.Active
         };
 
-        // Check if default administrator already created
+        var customer = new ApplicationUser
+        {
+            FirstName = "Customer",
+            LastName = "Smith",
+            UserName = "client@demo.com",
+            Email = "client@demo.com",
+            EmailConfirmed = true,
+            Media = new Media(MediaEntityType.User),
+            Status = UserStatus.Active
+        };
+
+        var vendor = new ApplicationUser
+        {
+            FirstName = "Vendor",
+            LastName = "Smith",
+            UserName = "vendor@demo.com",
+            Email = "vendor@demo.com",
+            EmailConfirmed = true,
+            Media = new Media(MediaEntityType.User),
+            Status = UserStatus.Active
+        };
+
+        var existedCustomer = userManager.Users.FirstOrDefault(u => u.UserName == customer.UserName);
+        if (existedCustomer != null)
+        {
+            await userManager.CreateAsync(customer, "Test12345!");
+            await userManager.AddClaimAsync(customer, new Claim("scope", "default"));
+
+            await userManager.AddToRolesAsync(
+                customer,
+                new[] { customerRole.Name! });
+        }
+
+        var existedVendor = userManager.Users.FirstOrDefault(u => u.UserName == vendor.UserName);
+        if (existedVendor != null)
+        {
+            await userManager.CreateAsync(vendor, "Test12345!");
+            await userManager.AddClaimAsync(vendor, new Claim("scope", "default"));
+
+            await userManager.AddToRolesAsync(
+                vendor,
+                new[] { vendorRole.Name! });
+        }
+
         var existedAdministrator = userManager.Users.FirstOrDefault(u => u.UserName == administrator.UserName);
-        if (existedAdministrator != null) return existedAdministrator;
+        if (existedAdministrator == null)
+        {
+            await userManager.CreateAsync(administrator, "Administrator1!");
+            await userManager.AddClaimAsync(administrator, new Claim("scope", "default"));
 
-        // Create default administraotor
-        await userManager.CreateAsync(administrator, "Administrator1!");
-        await userManager.AddClaimAsync(administrator, new Claim("scope", "default"));
-
-        // Add the user to the role (Administrator)
-        await userManager.AddToRolesAsync(
-            administrator,
-            new[] { administratorRole.Name! });
+            await userManager.AddToRolesAsync(
+                administrator,
+                new[] { administratorRole.Name! });
+        }
 
         return administrator;
     }
