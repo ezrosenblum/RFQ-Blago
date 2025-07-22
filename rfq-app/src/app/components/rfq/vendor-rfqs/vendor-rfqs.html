@@ -69,7 +69,7 @@
             {{ statistics.acceptedSubmissionsCount }}
           </div>
           <div class="text-sm text-secondary-600 dark:text-secondary-400">
-            Quoted
+            Accepted
           </div>
         </div>
       </div>
@@ -252,7 +252,7 @@
           </div>
 
           <!-- Sort Controls -->
-          <div class="flex items-center space-x-3 mt-4 sm:mt-0">
+          <!-- <div class="flex items-center space-x-3 mt-4 sm:mt-0">
             <span class="text-sm font-medium text-secondary-700 dark:text-secondary-300">Sort by:</span>
             <select
               (change)="setSorting($any($event.target).value)"
@@ -275,7 +275,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
               </svg>
             </button>
-          </div>
+          </div> -->
         </div>
       </form>
     </div>
@@ -331,7 +331,7 @@
                 </div>
                 <div class="text-right">
                   <div class="text-lg font-semibold text-secondary-900 dark:text-secondary-100">
-                    {{ rfq.quantity | number:'1.0-2' }} {{ rfq.unit!.name! }}
+                    <span class="text-sm">QTY: <span [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-primary-600 bg-primary-100'">{{ rfq.quantity | number:'1.0-2' }}</span></span><span class="ml-1 text-sm">Unit:</span> <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ml-1" [ngClass]="getUnitColor(rfq.unit!.name!)">{{ rfq.unit!.name! }}</span>
                   </div>
                   <div class="text-sm text-secondary-500 dark:text-secondary-400">
                     ID: {{ rfq.id }}
@@ -344,7 +344,7 @@
                 <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 mb-2">
                   Project Description
                 </h3>
-                <p class="text-secondary-700 dark:text-secondary-300 leading-relaxed" [title]="rfq.description">
+                <p class="text-md text-secondary-700 dark:text-secondary-300 leading-relaxed" [title]="rfq.description">
                   {{ truncateText(rfq.description!, 300) }}
                 </p>
               </div>
@@ -357,7 +357,19 @@
                 </div>
                 <div>
                   <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400">Submitted By</div>
-                  <div class="text-secondary-900 dark:text-secondary-100">{{rfq.user?.email}}</div>
+                    <div class="text-secondary-900 dark:text-secondary-100">
+                    <div class="flex items-center space-x-2">
+                      <div
+                      class="inline-flex items-center justify-center w-8 h-8 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full text-sm font-medium"
+                      [title]="rfq.user?.firstName + ' ' + rfq.user?.lastName"
+                      >
+                      {{ getInitials(rfq.user?.firstName, rfq.user?.lastName) }}
+                      </div>
+                      <div>
+                      <div class="text-xs text-secondary-500 dark:text-secondary-400">{{rfq.user?.email}}</div>
+                      </div>
+                    </div>
+                    </div>
                 </div>
               </div>
             </div>
@@ -403,7 +415,7 @@
               <th class="px-6 py-3 text-left">Description</th>
               <th class="px-6 py-3 text-left">
                 <button (click)="setSorting(3)" class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
-                  <span>Quantity</span>
+                  <span>Quantity/Unit</span>
                   <svg *ngIf="sortBy === 3" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
                   </svg>
@@ -424,40 +436,47 @@
           </thead>
           <tbody class="divide-y divide-secondary-200 dark:divide-secondary-700">
             <tr *ngFor="let rfq of filteredRfqs; trackBy: trackByRfqId" class="hover:bg-secondary-50 dark:hover:bg-dark-700">
-              <td class="px-6 py-4">
+              <td class="px-4 py-2">
                 <span
-                  [class]="'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status!)"
+                  [class]="'inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ' + getStatusColor(rfq.status!)"
                 >
                   {{ rfq!.status!.name }}
                 </span>
               </td>
-            <td class="px-6 py-4 max-w-xs">
-              <div>
-                <p class="text-sm text-secondary-900 dark:text-secondary-100 truncate-text m-0" [title]="rfq.description">{{rfq.description}}</p>
-                
-              </div>
-            </td>
-              <td class="px-6 py-4">
-                <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{ rfq.quantity | number:'1.0-2' }}
-                </div>
-                <div class="text-xs text-secondary-500 dark:text-secondary-400">
-                  {{ rfq.unit!.name! }}
+              <td class="px-6 py-4 w-80">
+                <div class="w-full">
+                  <p class="text-xs text-secondary-900 dark:text-secondary-100 truncate-text m-0" [title]="rfq.description">{{rfq.description}}</p>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <div class="text-sm text-secondary-900 dark:text-secondary-100 max-w-xs">
+                <div class="text-sm text-secondary-900 dark:text-secondary-100">
+                  {{ rfq.quantity | number:'1.0-2' }} <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ml-1" [ngClass]="getUnitColor(rfq.unit!.name!)">{{ rfq.unit!.name! }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-xs text-secondary-900 dark:text-secondary-100 max-w-xs">
                   {{ truncateText(rfq.jobLocation!, 40) }}
                 </div>
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{rfq.user?.email}}
+                  <div class="flex flex-col items-center space-y-1">
+                  <div
+                    class="inline-flex items-center justify-center w-8 h-8 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full text-sm font-medium"
+                    [title]="rfq.user?.firstName + ' ' + rfq.user?.lastName"
+                  >
+                    {{ getInitials(rfq.user?.firstName, rfq.user?.lastName) }}
+                  </div>
+                  <div class="text-xs text-secondary-500 dark:text-secondary-400 text-center">
+                    {{rfq.user?.email}}
+                  </div>
+                  </div>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                  {{ formatDate(rfq.submissionDate!) }}
+                <div class="text-xs text-secondary-900 dark:text-secondary-100">
+                  <div>{{ formatDate(rfq.submissionDate!)  | date:'mediumDate' }}</div>
+                  <div class="text-xs text-secondary-500 dark:text-secondary-400">{{ rfq.submissionDate! | date:'shortTime' }}</div>
                 </div>
               </td>
               <td class="px-6 py-4" *ngIf="!userId">
@@ -466,7 +485,7 @@
                 [ngModel]="rfq.status!.id!"
                 (change)="updateRfqStatus(rfq.id!, $any($event.target).value)"
                 [disabled]="isUpdating"
-                class="form-select text-sm min-w-[140px]"
+                class="form-select text-xs min-w-[125px]"
               >
                 <option *ngFor="let item of statusOptions" [value]="item.id">
                   {{ item.name }}

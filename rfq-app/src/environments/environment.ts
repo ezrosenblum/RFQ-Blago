@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:5001/api',
+  apiUrl: 'http://localhost:8090/api/v1/',
   appName: 'RFQ System',
   version: '1.0.0'
 };

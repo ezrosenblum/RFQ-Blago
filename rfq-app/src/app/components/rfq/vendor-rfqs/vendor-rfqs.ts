@@ -3,10 +3,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { Auth } from '../../services/auth';
-import { RfqService } from '../../services/rfq';
-import { LookupValue, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, UnitType } from '../../models/rfq.model';
-import { User, UserRole } from '../../models/user.model';
+import { LookupValue, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, UnitType } from '../../../models/rfq.model';
+import { User, UserRole } from '../../../models/user.model';
+import { Auth } from '../../../services/auth';
+import { RfqService } from '../../../services/rfq';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -52,7 +52,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   statistics: RfqStatistics = {
     submissionsCount: 0,
     pendingSubmissionsCount: 0,
-    reviewedSubmissionsCount: 0,  
+    reviewedSubmissionsCount: 0,
     acceptedSubmissionsCount: 0,
     rejectedSubmissionsCount: 0,
     last24HoursSubmissionsCount: 0}
@@ -282,7 +282,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
         next: (updatedRfq) => {
           this.isUpdating = false;
           this.successMessage = `RFQ status updated!`;
-          this.loadStatistics(); 
+          this.loadStatistics();
           this.loadRfqs();
 
           // Clear success message after 3 seconds
@@ -452,6 +452,21 @@ getRelativeTime(date: Date | string): string {
     return rfq.id!;
   }
 
+  getInitials(firstName?: string, lastName?: string): string {
+    const first = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const last = lastName ? lastName.charAt(0).toUpperCase() : '';
+    return first + last || '?';
+  }
+
+  getUnitColor(unitName: string): string {
+    const unitColors: { [key: string]: string } = {
+      'l f': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+      's f': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      'e a': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+    };
+
+    return unitColors[unitName.toLowerCase()] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+  }
   // Expose Math to template
   Math = Math;
 }

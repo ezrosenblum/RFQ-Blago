@@ -8,5 +8,5 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "7090:90"
+      - "7090:80"
     restart: always

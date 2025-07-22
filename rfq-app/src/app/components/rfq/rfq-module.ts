@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { RfqRoutingModule } from './rfq-routing-module';
 import { RequestQuote } from './request-quote/request-quote';
-import { VendorRfqs } from './vendor-rfqs/vendor-rfqs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { VendorRfqs } from './vendor-rfqs/vendor-rfqs';
 
 
 @NgModule({

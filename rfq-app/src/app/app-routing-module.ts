@@ -2,8 +2,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth-guard';
-import { AuthModule } from './auth/auth-module';
-import { VendorRfqs } from './rfq/vendor-rfqs/vendor-rfqs';
+import { VendorRfqs } from './components/rfq/vendor-rfqs/vendor-rfqs';
 
 const routes: Routes = [
   {
@@ -17,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: 'request-quote',
-    loadChildren: () => import('./rfq/rfq-module').then(m => m.RfqModule)
+    loadChildren: () => import('./components/rfq/rfq-module').then(m => m.RfqModule)
   },
   {
     path: 'vendor-rfqs',

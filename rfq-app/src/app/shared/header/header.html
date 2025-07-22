@@ -72,13 +72,16 @@
         <!-- User Menu -->
         <div *ngIf="isAuthenticated" class="relative">
           <div class="flex items-center space-x-3">
+            <!-- User role display -->
+             <div class="text-right">
+              <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-400">
+                {{ getRoleDisplayName() }}
+              </div>
+            </div>
             <!-- User Info -->
             <div class="text-right">
               <div class="text-sm font-medium text-secondary-900 dark:text-secondary-100">
                 {{ getUserDisplayName() }}
-              </div>
-              <div class="text-xs text-secondary-500 dark:text-secondary-400">
-                {{ getRoleDisplayName() }}
               </div>
             </div>
 
