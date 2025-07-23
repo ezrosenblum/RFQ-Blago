@@ -17,7 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',
 })
-export class ResetPasswordComponent implements OnInit{
+export class ResetPasswordComponent implements OnInit {
   resetPasswordForm!: FormGroup;
   isLoading = false;
   errorMessage = '';
@@ -124,13 +124,21 @@ export class ResetPasswordComponent implements OnInit{
       return;
     }
 
-    const fullUrl = window.location.href;
-    const match = fullUrl.match(/[?&]token=([^&#]*)/);
-    const rawToken = match ? match[1] : null;
+    const rawToken = this.route.snapshot.queryParamMap.get('token');
+    const uid = this.route.snapshot.queryParamMap.get('uid');
+
+    if (!rawToken || !uid) {
+      this.snackBar.open(
+        'Invalid or missing reset link. Please try again.',
+        'Close',
+        { duration: 3000, panelClass: ['snackbar-error'] }
+      );
+      return;
+    }
 
     const request = new PasswordResetRequest(
-      rawToken!,
-      this.route.snapshot.queryParams['uid'],
+      rawToken,
+      uid,
       this.resetPasswordForm.get('password')!.value
     );
 
@@ -150,7 +158,7 @@ export class ResetPasswordComponent implements OnInit{
               panelClass: ['snackbar-success'],
             }
           );
-          this.navigateToLogin()
+          this.navigateToLogin();
         },
         error: (error) => {
           this.isLoading = false;
@@ -164,19 +172,16 @@ export class ResetPasswordComponent implements OnInit{
   }
 
   private handleResetPasswordError(error: any): void {
-    if (error.status === 400) {
-      this.errorMessage =
-        'Invalid or expired token. Please request a new password reset link.';
-    } else if (error.status === 422) {
-      this.errorMessage =
-        'The provided password does not meet security requirements.';
-    } else if (error.status === 0) {
-      this.errorMessage =
-        'Unable to connect to the server. Please check your internet connection.';
-    } else {
-      this.errorMessage =
-        error.error?.message || 'Password reset failed. Please try again.';
-    }
+    const messages: { [key: number]: string } = {
+      400: 'Invalid or expired token. Please request a new password reset link.',
+      422: 'The provided password does not meet security requirements.',
+      0: 'Unable to connect to the server. Please check your internet connection.',
+    };
+
+    this.errorMessage =
+      messages[error.status] ||
+      error.error?.message ||
+      'Password reset failed. Please try again.';
   }
 
   private markFormGroupTouched(): void {
