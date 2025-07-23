@@ -33,3 +33,11 @@ export class Token {
         public refreshToken: string
     ) { }
 }
+
+
+export class PasswordResetRequest {
+    constructor(
+        public token: string,
+        public uid: string,
+        public password: string) { }
+}

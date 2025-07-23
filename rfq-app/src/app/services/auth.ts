@@ -6,11 +6,17 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 import { User, UserRole } from '../models/user.model';
-import { LoginRequest, SignupRequest, TokenPayload, Token } from '../models/auth.model';
+import {
+  LoginRequest,
+  SignupRequest,
+  TokenPayload,
+  Token,
+  PasswordResetRequest,
+} from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class Auth {
   private readonly API_URL = environment.apiUrl;
@@ -23,56 +29,63 @@ export class Auth {
 
   public redirectUrl: string | null = null;
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     this.initializeAuthState();
   }
 
   private initializeAuthState(): void {
     const token = this.getToken();
-    if(token) {
+    if (token) {
       this.getUserData().pipe(
-        map(user => {
+        map((user) => {
           this.currentUserSubject.next(user);
           this.isAuthenticatedSubject.next(true);
 
           return user;
-        }))
+        })
+      );
     }
   }
 
   login(credentials: LoginRequest): Observable<Token> {
-    return this.http.post<Token>(`${this.API_URL}Authenticate/login`, credentials)
+    return this.http
+      .post<Token>(`${this.API_URL}Authenticate/login`, credentials)
       .pipe(
-      catchError(err => {
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
+
+  resetPassword(data: PasswordResetRequest): Observable<void> {
+    return this.http
+      .post<void>(`${this.API_URL}/User/reset-password`, data)
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
+  getUserData(): Observable<User> {
+    return this.http.get<User>(`${this.API_URL}User/me`).pipe(
+      catchError((err) => {
         return throwError(() => err);
       })
     );
   }
 
-  getUserData(): Observable<User> {
-    return this.http.get<User>(`${this.API_URL}User/me`).pipe(
-      catchError(err => {
-        return throwError(() => err);
-      })
-    );;
-  }
-
   signup(userData: SignupRequest): Observable<User> {
-    return this.http.post<User>(`${this.API_URL}User`, userData)
-      .pipe(
-        map(response => {
-          if (response && response.id) {
-            return response;
-          }
-          throw new Error('Signup failed');
-        }),
-        tap(response => {
-          this.router.navigate(['/auth/login']);
-        })
-      );
+    return this.http.post<User>(`${this.API_URL}User`, userData).pipe(
+      map((response) => {
+        if (response && response.id) {
+          return response;
+        }
+        throw new Error('Signup failed');
+      }),
+      tap((response) => {
+        this.router.navigate(['/auth/login']);
+      })
+    );
   }
 
   logout(): void {
@@ -114,9 +127,14 @@ export class Auth {
   private decodeToken(token: string): TokenPayload {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
 
     return JSON.parse(jsonPayload);
   }
@@ -140,15 +158,16 @@ export class Auth {
 
   // Update user profile
   updateProfile(updates: Partial<User>): Observable<User> {
-    return this.http.put<ApiResponse<User>>(`${this.API_URL}/auth/profile`, updates)
+    return this.http
+      .put<ApiResponse<User>>(`${this.API_URL}/auth/profile`, updates)
       .pipe(
-        map(response => {
+        map((response) => {
           if (response.success && response.data) {
             return response.data;
           }
           throw new Error(response.message || 'Profile update failed');
         }),
-        tap(user => {
+        tap((user) => {
           this.currentUserSubject.next(user);
         })
       );
