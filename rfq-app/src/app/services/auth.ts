@@ -88,6 +88,16 @@ export class Auth {
     );
   }
 
+  forgotPassword(forgotPassword: { email: string }): Observable<void> {
+    return this.http.post<void>(
+      `${this.API_URL}/User/forgot-password`, forgotPassword
+    ).pipe(
+      catchError(err => {
+        return throwError(() => err);
+      })
+    );
+  }
+
   logout(): void {
     this.clearAuthData();
     this.router.navigate(['/auth/login']);
