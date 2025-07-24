@@ -128,6 +128,10 @@ export class Login implements OnInit, OnDestroy {
     this.router.navigate(['/auth/signup']);
   }
 
+  navigateToForgotPassword(): void {
+    this.router.navigate(['/auth/forgot-password']);
+  }
+
   // Helper methods for template
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);

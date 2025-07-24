@@ -11,6 +11,7 @@ import {
   SignupRequest,
   TokenPayload,
   Token,
+  VerifyData,
   PasswordResetRequest,
 } from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
@@ -87,6 +88,25 @@ export class Auth {
       })
     );
   }
+
+  forgotPassword(forgotPassword: { email: string }): Observable<void> {
+    return this.http.post<void>(
+      `${this.API_URL}/User/forgot-password`, forgotPassword
+    ).pipe(
+      catchError(err => {
+        return throwError(() => err);
+      })
+    );
+  }
+
+  public putVerify(postDataResetPass: VerifyData): Observable<VerifyData> {
+    return this.http.put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass)
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );;
+  };
 
   logout(): void {
     this.clearAuthData();
