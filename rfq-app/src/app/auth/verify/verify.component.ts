@@ -17,18 +17,21 @@ export class VerifyComponent {
   constructor(private _router: Router, private _authService: Auth) { this.getData();}
 
   getData() {
-    let token: any;
-    let uid: any;
-    token = this._router.url.split('token=')[1];
-    uid = token.split('&uid=')[1];
-    token = token.split('&')[0];
+    let token: string | null = null;
+    let uid: string | null = null;
+    const tokenParam = this._router.url.split('token=')[1];
+    if (tokenParam) {
+      const uidParam = tokenParam.split('&uid=');
+      token = uidParam[0]?.split('&')[0] || null;
+      uid = uidParam[1] || null;
+    }
+
     this.verifyData.token = token;
     this.verifyData.uid = uid;
 
     if (this.verifyData.token && this.verifyData.uid) {
       this._authService
         .putVerify(this.verifyData)
-        .pipe()
         .subscribe(
           (data: any) => {
             this.showSpinner = false;

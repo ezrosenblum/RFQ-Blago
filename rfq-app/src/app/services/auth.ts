@@ -100,7 +100,12 @@ export class Auth {
   }
 
   public putVerify(postDataResetPass: VerifyData): Observable<VerifyData> {
-    return this.http.put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass);
+    return this.http.put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass)
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );;
   };
 
   logout(): void {
