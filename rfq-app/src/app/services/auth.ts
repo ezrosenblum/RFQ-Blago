@@ -11,6 +11,7 @@ import {
   SignupRequest,
   TokenPayload,
   Token,
+  VerifyData,
   PasswordResetRequest,
 } from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
@@ -97,6 +98,10 @@ export class Auth {
       })
     );
   }
+
+  public putVerify(postDataResetPass: VerifyData): Observable<VerifyData> {
+    return this.http.put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass);
+  };
 
   logout(): void {
     this.clearAuthData();
