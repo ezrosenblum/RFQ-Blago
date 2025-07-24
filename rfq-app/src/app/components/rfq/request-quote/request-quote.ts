@@ -1,3 +1,4 @@
+import { ActualFileObject, FilePondInitialFile } from './../../../../../node_modules/filepond/types/index.d';
 // src/app/rfq/request-quote/request-quote.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -26,6 +27,18 @@ export class RequestQuote implements OnInit, OnDestroy {
 
   // Unit options for dropdown
   unitOptions: LookupValue[] = [];
+
+  pondOptions = {
+    allowMultiple: true,
+    maxFiles: 5,
+    labelIdle: 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+  };
+
+  pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
+
+  handleFilePondInit() {
+    console.log('FilePond has initialized');
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -90,7 +103,8 @@ export class RequestQuote implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(200),
         this.noOnlyWhitespaceValidator
-      ]]
+      ]],
+      attachments: [null]
     });
 
   }
@@ -119,11 +133,13 @@ export class RequestQuote implements OnInit, OnDestroy {
       this.errorMessage = '';
       this.successMessage = '';
 
+      const uploadedFiles = this.rfqForm.value.attachments;
       const rfqData: RfqRequest = {
         description: this.rfqForm.value.description.trim(),
         quantity: parseFloat(this.rfqForm.value.quantity),
         unit: Number(this.rfqForm.value.unit),
-        jobLocation: this.rfqForm.value.jobLocation.trim()
+        jobLocation: this.rfqForm.value.jobLocation.trim(),
+        attachments: uploadedFiles
       };
 
       this.rfqService.createRfq(rfqData)
@@ -289,5 +305,20 @@ export class RequestQuote implements OnInit, OnDestroy {
     const selectedUnit = this.rfqForm.get('unit')?.value;
     const unitOption = this.unitOptions.find(option => option.id === selectedUnit);
     return unitOption?.name || '';
+  }
+
+  onFilesUpdated(files: (string| FilePondInitialFile | Blob | ActualFileObject)[]): void {
+    this.pondFiles = files;
+
+    const rawFiles: File[] = files
+    .map(file => {
+      if (typeof file === 'string') return null;
+      if ('file' in file) return file.file as File;
+      if (file instanceof Blob) return file as File;
+      return null;
+    })
+    .filter((f): f is File => f !== null);
+
+    this.rfqForm.get('attachments')?.setValue(rawFiles);
   }
 }
