@@ -7,7 +7,6 @@ import { App } from './app';
 import { SharedModule } from './shared/shared-module';
 import { AppRoutingModule } from './app-routing-module';
 import { AuthInterceptor } from './interceptors/auth-interceptor';
-import { FilePondModule } from 'ngx-filepond';
 
 @NgModule({
   declarations: [
@@ -21,7 +20,6 @@ import { FilePondModule } from 'ngx-filepond';
     FormsModule,
     AppRoutingModule,
     SharedModule,
-    FilePondModule
   ],
   providers: [
     {

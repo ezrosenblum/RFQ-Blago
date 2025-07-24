@@ -78,5 +78,5 @@ export interface FilePondFile {
   id: string;
   status: number;
   origin: 'input' | 'limbo' | 'local' | 'remote';
-  [key: string]: any;
+  [key: string]: string | number | boolean | File | undefined;
 }

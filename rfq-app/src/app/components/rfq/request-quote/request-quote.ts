@@ -1,4 +1,4 @@
-import { ActualFileObject, FilePondInitialFile } from './../../../../../node_modules/filepond/types/index.d';
+import { ActualFileObject, FilePondInitialFile } from 'filepond';
 // src/app/rfq/request-quote/request-quote.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -35,10 +35,6 @@ export class RequestQuote implements OnInit, OnDestroy {
   };
 
   pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
-
-  handleFilePondInit() {
-    console.log('FilePond has initialized');
-  }
 
   constructor(
     private fb: FormBuilder,
