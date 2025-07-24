@@ -5,6 +5,7 @@ export interface RfqRequest {
   quantity: number;
   unit: number;
   jobLocation: string;
+  attachments: File[];
 }
 
 
@@ -70,4 +71,12 @@ export enum RfqStatus {
   REVIEWED = 2,
   QUOTED = 3,
   REJECTED = 4
+}
+
+export interface FilePondFile {
+  file: File;
+  id: string;
+  status: number;
+  origin: 'input' | 'limbo' | 'local' | 'remote';
+  [key: string]: string | number | boolean | File | undefined;
 }

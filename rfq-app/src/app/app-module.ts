@@ -8,7 +8,6 @@ import { SharedModule } from './shared/shared-module';
 import { AppRoutingModule } from './app-routing-module';
 import { AuthInterceptor } from './interceptors/auth-interceptor';
 
-
 @NgModule({
   declarations: [
     App
@@ -20,7 +19,7 @@ import { AuthInterceptor } from './interceptors/auth-interceptor';
     ReactiveFormsModule,
     FormsModule,
     AppRoutingModule,
-    SharedModule
+    SharedModule,
   ],
   providers: [
     {
