@@ -1,0 +1,35 @@
+.initials-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 0.65rem;
+  background-color: transparent;
+  color: #fff;
+  font-size: 2em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.custom-font-style {
+  font-family: var(--bs-font-monospace);
+}
+
+::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  color: #636674 !important;
+  display: inline-flex;
+  align-items: center;
+}
+
+::ng-deep .mdc-tab--active .mdc-tab__text-label,
+.mdc-tab--active .mdc-tab__icon {
+  color: #006ae6 !important;
+}
+
+::ng-deep .mdc-tab-indicator .mdc-tab-indicator__content {
+  color: #87888f;
+}
+
+::ng-deep .mat-mdc-tab-label-container {
+  border: none!important;
+}
