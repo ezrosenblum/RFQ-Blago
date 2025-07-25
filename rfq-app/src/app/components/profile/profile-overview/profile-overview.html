@@ -1,9 +1,9 @@
 <!-- Profile Details View Card -->
-<div class="bg-white shadow-md rounded-xl mb-10 dark:bg-dark-900">
+<div class="bg-white dark:bg-dark-900 shadow-md rounded-xl mb-10">
   <!-- Card Header -->
-  <div class="flex justify-between items-center px-6 py-4 border-b">
+  <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-dark-700">
     <div>
-      <h3 class="text-lg font-bold text-gray-900 m-0">Profile Details</h3>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white m-0">Profile Details</h3>
     </div>
     <a
       routerLink="/profile"
@@ -18,11 +18,11 @@
   <div class="px-6 py-8" *ngIf="user">
     <!-- Full Name -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
-      <label class="md:col-span-4 text-sm font-medium text-gray-500">
+      <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">
         Full Name
       </label>
       <div class="md:col-span-8">
-        <span class="text-gray-800 font-semibold text-sm">
+        <span class="text-gray-900 dark:text-white font-medium text-base">
           {{ user.firstName }} {{ user.lastName }}
         </span>
       </div>
@@ -30,19 +30,23 @@
 
     <!-- Contact Phone -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
-      <label class="md:col-span-4 text-sm font-medium text-gray-500 flex items-center gap-1">
+      <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-1">
         Contact Phone
-        <i class="ki-outline ki-information text-gray-400 text-xs" title="Phone is verified"></i>
+        <i
+          class="ki-outline ki-information text-gray-400 dark:text-gray-400 text-xs"
+          title="Phone is verified"
+        ></i>
       </label>
       <div class="md:col-span-8 flex items-center gap-2">
-        <span class="text-gray-800 font-semibold text-sm">
+        <span class="text-gray-900 dark:text-white font-medium text-base">
           {{ user.phoneNumber }}
         </span>
-        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+        <span
+          class="bg-green-200 dark:bg-green-700 text-green-800 dark:text-green-100 text-xs font-semibold px-2 py-0.5 rounded-full"
+        >
           Verified
         </span>
       </div>
     </div>
   </div>
 </div>
-
