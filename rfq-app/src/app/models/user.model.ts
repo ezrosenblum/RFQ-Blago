@@ -9,6 +9,7 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   type: string;
+  dateCreated?: Date; // Optional field for date created
 }
 
 export interface LookupValue {
