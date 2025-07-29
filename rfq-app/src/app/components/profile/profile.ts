@@ -70,8 +70,6 @@ export class ProfileComponent implements OnInit {
         return '';
     }
   }
-
-  onProfileUpdated(): void {}
   onTabChange(event: any) {
     const tabLabels = ['Overview', 'Settings'];
     this.selectedTab = tabLabels[event.index];

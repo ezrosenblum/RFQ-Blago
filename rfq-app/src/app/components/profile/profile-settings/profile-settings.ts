@@ -1,6 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { User } from '../../../models/user.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   standalone: false,
@@ -18,6 +23,8 @@ export class ProfileSettingsComponent implements OnInit {
   selectedFile: File | null = null;
   previewImageUrl: string | null = null;
 
+  errors: ValidationErrors | null = null;
+
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -30,7 +37,18 @@ export class ProfileSettingsComponent implements OnInit {
       profilePicture: [''],
     });
   }
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.user) {
+      this.userForm.patchValue({
+        firstName: this.user.firstName,
+        lastName: this.user.lastName,
+        email: this.user.email,
+        phoneNumber: this.user.phoneNumber,
+        profilePicture: this.user.profilePicture,
+      });
+      this.initialUserData = { ...this.user };
+    }
+  }
   filterPhoneNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^0-9+]/g, '');
@@ -61,9 +79,23 @@ export class ProfileSettingsComponent implements OnInit {
     );
   }
 
-  onSubmit(): void {}
+  onSubmit(): void {
+    if (this.userForm.valid) {
+      this.isSubmitting = true;
+      this.updateProfile.emit();
+      this.isSubmitting = false;
+    } else {
+      this.userForm.markAllAsTouched();
+    }
+  }
 
-  discardChanges(): void {}
+  discardChanges(): void {
+    if (this.initialUserData) {
+      this.userForm.reset(this.initialUserData);
+      this.previewImageUrl = this.initialUserData.profilePicture || null;
+      this.selectedFile = null;
+    }
+  }
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.userForm.get(fieldName);
@@ -72,13 +104,16 @@ export class ProfileSettingsComponent implements OnInit {
 
   getFieldError(fieldName: string): string {
     const field = this.userForm.get(fieldName);
-    if (field && field.errors && field.touched) {
+
+    if (field?.errors && field.touched) {
       if (field.errors['required']) return `${fieldName} is required`;
       if (field.errors['email']) return 'Please enter a valid email address';
-      if (field.errors['minlength'])
+      if (field.errors['minlength']) {
         return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
-      if (field.errors['maxlength'])
+      }
+      if (field.errors['maxlength']) {
         return `${fieldName} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
+      }
     }
     return '';
   }

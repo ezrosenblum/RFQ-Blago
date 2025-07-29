@@ -11,13 +11,10 @@ import { RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    component: ProfileComponent,
-    children: [
-      { path: '', component: ProfileOverviewComponent },
-      { path: 'settings', component: ProfileSettingsComponent }
-    ]
+    component: ProfileComponent
   }
 ];
+
 
 @NgModule({
   declarations: [
