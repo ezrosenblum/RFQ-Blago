@@ -32,7 +32,7 @@ export class ProfileComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const tab = params.get('tab');
-        if (tab === 'Overview' || tab === 'Settings') {
+        if (tab === 'Overview' || tab === 'Settings' || tab === 'Materials') {
           this.selectedTab = tab;
         }
       });
@@ -71,7 +71,7 @@ export class ProfileComponent implements OnInit {
     }
   }
   onTabChange(event: any) {
-    const tabLabels = ['Overview', 'Settings'];
+    const tabLabels = ['Overview', 'Settings', 'Materials'];
     this.selectedTab = tabLabels[event.index];
     this.router.navigate([], {
       relativeTo: this.route,
@@ -79,4 +79,13 @@ export class ProfileComponent implements OnInit {
       queryParamsHandling: 'merge',
     });
   }
+
+  get selectedIndex(): number {
+  switch (this.selectedTab) {
+    case 'Overview': return 0;
+    case 'Settings': return 1;
+    default: return 2;
+  }
+}
+
 }

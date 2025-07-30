@@ -11,10 +11,14 @@
 
   <!-- Form -->
   <form class="pt-6" [formGroup]="userForm" (ngSubmit)="onSubmit()">
-    <div class="border-t border-gray-200 dark:border-dark-700 px-6 py-8 space-y-8">
+    <div
+      class="border-t border-gray-200 dark:border-dark-700 px-6 py-8 space-y-8"
+    >
       <!-- Avatar Upload -->
       <div class="grid grid-cols-1 md:grid-cols-12 items-start gap-6">
-        <label class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300">
+        <label
+          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+        >
           Avatar
         </label>
         <div class="md:col-span-8 space-y-2">
@@ -22,14 +26,28 @@
             *ngIf="!previewImageUrl"
             class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md flex items-center justify-center h-32 w-32"
           >
-            <label class="cursor-pointer flex flex-col items-center justify-center">
-              <input type="file" (change)="onFileSelected($event)" class="hidden" />
-              <mat-icon class="text-gray-500 dark:text-gray-400">image</mat-icon>
-              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload</span>
+            <label
+              class="cursor-pointer flex flex-col items-center justify-center"
+            >
+              <input
+                type="file"
+                (change)="onFileSelected($event)"
+                class="hidden"
+              />
+              <mat-icon class="text-gray-500 dark:text-gray-400"
+                >image</mat-icon
+              >
+              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                >Upload</span
+              >
             </label>
           </div>
           <div *ngIf="previewImageUrl" class="relative w-32">
-            <img [src]="previewImageUrl" alt="Preview" class="rounded-md border dark:border-gray-700" />
+            <img
+              [src]="previewImageUrl"
+              alt="Preview"
+              class="rounded-md border dark:border-gray-700"
+            />
             <button
               type="button"
               (click)="onDeleteImage()"
@@ -47,7 +65,9 @@
 
       <!-- Full Name -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <label class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300">
+        <label
+          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+        >
           Full Name
         </label>
         <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
@@ -60,7 +80,10 @@
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
               [class.border-error-500]="isFieldInvalid('firstName')"
             />
-            <div *ngIf="isFieldInvalid('firstName')" class="text-xs text-red-500 mt-1">
+            <div
+              *ngIf="isFieldInvalid('firstName')"
+              class="text-xs text-red-500 mt-1"
+            >
               <div *ngIf="userForm.get('firstName')?.errors?.['required']">
                 First name is required
               </div>
@@ -76,7 +99,10 @@
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
               [class.border-error-500]="isFieldInvalid('lastName')"
             />
-            <div *ngIf="isFieldInvalid('lastName')" class="text-xs text-red-500 mt-1">
+            <div
+              *ngIf="isFieldInvalid('lastName')"
+              class="text-xs text-red-500 mt-1"
+            >
               <div *ngIf="userForm.get('lastName')?.errors?.['required']">
                 Last name is required
               </div>
@@ -87,9 +113,14 @@
 
       <!-- Phone -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <label class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+        <label
+          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2"
+        >
           Contact Phone
-          <i class="ki-outline ki-information-5 text-gray-400 text-sm dark:text-gray-500" title="Invalid or missing phone number"></i>
+          <i
+            class="ki-outline ki-information-5 text-gray-400 text-sm dark:text-gray-500"
+            title="Invalid or missing phone number"
+          ></i>
         </label>
         <div class="md:col-span-8 relative">
           <input
@@ -102,7 +133,10 @@
             class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             [class.border-error-500]="isFieldInvalid('phoneNumber')"
           />
-          <div *ngIf="isFieldInvalid('phoneNumber')" class="text-xs text-red-500 mt-1">
+          <div
+            *ngIf="isFieldInvalid('phoneNumber')"
+            class="text-xs text-red-500 mt-1"
+          >
             <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">
               Invalid phone number format
             </div>
@@ -115,7 +149,10 @@
 
       <!-- Email -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <label for="email" class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300">
+        <label
+          for="email"
+          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+        >
           Email Address *
         </label>
         <div class="md:col-span-8 relative">
@@ -130,14 +167,146 @@
             [class.border-error-500]="isFieldInvalid('email')"
           />
         </div>
-        <div *ngIf="isFieldInvalid('email')" class="form-error text-red-500 text-xs">
+        <div
+          *ngIf="isFieldInvalid('email')"
+          class="form-error text-red-500 text-xs"
+        >
           {{ getFieldError("email") }}
         </div>
       </div>
+
+      <div class="space-y-8">
+        <!-- Company Name -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+            >Company Name</label
+          >
+          <div class="md:col-span-8">
+            <input
+              type="text"
+              formControlName="companyName"
+              placeholder="Company Name"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+              [class.border-error-500]="isFieldInvalid('companyName')"
+            />
+            <div
+              *ngIf="isFieldInvalid('companyName')"
+              class="text-xs text-red-500 mt-1"
+            >
+              Company name is required
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Address -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+            >Business Address</label
+          >
+          <div class="md:col-span-8">
+            <input
+              type="text"
+              formControlName="businessAddress"
+              placeholder="Business Address"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            />
+          </div>
+        </div>
+
+        <!-- Contact Person -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+            >Contact Person</label
+          >
+          <div class="md:col-span-8">
+            <input
+              type="text"
+              formControlName="contactPerson"
+              placeholder="Contact Person"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            />
+          </div>
+        </div>
+
+        <!-- Business Description -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+            >Business Description</label
+          >
+          <div class="md:col-span-8">
+            <textarea
+              formControlName="businessDescription"
+              rows="4"
+              placeholder="Describe your specialties, services, or products..."
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Company Size & Years in Business -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+          >
+            Company Size / Years in Business
+          </label>
+          <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
+            <input
+              type="text"
+              formControlName="companySize"
+              placeholder="Company Size"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            />
+            <input
+              type="number"
+              formControlName="yearsInBusiness"
+              placeholder="Years"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            />
+          </div>
+        </div>
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <label
+              for="businessLicense"
+              class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+            >
+              Business License/Certification (Optional)
+            </label>
+            <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
+              <div>
+                <input
+                  id="businessLicense"
+                  name="businessLicense"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  (change)="onFileSelected($event)"
+                  class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 block w-full"
+                />
+                <p class="mt-1 text-xs text-secondary-500">
+                  Accepted formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
+                </p>
+                <div
+                  *ngIf="selectedFileName"
+                  class="mt-2 text-sm text-secondary-600"
+                >
+                  Selected: {{ selectedFileName }}
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
     </div>
 
+    <!-- Vendor-Specific Fields -->
+
     <!-- Footer Buttons -->
-    <div class="flex justify-end gap-4 px-6 py-6 border-t border-gray-200 dark:border-dark-700">
+    <div
+      class="flex justify-end gap-4 px-6 py-6 border-t border-gray-200 dark:border-dark-700"
+    >
       <button
         type="reset"
         (click)="discardChanges()"
@@ -154,12 +323,12 @@
         <ng-container *ngIf="isSubmitting">
           <span class="flex items-center">
             Please wait
-            <span class="ml-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <span
+              class="ml-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></span>
           </span>
         </ng-container>
-        <ng-container *ngIf="!isSubmitting">
-          Save Changes
-        </ng-container>
+        <ng-container *ngIf="!isSubmitting"> Save Changes </ng-container>
       </button>
     </div>
   </form>

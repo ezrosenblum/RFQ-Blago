@@ -7,6 +7,7 @@ import { ProfileSettingsComponent } from './profile-settings/profile-settings';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Routes } from '@angular/router';
+import { MaterialCategoriesSelectionComponent } from './material-categories-selection/material-categories-selection.component';
 
 const routes: Routes = [
   {
@@ -20,7 +21,8 @@ const routes: Routes = [
   declarations: [
     ProfileComponent,
     ProfileOverviewComponent,
-    ProfileSettingsComponent
+    ProfileSettingsComponent,
+    MaterialCategoriesSelectionComponent
   ],
   imports: [
     CommonModule,

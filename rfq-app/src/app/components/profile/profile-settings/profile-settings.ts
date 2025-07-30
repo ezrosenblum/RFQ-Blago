@@ -22,6 +22,7 @@ export class ProfileSettingsComponent implements OnInit {
   initialUserData: User | null = null;
   selectedFile: File | null = null;
   previewImageUrl: string | null = null;
+  selectedFileName: string | null = null;
 
   errors: ValidationErrors | null = null;
 
@@ -35,6 +36,12 @@ export class ProfileSettingsComponent implements OnInit {
         [Validators.minLength(9), Validators.pattern('^\\+?[0-9]{0,20}$')],
       ],
       profilePicture: [''],
+      companyName: [''],
+      businessAddress: [''],
+      contactPerson: [''],
+      businessDescription: [''],
+      companySize: [''],
+      yearsInBusiness: [''],
     });
   }
   ngOnInit(): void {
