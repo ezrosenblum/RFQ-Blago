@@ -6,6 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Auth} from '../../services/auth';
 import { SignupRequest } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-signup',
@@ -31,7 +32,8 @@ export class Signup implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.initializeForm();
   }
@@ -199,23 +201,50 @@ export class Signup implements OnInit, OnDestroy {
   getFieldError(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
     if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${fieldName} is required`;
-      if (field.errors['requiredTrue']) return 'You must agree to the terms and conditions';
-      if (field.errors['email']) return 'Please enter a valid email address';
-      if (field.errors['minlength']) return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
-      if (field.errors['maxlength']) return `${fieldName} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
-      if (field.errors['pattern']) return `${fieldName} contains invalid characters`;
-      if (field.errors['passwordMismatch']) return 'Passwords do not match';
+      const fieldLabel = this.translate.instant(`FIELDS.${fieldName}`);
+
+      if (field.errors['required']) {
+        return this.translate.instant('AUTH.VALIDATION.REQUIRED', { field: fieldLabel });
+      }
+      if (field.errors['requiredTrue']) {
+        return this.translate.instant('AUTH.VALIDATION.REQUIRED_AGREEMENT');
+      }
+      if (field.errors['email']) {
+        return this.translate.instant('AUTH.VALIDATION.EMAIL');
+      }
+      if (field.errors['minlength']) {
+        return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
+          field: fieldLabel,
+          min: field.errors['minlength'].requiredLength
+        });
+      }
+      if (field.errors['maxlength']) {
+        return this.translate.instant('AUTH.VALIDATION.MAX_LENGTH', {
+          field: fieldLabel,
+          max: field.errors['maxlength'].requiredLength
+        });
+      }
+      if (field.errors['pattern']) {
+        return this.translate.instant('AUTH.VALIDATION.PATTERN', { field: fieldLabel });
+      }
+      if (field.errors['passwordMismatch']) {
+        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
+      }
       if (field.errors['passwordStrength']) {
-        const requirements = [];
         const strength = field.errors['passwordStrength'];
-        if (!strength.hasNumber) requirements.push('one number');
-        if (!strength.hasUpper) requirements.push('one uppercase letter');
-        if (!strength.hasLower) requirements.push('one lowercase letter');
-        if (!strength.hasSpecial) requirements.push('one special character');
-        return `Password must contain ${requirements.join(', ')}`;
+        const requirements = [];
+
+        if (!strength.hasNumber) requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.NUMBER'));
+        if (!strength.hasUpper) requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.UPPER'));
+        if (!strength.hasLower) requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.LOWER'));
+        if (!strength.hasSpecial) requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.SPECIAL'));
+
+        return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
+          rules: requirements.join(', ')
+        });
       }
     }
+
     return '';
   }
 

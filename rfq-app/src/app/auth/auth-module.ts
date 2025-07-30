@@ -9,6 +9,7 @@ import { AuthRoutingModule } from './auth-routing-module';
 import { ResetPasswordComponent } from './reset-password/reset-password';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { VerifyComponent } from './verify/verify.component';
+import { TranslateModule  } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { VerifyComponent } from './verify/verify.component';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    AuthRoutingModule
+    AuthRoutingModule,
+    TranslateModule
   ]
 })
 export class AuthModule { }
