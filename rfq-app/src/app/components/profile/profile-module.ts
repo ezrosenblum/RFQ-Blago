@@ -8,6 +8,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Routes } from '@angular/router';
 import { MaterialCategoriesSelectionComponent } from './material-categories-selection/material-categories-selection.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 const routes: Routes = [
   {

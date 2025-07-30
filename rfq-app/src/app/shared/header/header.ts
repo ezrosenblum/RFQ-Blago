@@ -162,4 +162,5 @@ export class Header implements OnInit, OnDestroy {
   isCurrentRoute(route: string): boolean {
     return this.router.url === route;
   }
+  
 }
