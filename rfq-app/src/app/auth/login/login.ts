@@ -5,6 +5,7 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { LoginRequest } from '../../models/auth.model';
 import { Auth } from '../../services/auth';
 import { User } from '../../models/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,8 @@ export class Login implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.initializeForm();
   }
@@ -141,10 +143,24 @@ export class Login implements OnInit, OnDestroy {
   getFieldError(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${fieldName} is required`;
-      if (field.errors['email']) return 'Please enter a valid email address';
-      if (field.errors['minlength']) return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
-      if (field.errors['maxlength']) return `${fieldName} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
+      if (field.errors['required']) {
+        return this.translate.instant('AUTH.VALIDATION.REQUIRED', { field: fieldName });
+      }
+      if (field.errors['email']) {
+        return this.translate.instant('AUTH.VALIDATION.EMAIL');
+      }
+      if (field.errors['minlength']) {
+        return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
+          field: fieldName,
+          min: field.errors['minlength'].requiredLength
+        });
+      }
+      if (field.errors['maxlength']) {
+        return this.translate.instant('AUTH.VALIDATION.MAX_LENGTH', {
+          field: fieldName,
+          max: field.errors['maxlength'].requiredLength
+        });
+      }
     }
     return '';
   }

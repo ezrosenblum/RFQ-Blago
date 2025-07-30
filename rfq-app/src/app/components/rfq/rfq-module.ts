@@ -6,7 +6,7 @@ import { RequestQuote } from './request-quote/request-quote';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VendorRfqs } from './vendor-rfqs/vendor-rfqs';
 import { FilePondModule } from 'ngx-filepond';
-
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,8 @@ import { FilePondModule } from 'ngx-filepond';
     ReactiveFormsModule,
     FormsModule,
     RfqRoutingModule,
-    FilePondModule
+    FilePondModule,
+    TranslateModule
   ]
 })
 export class RfqModule { }

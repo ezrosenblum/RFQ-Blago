@@ -4,14 +4,14 @@
     <!-- Header -->
     <div class="text-center">
       <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100">
-        RFQ System
+        {{'AUTH.RFQ_SYSTEM' | translate}}
       </h1>
       <h2 class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200">
-        Verifying email
+        {{'AUTH.VERIFYING_EMAIL' | translate}}
       </h2>
       <div *ngIf="showSpinner" class="flex items-center">
         <div class="spinner mr-2"></div>
-        <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">Please wait while we verify your email address</p>
+        <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">{{'AUTH.PLEASE_WAIT_WHILE_WE_VERIFY_YOUR_EMAIL_ADDRESS' | translate}}</p>
       </div>
     </div>
 </div>
