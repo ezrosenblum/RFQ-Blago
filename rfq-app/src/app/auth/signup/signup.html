@@ -1,16 +1,22 @@
 <!-- src/app/auth/signup/signup.component.html -->
-<div class="min-h-screen flex items-center justify-center bg-secondary-50 dark:bg-dark-900 py-12 px-4 sm:px-6 lg:px-8">
+<div
+  class="min-h-screen flex items-center justify-center bg-secondary-50 dark:bg-dark-900 py-12 px-4 sm:px-6 lg:px-8"
+>
   <div class="max-w-md w-full space-y-8">
     <!-- Header -->
     <div class="text-center">
       <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100">
         RFQ System
       </h1>
-      <h2 class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200">
-        Create your account
+      <h2
+        class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200"
+      >
+        {{ isVendorDetailsStep ? 'Company Information' : 'Create your account'
+        }}
       </h2>
       <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
-        Join the RFQ system to start requesting or providing quotes
+        {{ isVendorDetailsStep ? 'Tell us about your business' : 'Join the RFQ
+        system to start requesting or providing quotes' }}
       </p>
     </div>
 
@@ -22,221 +28,473 @@
     >
       <div class="flex">
         <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
         </svg>
         <span>{{ successMessage }}</span>
       </div>
     </div>
 
     <!-- Signup Form -->
-    <form class="mt-8 space-y-6" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+    <form
+      class="mt-8 space-y-6"
+      [formGroup]="signupForm"
+      (ngSubmit)="onSubmit()"
+    >
       <!-- Error Message -->
-      <div
-        *ngIf="errorMessage"
-        class="alert alert-error fade-in"
-        role="alert"
-      >
+      <div *ngIf="errorMessage" class="alert alert-error fade-in" role="alert">
         <div class="flex">
           <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
           </svg>
           <span>{{ errorMessage }}</span>
         </div>
       </div>
 
-      <!-- Name Fields -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <!-- First Name -->
-        <div>
-          <label for="firstName" class="form-label">
-            First Name *
-          </label>
-          <input
-            id="firstName"
-            name="firstName"
-            type="text"
-            autocomplete="given-name"
-            formControlName="firstName"
-            class="form-input"
-            [class.border-error-500]="isFieldInvalid('firstName')"
-            placeholder="Enter first name"
-          >
-          <div *ngIf="isFieldInvalid('firstName')" class="form-error">
-            {{ getFieldError('firstName') }}
-          </div>
-        </div>
-
-        <!-- Last Name -->
-        <div>
-          <label for="lastName" class="form-label">
-            Last Name *
-          </label>
-          <input
-            id="lastName"
-            name="lastName"
-            type="text"
-            autocomplete="family-name"
-            formControlName="lastName"
-            class="form-input"
-            [class.border-error-500]="isFieldInvalid('lastName')"
-            placeholder="Enter last name"
-          >
-          <div *ngIf="isFieldInvalid('lastName')" class="form-error">
-            {{ getFieldError('lastName') }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Email Field -->
-      <div>
-        <label for="email" class="form-label">
-          Email Address *
-        </label>
-        <div class="relative">
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            formControlName="email"
-            class="form-input"
-            [class.border-error-500]="isFieldInvalid('email')"
-            placeholder="Enter your email address"
-          >
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-            <svg *ngIf="!isFieldInvalid('email')" class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
-            </svg>
-            <svg *ngIf="isFieldInvalid('email')" class="h-5 w-5 text-error-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-          </div>
-        </div>
-        <div *ngIf="isFieldInvalid('email')" class="form-error">
-          {{ getFieldError('email') }}
-        </div>
-      </div>
-
-      <!-- Role Selection -->
-      <div>
-        <label for="role" class="form-label">
-          Account Type *
-        </label>
-        <select
-          id="role"
-          name="role"
-          formControlName="role"
-          class="form-select"
-          [class.border-error-500]="isFieldInvalid('role')"
-        >
-          <option value="" disabled>Select your role</option>
-          <option *ngFor="let role of userRoles" [value]="role.value">
-            {{ role.label }}
-          </option>
-        </select>
-        <div *ngIf="isFieldInvalid('role')" class="form-error">
-          {{ getFieldError('role') }}
-        </div>
-      </div>
-
-      <!-- Password Field -->
-      <div>
-        <label for="password" class="form-label">
-          Password *
-        </label>
-        <div class="relative">
-          <input
-            id="password"
-            name="password"
-            [type]="showPassword ? 'text' : 'password'"
-            autocomplete="new-password"
-            formControlName="password"
-            class="form-input"
-            [class.border-error-500]="isFieldInvalid('password')"
-            placeholder="Create a strong password"
-          >
-          <button
-            type="button"
-            (click)="togglePasswordVisibility()"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center"
-          >
-            <svg *ngIf="!showPassword" class="h-5 w-5 text-secondary-400 hover:text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-            </svg>
-            <svg *ngIf="showPassword" class="h-5 w-5 text-secondary-400 hover:text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Password Strength Indicator -->
-        <div *ngIf="signupForm.get('password')?.value" class="mt-2">
-          <div class="flex items-center space-x-2">
-            <div class="flex space-x-1">
-              <div
-                class="h-1 w-8 rounded-full transition-colors duration-200"
-                [class]="getPasswordStrength() === 'weak' ? 'bg-error-500' :
-                        getPasswordStrength() === 'medium' ? 'bg-warning-500' : 'bg-success-500'"
-              ></div>
-              <div
-                class="h-1 w-8 rounded-full transition-colors duration-200"
-                [class]="getPasswordStrength() === 'medium' ? 'bg-warning-500' :
-                        getPasswordStrength() === 'strong' ? 'bg-success-500' : 'bg-secondary-200 dark:bg-secondary-700'"
-              ></div>
-              <div
-                class="h-1 w-8 rounded-full transition-colors duration-200"
-                [class]="getPasswordStrength() === 'strong' ? 'bg-success-500' : 'bg-secondary-200 dark:bg-secondary-700'"
-              ></div>
+      <!-- Step 1: Basic User Information -->
+      <div *ngIf="!isVendorDetailsStep">
+        <!-- Name Fields -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <!-- First Name -->
+          <div>
+            <label for="firstName" class="form-label"> First Name * </label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              autocomplete="given-name"
+              formControlName="firstName"
+              class="form-input"
+              [class.border-error-500]="isFieldInvalid('firstName')"
+              placeholder="Enter first name"
+            />
+            <div *ngIf="isFieldInvalid('firstName')" class="form-error">
+              {{ getFieldError('firstName') }}
             </div>
-            <span
-              class="text-xs font-medium capitalize"
-              [class]="getPasswordStrength() === 'weak' ? 'text-error-600 dark:text-error-400' :
-                      getPasswordStrength() === 'medium' ? 'text-warning-600 dark:text-warning-400' :
-                      'text-success-600 dark:text-success-400'"
-            >
-              {{ getPasswordStrength() }}
-            </span>
+          </div>
+
+          <!-- Last Name -->
+          <div>
+            <label for="lastName" class="form-label"> Last Name * </label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              autocomplete="family-name"
+              formControlName="lastName"
+              class="form-input"
+              [class.border-error-500]="isFieldInvalid('lastName')"
+              placeholder="Enter last name"
+            />
+            <div *ngIf="isFieldInvalid('lastName')" class="form-error">
+              {{ getFieldError('lastName') }}
+            </div>
           </div>
         </div>
 
-        <div *ngIf="isFieldInvalid('password')" class="form-error">
-          {{ getFieldError('password') }}
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="form-label"> Email Address * </label>
+          <div class="relative">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              formControlName="email"
+              class="form-input"
+              [class.border-error-500]="isFieldInvalid('email')"
+              placeholder="Enter your email address"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <svg
+                *ngIf="!isFieldInvalid('email')"
+                class="h-5 w-5 text-secondary-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                />
+              </svg>
+              <svg
+                *ngIf="isFieldInvalid('email')"
+                class="h-5 w-5 text-error-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
+          <div *ngIf="isFieldInvalid('email')" class="form-error">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div>
+          <label for="role" class="form-label"> Account Type * </label>
+          <select
+            id="role"
+            name="role"
+            formControlName="role"
+            class="form-select"
+            [class.border-error-500]="isFieldInvalid('role')"
+            (change)="onRoleChange()"
+          >
+            <option value="" disabled>Select your role</option>
+            <option *ngFor="let role of userRoles" [value]="role.value">
+              {{ role.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('role')" class="form-error">
+            {{ getFieldError('role') }}
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="form-label"> Password * </label>
+          <div class="relative">
+            <input
+              id="password"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              autocomplete="new-password"
+              formControlName="password"
+              class="form-input"
+              [class.border-error-500]="isFieldInvalid('password')"
+              placeholder="Create a strong password"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <svg
+                *ngIf="!showPassword"
+                class="h-5 w-5 text-secondary-400 hover:text-secondary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                *ngIf="showPassword"
+                class="h-5 w-5 text-secondary-400 hover:text-secondary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Password Strength Indicator -->
+          <div *ngIf="signupForm.get('password')?.value" class="mt-2">
+            <div class="flex items-center space-x-2">
+              <div class="flex space-x-1">
+                <div
+                  class="h-1 w-8 rounded-full transition-colors duration-200"
+                  [class]="getPasswordStrength() === 'weak' ? 'bg-error-500' :
+                          getPasswordStrength() === 'medium' ? 'bg-warning-500' : 'bg-success-500'"
+                ></div>
+                <div
+                  class="h-1 w-8 rounded-full transition-colors duration-200"
+                  [class]="getPasswordStrength() === 'medium' ? 'bg-warning-500' :
+                          getPasswordStrength() === 'strong' ? 'bg-success-500' : 'bg-secondary-200 dark:bg-secondary-700'"
+                ></div>
+                <div
+                  class="h-1 w-8 rounded-full transition-colors duration-200"
+                  [class]="getPasswordStrength() === 'strong' ? 'bg-success-500' : 'bg-secondary-200 dark:bg-secondary-700'"
+                ></div>
+              </div>
+              <span
+                class="text-xs font-medium capitalize"
+                [class]="getPasswordStrength() === 'weak' ? 'text-error-600 dark:text-error-400' :
+                        getPasswordStrength() === 'medium' ? 'text-warning-600 dark:text-warning-400' :
+                        'text-success-600 dark:text-success-400'"
+              >
+                {{ getPasswordStrength() }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="isFieldInvalid('password')" class="form-error">
+            {{ getFieldError('password') }}
+          </div>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div>
+          <label for="confirmPassword" class="form-label">
+            Confirm Password *
+          </label>
+          <div class="relative">
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              autocomplete="new-password"
+              formControlName="confirmPassword"
+              class="form-input"
+              [class.border-error-500]="isFieldInvalid('confirmPassword')"
+              placeholder="Confirm your password"
+            />
+            <button
+              type="button"
+              (click)="toggleConfirmPasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <svg
+                *ngIf="!showConfirmPassword"
+                class="h-5 w-5 text-secondary-400 hover:text-secondary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg
+                *ngIf="showConfirmPassword"
+                class="h-5 w-5 text-secondary-400 hover:text-secondary-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                />
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="isFieldInvalid('confirmPassword')" class="form-error">
+            {{ getFieldError('confirmPassword') }}
+          </div>
         </div>
       </div>
 
-      <!-- Confirm Password Field -->
-      <div>
-        <label for="confirmPassword" class="form-label">
-          Confirm Password *
-        </label>
-        <div class="relative">
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            [type]="showConfirmPassword ? 'text' : 'password'"
-            autocomplete="new-password"
-            formControlName="confirmPassword"
-            class="form-input"
-            [class.border-error-500]="isFieldInvalid('confirmPassword')"
-            placeholder="Confirm your password"
-          >
+      <!-- Step 2: Vendor Details (only shown for vendors) -->
+      <div *ngIf="isVendorDetailsStep" class="space-y-6">
+        <!-- Back Button -->
+        <div class="flex justify-start">
           <button
             type="button"
-            (click)="toggleConfirmPasswordVisibility()"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center"
+            (click)="goBackToBasicInfo()"
+            class="flex items-center text-sm text-secondary-600 hover:text-secondary-800 dark:text-secondary-400 dark:hover:text-secondary-200"
           >
-            <svg *ngIf="!showConfirmPassword" class="h-5 w-5 text-secondary-400 hover:text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            <svg
+              class="h-4 w-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
-            <svg *ngIf="showConfirmPassword" class="h-5 w-5 text-secondary-400 hover:text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
-            </svg>
+            Back to account details
           </button>
         </div>
-        <div *ngIf="isFieldInvalid('confirmPassword')" class="form-error">
-          {{ getFieldError('confirmPassword') }}
+
+        <!-- Company Name -->
+        <div>
+          <label for="companyName" class="form-label"> Company Name * </label>
+          <input
+            id="companyName"
+            name="companyName"
+            type="text"
+            formControlName="companyName"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('companyName')"
+            placeholder="Enter your company name"
+          />
+          <div *ngIf="isFieldInvalid('companyName')" class="form-error">
+            {{ getFieldError('companyName') }}
+          </div>
+        </div>
+
+        <!-- Business Address -->
+        <div>
+          <label for="businessAddress" class="form-label">
+            Business Address *
+          </label>
+          <textarea
+            id="businessAddress"
+            name="businessAddress"
+            rows="3"
+            formControlName="businessAddress"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('businessAddress')"
+            placeholder="Enter your complete business address"
+          ></textarea>
+          <div *ngIf="isFieldInvalid('businessAddress')" class="form-error">
+            {{ getFieldError('businessAddress') }}
+          </div>
+        </div>
+
+        <!-- Contact Person -->
+        <div>
+          <label for="contactPerson" class="form-label">
+            Primary Contact Person *
+          </label>
+          <input
+            id="contactPerson"
+            name="contactPerson"
+            type="text"
+            formControlName="contactPerson"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('contactPerson')"
+            placeholder="Enter contact person name"
+          />
+          <div *ngIf="isFieldInvalid('contactPerson')" class="form-error">
+            {{ getFieldError('contactPerson') }}
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <label for="phoneNumber" class="form-label"> Phone Number * </label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            formControlName="phoneNumber"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('phoneNumber')"
+            placeholder="Enter your phone number"
+          />
+          <div *ngIf="isFieldInvalid('phoneNumber')" class="form-error">
+            {{ getFieldError('phoneNumber') }}
+          </div>
+        </div>
+
+        <!-- Business Description -->
+        <div>
+          <label for="businessDescription" class="form-label">
+            Business Description/Specialties *
+          </label>
+          <textarea
+            id="businessDescription"
+            name="businessDescription"
+            rows="4"
+            formControlName="businessDescription"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('businessDescription')"
+            placeholder="Describe your business and specialties"
+          ></textarea>
+          <div *ngIf="isFieldInvalid('businessDescription')" class="form-error">
+            {{ getFieldError('businessDescription') }}
+          </div>
+        </div>
+
+        <!-- Company Size -->
+        <div>
+          <label for="companySize" class="form-label">
+            Company Size (Optional)
+          </label>
+          <select
+            id="companySize"
+            name="companySize"
+            formControlName="companySize"
+            class="form-select"
+          >
+            <option value="">Select company size</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-200">51-200 employees</option>
+            <option value="201-500">201-500 employees</option>
+            <option value="500+">500+ employees</option>
+          </select>
+        </div>
+
+        <!-- Years in Business -->
+        <div>
+          <label for="yearsInBusiness" class="form-label">
+            Years in Business (Optional)
+          </label>
+          <input
+            id="yearsInBusiness"
+            name="yearsInBusiness"
+            type="number"
+            min="0"
+            max="100"
+            formControlName="yearsInBusiness"
+            class="form-input"
+            placeholder="Enter years in business"
+          />
+        </div>
+
+        <!-- Business License Upload -->
+        <div>
+          <label for="businessLicense" class="form-label">
+            Business License/Certification (Optional)
+          </label>
+          <input
+            id="businessLicense"
+            name="businessLicense"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            (change)="onFileSelected($event)"
+            class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+          />
+          <p class="mt-1 text-xs text-secondary-500">
+            Accepted formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
+          </p>
+          <div *ngIf="selectedFileName" class="mt-2 text-sm text-secondary-600">
+            Selected: {{ selectedFileName }}
+          </div>
         </div>
       </div>
 
@@ -244,13 +502,16 @@
       <div>
         <button
           type="submit"
-          [disabled]="isLoading || signupForm.invalid"
+          [disabled]="isLoading || !isFormValidForCurrentStep()"
           class="btn btn-primary w-full flex justify-center py-3 px-4"
         >
-          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="!isLoading">{{ getSubmitButtonText() }}</span>
           <div *ngIf="isLoading" class="flex items-center">
             <div class="spinner mr-2"></div>
-            <span>Creating account...</span>
+            <span
+              >{{ isVendorDetailsStep ? 'Creating account...' : 'Processing...'
+              }}</span
+            >
           </div>
         </button>
       </div>
