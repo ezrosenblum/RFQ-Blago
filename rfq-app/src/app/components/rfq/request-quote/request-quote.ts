@@ -8,6 +8,7 @@ import { User, UserRole } from '../../../models/user.model';
 import { LookupValue, RfqRequest } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
+import { FileItem } from '../../../models/form-validation';
 
 @Component({
   selector: 'app-request-quote',
@@ -35,6 +36,24 @@ export class RequestQuote implements OnInit, OnDestroy {
   };
 
   pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
+
+  // Dummy data for file view component
+  attachedFiles: FileItem[] = [
+    {
+      id: '1',
+      name: 'document.pdf',
+      size: 2048576,
+      lastModified: new Date('2024-01-15'),
+      type: 'application/pdf'
+    },
+    {
+      id: '2',  
+      name: 'image.png',
+      size: 1024000,
+      lastModified: new Date('2024-01-16'),
+      type: 'image/png'
+    }
+  ];
 
   constructor(
     private fb: FormBuilder,
