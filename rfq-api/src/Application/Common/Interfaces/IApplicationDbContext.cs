@@ -2,6 +2,7 @@
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.User;
+using Domain.Entities.Users.CompanyDetails;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -15,4 +16,5 @@ public interface IApplicationDbContext
     DbSet<RefreshToken> RefreshToken { get; }
     DbSet<Language> Language { get; }
     DbSet<Submission> Submission { get; }
+    DbSet<UserCompanyDetails> UserCompanyDetails { get; }
 }

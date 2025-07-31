@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistence;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250731115041_AddCompanyDetailsInUser")]
+    partial class AddCompanyDetailsInUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,63 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.Companies.UserCompanyDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanySize")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ContactPersonEmail")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContactPersonFirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContactPersonLastName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContactPersonPhone")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("LastModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Media")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserCompanyDetails");
+                });
 
             modelBuilder.Entity("Domain.Entities.Languages.Language", b =>
                 {
@@ -240,75 +300,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Users.CompanyDetails.UserCompanyDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompanySize")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ContactPersonEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContactPersonFirstName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContactPersonLastName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContactPersonPhone")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("LastModifiedBy")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("LatitudeAddress")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("LongitudeAddress")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("Media")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<double?>("OperatingRadius")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("StreetAddress")
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserCompanyDetails");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -441,6 +432,17 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Companies.UserCompanyDetails", b =>
+                {
+                    b.HasOne("Domain.Entities.User.ApplicationUser", "User")
+                        .WithOne("GetUserCompanyDetails")
+                        .HasForeignKey("Domain.Entities.Companies.UserCompanyDetails", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.RefreshTokens.RefreshToken", b =>
                 {
                     b.HasOne("Domain.Entities.User.ApplicationUser", "User")
@@ -457,17 +459,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User.ApplicationUser", "User")
                         .WithMany("Submissions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Users.CompanyDetails.UserCompanyDetails", b =>
-                {
-                    b.HasOne("Domain.Entities.User.ApplicationUser", "User")
-                        .WithOne("GetUserCompanyDetails")
-                        .HasForeignKey("Domain.Entities.Users.CompanyDetails.UserCompanyDetails", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

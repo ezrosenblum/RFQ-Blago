@@ -3,6 +3,7 @@ using Domain.Entities.Languages;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.User;
+using Domain.Entities.Users.CompanyDetails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<RefreshToken> RefreshToken => Set<RefreshToken>();
     public DbSet<Language> Language => Set<Language>();
     public DbSet<Submission> Submission => Set<Submission>();
+    public DbSet<UserCompanyDetails> UserCompanyDetails => Set<UserCompanyDetails>();
 
 
     protected override void OnModelCreating(ModelBuilder builder)
