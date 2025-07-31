@@ -11,6 +11,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { SignupRequest } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-signup',
@@ -36,7 +37,8 @@ export class Signup implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.initializeForm();
   }
@@ -229,19 +231,30 @@ export class Signup implements OnInit, OnDestroy {
     return !!(field && field.invalid && field.touched);
   }
 
-  getFieldError(fieldName: string): string {
+   getFieldError(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
     if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${fieldName} is required`;
+      if (field.errors['required'])
+        return `${this.getFieldDisplayName(fieldName)} is required`;
       if (field.errors['requiredTrue'])
         return 'You must agree to the terms and conditions';
       if (field.errors['email']) return 'Please enter a valid email address';
       if (field.errors['minlength'])
-        return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
+        return `${this.getFieldDisplayName(fieldName)} must be at least ${
+          field.errors['minlength'].requiredLength
+        } characters`;
       if (field.errors['maxlength'])
-        return `${fieldName} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
-      if (field.errors['pattern'])
-        return `${fieldName} contains invalid characters`;
+        return `${this.getFieldDisplayName(fieldName)} must not exceed ${
+          field.errors['maxlength'].requiredLength
+        } characters`;
+      if (field.errors['pattern']) {
+        if (fieldName === 'phoneNumber') {
+          return 'Please enter a valid phone number';
+        }
+        return `${this.getFieldDisplayName(
+          fieldName
+        )} contains invalid characters`;
+      }
       if (field.errors['passwordMismatch']) return 'Passwords do not match';
       if (field.errors['passwordStrength']) {
         const requirements = [];

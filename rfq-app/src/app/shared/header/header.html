@@ -15,7 +15,7 @@
               d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
             />
           </svg>
-          <span class="text-xl font-bold">RFQ System</span>
+          <span class="text-xl font-bold">{{'AUTH.RFQ_SYSTEM' | translate}}</span>
         </button>
       </div>
 
@@ -29,7 +29,7 @@
           [class.dark:text-primary-400]="isCurrentRoute('/request-quote')"
           class="nav-link px-3 py-2 rounded-md text-sm font-medium"
         >
-          Request Quote
+          {{'REQUEST.REQUEST_QUOTE' | translate}}
         </button>
 
         <!-- Authenticated Navigation -->
@@ -40,7 +40,7 @@
           [class.dark:text-primary-400]="isCurrentRoute('/vendor-rfqs')"
           class="nav-link px-3 py-2 rounded-md text-sm font-medium"
         >
-          View RFQs
+          {{'HEADER.VIEW_RFQS' | translate}}
         </button>
 
         <!-- Theme Toggle -->
@@ -85,13 +85,13 @@
             (click)="navigateToLogin()"
             class="btn btn-ghost px-4 py-2 text-sm"
           >
-            Sign In
+            {{'AUTH.SIGN_IN' | translate}}
           </button>
           <button
             (click)="navigateToSignup()"
             class="btn btn-primary px-4 py-2 text-sm"
           >
-            Sign Up
+            {{'HEADER.SIGN_UP' | translate}}
           </button>
         </div>
 
@@ -239,7 +239,7 @@
           [class.dark:text-primary-400]="isCurrentRoute('/request-quote')"
           class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
         >
-          Request Quote
+          {{'REQUEST.REQUEST_QUOTE' | translate}}
         </button>
 
         <!-- Authenticated Navigation -->
@@ -252,7 +252,7 @@
           [class.dark:text-primary-400]="isCurrentRoute('/vendor-rfqs')"
           class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
         >
-          View RFQs
+          {{'HEADER.VIEW_RFQS' | translate}}
         </button>
 
         <!-- Authentication Section -->
@@ -286,13 +286,13 @@
               (click)="navigateToLogin()"
               class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
             >
-              Sign In
+              {{'AUTH.SIGN_IN' | translate}}
             </button>
             <button
               (click)="navigateToSignup()"
               class="block w-full text-left px-3 py-2 rounded-md text-base font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors duration-200"
             >
-              Sign Up
+              {{'HEADER.SIGN_UP' | translate}}
             </button>
           </div>
 
@@ -316,7 +316,7 @@
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
-              <span>Sign Out</span>
+              <span>{{'HEADER.SIGN_OUT' | translate}}</span>
             </div>
           </button>
         </div>

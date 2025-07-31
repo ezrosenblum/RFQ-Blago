@@ -7,6 +7,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('./assets/styles/icons.css');
 
+// FilePond drag and drop 
+@import "filepond/dist/filepond.min.css";
+
 // Custom CSS variables for dark theme
 :root {
   --color-primary: #3b82f6;

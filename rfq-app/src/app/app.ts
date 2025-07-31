@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Auth } from './services/auth';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,9 @@ export class App implements OnInit {
 
   constructor(
     private authService: Auth,
+    private translate: TranslateService
   ) {}
+
 
   ngOnInit(): void {
     if (localStorage.getItem('rfqTokenAcc')) {
@@ -24,5 +27,7 @@ export class App implements OnInit {
         }
       });
     }
+    this.translate.setDefaultLang('en');
+    this.translate.use('en');
   }
 }

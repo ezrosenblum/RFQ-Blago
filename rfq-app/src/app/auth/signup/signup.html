@@ -4,13 +4,13 @@
     <!-- Header -->
     <div class="text-center">
       <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100">
-        RFQ System
+        {{'AUTH.RFQ_SYSTEM' | translate}}
       </h1>
       <h2 class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200">
-        Create your account
+        {{'AUTH.CREATE_YOUR_ACCOUNT' | translate}}
       </h2>
       <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
-        Join the RFQ system to start requesting or providing quotes
+        {{'AUTH.JOIN_THE_RFQ_SYSTEM' | translate}}
       </p>
     </div>
 
@@ -49,7 +49,7 @@
         <!-- First Name -->
         <div>
           <label for="firstName" class="form-label">
-            First Name *
+            {{'AUTH.FIRST_NAME' | translate}} *
           </label>
           <input
             id="firstName"
@@ -69,7 +69,7 @@
         <!-- Last Name -->
         <div>
           <label for="lastName" class="form-label">
-            Last Name *
+            {{'AUTH.LAST_NAME' | translate}} *
           </label>
           <input
             id="lastName"
@@ -90,7 +90,7 @@
       <!-- Email Field -->
       <div>
         <label for="email" class="form-label">
-          Email Address *
+          {{'AUTH.EMAIL_ADDRESS' | translate}} *
         </label>
         <div class="relative">
           <input
@@ -120,7 +120,7 @@
       <!-- Role Selection -->
       <div>
         <label for="role" class="form-label">
-          Account Type *
+          {{'AUTH.ACCOUNT_TYPE' | translate}} *
         </label>
         <select
           id="role"
@@ -142,7 +142,7 @@
       <!-- Password Field -->
       <div>
         <label for="password" class="form-label">
-          Password *
+          {{'AUTH.PASSWORD' | translate}} *
         </label>
         <div class="relative">
           <input
@@ -208,7 +208,7 @@
       <!-- Confirm Password Field -->
       <div>
         <label for="confirmPassword" class="form-label">
-          Confirm Password *
+          {{'AUTH.CONFIRM_PASSWORD' | translate}} *
         </label>
         <div class="relative">
           <input
@@ -247,10 +247,10 @@
           [disabled]="isLoading || signupForm.invalid"
           class="btn btn-primary w-full flex justify-center py-3 px-4"
         >
-          <span *ngIf="!isLoading">Create Account</span>
+          <span *ngIf="!isLoading">{{'AUTH.CREATE_ACCOUNT' | translate}}</span>
           <div *ngIf="isLoading" class="flex items-center">
             <div class="spinner mr-2"></div>
-            <span>Creating account...</span>
+            <span>{{'AUTH.CREATING_ACCOUNT' | translate}}</span>
           </div>
         </button>
       </div>
@@ -258,13 +258,13 @@
       <!-- Login Link -->
       <div class="text-center">
         <p class="text-sm text-secondary-600 dark:text-secondary-400">
-          Already have an account?
+          {{'AUTH.ALREADY_HAVE_AN_ACCOUNT' | translate}}
           <button
             type="button"
             (click)="navigateToLogin()"
             class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 ml-1"
           >
-            Sign in here
+            {{'AUTH.SIGN_IN_HERE' | translate}}
           </button>
         </p>
       </div>
@@ -273,7 +273,7 @@
     <!-- Additional Info -->
     <div class="mt-8 text-center">
       <p class="text-xs text-secondary-500 dark:text-secondary-400">
-        Your account will be reviewed and activated within 24 hours
+        {{'AUTH.YOUR_ACCOUNT_WILL_BE_REVIEWED_AND_ACTIVATED' | translate}}
       </p>
     </div>
   </div>

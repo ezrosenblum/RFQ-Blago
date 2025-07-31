@@ -36,8 +36,13 @@ export class Token {
 
 
 export class PasswordResetRequest {
-    constructor(
-        public token: string,
-        public uid: string,
-        public password: string) { }
+  constructor(
+    public token: string,
+    public uid: string,
+    public password: string) { }
+}
+
+export class VerifyData {
+  token?: string | null | undefined;
+  uid?: string | null | undefined;
 }

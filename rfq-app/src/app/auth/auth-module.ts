@@ -7,18 +7,24 @@ import { Login } from './login/login';
 import { Signup} from './signup/signup';
 import { AuthRoutingModule } from './auth-routing-module';
 import { ResetPasswordComponent } from './reset-password/reset-password';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { VerifyComponent } from './verify/verify.component';
+import { TranslateModule  } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [
     Login,
     Signup,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    ForgotPasswordComponent,
+    VerifyComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    AuthRoutingModule
+    AuthRoutingModule,
+    TranslateModule
   ]
 })
 export class AuthModule { }

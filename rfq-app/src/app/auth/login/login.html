@@ -4,20 +4,20 @@
     <!-- Header -->
     <div class="text-center">
       <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100">
-        RFQ System
+        {{"AUTH.RFQ_SYSTEM" | translate}}
       </h1>
       <h2 class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200">
-        Sign in to your account
+        {{"AUTH.SIGN_IN_TO_YOUR_ACCOUNT" | translate}}
       </h2>
       <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
-        Enter your credentials to access the RFQ system
+        {{"AUTH.ENTER_YOUR_CREDENTIALS_TO_ACCESS_RFQ_SYSTEM" | translate}}
       </p>
     </div>
 
     <!-- Demo Accounts -->
     <div class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4">
       <h3 class="text-sm font-medium text-primary-800 dark:text-primary-200 mb-3">
-        Demo Accounts (Click to use):
+        {{"AUTH.DEMO_ACCOUNTS" | translate}}
       </h3>
       <div class="space-y-2">
         <button
@@ -51,7 +51,7 @@
       <!-- Email Field -->
       <div>
         <label for="email" class="form-label">
-          Email Address *
+          {{'AUTH.EMAIL_ADDRESS' | translate}} *
         </label>
         <div class="relative">
           <input
@@ -81,7 +81,7 @@
       <!-- Password Field -->
       <div>
         <label for="password" class="form-label">
-          Password *
+          {{'AUTH.PASSWORD' | translate}} *
         </label>
         <div class="relative">
           <input
@@ -124,14 +124,14 @@
             class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-secondary-300 dark:border-secondary-600 rounded"
           >
           <label for="rememberMe" class="ml-2 block text-sm text-secondary-700 dark:text-secondary-300">
-            Remember me
+            {{'AUTH.REMEMBER_ME' | translate}}
           </label>
         </div>
-        <!-- <div class="text-sm">
-          <a href="#" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
-            Forgot password?
+        <div class="text-sm">
+          <a (click)="navigateToForgotPassword()" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+            {{'AUTH.FORGOT_PASSWORD' | translate}}
           </a>
-        </div> -->
+        </div>
       </div>
 
       <!-- Submit Button -->
@@ -141,10 +141,10 @@
           [disabled]="isLoading || loginForm.invalid"
           class="btn btn-primary w-full flex justify-center py-3 px-4"
         >
-          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="!isLoading">{{'AUTH.SIGN_IN' | translate}}</span>
           <div *ngIf="isLoading" class="flex items-center">
             <div class="spinner mr-2"></div>
-            <span>Signing in...</span>
+            <span>{{'AUTH.SIGNING_IN' | translate}}</span>
           </div>
         </button>
       </div>
@@ -152,13 +152,13 @@
       <!-- Sign Up Link -->
       <div class="text-center">
         <p class="text-sm text-secondary-600 dark:text-secondary-400">
-          Don't have an account?
+          {{'AUTH.DONT_HAVE_AN_ACCOUNT' | translate}}
           <button
             type="button"
             (click)="navigateToSignup()"
             class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 ml-1"
           >
-            Sign up here
+            {{'AUTH.SIGN_UP_HERE' | translate}}
           </button>
         </p>
       </div>
@@ -167,7 +167,7 @@
     <!-- Additional Info -->
     <div class="mt-8 text-center">
       <p class="text-xs text-secondary-500 dark:text-secondary-400">
-        By signing in, you agree to our Terms of Service and Privacy Policy
+        {{'AUTH.SIGNING_IN_AGREE_TERMS' | translate}}
       </p>
     </div>
   </div>
