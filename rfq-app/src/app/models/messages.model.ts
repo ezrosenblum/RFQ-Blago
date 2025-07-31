@@ -1,4 +1,4 @@
-interface Conversation {
+export interface Conversation {
   id: number;
   company: string;
   initials: string;
@@ -9,7 +9,7 @@ interface Conversation {
   hasIndicator?: boolean;
 }
 
-interface Message {
+export interface Message {
   sender: string;
   content: string;
   time: string;
@@ -24,7 +24,7 @@ interface Message {
   };
 }
 
-interface Activity {
+export interface Activity {
   icon: string;
   title: string;
   subtitle?: string;

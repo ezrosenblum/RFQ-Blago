@@ -40,9 +40,10 @@
         <input
           type="text"
           placeholder="Search"
-          [(ngModel)]="searchTerm"
+          (input)="onSearchChange($event)"
           class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
         />
+
         <svg
           class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 cursor-pointer"
           fill="none"
@@ -62,7 +63,7 @@
     <!-- Conversations -->
     <div class="flex-1 overflow-y-auto">
       <div
-        *ngFor="let conv of conversations; let i = index"
+        *ngFor="let conv of filteredConversations; let i = index"
         (click)="selectChat(i)"
         [class]="
           'p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ' +
@@ -85,9 +86,9 @@
               <h3 class="font-medium text-gray-900 dark:text-white truncate">
                 {{ conv.company }}
               </h3>
-              <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                conv.time
-              }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400"
+                >{{ conv.time }}</span
+              >
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {{ conv.project }}
@@ -202,12 +203,12 @@
         </div>
         <div class="flex-1">
           <div class="flex items-center space-x-2 mb-1">
-            <span class="font-medium text-gray-900 dark:text-white">{{
-              msg.sender
-            }}</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">{{
-              msg.time
-            }}</span>
+            <span class="font-medium text-gray-900 dark:text-white"
+              >{{ msg.sender }}</span
+            >
+            <span class="text-xs text-gray-500 dark:text-gray-400"
+              >{{ msg.time }}</span
+            >
           </div>
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl">
             <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
@@ -222,9 +223,9 @@
             <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {{ msg.preview?.description }}
             </p>
-            <span class="text-xs text-gray-500 dark:text-gray-400 mt-2 block">{{
-              msg.preview?.platform
-            }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-2 block"
+              >{{ msg.preview?.platform }}</span
+            >
           </div>
         </div>
       </div>

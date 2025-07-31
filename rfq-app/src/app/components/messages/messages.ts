@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Activity, Conversation, Message } from '../../models/messages.model';
 
 @Component({
   standalone: false,
@@ -6,8 +7,9 @@ import { Component } from '@angular/core';
   templateUrl: './messages.html',
   styleUrl: './messages.scss',
 })
-export class MessagesComponent {
+export class MessagesComponent implements OnInit {
   searchTerm: string = '';
+  filteredConversations: Conversation[] = [];
   newMessage: string = '';
   selectedChatIndex: number = 0;
 
@@ -159,9 +161,22 @@ export class MessagesComponent {
       bgColor: 'bg-orange-500',
     },
   ];
-  constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.filteredConversations = this.conversations;
+  }
+
+  onSearchChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input?.value || '';
+    this.searchTerm = value.toLowerCase();
+    this.filteredConversations = this.conversations.filter(
+      (conv) =>
+        conv.company.toLowerCase().includes(this.searchTerm) ||
+        conv.project.toLowerCase().includes(this.searchTerm) ||
+        conv.lastMessage.toLowerCase().includes(this.searchTerm)
+    );
+  }
 
   get selectedConversation(): Conversation {
     return this.conversations[this.selectedChatIndex];

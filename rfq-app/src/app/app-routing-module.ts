@@ -27,7 +27,8 @@ const routes: Routes = [
   },
    {
     path: 'messages',
-    component: MessagesComponent
+    component: MessagesComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'vendor-rfqs',
