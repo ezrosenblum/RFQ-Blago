@@ -9,9 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
-import { SignupRequest } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-signup',
@@ -26,6 +24,8 @@ export class Signup implements OnInit, OnDestroy {
   successMessage = '';
   showPassword = false;
   showConfirmPassword = false;
+  isVendorDetailsStep = false;
+  selectedFileName = '';
 
   private destroy$ = new Subject<void>();
 
@@ -37,8 +37,7 @@ export class Signup implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
-    private router: Router,
-    private translate: TranslateService
+    private router: Router
   ) {
     this.initializeForm();
   }
@@ -58,6 +57,7 @@ export class Signup implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.signupForm = this.fb.group(
       {
+        // Basic user information
         firstName: [
           '',
           [
@@ -89,18 +89,249 @@ export class Signup implements OnInit, OnDestroy {
           '',
           [
             Validators.required,
-            Validators.minLength(8),
+            Validators.minLength(6),
             Validators.maxLength(50),
             this.passwordStrengthValidator,
           ],
         ],
         confirmPassword: ['', [Validators.required]],
         role: [UserRole.CLIENT, [Validators.required]],
+        companyName: [''],
+        businessAddress: [''],
+        contactPerson: [''],
+        phoneNumber: [''],
+        businessDescription: [''],
+        companySize: [''],
+        yearsInBusiness: [''],
+        businessLicense: [''],
       },
       {
         validators: this.passwordMatchValidator,
       }
     );
+  }
+
+  onRoleChange(): void {
+    const role = this.signupForm.get('role')?.value;
+    if (role === UserRole.VENDOR) {
+      this.addVendorValidators();
+    } else {
+      this.removeVendorValidators();
+      this.isVendorDetailsStep = false;
+    }
+  }
+
+  private addVendorValidators(): void {
+    const vendorFields = {
+      companyName: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(100),
+      ],
+      businessAddress: [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(500),
+      ],
+      contactPerson: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+      ],
+      phoneNumber: [
+        Validators.required,
+        Validators.pattern(/^\+?[\d\s\-\(\)]{10,15}$/),
+      ],
+      businessDescription: [
+        Validators.required,
+        Validators.minLength(20),
+        Validators.maxLength(1000),
+      ],
+    };
+
+    Object.keys(vendorFields).forEach((field) => {
+      this.signupForm
+        .get(field)
+        ?.setValidators(vendorFields[field as keyof typeof vendorFields]);
+      this.signupForm.get(field)?.updateValueAndValidity();
+    });
+  }
+
+  private removeVendorValidators(): void {
+    const vendorFields = [
+      'companyName',
+      'businessAddress',
+      'contactPerson',
+      'phoneNumber',
+      'businessDescription',
+    ];
+
+    vendorFields.forEach((field) => {
+      this.signupForm.get(field)?.clearValidators();
+      this.signupForm.get(field)?.updateValueAndValidity();
+      this.signupForm.get(field)?.setValue('');
+    });
+  }
+
+  getSubmitButtonText(): string {
+    if (this.isVendorDetailsStep) {
+      return 'Create Account';
+    }
+
+    const role = this.signupForm.get('role')?.value;
+    return role === UserRole.VENDOR ? 'Next' : 'Create Account';
+  }
+
+  isFormValidForCurrentStep(): boolean {
+    if (this.isVendorDetailsStep) {
+      return this.signupForm.valid;
+    } else {
+      const basicFields = [
+        'firstName',
+        'lastName',
+        'email',
+        'password',
+        'confirmPassword',
+        'role',
+      ];
+      return basicFields.every((field) => {
+        const control = this.signupForm.get(field);
+        return control && control.valid;
+      });
+    }
+  }
+
+  goBackToBasicInfo(): void {
+    this.isVendorDetailsStep = false;
+    this.errorMessage = '';
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        this.errorMessage = 'File size must be less than 5MB';
+        event.target.value = '';
+        this.selectedFileName = '';
+        return;
+      }
+      const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        this.errorMessage =
+          'Invalid file type. Please upload PDF, JPG, PNG, DOC, or DOCX files only.';
+        event.target.value = '';
+        this.selectedFileName = '';
+        return;
+      }
+
+      this.selectedFileName = file.name;
+      this.signupForm.patchValue({ businessLicense: file });
+      this.errorMessage = '';
+    }
+  }
+
+  onSubmit(): void {
+    const role = this.signupForm.get('role')?.value;
+    if (role === UserRole.VENDOR && !this.isVendorDetailsStep) {
+      if (this.isFormValidForCurrentStep()) {
+        this.isVendorDetailsStep = true;
+        this.errorMessage = '';
+      } else {
+        this.markBasicFieldsAsTouched();
+      }
+      return;
+    }
+
+    if (this.isFormValidForCurrentStep() && !this.isLoading) {
+      this.isLoading = true;
+      this.errorMessage = '';
+      this.successMessage = '';
+
+      const signupData: any = {
+        email: this.signupForm.value.email.trim().toLowerCase(),
+        password: this.signupForm.value.password,
+        firstName: this.signupForm.value.firstName.trim(),
+        lastName: this.signupForm.value.lastName.trim(),
+        role: this.signupForm.value.role,
+      };
+      if (role === UserRole.VENDOR) {
+        signupData.vendorDetails = {
+          companyName: this.signupForm.value.companyName.trim(),
+          businessAddress: this.signupForm.value.businessAddress.trim(),
+          contactPerson: this.signupForm.value.contactPerson.trim(),
+          phoneNumber: this.signupForm.value.phoneNumber.trim(),
+          businessDescription: this.signupForm.value.businessDescription.trim(),
+          companySize: this.signupForm.value.companySize || null,
+          yearsInBusiness: this.signupForm.value.yearsInBusiness || null,
+          businessLicense: this.signupForm.value.businessLicense || null,
+        };
+      }
+
+      this.authService
+        .signup(signupData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            this.successMessage =
+              'Account created successfully! You will be redirected shortly.';
+            setTimeout(() => {
+              console.log('Signup successful:', response);
+              this.router.navigate(['/dashboard']);
+            }, 1500);
+          },
+          error: (error) => {
+            this.isLoading = false;
+            this.handleSignupError(error);
+          },
+        });
+    } else {
+      this.markFormGroupTouched();
+    }
+  }
+
+  private markBasicFieldsAsTouched(): void {
+    const basicFields = [
+      'firstName',
+      'lastName',
+      'email',
+      'password',
+      'confirmPassword',
+      'role',
+    ];
+    basicFields.forEach((field) => {
+      const control = this.signupForm.get(field);
+      control?.markAsTouched();
+    });
+  }
+
+  private handleSignupError(error: any): void {
+    if (error.status === 409) {
+      this.errorMessage =
+        'An account with this email already exists. Please use a different email or try logging in.';
+    } else if (error.status === 400) {
+      this.errorMessage =
+        'Invalid data provided. Please check your inputs and try again.';
+    } else if (error.status === 0) {
+      this.errorMessage =
+        'Unable to connect to server. Please check your internet connection.';
+    } else {
+      this.errorMessage =
+        error.error?.message || 'Signup failed. Please try again.';
+    }
+  }
+
+  private markFormGroupTouched(): void {
+    Object.keys(this.signupForm.controls).forEach((key) => {
+      const control = this.signupForm.get(key);
+      control?.markAsTouched();
+    });
   }
 
   private passwordStrengthValidator(
@@ -109,7 +340,7 @@ export class Signup implements OnInit, OnDestroy {
     const value = control.value;
     if (!value) return null;
 
-    const isLongEnough = value.length >= 6;
+    const isLongEnough = value.length >= 8;
     const hasNumber = /[0-9]/.test(value);
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
@@ -144,7 +375,6 @@ export class Signup implements OnInit, OnDestroy {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     } else {
-      // Remove the error if passwords match
       if (confirmPassword.errors) {
         delete confirmPassword.errors['passwordMismatch'];
         if (Object.keys(confirmPassword.errors).length === 0) {
@@ -153,64 +383,6 @@ export class Signup implements OnInit, OnDestroy {
       }
     }
     return null;
-  }
-
-  onSubmit(): void {
-    if (this.signupForm.valid && !this.isLoading) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      this.successMessage = '';
-
-      const signupData: SignupRequest = {
-        email: this.signupForm.value.email.trim().toLowerCase(),
-        password: this.signupForm.value.password,
-        firstName: this.signupForm.value.firstName.trim(),
-        lastName: this.signupForm.value.lastName.trim(),
-        role: this.signupForm.value.role,
-      };
-
-      this.authService
-        .signup(signupData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.successMessage =
-              'Account created successfully! You will be redirected shortly.';
-            setTimeout(() => {
-              console.log('Signup successful:', response);
-            }, 1500);
-          },
-          error: (error) => {
-            this.isLoading = false;
-            this.handleSignupError(error);
-          },
-        });
-    } else {
-      this.markFormGroupTouched();
-    }
-  }
-
-  private handleSignupError(error: any): void {
-    if (error.status === 409) {
-      this.errorMessage =
-        'An account with this email already exists. Please use a different email or try logging in.';
-    } else if (error.status === 400) {
-      this.errorMessage =
-        'Invalid data provided. Please check your inputs and try again.';
-    } else if (error.status === 0) {
-      this.errorMessage =
-        'Unable to connect to server. Please check your internet connection.';
-    } else {
-      this.errorMessage =
-        error.error?.message || 'Signup failed. Please try again.';
-    }
-  }
-
-  private markFormGroupTouched(): void {
-    Object.keys(this.signupForm.controls).forEach((key) => {
-      const control = this.signupForm.get(key);
-      control?.markAsTouched();
-    });
   }
 
   togglePasswordVisibility(): void {
@@ -225,13 +397,12 @@ export class Signup implements OnInit, OnDestroy {
     this.router.navigate(['/auth/login']);
   }
 
-  // Helper methods for template
   isFieldInvalid(fieldName: string): boolean {
     const field = this.signupForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
-   getFieldError(fieldName: string): string {
+  getFieldError(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
     if (field && field.errors && field.touched) {
       if (field.errors['required'])
@@ -270,6 +441,25 @@ export class Signup implements OnInit, OnDestroy {
     return '';
   }
 
+  private getFieldDisplayName(fieldName: string): string {
+    const fieldNames: { [key: string]: string } = {
+      firstName: 'First name',
+      lastName: 'Last name',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm password',
+      role: 'Role',
+      companyName: 'Company name',
+      businessAddress: 'Business address',
+      contactPerson: 'Contact person',
+      phoneNumber: 'Phone number',
+      businessDescription: 'Business description',
+      companySize: 'Company size',
+      yearsInBusiness: 'Years in business',
+    };
+    return fieldNames[fieldName] || fieldName;
+  }
+
   getPasswordStrength(): string {
     const password = this.signupForm.get('password');
     if (!password?.value) return '';
@@ -293,4 +483,10 @@ export class Signup implements OnInit, OnDestroy {
     if (criteriaCount < 5) return 'medium';
     return 'strong';
   }
+  get message(): string {
+    return this.isVendorDetailsStep
+      ? 'Tell us about your business'
+      : 'Join the RFQ system to start requesting or providing quotes';
+  }
 }
+
