@@ -80,3 +80,14 @@ export interface FilePondFile {
   origin: 'input' | 'limbo' | 'local' | 'remote';
   [key: string]: string | number | boolean | File | undefined;
 }
+
+export interface GoogleMapsApi {
+  maps: {
+    Map: new (element: HTMLElement, options: any) => any;
+    Marker: new (options: any) => any;
+    Circle: new (options: any) => any;
+    places: {
+      Autocomplete: new (input: HTMLInputElement, options: any) => any;
+    };
+  };
+}

@@ -32,7 +32,7 @@ export class ProfileComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const tab = params.get('tab');
-        if (tab === 'Overview' || tab === 'Settings' || tab === 'Materials') {
+        if (tab === 'Overview' || tab === 'Settings' || tab === 'Materials' || tab === 'Service_Areas') {
           this.selectedTab = tab;
         }
       });
@@ -71,7 +71,7 @@ export class ProfileComponent implements OnInit {
     }
   }
   onTabChange(event: any) {
-    const tabLabels = ['Overview', 'Settings', 'Materials'];
+    const tabLabels = ['Overview', 'Settings', 'Materials', 'Service_Areas'];
     this.selectedTab = tabLabels[event.index];
     this.router.navigate([], {
       relativeTo: this.route,
@@ -84,7 +84,9 @@ export class ProfileComponent implements OnInit {
   switch (this.selectedTab) {
     case 'Overview': return 0;
     case 'Settings': return 1;
-    default: return 2;
+    case 'Materials': return 2;
+    case 'Service_Areas': return 3;
+    default: return 0;
   }
 }
 
