@@ -4,7 +4,7 @@ name: Deploy Angular Frontend
 on:
   push:
     branches: [ development ]
-    paths: [ 'frontend/**' ]
+    paths: [ 'rfq-app/**' ]
 
 jobs:
   deploy:
@@ -22,7 +22,7 @@ jobs:
     
     - name: Build Angular Docker image
       run: |
-        cd frontend
+        cd rfq-app
         docker build -t rfq/angular .
     
     - name: Run Angular container
