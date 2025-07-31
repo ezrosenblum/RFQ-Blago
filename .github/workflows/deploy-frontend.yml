@@ -4,7 +4,6 @@ name: Deploy Angular Frontend
 on:
   push:
     branches: [ development ]
-    paths: [ 'rfq-app/**' ]
 
 jobs:
   deploy:
