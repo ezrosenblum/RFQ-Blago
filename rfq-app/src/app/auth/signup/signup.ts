@@ -9,7 +9,6 @@ import {
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
-import { SignupRequest } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
 
 @Component({
@@ -90,7 +89,7 @@ export class Signup implements OnInit, OnDestroy {
           '',
           [
             Validators.required,
-            Validators.minLength(8),
+            Validators.minLength(6),
             Validators.maxLength(50),
             this.passwordStrengthValidator,
           ],
@@ -431,7 +430,7 @@ export class Signup implements OnInit, OnDestroy {
       if (field.errors['passwordStrength']) {
         const requirements = [];
         const strength = field.errors['passwordStrength'];
-        if (!strength.isLongEnough) requirements.push('at least 8 characters');
+        if (!strength.isLongEnough) requirements.push('at least 6 characters');
         if (!strength.hasNumber) requirements.push('one number');
         if (!strength.hasUpper) requirements.push('one uppercase letter');
         if (!strength.hasLower) requirements.push('one lowercase letter');
@@ -490,3 +489,4 @@ export class Signup implements OnInit, OnDestroy {
       : 'Join the RFQ system to start requesting or providing quotes';
   }
 }
+
