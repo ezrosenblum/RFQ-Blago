@@ -1,5 +1,5 @@
-# .github/workflows/deploy-app.yml
-name: Deploy Angular App
+# .github/workflows/deploy-frontend.yml
+name: Deploy Angular Frontend
 
 on:
   push:
