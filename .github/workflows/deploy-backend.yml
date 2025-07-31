@@ -4,7 +4,6 @@ name: Deploy .NET Core Backend
 on:
   push:
     branches: [ development ]
-    paths: [ 'rfq-api/**']
 
 jobs:
   deploy:
