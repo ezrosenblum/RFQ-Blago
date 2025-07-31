@@ -15,7 +15,9 @@
               d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
             />
           </svg>
-          <span class="text-xl font-bold">{{'AUTH.RFQ_SYSTEM' | translate}}</span>
+          <span class="text-xl font-bold"
+            >{{'AUTH.RFQ_SYSTEM' | translate}}</span
+          >
         </button>
       </div>
 
@@ -43,6 +45,15 @@
           {{'HEADER.VIEW_RFQS' | translate}}
         </button>
 
+        <button
+          *ngIf="canAccessVendorRfqs()"
+          (click)="navigateToMessages()"
+          [class.text-primary-600]="isCurrentRoute('/messages')"
+          [class.dark:text-primary-400]="isCurrentRoute('/messages')"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+        >
+          {{'HEADER.MESSAGES' | translate}}
+        </button>
         <!-- Theme Toggle -->
         <button
           (click)="toggleTheme()"
@@ -116,6 +127,8 @@
             </div>
 
             <!-- User Avatar -->
+            <div
+              class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-medium"
             <a
               matTooltip="Profile Details"
               [routerLink]="['/profile']"
@@ -123,7 +136,7 @@
             >
               {{ getUserInitials() }}
             </a>
-
+           </div>
             <!-- Logout Button -->
             <button
               (click)="logout()"
@@ -255,6 +268,17 @@
           {{'HEADER.VIEW_RFQS' | translate}}
         </button>
 
+        <button
+          *ngIf="canAccessVendorRfqs()"
+          (click)="navigateToMessages()"
+          [class.bg-primary-50]="isCurrentRoute('/messages')"
+          [class.dark:bg-primary-900]="isCurrentRoute('/messages')"
+          [class.text-primary-600]="isCurrentRoute('/messages')"
+          [class.dark:text-primary-400]="isCurrentRoute('/messages')"
+          class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
+        >
+          {{'HEADER.MESSAGES' | translate}}
+        </button>
         <!-- Authentication Section -->
         <div
           class="pt-4 border-t border-secondary-200 dark:border-secondary-700"

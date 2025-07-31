@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth-guard';
 import { VendorRfqs } from './components/rfq/vendor-rfqs/vendor-rfqs';
+import { MessagesComponent } from './components/messages/messages';
 
 const routes: Routes = [
   {
@@ -23,6 +24,11 @@ const routes: Routes = [
     path: 'profile',
     loadChildren: () =>
       import('./components/profile/profile-module').then((m) => m.ProfileModule),
+  },
+   {
+    path: 'messages',
+    component: MessagesComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'vendor-rfqs',

@@ -106,6 +106,10 @@ export class Header implements OnInit, OnDestroy {
     this.router.navigate(['/vendor-rfqs']);
   }
 
+   navigateToMessages(): void {
+    this.closeMenu();
+    this.router.navigate(['/messages']);
+  }
   navigateToHome(): void {
     this.closeMenu();
     this.router.navigate(['/']);

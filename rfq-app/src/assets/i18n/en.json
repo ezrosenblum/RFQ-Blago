@@ -145,6 +145,7 @@
     "SIGN_UP": "Sign Up",
     "SIGN_OUT": "Sign Out",
     "VENDOR": "Vendor",
-    "CLIENT": "Client"
+    "CLIENT": "Client",
+    "MESSAGES": "Messages"
   }
 }
