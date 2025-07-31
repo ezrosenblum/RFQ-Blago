@@ -4,7 +4,7 @@ name: Deploy .NET Core Backend
 on:
   push:
     branches: [ development ]
-    paths: [ 'backend/**', 'src/**' ]
+    paths: [ 'rfq-api/**']
 
 jobs:
   deploy:
@@ -25,16 +25,16 @@ jobs:
         export ASPNETCORE_ENVIRONMENT=Production
         
         # Build API
-        docker build -t rfqsubmission/api -f src/Api/Dockerfile .
+        docker build -t rfqsubmission/api -f rfq-api/src/Api/Dockerfile ./rfq-api
         
         # Build Worker
-        docker build -t rfqsubmission/worker -f src/Worker/Dockerfile .
+        docker build -t rfqsubmission/worker -f rfq-api/src/Worker/Dockerfile ./rfq-api
         
         # Build EmailService
-        docker build -t rfqsubmission/emailservice -f src/EmailService/Dockerfile .
+        docker build -t rfqsubmission/emailservice -f rfq-api/src/EmailService/Dockerfile ./rfq-api
         
         # Build NotificationService
-        docker build -t rfqsubmission/notificationservice -f src/NotificationService/Dockerfile .
+        docker build -t rfqsubmission/notificationservice -f rfq-api/src/NotificationService/Dockerfile ./rfq-api
         
         # Run API
         docker run -d \
