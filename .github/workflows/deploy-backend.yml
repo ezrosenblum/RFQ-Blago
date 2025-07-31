@@ -42,11 +42,7 @@ jobs:
           -p 8090:80 \
           --restart unless-stopped \
           -e ASPNETCORE_ENVIRONMENT=Production \
-          -e DB_HOST=rfqsubmission-postgres-host \
-          -e DB_PORT=5432 \
-          -e DB_USER=admin \
-          -e DB_PASS=passw123 \
-          -e DB_NAME=rfqsubmission \
+          -e ConnectionStrings__Default="Host=rfqsubmission-postgres-host;Port=5432;Database=rfqsubmission;Username=admin;Password=passw123" \
           rfqsubmission/api
         
         # Run Worker
