@@ -4,7 +4,7 @@ import { Header } from './header/header';
 import { Footer } from './footer/footer';
 import { LoadingSpinner } from './loading-spinner/loading-spinner';
 import { RouterModule } from '@angular/router';
-
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @NgModule({
@@ -15,7 +15,8 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    TranslateModule
   ],
   exports: [
     Header,

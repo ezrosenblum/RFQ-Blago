@@ -1,9 +1,14 @@
 // src/app/auth/signup/signup.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { Auth} from '../../services/auth';
+import { Auth } from '../../services/auth';
 import { SignupRequest } from '../../models/auth.model';
 import { UserRole } from '../../models/user.model';
 
@@ -11,7 +16,7 @@ import { UserRole } from '../../models/user.model';
   selector: 'app-signup',
   standalone: false,
   templateUrl: './signup.html',
-  styleUrls: ['./signup.scss']
+  styleUrls: ['./signup.scss'],
 })
 export class Signup implements OnInit, OnDestroy {
   signupForm!: FormGroup;
@@ -99,7 +104,7 @@ export class Signup implements OnInit, OnDestroy {
         businessDescription: [''],
         companySize: [''],
         yearsInBusiness: [''],
-        businessLicense: ['']
+        businessLicense: [''],
       },
       {
         validators: this.passwordMatchValidator,
@@ -119,23 +124,50 @@ export class Signup implements OnInit, OnDestroy {
 
   private addVendorValidators(): void {
     const vendorFields = {
-      companyName: [Validators.required, Validators.minLength(2), Validators.maxLength(100)],
-      businessAddress: [Validators.required, Validators.minLength(10), Validators.maxLength(500)],
-      contactPerson: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
-      phoneNumber: [Validators.required, Validators.pattern(/^\+?[\d\s\-\(\)]{10,15}$/)],
-      businessDescription: [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]
+      companyName: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(100),
+      ],
+      businessAddress: [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(500),
+      ],
+      contactPerson: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+      ],
+      phoneNumber: [
+        Validators.required,
+        Validators.pattern(/^\+?[\d\s\-\(\)]{10,15}$/),
+      ],
+      businessDescription: [
+        Validators.required,
+        Validators.minLength(20),
+        Validators.maxLength(1000),
+      ],
     };
 
-    Object.keys(vendorFields).forEach(field => {
-      this.signupForm.get(field)?.setValidators(vendorFields[field as keyof typeof vendorFields]);
+    Object.keys(vendorFields).forEach((field) => {
+      this.signupForm
+        .get(field)
+        ?.setValidators(vendorFields[field as keyof typeof vendorFields]);
       this.signupForm.get(field)?.updateValueAndValidity();
     });
   }
 
   private removeVendorValidators(): void {
-    const vendorFields = ['companyName', 'businessAddress', 'contactPerson', 'phoneNumber', 'businessDescription'];
-    
-    vendorFields.forEach(field => {
+    const vendorFields = [
+      'companyName',
+      'businessAddress',
+      'contactPerson',
+      'phoneNumber',
+      'businessDescription',
+    ];
+
+    vendorFields.forEach((field) => {
       this.signupForm.get(field)?.clearValidators();
       this.signupForm.get(field)?.updateValueAndValidity();
       this.signupForm.get(field)?.setValue('');
@@ -146,7 +178,7 @@ export class Signup implements OnInit, OnDestroy {
     if (this.isVendorDetailsStep) {
       return 'Create Account';
     }
-    
+
     const role = this.signupForm.get('role')?.value;
     return role === UserRole.VENDOR ? 'Next' : 'Create Account';
   }
@@ -155,8 +187,15 @@ export class Signup implements OnInit, OnDestroy {
     if (this.isVendorDetailsStep) {
       return this.signupForm.valid;
     } else {
-      const basicFields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'role'];
-      return basicFields.every(field => {
+      const basicFields = [
+        'firstName',
+        'lastName',
+        'email',
+        'password',
+        'confirmPassword',
+        'role',
+      ];
+      return basicFields.every((field) => {
         const control = this.signupForm.get(field);
         return control && control.valid;
       });
@@ -177,10 +216,17 @@ export class Signup implements OnInit, OnDestroy {
         this.selectedFileName = '';
         return;
       }
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 
-                           'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ];
       if (!allowedTypes.includes(file.type)) {
-        this.errorMessage = 'Invalid file type. Please upload PDF, JPG, PNG, DOC, or DOCX files only.';
+        this.errorMessage =
+          'Invalid file type. Please upload PDF, JPG, PNG, DOC, or DOCX files only.';
         event.target.value = '';
         this.selectedFileName = '';
         return;
@@ -225,7 +271,7 @@ export class Signup implements OnInit, OnDestroy {
           businessDescription: this.signupForm.value.businessDescription.trim(),
           companySize: this.signupForm.value.companySize || null,
           yearsInBusiness: this.signupForm.value.yearsInBusiness || null,
-          businessLicense: this.signupForm.value.businessLicense || null
+          businessLicense: this.signupForm.value.businessLicense || null,
         };
       }
 
@@ -252,8 +298,15 @@ export class Signup implements OnInit, OnDestroy {
   }
 
   private markBasicFieldsAsTouched(): void {
-    const basicFields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'role'];
-    basicFields.forEach(field => {
+    const basicFields = [
+      'firstName',
+      'lastName',
+      'email',
+      'password',
+      'confirmPassword',
+      'role',
+    ];
+    basicFields.forEach((field) => {
       const control = this.signupForm.get(field);
       control?.markAsTouched();
     });
@@ -353,19 +406,26 @@ export class Signup implements OnInit, OnDestroy {
   getFieldError(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
     if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${this.getFieldDisplayName(fieldName)} is required`;
+      if (field.errors['required'])
+        return `${this.getFieldDisplayName(fieldName)} is required`;
       if (field.errors['requiredTrue'])
         return 'You must agree to the terms and conditions';
       if (field.errors['email']) return 'Please enter a valid email address';
       if (field.errors['minlength'])
-        return `${this.getFieldDisplayName(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
+        return `${this.getFieldDisplayName(fieldName)} must be at least ${
+          field.errors['minlength'].requiredLength
+        } characters`;
       if (field.errors['maxlength'])
-        return `${this.getFieldDisplayName(fieldName)} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
+        return `${this.getFieldDisplayName(fieldName)} must not exceed ${
+          field.errors['maxlength'].requiredLength
+        } characters`;
       if (field.errors['pattern']) {
         if (fieldName === 'phoneNumber') {
           return 'Please enter a valid phone number';
         }
-        return `${this.getFieldDisplayName(fieldName)} contains invalid characters`;
+        return `${this.getFieldDisplayName(
+          fieldName
+        )} contains invalid characters`;
       }
       if (field.errors['passwordMismatch']) return 'Passwords do not match';
       if (field.errors['passwordStrength']) {
@@ -396,7 +456,7 @@ export class Signup implements OnInit, OnDestroy {
       phoneNumber: 'Phone number',
       businessDescription: 'Business description',
       companySize: 'Company size',
-      yearsInBusiness: 'Years in business'
+      yearsInBusiness: 'Years in business',
     };
     return fieldNames[fieldName] || fieldName;
   }
@@ -423,5 +483,10 @@ export class Signup implements OnInit, OnDestroy {
     if (criteriaCount < 3) return 'weak';
     if (criteriaCount < 5) return 'medium';
     return 'strong';
+  }
+  get message(): string {
+    return this.isVendorDetailsStep
+      ? 'Tell us about your business'
+      : 'Join the RFQ system to start requesting or providing quotes';
   }
 }

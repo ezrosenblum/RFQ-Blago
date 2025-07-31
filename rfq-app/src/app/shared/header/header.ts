@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { User, UserRole } from '../../models/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
@@ -24,7 +25,8 @@ export class Header implements OnInit, OnDestroy {
 
   constructor(
     private authService: Auth,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -142,9 +144,9 @@ export class Header implements OnInit, OnDestroy {
 
     switch (this.currentUser.type) {
       case UserRole.VENDOR:
-        return 'Vendor';
+        return this.translate.instant('HEADER.VENDOR');
       case UserRole.CLIENT:
-        return 'Client';
+        return this.translate.instant('HEADER.CLIENT');
       default:
         return '';
     }
