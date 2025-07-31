@@ -1,5 +1,7 @@
 <!-- src/app/shared/header/header.component.html -->
-<header class="bg-white dark:bg-dark-900 shadow-sm border-b border-secondary-200 dark:border-secondary-700 sticky top-0 z-50">
+<header
+  class="bg-white dark:bg-dark-900 shadow-sm border-b border-secondary-200 dark:border-secondary-700 sticky top-0 z-50"
+>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
       <!-- Logo and Brand -->
@@ -9,9 +11,13 @@
           class="flex items-center space-x-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors duration-200"
         >
           <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            <path
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
           </svg>
-          <span class="text-xl font-bold">{{'AUTH.RFQ_SYSTEM' | translate}}</span>
+          <span class="text-xl font-bold"
+            >{{'AUTH.RFQ_SYSTEM' | translate}}</span
+          >
         </button>
       </div>
 
@@ -39,17 +45,48 @@
           {{'HEADER.VIEW_RFQS' | translate}}
         </button>
 
+        <button
+          *ngIf="canAccessVendorRfqs()"
+          (click)="navigateToMessages()"
+          [class.text-primary-600]="isCurrentRoute('/messages')"
+          [class.dark:text-primary-400]="isCurrentRoute('/messages')"
+          class="nav-link px-3 py-2 rounded-md text-sm font-medium"
+        >
+          {{'HEADER.MESSAGES' | translate}}
+        </button>
         <!-- Theme Toggle -->
         <button
           (click)="toggleTheme()"
           class="p-2 rounded-md text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
           [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
         >
-          <svg *ngIf="!isDarkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          <svg
+            *ngIf="!isDarkMode"
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+            />
           </svg>
-          <svg *ngIf="isDarkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          <svg
+            *ngIf="isDarkMode"
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+            />
           </svg>
         </button>
 
@@ -73,31 +110,51 @@
         <div *ngIf="isAuthenticated" class="relative">
           <div class="flex items-center space-x-3">
             <!-- User role display -->
-             <div class="text-right">
-              <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-400">
+            <div class="text-right">
+              <div
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800 dark:bg-success-900/20 dark:text-success-400"
+              >
                 {{ getRoleDisplayName() }}
               </div>
             </div>
             <!-- User Info -->
             <div class="text-right">
-              <div class="text-sm font-medium text-secondary-900 dark:text-secondary-100">
+              <div
+                class="text-sm font-medium text-secondary-900 dark:text-secondary-100"
+              >
                 {{ getUserDisplayName() }}
               </div>
             </div>
 
             <!-- User Avatar -->
-            <div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-medium">
+            <div
+              class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-medium"
+            <a
+              matTooltip="Profile Details"
+              [routerLink]="['/profile']"
+              class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-sm font-medium transition-transform duration-200 ease-out hover:scale-105"
+            >
               {{ getUserInitials() }}
-            </div>
-
+            </a>
+           </div>
             <!-- Logout Button -->
             <button
               (click)="logout()"
               class="btn btn-outline px-3 py-1 text-sm"
               title="Sign Out"
             >
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
             </button>
           </div>
@@ -111,11 +168,33 @@
           (click)="toggleTheme()"
           class="p-2 rounded-md text-secondary-500 dark:text-secondary-400 hover:text-secondary-700 dark:hover:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
         >
-          <svg *ngIf="!isDarkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          <svg
+            *ngIf="!isDarkMode"
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+            />
           </svg>
-          <svg *ngIf="isDarkMode" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          <svg
+            *ngIf="isDarkMode"
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+            />
           </svg>
         </button>
 
@@ -126,11 +205,33 @@
           [attr.aria-expanded]="isMenuOpen"
           aria-label="Toggle menu"
         >
-          <svg *ngIf="!isMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <svg
+            *ngIf="!isMenuOpen"
+            class="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
-          <svg *ngIf="isMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          <svg
+            *ngIf="isMenuOpen"
+            class="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -167,16 +268,33 @@
           {{'HEADER.VIEW_RFQS' | translate}}
         </button>
 
+        <button
+          *ngIf="canAccessVendorRfqs()"
+          (click)="navigateToMessages()"
+          [class.bg-primary-50]="isCurrentRoute('/messages')"
+          [class.dark:bg-primary-900]="isCurrentRoute('/messages')"
+          [class.text-primary-600]="isCurrentRoute('/messages')"
+          [class.dark:text-primary-400]="isCurrentRoute('/messages')"
+          class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200"
+        >
+          {{'HEADER.MESSAGES' | translate}}
+        </button>
         <!-- Authentication Section -->
-        <div class="pt-4 border-t border-secondary-200 dark:border-secondary-700">
+        <div
+          class="pt-4 border-t border-secondary-200 dark:border-secondary-700"
+        >
           <!-- User Info -->
           <div *ngIf="isAuthenticated" class="px-3 py-2">
             <div class="flex items-center space-x-3">
-              <div class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
+              <div
+                class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium"
+              >
                 {{ getUserInitials() }}
               </div>
               <div>
-                <div class="text-base font-medium text-secondary-900 dark:text-secondary-100">
+                <div
+                  class="text-base font-medium text-secondary-900 dark:text-secondary-100"
+                >
                   {{ getUserDisplayName() }}
                 </div>
                 <div class="text-sm text-secondary-500 dark:text-secondary-400">
@@ -209,8 +327,18 @@
             class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 transition-colors duration-200 mt-2"
           >
             <div class="flex items-center space-x-2">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
               <span>{{'HEADER.SIGN_OUT' | translate}}</span>
             </div>
