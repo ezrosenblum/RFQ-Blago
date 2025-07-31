@@ -1,0 +1,35 @@
+# .github/workflows/deploy-app.yml
+name: Deploy Angular App
+
+on:
+  push:
+    branches: [ development ]
+    paths: [ 'frontend/**' ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Stop existing container
+      run: |
+        docker stop rfq-app || true
+        docker rm rfq-app || true
+        docker rmi rfq/angular || true
+      continue-on-error: true
+    
+    - name: Build Angular Docker image
+      run: |
+        cd frontend
+        docker build -t rfq/angular .
+    
+    - name: Run Angular container
+      run: |
+        docker run -d \
+          --name rfq-app \
+          --network rfq-network \
+          -p 7090:80 \
+          --restart unless-stopped \
+          rfq/angular
