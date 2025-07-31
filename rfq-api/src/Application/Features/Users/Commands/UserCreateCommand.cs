@@ -9,6 +9,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Application.Features.Users.Validators;
+using MediatR;
+using DTO.User.CompanyDetails;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Features.Users.Commands;
 
@@ -18,8 +21,9 @@ public sealed record UserCreateCommand(
     string Email,
     string Password,
     string? PhoneNumber,
-    string Role
-    ) : ICommand<UserResponse>, IUserInsertData;
+    string Role,
+    UserCompanyDetailsCreateRequest? CompanyDetails,
+    IFormFile? Certificate) : ICommand<UserResponse>, IUserInsertData;
 
 public sealed class UserCreateCommandHandler : ICommandHandler<UserCreateCommand, UserResponse>
 {
@@ -27,17 +31,20 @@ public sealed class UserCreateCommandHandler : ICommandHandler<UserCreateCommand
     private readonly IApplicationUserManager _applicationUserManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
+    private readonly ISender _mediatr;
 
     public UserCreateCommandHandler(
         IDateTime dateTimeProvider,
         IApplicationUserManager applicationUserManager,
         UserManager<ApplicationUser> userManager,
-        IMapper mapper)
+        IMapper mapper,
+        ISender mediatr)
     {
         _dateTimeProvider = dateTimeProvider;
         _applicationUserManager = applicationUserManager;
         _userManager = userManager;
         _mapper = mapper;
+        _mediatr = mediatr;
     }
     public async Task<UserResponse> Handle(UserCreateCommand command, CancellationToken cancellationToken)
     {
@@ -45,9 +52,17 @@ public sealed class UserCreateCommandHandler : ICommandHandler<UserCreateCommand
             command,
             _dateTimeProvider);
 
+        if (command.Role == UserRole.Vendor)
+        {
+            var companyDetails = await _mediatr.Send(_mapper.Map<UserCompanyDetailsCreateCommand>(command), cancellationToken);
+
+            user.SetCompany(companyDetails);
+        }
+
         await _applicationUserManager.CreateAsync(user, command.Password);
         await _userManager.AddClaimAsync(user, new Claim("scope", "default"));
         await _userManager.AddToRoleAsync(user, command.Role);
+
         return _mapper.Map<UserResponse>(user);
     }
 }

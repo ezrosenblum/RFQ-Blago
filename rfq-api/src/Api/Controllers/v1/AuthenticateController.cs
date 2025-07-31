@@ -15,6 +15,23 @@ public class AuthenticateController : ApiControllerBase
     {
         return Ok(await Mediator.Send(request));
     }
+
+    [AllowAnonymous]
+    [HttpPut("verify")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailCommand request)
+    {
+        await Mediator.Send(request);
+        return Ok();
+    }
+
+    [AllowAnonymous]
+    [HttpPut("verify/resend-code")]
+    public async Task<IActionResult> ResendVerificationCodeForCientApp([FromBody] ResendVeirifcationCommand request)
+    {
+        await Mediator.Send(request);
+        return Ok();
+    }
+
     [AllowAnonymous]
     [HttpPost("refresh-token")]
     public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenCommand request)

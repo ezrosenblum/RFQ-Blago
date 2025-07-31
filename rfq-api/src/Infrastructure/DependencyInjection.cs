@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Identity;
+using Application.Common.Services;
 using Domain.Interfaces;
 using Infrastructure.Caching;
 using Infrastructure.Identity;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<IApplicationUserManager, ApplicationUserManager>();
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddSingleton<IEncryption, EncryptionService>();
+        services.AddScoped<IIdentityImpersonator, IdentityImpersonator>();
         services.AddMessageBroker(assembly, true);
         services.AddMediaStorage(configuration);
         services.AddCaching(configuration);
