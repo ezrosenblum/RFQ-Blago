@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FilePondModule } from 'ngx-filepond';
 import { TranslateModule } from '@ngx-translate/core';
-import { MessagesComponent } from './messages.component';
+import { MessagesComponent } from './messages';
 
 @NgModule({
   declarations: [

@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth-guard';
 import { VendorRfqs } from './components/rfq/vendor-rfqs/vendor-rfqs';
-import { MessagesComponent } from './components/messages/messages.component';
+import { MessagesComponent } from './components/messages/messages';
 
 const routes: Routes = [
   {

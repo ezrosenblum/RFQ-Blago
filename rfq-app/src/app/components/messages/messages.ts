@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 @Component({
   standalone: false,
   selector: 'app-messages',
-  templateUrl: './messages.component.html',
-  styleUrl: './messages.component.scss',
+  templateUrl: './messages.html',
+  styleUrl: './messages.scss',
 })
 export class MessagesComponent {
   searchTerm: string = '';
