@@ -129,10 +129,14 @@
             <!-- User Avatar -->
             <div
               class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-medium"
+            <a
+              matTooltip="Profile Details"
+              [routerLink]="['/profile']"
+              class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-sm font-medium transition-transform duration-200 ease-out hover:scale-105"
             >
               {{ getUserInitials() }}
-            </div>
-
+            </a>
+           </div>
             <!-- Logout Button -->
             <button
               (click)="logout()"

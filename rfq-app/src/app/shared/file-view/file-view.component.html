@@ -1,0 +1,59 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+    <div *ngFor="let file of files"
+        class="bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-4 border border-gray-700">
+        <!-- File Icon -->
+        <div class="flex justify-center mb-3">
+            <div [ngClass]="getFileIconClass(file.type)" class="w-12 h-12 flex items-center justify-center rounded-lg">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path [attr.d]="getFileIconPath(file.type)"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- File Name -->
+        <div class="text-center mb-2">
+            <h3 class="mt-2 text-sm font-medium text-gray-100" [title]="file.name">
+                {{ file.name }}
+            </h3>
+        </div>
+
+        <!-- File Details -->
+        <div class="space-y-1 text-xs text-gray-400">
+            <div class="flex justify-between">
+                <span>Size:</span>
+                <span class="font-medium text-gray-300">{{ formatFileSize(file.size) }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Modified:</span>
+                <span class="font-medium text-gray-300">{{ formatDate(file.lastModified) }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Type:</span>
+                <span class="font-medium text-gray-300 uppercase">{{ getFileExtension(file.name) }}</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Optional) -->
+        <div class="mt-3 pt-3 border-t border-gray-700">
+            <div class="flex justify-between">
+                <button  (click)="onView(file)" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                    View
+                </button>
+                <button (click)="onRemove(file)" class="text-red-600 hover:text-red-800 text-xs font-medium">
+                    Remove
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Empty state -->
+<div *ngIf="files.length === 0" class="text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+        <path
+            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No files</h3>
+    <p class="mt-1 text-sm text-gray-500">Get started by uploading a file.</p>
+</div>

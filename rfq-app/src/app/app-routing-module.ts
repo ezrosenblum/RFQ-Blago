@@ -9,15 +9,21 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: '/request-quote',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
+    loadChildren: () => import('./auth/auth-module').then((m) => m.AuthModule),
   },
   {
     path: 'request-quote',
-    loadChildren: () => import('./components/rfq/rfq-module').then(m => m.RfqModule)
+    loadChildren: () =>
+      import('./components/rfq/rfq-module').then((m) => m.RfqModule),
+  },
+  {
+    path: 'profile',
+    loadChildren: () =>
+      import('./components/profile/profile-module').then((m) => m.ProfileModule),
   },
    {
     path: 'messages',
@@ -26,21 +32,23 @@ const routes: Routes = [
   {
     path: 'vendor-rfqs',
     component: VendorRfqs,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
   },
   {
     path: '**',
-    redirectTo: '/request-quote'
-  }
+    redirectTo: '/request-quote',
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {
-    enableTracing: false, // Set to true for debugging
-    scrollPositionRestoration: 'top',
-    anchorScrolling: 'enabled',
-    scrollOffset: [0, 64]
-  })],
-  exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      enableTracing: false, // Set to true for debugging
+      scrollPositionRestoration: 'top',
+      anchorScrolling: 'enabled',
+      scrollOffset: [0, 64],
+    }),
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
