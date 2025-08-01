@@ -1,4 +1,5 @@
 ﻿using DTO.Response;
+using DTO.User.CompanyDetails;
 
 namespace DTO.User;
 
@@ -8,5 +9,6 @@ public record UserResponse : UserBaseResponse
     public string? SuspensionReason { get; init; }
     public DateTime DateCreated { get; init; }
     public ListItemBaseResponse Status { get; init; } = null!;
+    public UserCompanyDetailsResponse? CompanyDetails { get; init; }
 }
 

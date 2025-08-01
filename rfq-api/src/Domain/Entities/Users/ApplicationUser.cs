@@ -2,6 +2,7 @@
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.Users;
+using Domain.Entities.Users.CompanyDetails;
 using Domain.Entities.Users.Providers;
 using Domain.Events;
 using Domain.Events.Users;
@@ -49,6 +50,8 @@ namespace Domain.Entities.User
         public string? EmailVerificationToken { get; private set; }
         public string? SuspensionReason { get; private set; }
 
+        public virtual UserCompanyDetails? CompanyDetails { get; private set; }
+
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 
@@ -67,7 +70,8 @@ namespace Domain.Entities.User
                 Uid = Guid.NewGuid(),
                 Media = new Media(MediaEntityType.User),
                 PhoneNumber = data.PhoneNumber,
-                Status = UserStatus.AwaitingConfirmation
+                Status = UserStatus.AwaitingConfirmation,
+                EmailConfirmed = false
             };
 
             user.AddDomainEvent(new UserCreatedEvent(user));
@@ -180,6 +184,11 @@ namespace Domain.Entities.User
         public void SetEmailVerificationToken(string token)
         {
             EmailVerificationToken = token;
+        }
+
+        public void SetCompany(UserCompanyDetails company)
+        {
+            CompanyDetails = company;
         }
     }
 }

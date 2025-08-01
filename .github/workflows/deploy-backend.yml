@@ -1,0 +1,71 @@
+# github/workflows/deploy-backend.yml
+name: Deploy .NET Core Backend
+
+on:
+  push:
+    branches: [ development ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Stop existing containers
+      run: |
+        docker stop rfqsubmission_api rfqsubmission_worker rfqsubmission_emailservice rfqsubmission_notificationservice || true
+        docker rm rfqsubmission_api rfqsubmission_worker rfqsubmission_emailservice rfqsubmission_notificationservice || true
+        docker rmi rfqsubmission/api rfqsubmission/worker rfqsubmission/emailservice rfqsubmission/notificationservice || true
+      continue-on-error: true
+    
+    - name: Build and run backend services
+      run: |
+        export ASPNETCORE_ENVIRONMENT=Production
+        
+        # Build API
+        docker build -t rfqsubmission/api -f rfq-api/src/Api/Dockerfile ./rfq-api
+        
+        # Build Worker
+        docker build -t rfqsubmission/worker -f rfq-api/src/Worker/Dockerfile ./rfq-api
+        
+        # Build EmailService
+        docker build -t rfqsubmission/emailservice -f rfq-api/src/EmailService/Dockerfile ./rfq-api
+        
+        # Build NotificationService
+        docker build -t rfqsubmission/notificationservice -f rfq-api/src/NotificationService/Dockerfile ./rfq-api
+        
+        # Run API
+        docker run -d \
+          --name rfqsubmission_api \
+          --network rfq-network \
+          -p 8090:80 \
+          --restart unless-stopped \
+          -e ASPNETCORE_ENVIRONMENT=Production \
+          -e ConnectionStrings__Default="Host=rfqsubmission-postgres-host;Port=5432;Database=rfqsubmission;Username=admin;Password=passw123" \
+          rfqsubmission/api
+        
+        # Run Worker
+        docker run -d \
+          --name rfqsubmission_worker \
+          --network rfq-network \
+          --restart unless-stopped \
+          -e ASPNETCORE_ENVIRONMENT=Production \
+          rfqsubmission/worker
+        
+        # Run EmailService
+        docker run -d \
+          --name rfqsubmission_emailservice \
+          --network rfq-network \
+          --restart unless-stopped \
+          -e ASPNETCORE_ENVIRONMENT=Production \
+          rfqsubmission/emailservice
+        
+        # Run NotificationService
+        docker run -d \
+          --name rfqsubmission_notificationservice \
+          --network rfq-network \
+          -p 8091:80 \
+          --restart unless-stopped \
+          -e ASPNETCORE_ENVIRONMENT=Production \
+          rfqsubmission/notificationservice
