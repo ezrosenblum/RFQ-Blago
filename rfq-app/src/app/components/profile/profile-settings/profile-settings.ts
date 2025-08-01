@@ -2,10 +2,16 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { User } from '../../../models/user.model';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import {
+  CountryISO,
+  PhoneNumberFormat,
+  SearchCountryField,
+} from 'ngx-intl-tel-input';
 
 @Component({
   standalone: false,
@@ -124,4 +130,5 @@ export class ProfileSettingsComponent implements OnInit {
     }
     return '';
   }
+
 }

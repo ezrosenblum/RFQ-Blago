@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { AuthInterceptor } from './interceptors/auth-interceptor';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { PhoneInputComponent } from './shared/phone-input/phone-input';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
