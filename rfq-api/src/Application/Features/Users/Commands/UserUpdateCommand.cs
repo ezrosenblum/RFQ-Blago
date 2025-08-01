@@ -1,16 +1,20 @@
 ﻿using Application.Common.Exceptions;
-using Application.Common.Interfaces.Identity;
-using Application.Common.Interfaces.Request.Handlers;
-using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Request;
+using Application.Common.Interfaces.Request.Handlers;
+using Application.Common.Localization;
+using Application.Features.Users.CompanyDetails.Commands;
 using Application.Features.Users.Validators;
 using AutoMapper;
 using Domain.Entities.User;
 using Domain.Entities.Users;
+using DTO.Enums.Company;
 using DTO.User;
+using DTO.User.CompanyDetails;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Application.Common.Localization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Users.Commands;
 
@@ -18,48 +22,85 @@ public sealed record UserUpdateCommand(
     string FirstName,
     string LastName,
     string Email,
-    string? PhoneNumber
+    string? PhoneNumber,
+    UserCompanyDetailsUpdateRequest? ComapnyDetails
     ) : IUserUpdateData, ICommand<UserResponse>;
 
 
 public sealed class UserUpdateCommandHandler : ICommandHandler<UserUpdateCommand, UserResponse>
 {
-    private readonly IApplicationUserManager _applicationUserManager;
+    private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
     private readonly ILocalizationService _localizationService;
+    private readonly ISender _mediatr;
 
     public UserUpdateCommandHandler(
-        IApplicationUserManager applicationUserManager,
+        IApplicationDbContext dbContext,
         IMapper mapper,
         UserManager<ApplicationUser> userManager,
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        ISender mediatr)
     {
-        _applicationUserManager = applicationUserManager;
+        _dbContext = dbContext;
         _mapper = mapper;
         _userManager = userManager;
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
         _localizationService = localizationService;
+        _mediatr = mediatr;
     }
 
     public async Task<UserResponse> Handle(UserUpdateCommand command, CancellationToken cancellationToken)
     {
-        var user = await _applicationUserManager.GetAsync((int)_currentUserService.UserId!);
+        var user = await _dbContext.User
+            .Include(u => u.CompanyDetails)
+            .FirstOrDefaultAsync(u => u.Id == (int)_currentUserService.UserId!);
 
         if (user == null)
             throw new NotFoundException(_localizationService.GetValue("user.notFound.error.message"));
 
         user.Update(command);
 
+        UserCompanyDetailsUpdateCommand? companyCommand = null;
+
+        if (command.ComapnyDetails is not null)
+        {
+            var details = command.ComapnyDetails;
+
+            companyCommand = new UserCompanyDetailsUpdateCommand(
+                Id: user.CompanyDetails!.Id,
+                Name: details.Name,
+                ContactPersonFirstName: details.ContactPersonFirstName,
+                ContactPersonLastName: details.ContactPersonLastName,
+                ContactPersonEmail: details.ContactPersonEmail,
+                ContactPersonPhone: details.ContactPersonPhone,
+                Description: details.Description,
+                StreetAddress: details.StreetAddress,
+                LatitudeAddress: details.LatitudeAddress,
+                LongitudeAddress: details.LongitudeAddress,
+                OperatingRadius: details.OperatingRadius,
+                CompanySize: (CompanySize)details.CompanySize,
+                Certificate: details.Certificate
+            );
+
+            await _mediatr.Send(companyCommand, cancellationToken);
+
+        }
+
         await _userManager.UpdateAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<UserResponse>(user);
+        var userResponse = _mapper.Map<UserResponse>(user);
+
+        if (companyCommand is not null)
+            userResponse.CompanyDetails = _mapper.Map<UserCompanyDetailsResponse>(companyCommand);
+
+        return userResponse;
     }
 }
 

@@ -7,6 +7,7 @@ using DTO.Enums.Company;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
+namespace Application.Features.Users.CompanyDetails.Commands;
 
 public sealed record UserCompanyDetailsCreateCommand(
     string Name,

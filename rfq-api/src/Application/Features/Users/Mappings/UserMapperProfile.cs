@@ -1,4 +1,5 @@
 ﻿using Application.Features.Users.Commands;
+using Application.Features.Users.CompanyDetails.Commands;
 using Application.Features.Users.Search;
 using AutoMapper;
 using Domain.Entities.User;
@@ -46,5 +47,13 @@ public sealed class UserMapperProfile : Profile
                 src.CompanyDetails!.OperatingRadius,
                 (CompanySize)src.CompanyDetails!.CompanySize,
                 src.Certificate));
+
+        CreateMap<UserUpdateRequest, UserUpdateCommand>()
+            .ConstructUsing(src => new UserUpdateCommand(
+                src.FirstName,
+                src.LastName,
+                src.Email,
+                src.PhoneNumber,
+                src.CompanyDetails));
     }
 }
