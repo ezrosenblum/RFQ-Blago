@@ -1,14 +1,11 @@
 ﻿using Domain.Entities.Base;
 using Domain.Entities.Medias;
-using Domain.Entities.Submissions;
 using Domain.Entities.User;
 using Domain.Events;
-using Domain.Events.Submissions;
 using Domain.Events.Users.CompanyDetails;
 using Domain.Interfaces;
 using DTO.Enums.Company;
 using DTO.Enums.Media;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 
 namespace Domain.Entities.Users.CompanyDetails;

@@ -3,5 +3,6 @@
 public enum MediaEntityType
 {
     User = 1,
-    UserCompanyDetails
+    UserCompanyDetails,
+    Submission
 }

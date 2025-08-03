@@ -69,5 +69,19 @@ namespace Api.Controllers.v1
         {
             return EnumHelper.ToListItemBaseResponses<SubmissionStatus>();
         }
+
+        [HttpPut("{id:int}/file")]
+        public async Task<IActionResult> UploadFile([FromForm] IFormFile file, [FromRoute] int id)
+        {
+            await Mediator.Send(new SubmissionFileUploadCommand(id, file));
+            return Ok();
+        }
+
+        [HttpDelete("{id:int}/file/{fileId:guid}")]
+        public async Task<IActionResult> RemoveFile([FromRoute] int id, [FromRoute] Guid fileId)
+        {
+            await Mediator.Send(new SubmissionFileRemoveCommand(id, fileId));
+            return Ok();
+        }
     }
 }
