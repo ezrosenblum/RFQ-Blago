@@ -147,5 +147,19 @@
     "VENDOR": "Vendor",
     "CLIENT": "Client",
     "MESSAGES": "Messages"
+  },
+
+  "SERVICE_AREA": {
+    "LOCATION": "Location",
+    "LOCATION_PLACEHOLDER": "Search for a city or location...",
+    "RANGE": "Range",
+    "RANGE_INFO": "Range info",
+    "RANGE_PLACEHOLDER": "Enter range in kilometers",
+    "ADDRESS": "Address",
+    "COORDINATES": "Coordinates",
+    "KM": "km",
+    "KM_RADIUS": "km radius",
+    "SELECT_LOCATION": "Select Location",
+    "SELECTED_AREA": "Selected Area"
   }
 }
