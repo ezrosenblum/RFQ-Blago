@@ -1,8 +1,11 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository.Base;
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
 using Application.Common.Localization;
+using Application.Features.Validators;
+using Domain.Entities.Submissions;
 using DTO.Enums.Submission;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -34,10 +37,7 @@ public sealed class SubmissionStatusChangeCommandHandler : ICommandHandler<Submi
     {
         var submission = await _dbContext.Submission
             .Include(d => d.User)
-            .FirstOrDefaultAsync(s => s.Id == command.Id, cancellationToken);
-
-        if (submission == null)
-            throw new NotFoundException(_localizationService.GetValue("submission.notFound.error.message"));
+            .FirstAsync(s => s.Id == command.Id, cancellationToken);
 
         submission.ChangeStatus(command.Status);
 
@@ -48,10 +48,20 @@ public sealed class SubmissionStatusChangeCommandHandler : ICommandHandler<Submi
 
 public sealed class SubmissionStatusChangeCommandValidator : AbstractValidator<SubmissionStatusChangeCommand>
 {
-    public SubmissionStatusChangeCommandValidator()
+    public SubmissionStatusChangeCommandValidator(
+        IRepository<Submission> submissionRepository,
+        ILocalizationService localizationService)
     {
-        RuleFor(cmd => cmd.Id)
-            .NotEmpty();
+        RuleFor(x => x.Id)
+            .NotNull()
+            .NotEmpty()
+            .DependentRules(
+                  () =>
+                  {
+                      RuleFor(x => new EntityExistsValidatorData(x.Id))
+                        .SetValidator(new EntityExistsValidator<Submission>(submissionRepository, localizationService))
+                        .OverridePropertyName(nameof(SubmissionStatusChangeCommand.Id));
+                  });
 
         RuleFor(cmd => cmd.Status)
             .NotEmpty()
