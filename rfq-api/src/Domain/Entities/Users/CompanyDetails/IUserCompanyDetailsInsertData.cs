@@ -14,5 +14,5 @@ public interface IUserCompanyDetailsInsertData
     double? LatitudeAddress { get; }
     double? LongitudeAddress { get; }
     double? OperatingRadius { get; }
-    CompanySize CompanySize { get; }
+    CompanySize? CompanySize { get; }
 }

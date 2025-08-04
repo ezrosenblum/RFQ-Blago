@@ -22,7 +22,7 @@ public sealed record UserCompanyDetailsUpdateCommand(
     double? LatitudeAddress,
     double? LongitudeAddress,
     double? OperatingRadius,
-    CompanySize CompanySize,
+    CompanySize? CompanySize,
     IFormFile? Certificate) : ICommand<UserCompanyDetailsResponse>, IUserCompanyDetailsUpdateData;
 
 public sealed class UserCompanyDetailsUpdateCommandHandler : ICommandHandler<UserCompanyDetailsUpdateCommand, UserCompanyDetailsResponse>

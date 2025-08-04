@@ -23,7 +23,7 @@ public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMe
     public double? LongitudeAddress { get; private set; }
     public double? LatitudeAddress { get; private set; }
     public double? OperatingRadius { get; private set; }
-    public CompanySize CompanySize { get; private set; }
+    public CompanySize? CompanySize { get; private set; }
 
     public Media Media { get; set; } = null!;
 

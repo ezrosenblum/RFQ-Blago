@@ -20,7 +20,7 @@ public sealed record UserCompanyDetailsCreateCommand(
     double? LatitudeAddress,
     double? LongitudeAddress,
     double? OperatingRadius,
-    CompanySize CompanySize,
+    CompanySize? CompanySize,
     IFormFile? Certificate) : ICommand<UserCompanyDetails>, IUserCompanyDetailsInsertData;
 
 public sealed class UserCompanyDetailsCreateCommandHandler : ICommandHandler<UserCompanyDetailsCreateCommand, UserCompanyDetails>
