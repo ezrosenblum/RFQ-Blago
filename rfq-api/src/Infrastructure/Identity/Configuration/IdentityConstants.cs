@@ -1,6 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using StackExchange.Redis;
-
 namespace Infrastructure.Identity.Configuration;
 
 public static class IdentityConstants
