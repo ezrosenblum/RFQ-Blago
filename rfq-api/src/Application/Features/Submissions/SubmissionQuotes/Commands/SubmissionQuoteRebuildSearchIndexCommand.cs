@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Request.Handlers;
 using Application.Common.Search;
 using Application.Features.Submissions.Queries;
+using Application.Features.Submissions.SubmissionQuotes.Queries;
 using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using MediatR;
