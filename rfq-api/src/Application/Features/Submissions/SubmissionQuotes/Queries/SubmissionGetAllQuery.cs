@@ -5,7 +5,7 @@ using AutoMapper;
 using DTO.Submission.SubmissionQuote;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.Submissions.Queries;
+namespace Application.Features.Submissions.SubmissionQuotes.Queries;
 
 public sealed record SubmissionQuoteGetAllQuery() : IQuery<IReadOnlyCollection<SubmissionQuoteResponse>>;
 public sealed class SubmissionQuoteGetAllQueryHandler : IQueryHandler<SubmissionQuoteGetAllQuery, IReadOnlyCollection<SubmissionQuoteResponse>>
