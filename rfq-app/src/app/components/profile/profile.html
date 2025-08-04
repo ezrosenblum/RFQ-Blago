@@ -147,12 +147,13 @@
             <!-- Tabs -->
             <mat-tab-group
               (selectedTabChange)="onTabChange($event)"
-              class="w-full sm:w-[300px] md:w-[400px]"
+              class="w-full sm:w-[400px] md:w-[600px]"
               [selectedIndex]="selectedIndex"
             >
               <mat-tab label="Overview"></mat-tab>
               <mat-tab label="Settings"></mat-tab>
               <mat-tab label="Materials"></mat-tab>
+              <mat-tab label="Service Areas"></mat-tab>
             </mat-tab-group>
           </div>
         </div>
@@ -170,6 +171,9 @@
     </ng-container>
     <ng-container *ngIf="selectedTab === 'Materials'">
       <app-material-categories-selection></app-material-categories-selection>
+    </ng-container>
+    <ng-container *ngIf="selectedTab === 'Service_Areas'">
+      <app-service-areas></app-service-areas>
     </ng-container>
   </div>
 </div>
