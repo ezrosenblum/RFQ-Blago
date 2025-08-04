@@ -1,8 +1,6 @@
 ﻿using DTO.Medias;
 using DTO.Response;
 using DTO.User;
-using Nest;
-
 namespace DTO.Submission;
 
 public record SubmissionBaseResponse
