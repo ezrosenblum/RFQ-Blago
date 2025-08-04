@@ -1,0 +1,37 @@
+﻿using Application.Features.Submissions.SubmissionQuotes.Search;
+using AutoMapper;
+using Domain.Entities.Submissions.SubmissionQuotes;
+using DTO.Enums.Submission.SubmissionQuote;
+using DTO.Submission.SubmissionQuote;
+
+namespace Application.Features.Submissions.Mappings;
+
+public sealed class SubmissionQuoteMapperProfile : Profile
+{
+    public SubmissionQuoteMapperProfile()
+    {
+        CreateMap<SubmissionQuote, SubmissionQuoteResponse>()
+            .ForMember(d => d.ValidUntil, opt => opt.MapFrom(src => CalculateValidUntil(src)));
+
+        CreateMap<SubmissionQuote, SubmissionQuoteBaseResponse>()
+            .ForMember(d => d.ValidUntil, opt => opt.MapFrom(src => CalculateValidUntil(src)));
+
+        CreateMap<SubmissionQuote, SubmissionQuoteSearchable>()
+            .ForMember(d => d.ValidUntil, opt => opt.MapFrom(src => CalculateValidUntil(src)));
+
+        CreateMap<SubmissionQuoteBaseResponse, SubmissionQuoteSearchable>();
+
+        CreateMap<SubmissionQuoteResponse, SubmissionQuoteSearchable>();
+    }
+
+    private static DateTime CalculateValidUntil(SubmissionQuote s) =>
+    s.QuoteValidityIntervalType switch
+    {
+        SubmissionQuoteValidityIntervalType.Day => s.Created.AddDays(s.QuoteValidityInterval),
+        SubmissionQuoteValidityIntervalType.Week => s.Created.AddDays(s.QuoteValidityInterval * 7),
+        SubmissionQuoteValidityIntervalType.Month => s.Created.AddMonths(s.QuoteValidityInterval),
+        SubmissionQuoteValidityIntervalType.Year => s.Created.AddYears(s.QuoteValidityInterval),
+        _ => s.Created
+    };
+
+}

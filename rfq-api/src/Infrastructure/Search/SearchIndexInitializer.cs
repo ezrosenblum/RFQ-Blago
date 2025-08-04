@@ -1,5 +1,5 @@
 ﻿using Application.Features.Submissions.Commands;
-using Application.Features.Users.Commands;
+using Application.Features.Submissions.SubmissionQuotes.Commands;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Persistence;
@@ -11,6 +11,7 @@ public static class SearchIndexInitializer
     public static async Task InitializeIndexes(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
     {
         await InitializeSubmissionIndex(mediatr, logger);
+        await InitializeSubmissionQuoteIndex(mediatr, logger);
     }
 
     private static async Task InitializeSubmissionIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
@@ -26,6 +27,17 @@ public static class SearchIndexInitializer
             logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR SUBMISSION");
         }
     }
-
-
+    private static async Task InitializeSubmissionQuoteIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
+    {
+        try
+        {
+            logger.LogDebug("STARTED BUILDING SEARCH INDEX FOR SUBMISSION QUOTE");
+            await mediatr.Send(new SubmissionQuoteRebuildSearchIndexCommand());
+            logger.LogDebug("FINISHED BUILDING SEARCH INDEX FOR SUBMISSION QUOTE");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR SUBMISSION QUOTE");
+        }
+    }
 }

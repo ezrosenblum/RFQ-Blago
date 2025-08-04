@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-
 namespace Infrastructure.Identity.Configuration;
 
 public static class IdentityConstants
@@ -17,6 +16,7 @@ public static class IdentityConstants
         public const string UserName = "userName";
         public const string FirstName = "firstName";
         public const string LastName = "lastName";
+        public const string Role = "userRole";
     }
 
     public const string DefaultSecurityAlgorithm = SecurityAlgorithms.HmacSha256;

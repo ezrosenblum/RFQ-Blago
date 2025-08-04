@@ -1,6 +1,8 @@
 ﻿using Application.Common.Search;
 using Application.Features.Submissions.Search;
+using Application.Features.Submissions.SubmissionQuotes.Search;
 using Application.Features.Users.Search;
+using Domain.Entities.Submissions.SubmissionQuotes;
 using DTO.Pagination;
 using DTO.Sorting;
 using Elasticsearch.Net;
@@ -87,6 +89,19 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
 
         return new PaginatedList<SubmissionSearchable>(searchResponse.Documents.ToList(), (int)searchResponse.Total, criteria.Paging.PageNumber, criteria.Paging.PageSize);
     }
+
+    public async Task<PaginatedList<SubmissionQuoteSearchable>> SearchSubmissionQuotesAsync(ISubmissionQuoteFullSearchCriteria criteria)
+    {
+        var searchResponse = await _elasticClient.SearchAsync<SubmissionQuoteSearchable>(s => s
+            .Index(_index)
+            .Query(q => BuildSubmissionQuoteSearchQuery(q, criteria))
+            .Sort(so => BuildSort(so, criteria.Sorting!))
+            .From((criteria.Paging.PageNumber - 1) * criteria.Paging.PageSize)
+        .Size(criteria.Paging.PageSize));
+
+        return new PaginatedList<SubmissionQuoteSearchable>(searchResponse.Documents.ToList(), (int)searchResponse.Total, criteria.Paging.PageNumber, criteria.Paging.PageSize);
+    }
+
     private QueryContainer BuildSubmissionSearchQuery(QueryContainerDescriptor<SubmissionSearchable> descriptor, ISubmissionFullSearchCriteria criteria)
     {
         var combinedQuery = new QueryContainer();
@@ -151,6 +166,88 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
 
         return combinedQuery;
     }
+
+    private QueryContainer BuildSubmissionQuoteSearchQuery(QueryContainerDescriptor<SubmissionQuoteSearchable> descriptor, ISubmissionQuoteFullSearchCriteria criteria)
+    {
+        var combinedQuery = new QueryContainer();
+
+        if (!string.IsNullOrWhiteSpace(criteria.Query))
+        {
+            combinedQuery &= (BuildTextQuery(criteria.Query) ||
+                              BuildWildcardQuery("title", criteria.Query) ||
+                              BuildWildcardQuery("description", criteria.Query));
+        }
+
+        if (criteria.VendorId.HasValue)
+        {
+            combinedQuery &= new TermQuery
+            {
+                Field = "vendorId",
+                Value = criteria.VendorId.Value
+            };
+        }
+
+        if (criteria.PriceFrom.HasValue)
+        {
+            combinedQuery &= new NumericRangeQuery
+            {
+                Field = "price",
+                GreaterThanOrEqualTo = (double)criteria.PriceFrom.Value
+            };
+        }
+
+        if (criteria.PriceTo.HasValue)
+        {
+            combinedQuery &= new NumericRangeQuery
+            {
+                Field = "price",
+                LessThanOrEqualTo = (double)criteria.PriceTo.Value
+            };
+        }
+
+        if (criteria.SubmissionUserId.HasValue)
+        {
+            combinedQuery &= new TermQuery
+            {
+                Field = "submission.user.id",
+                Value = criteria.SubmissionUserId.Value
+            };
+        }
+
+        if (criteria.SubmissionId.HasValue)
+        {
+            combinedQuery &= new TermQuery
+            {
+                Field = "submission.id",
+                Value = criteria.SubmissionId.Value
+            };
+        }
+
+        if (criteria.ValidFrom != null)
+        {
+            var date = criteria.ValidFrom.Value.Date;
+
+            combinedQuery &= new DateRangeQuery
+            {
+                Field = "validUntil",
+                GreaterThanOrEqualTo = date,
+            };
+        }
+
+        if (criteria.ValidTo != null)
+        {
+            var date = criteria.ValidTo.Value.Date.AddDays(1);
+
+            combinedQuery &= new DateRangeQuery
+            {
+                Field = "validUntil",
+                LessThan = date,
+            };
+        }
+
+        return combinedQuery;
+    }
+
     private SortDescriptor<TDescriptor> BuildSort<TDescriptor, TSort>(SortDescriptor<TDescriptor> descriptor, SortOptions<TSort> sortOptions)
     where TDescriptor : class, ISearchable
     where TSort : Enum

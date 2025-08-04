@@ -238,6 +238,65 @@ namespace Infrastructure.Migrations
                     b.ToTable("Submission");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Submissions.SubmissionQuotes.SubmissionQuote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("LastModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Media")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("QuoteValidityInterval")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuoteValidityIntervalType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VendorId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubmissionId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("SubmissionQuote");
+                });
+
             modelBuilder.Entity("Domain.Entities.User.ApplicationUser", b =>
                 {
                     b.Property<int>("Id")
@@ -642,6 +701,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Submissions.SubmissionQuotes.SubmissionQuote", b =>
+                {
+                    b.HasOne("Domain.Entities.Submissions.Submission", "Submission")
+                        .WithMany("SubmissionQuotes")
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User.ApplicationUser", "Vendor")
+                        .WithMany("SubmissionQuotes")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Submission");
+
+                    b.Navigation("Vendor");
+                });
+
             modelBuilder.Entity("Domain.Entities.Users.CompanyDetails.UserCompanyDetails", b =>
                 {
                     b.HasOne("Domain.Entities.User.ApplicationUser", "User")
@@ -704,6 +782,11 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.Submissions.Submission", b =>
+                {
+                    b.Navigation("SubmissionQuotes");
+                });
+
             modelBuilder.Entity("SubcategorySubmission", b =>
                 {
                     b.HasOne("Domain.Entities.Categories.Subcategory", null)
@@ -724,6 +807,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("CompanyDetails");
 
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("SubmissionQuotes");
 
                     b.Navigation("Submissions");
                 });

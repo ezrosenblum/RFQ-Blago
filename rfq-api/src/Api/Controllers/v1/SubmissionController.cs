@@ -2,13 +2,18 @@
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.Queries;
 using Application.Features.Submissions.Search;
+using Application.Features.Submissions.SubmissionQuotes.Commands;
+using Application.Features.Submissions.SubmissionQuotes.Queries;
+using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using DTO.Authentication;
 using DTO.Enums.Submission;
+using DTO.Enums.Submission.SubmissionQuote;
 using DTO.Pagination;
 using DTO.Response;
 using DTO.Submission;
 using DTO.Submission.Report;
+using DTO.Submission.SubmissionQuote;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -83,5 +88,46 @@ namespace Api.Controllers.v1
             await Mediator.Send(new SubmissionFileRemoveCommand(id, fileId));
             return Ok();
         }
+
+        [Authorize(Policy = AuthorizationPolicies.Vendor)]
+        [HttpPost("quote")]
+        public async Task<IActionResult> QuoteCreate([FromBody] SubmissionQuoteCreateCommand request)
+        {
+            await Mediator.Send(request);
+
+            return Ok();
+        }
+
+        [HttpGet("quote")]
+        public async Task<IReadOnlyCollection<SubmissionQuoteResponse>> GetAllQuotes()
+        {
+            return await Mediator.Send(new SubmissionQuoteGetAllQuery());
+        }
+
+        [HttpPost("quote/search")]
+        public async Task<PaginatedList<SubmissionQuoteSearchable>> FullQuoteSearch([FromBody] SubmissionQuoteFullSearchQuery request)
+        {
+            return await Mediator.Send(request);
+        }
+
+        [HttpPut("quote/{id:int}/file")]
+        public async Task<IActionResult> QuoteUploadFile([FromForm] IFormFile file, [FromRoute] int id)
+        {
+            await Mediator.Send(new SubmissionQuoteFileUploadCommand(id, file));
+            return Ok();
+        }
+
+        [HttpDelete("quote/{id:int}/file/{fileId:guid}")]
+        public async Task<IActionResult> QuoteRemoveFile([FromRoute] int id, [FromRoute] Guid fileId)
+        {
+            await Mediator.Send(new SubmissionQuoteFileRemoveCommand(id, fileId));
+            return Ok();
+        }
+        [HttpGet("quote/validity-type")]
+        public IReadOnlyCollection<ListItemBaseResponse> GetQuoteValidityTypes()
+        {
+            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>();
+        }
+
     }
 }
