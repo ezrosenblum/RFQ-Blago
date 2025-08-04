@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';
-import { Subject } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -69,17 +69,17 @@ export class ForgotPasswordComponent  {
 
     const resetPasswordData: { email: string } = this.forgotPasswordForm.value;
 
-    // this.authService.forgotPassword(resetPasswordData)
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe({
-    //     next: (response) => {
-    //       this.isLoading = false;
-    //       this.router.navigate(['/auth/login']);
-    //     },
-    //     error: (error) => {
-    //       this.isLoading = false;
-    //     }
-    //   });
+    this.authService.forgotPassword(resetPasswordData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          this.router.navigate(['/auth/login']);
+        },
+        error: (error) => {
+          this.isLoading = false;
+        }
+      });
   }
 
   navigateToSignup(): void {
