@@ -19,9 +19,6 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
   ]
 })
 export class PhoneInputComponent {
- @Input() formControlName!: string;
-  
-  // Internal form control for the phone input
   control = new FormControl('');
 
   CountryISO = CountryISO;
