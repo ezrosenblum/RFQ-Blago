@@ -2,7 +2,7 @@
 
 public sealed record UserCompanyDetailsCreateRequest
 {
-    public string Name { get; init; } = null!;
+    public string? Name { get; init; }
     public string? ContactPersonFirstName { get; init; }
     public string? ContactPersonLastName { get; init; }
     public string? ContactPersonEmail { get; init; }
@@ -12,5 +12,5 @@ public sealed record UserCompanyDetailsCreateRequest
     public double? LatitudeAddress { get; init; }
     public double? LongitudeAddress { get; init; }
     public double? OperatingRadius { get; init; }
-    public int CompanySize { get; init; }
+    public int? CompanySize { get; init; }
 }
