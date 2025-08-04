@@ -6,7 +6,6 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-
 @Component({
   standalone: false,
   selector: 'app-profile-settings',
@@ -124,4 +123,5 @@ export class ProfileSettingsComponent implements OnInit {
     }
     return '';
   }
+
 }

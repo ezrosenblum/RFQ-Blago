@@ -110,43 +110,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Phone -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <label
-          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2"
-        >
-          Contact Phone
-          <i
-            class="ki-outline ki-information-5 text-gray-400 text-sm dark:text-gray-500"
-            title="Invalid or missing phone number"
-          ></i>
-        </label>
-        <div class="md:col-span-8 relative">
-          <input
-            type="text"
-            id="phoneNumber"
-            formControlName="phoneNumber"
-            placeholder="Phone number"
-            maxlength="20"
-            (input)="filterPhoneNumber($event)"
-            class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
-            [class.border-error-500]="isFieldInvalid('phoneNumber')"
-          />
-          <div
-            *ngIf="isFieldInvalid('phoneNumber')"
-            class="text-xs text-red-500 mt-1"
-          >
-            <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">
-              Invalid phone number format
-            </div>
-            <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">
-              Phone number is too short
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Email -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
         <label
@@ -175,6 +138,32 @@
         </div>
       </div>
 
+      <!-- Phone -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <label
+          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2"
+        >
+          Contact Phone
+          <i
+            class="ki-outline ki-information-5 text-gray-400 text-sm dark:text-gray-500"
+            title="Invalid or missing phone number"
+          ></i>
+        </label>
+        <div class="md:col-span-8 relative">
+          <app-phone-input formControlName="phoneNumber"></app-phone-input>
+          <div
+            *ngIf="isFieldInvalid('phoneNumber')"
+            class="text-xs text-red-500 mt-1"
+          >
+            <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">
+              Invalid phone number format
+            </div>
+            <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">
+              Phone number is too short
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="space-y-8" *ngIf="user?.type === 'vendor'">
         <!-- Company Name -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">

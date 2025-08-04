@@ -8,9 +8,9 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Routes } from '@angular/router';
 import { MaterialCategoriesSelectionComponent } from './material-categories-selection/material-categories-selection.component';
+import { SharedModule } from '../../shared/shared-module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceAreasComponent } from "./service-areas/service-areas.component";
-
 const routes: Routes = [
   {
     path: '',
@@ -32,8 +32,9 @@ const routes: Routes = [
     FormsModule,
     MatTabsModule,
     MatIconModule,
+    SharedModule,
+    ServiceAreasComponent,
     RouterModule.forChild(routes),
-    ServiceAreasComponent
 ]
 })
 export class ProfileModule { }

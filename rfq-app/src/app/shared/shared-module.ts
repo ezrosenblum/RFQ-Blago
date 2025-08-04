@@ -6,6 +6,9 @@ import { LoadingSpinner } from './loading-spinner/loading-spinner';
 import { RouterModule } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
+import { PhoneInputComponent } from './phone-input/phone-input';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -13,18 +16,23 @@ import { TranslateModule } from '@ngx-translate/core';
   declarations: [
     Header,
     Footer,
-    LoadingSpinner
+    LoadingSpinner,
+    PhoneInputComponent
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule, 
+    FormsModule,
     RouterModule,
     MatTooltipModule,
-    TranslateModule
+    TranslateModule,
+    NgxIntlTelInputModule,
   ],
   exports: [
     Header,
     Footer,
-    LoadingSpinner
-  ]
+    LoadingSpinner,
+    PhoneInputComponent
+  ],
 })
 export class SharedModule { }
