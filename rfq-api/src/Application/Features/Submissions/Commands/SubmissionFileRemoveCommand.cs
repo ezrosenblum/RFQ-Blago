@@ -16,9 +16,9 @@ public sealed record SubmissionFileRemoveCommand(int SubmissionId, Guid FileId) 
 
 public sealed record SubmissionFileRemoveCommandHandler : ICommandHandler<SubmissionFileRemoveCommand>
 {
-    public readonly IMediaStorage _mediaStorage;
-    public readonly IRepository<Submission> _submissionRepository;
-    public readonly IUnitOfWork _unitOfWork;
+    private readonly IMediaStorage _mediaStorage;
+    private readonly IRepository<Submission> _submissionRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public SubmissionFileRemoveCommandHandler(
         IMediaStorage mediaStorage,
