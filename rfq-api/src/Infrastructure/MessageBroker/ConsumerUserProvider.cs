@@ -18,5 +18,12 @@ namespace Infrastructure.MessageBroker
                 return _identityContextAccessor.IdentityContext?.CurrentUser?.Id;
             }
         }
+        public string? UserRole
+        {
+            get
+            {
+                return _identityContextAccessor.IdentityContext?.CurrentUser?.Role;
+            }
+        }
     }
 }

@@ -3,5 +3,6 @@
     public interface ICurrentUserService
     {
         int? UserId { get; }
+        string? UserRole { get; }
     }
 }

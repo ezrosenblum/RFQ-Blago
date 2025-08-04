@@ -14,4 +14,5 @@ public class UserInfo : IUserInfo
 
     public int Id => int.Parse(_claimsPrincipal.FindFirstValue(Configuration.IdentityConstants.Claims.Id)!);
     public string UserName => _claimsPrincipal.FindFirstValue(Configuration.IdentityConstants.Claims.UserName)!;
+    public string Role => _claimsPrincipal.FindFirstValue(Configuration.IdentityConstants.Claims.Role)!;
 }
