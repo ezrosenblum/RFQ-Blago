@@ -29,5 +29,19 @@ namespace Api.Services
                 return null;
             }
         }
+
+        public string? UserRole
+        {
+            get
+            {
+                var claim = _httpContextAccessor.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == "userRole");
+
+                if (claim == null)
+                    return null;
+
+                return claim.Value.ToString();
+            }
+        }
+
     }
 }

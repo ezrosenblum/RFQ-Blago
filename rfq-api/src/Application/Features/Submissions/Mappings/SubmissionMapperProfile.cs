@@ -20,9 +20,14 @@ public sealed class SubmissionMapperProfile : Profile
                 src.Unit,
                 src.JobLocation));
 
+        CreateMap<Submission, SubmissionBaseResponse>()
+            .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
+
         CreateMap<Submission, SubmissionResponse>()
+            .ForMember(s => s.Quotes, opt => opt.MapFrom(d => d.SubmissionQuotes))
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
         CreateMap<Submission, SubmissionSearchable>()
+            .ForMember(s => s.Quotes, opt => opt.MapFrom(d => d.SubmissionQuotes))
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
 
         CreateMap<SubmissionResponse, SubmissionSearchable>();

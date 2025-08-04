@@ -2,6 +2,7 @@
 using Domain.Entities.Languages;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
+using Domain.Entities.Submissions.SubmissionQuotes;
 using Domain.Entities.User;
 using Domain.Entities.Users.CompanyDetails;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<RefreshToken> RefreshToken => Set<RefreshToken>();
     public DbSet<Language> Language => Set<Language>();
     public DbSet<Submission> Submission => Set<Submission>();
+    public DbSet<SubmissionQuote> SubmissionQuote => Set<SubmissionQuote>();
     public DbSet<UserCompanyDetails> UserCompanyDetails => Set<UserCompanyDetails>();
 
 

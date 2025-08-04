@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Base;
 using Domain.Entities.Medias;
+using Domain.Entities.Submissions.SubmissionQuotes;
 using Domain.Entities.User;
 using Domain.Events;
 using Domain.Events.Submissions;
@@ -21,6 +22,8 @@ namespace Domain.Entities.Submissions
         public Media Media { get; private set; }
 
         public ApplicationUser User { get; private set; } = null!;
+
+        public virtual ICollection<SubmissionQuote> SubmissionQuotes { get; set; } = new List<SubmissionQuote>();
 
         private Submission() { }
 

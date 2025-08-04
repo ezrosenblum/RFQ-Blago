@@ -4,5 +4,6 @@ public enum MediaEntityType
 {
     User = 1,
     UserCompanyDetails,
-    Submission
+    Submission,
+    SubmissionQuote,
 }

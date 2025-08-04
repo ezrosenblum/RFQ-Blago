@@ -62,7 +62,7 @@ public class ApplicationDbContextInitialiser
 
                 var identityContextSetter = services.GetRequiredService<IIdentityContextAccessor>();
 
-                identityContextSetter.IdentityContext = new IdentityContextCustom(new DefaultUserInfo(defaultApplicationUser));
+                identityContextSetter.IdentityContext = new IdentityContextCustom(new DefaultUserInfo(defaultApplicationUser, _userManager));
 
                 await ApplicationDbContextSeeder.SeedDefaultLanguages(_mediatr, _dbContext);
                 var localizationManageer = services.GetRequiredService<ILocalizationManager>();
@@ -86,13 +86,18 @@ public class ApplicationDbContextInitialiser
     public class DefaultUserInfo : IUserInfo
     {
         private readonly ApplicationUser _user;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DefaultUserInfo(ApplicationUser user)
+        public DefaultUserInfo(
+            ApplicationUser user,
+            UserManager<ApplicationUser> userManager)
         {
             _user = user;
+            _userManager = userManager;
         }
 
         public int Id => _user.Id;
         public string UserName => _user.UserName!;
+        public string Role => _userManager.GetRolesAsync(_user).Result.First();
     }
 }

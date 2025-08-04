@@ -2,10 +2,12 @@
 using Application.Identity;
 using Domain.Entities.User;
 using Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NCrontab;
+using System.Security.Permissions;
 
 namespace Infrastructure.TaskScheduler;
 
@@ -14,6 +16,7 @@ public abstract class ScheduledTaskBase : IHostedService
     private readonly CancellationTokenSource _stoppingCancellationTokenSource;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly CrontabSchedule _schedule;
+    private readonly UserManager<ApplicationUser> _userManager;
     private Task _executingTask;
     private DateTime _nextRun;
 
@@ -28,6 +31,7 @@ public abstract class ScheduledTaskBase : IHostedService
         _serviceScopeFactory = serviceScopeFactory;
         _schedule = CrontabSchedule.Parse(Schedule);
         _nextRun = _schedule.GetNextOccurrence(DateTime.Now);
+        _userManager = serviceScopeFactory.CreateScope().ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     }
 
     public virtual Task StartAsync(CancellationToken cancellationToken)
@@ -86,7 +90,7 @@ public abstract class ScheduledTaskBase : IHostedService
             if (administrator != null)
             {
                 var identityContextSetter = serviceProvider.GetService<IIdentityContextAccessor>();
-                identityContextSetter!.IdentityContext = new IdentityContextCustom(new ScheduledTaskUser(administrator));
+                identityContextSetter!.IdentityContext = new IdentityContextCustom(new ScheduledTaskUser(administrator, _userManager));
 
                 await Run(serviceProvider);
 
@@ -108,13 +112,18 @@ public abstract class ScheduledTaskBase : IHostedService
     private class ScheduledTaskUser : IUserInfo
     {
         private readonly ApplicationUser _user;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ScheduledTaskUser(ApplicationUser user)
+        public ScheduledTaskUser(
+            ApplicationUser user,
+            UserManager<ApplicationUser> userManager)
         {
             _user = user;
+            _userManager = userManager;
         }
 
         public int Id => _user.Id;
         public string UserName => _user.UserName!;
+        public string Role => _userManager.GetRolesAsync(_user).Result.First();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Domain.Entities.Medias;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
+using Domain.Entities.Submissions.SubmissionQuotes;
 using Domain.Entities.Users;
 using Domain.Entities.Users.CompanyDetails;
 using Domain.Entities.Users.Providers;
@@ -54,6 +55,7 @@ namespace Domain.Entities.User
 
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
+        public virtual ICollection<SubmissionQuote> SubmissionQuotes { get; set; } = new List<SubmissionQuote>();
 
         public static ApplicationUser Create(
             IUserInsertData data,

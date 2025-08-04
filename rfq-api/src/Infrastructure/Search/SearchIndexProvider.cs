@@ -1,5 +1,6 @@
 ﻿using Application.Common.Search;
 using Application.Features.Submissions.Search;
+using Application.Features.Submissions.SubmissionQuotes.Search;
 
 namespace Infrastructure.Search;
 
@@ -10,6 +11,7 @@ public class SearchIndexProvider : ISearchIndexProvider
         return typeof(T) switch
         {
             _ when typeof(T) == typeof(SubmissionSearchable) => SearchIndex.Submission,
+            _ when typeof(T) == typeof(SubmissionQuoteSearchable) => SearchIndex.SubmissionQuote,
             _ => SearchIndex.Default
         };
     }

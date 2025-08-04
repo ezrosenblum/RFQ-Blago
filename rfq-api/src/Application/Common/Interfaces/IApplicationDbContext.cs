@@ -1,6 +1,7 @@
 ﻿using Domain.Entities.Languages;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
+using Domain.Entities.Submissions.SubmissionQuotes;
 using Domain.Entities.User;
 using Domain.Entities.Users.CompanyDetails;
 using Microsoft.EntityFrameworkCore;
@@ -16,5 +17,6 @@ public interface IApplicationDbContext
     DbSet<RefreshToken> RefreshToken { get; }
     DbSet<Language> Language { get; }
     DbSet<Submission> Submission { get; }
+    DbSet<SubmissionQuote> SubmissionQuote { get; }
     DbSet<UserCompanyDetails> UserCompanyDetails { get; }
 }
