@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NCrontab;
-using System.Security.Permissions;
 
 namespace Infrastructure.TaskScheduler;
 
