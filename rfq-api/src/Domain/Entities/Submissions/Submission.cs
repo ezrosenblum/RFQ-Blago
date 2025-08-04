@@ -18,6 +18,9 @@ namespace Domain.Entities.Submissions
         public SubmissionUnit Unit { get; private set; }
         public SubmissionStatus Status { get; private set; } = SubmissionStatus.PendingReview;
         public string JobLocation { get; private set; } = null!;
+        public string? StreetAddress { get; private set; }
+        public double? LongitudeAddress { get; private set; }
+        public double? LatitudeAddress { get; private set; }
         public int UserId { get; private set; }
         public Media Media { get; private set; }
 
@@ -35,6 +38,9 @@ namespace Domain.Entities.Submissions
             Unit = data.Unit;
             JobLocation = data.JobLocation;
             UserId = userId;
+            StreetAddress = data.StreetAddress;
+            LongitudeAddress = data.LongitudeAddress;
+            LatitudeAddress = data.LatitudeAddress;
 
             Media = new Media(MediaEntityType.Submission);
 

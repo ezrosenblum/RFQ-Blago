@@ -5,7 +5,6 @@ using Domain.Entities.Submissions;
 using DTO.Enums.Submission;
 using DTO.Submission;
 using DTO.Submission.Report;
-using System.Linq.Expressions;
 
 namespace Application.Features.Submissions.Mappings;
 
@@ -18,7 +17,10 @@ public sealed class SubmissionMapperProfile : Profile
                 src.Description,
                 src.Quantity,
                 src.Unit,
-                src.JobLocation));
+                src.JobLocation,
+                src.StreetAddress,
+                src.LatitudeAddress,
+                src.LongitudeAddress));
 
         CreateMap<Submission, SubmissionBaseResponse>()
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
