@@ -21,9 +21,9 @@ public sealed record SubmissionFileUploadCommand(int SubmissionId, IFormFile Fil
 
 public sealed record SubmissionFileUploadCommandHandler : ICommandHandler<SubmissionFileUploadCommand>
 {
-    public readonly IMediaStorage _mediaStorage;
-    public readonly IRepository<Submission> _submissionRepository;
-    public readonly IUnitOfWork _unitOfWork;
+    private readonly IMediaStorage _mediaStorage;
+    private readonly IRepository<Submission> _submissionRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public SubmissionFileUploadCommandHandler(
         IMediaStorage mediaStorage,
