@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Features.Users.CompanyDetails.Commands;
+using AutoMapper;
 using Domain.Entities.Users.CompanyDetails;
 using DTO.User.CompanyDetails;
 
@@ -10,5 +11,9 @@ public sealed class UserCompanyDetailsMapperProfile : Profile
     {
         CreateMap<UserCompanyDetails, UserCompanyDetailsResponse>()
             .ForMember(d => d.CertificateUrl, opt => opt.MapFrom(s => s.Media.GetMainImageUrl()));
+
+        CreateMap<UserCompanyDetailsUpdateRequest, UserCompanyDetailsUpdateCommand>();
+
+        CreateMap<UserCompanyDetailsUpdateCommand, UserCompanyDetailsResponse>();
     }
 }

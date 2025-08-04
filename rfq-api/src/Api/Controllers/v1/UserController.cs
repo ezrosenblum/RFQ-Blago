@@ -28,8 +28,8 @@ public class UserController : ApiControllerBase
         return await Mediator.Send(request);
     }
 
-    [HttpPut()]
-    public async Task<UserResponse> Update([FromBody] UserUpdateRequest request)
+    [HttpPut]
+    public async Task<UserResponse> Update([FromForm] UserUpdateRequest request)
     {
         return await Mediator.Send(_mapper.Map<UserUpdateCommand>(request));
     }

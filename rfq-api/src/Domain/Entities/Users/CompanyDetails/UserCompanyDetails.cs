@@ -16,7 +16,7 @@ namespace Domain.Entities.Users.CompanyDetails;
 public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMedia
 {
     public int UserId { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public string? ContactPersonFirstName { get; private set; }
     public string? ContactPersonLastName { get; private set; }
     public string? ContactPersonEmail { get; private set; }
@@ -60,6 +60,24 @@ public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMe
 
         return userCompanyDetails;
     }
+
+    public void Update(IUserCompanyDetailsUpdateData data)
+    {
+        Name = data.Name;
+        ContactPersonFirstName = data.ContactPersonFirstName;
+        ContactPersonLastName = data.ContactPersonLastName ?? string.Empty;
+        ContactPersonEmail = data.ContactPersonEmail;
+        ContactPersonPhone = data.ContactPersonPhone;
+        Description = data.Description;
+        CompanySize = data.CompanySize;
+        StreetAddress = data.StreetAddress;
+        LongitudeAddress = data.LongitudeAddress;
+        LatitudeAddress = data.LatitudeAddress;
+        OperatingRadius = data.OperatingRadius;
+
+        AddDomainEvent(new UserCompanyDetailsUpdatedEvent(this));
+    }
+
     public async Task UploadFile(IMediaUpsertData data, IMediaStorage mediaStorage)
     {
         await Media.Save(data, Id, mediaStorage);

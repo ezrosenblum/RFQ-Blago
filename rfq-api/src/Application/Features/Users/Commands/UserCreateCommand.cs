@@ -12,6 +12,7 @@ using Application.Features.Users.Validators;
 using MediatR;
 using DTO.User.CompanyDetails;
 using Microsoft.AspNetCore.Http;
+using Application.Features.Users.CompanyDetails.Commands;
 
 namespace Application.Features.Users.Commands;
 
