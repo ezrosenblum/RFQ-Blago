@@ -49,7 +49,8 @@ public sealed class UserGetCurrentDetailsQueryHandler : IQueryHandler<UserGetCur
         if (user == null)
         {
             user = await _dbContext.User
-                                   .FirstOrDefaultAsync(u => u.Id == _currentUserService.UserId);
+                .Include(u => u.CompanyDetails)
+                .FirstOrDefaultAsync(u => u.Id == _currentUserService.UserId);
 
             if (user == null)
                 throw new NotFoundException(_localizationService.GetValue("user.notFound.error.message"));

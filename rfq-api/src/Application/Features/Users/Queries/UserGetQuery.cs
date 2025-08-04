@@ -1,13 +1,14 @@
 ﻿using Application.Common.Caching;
 using Application.Common.Exceptions;
-using Application.Common.Interfaces.Request.Handlers;
-using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Request;
+using Application.Common.Interfaces.Request.Handlers;
 using AutoMapper;
 using Domain.Entities.User;
 using DTO.User;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Users.Queries;
 
@@ -39,7 +40,9 @@ public sealed class UserGetQueryHandler : IQueryHandler<UserGetQuery, UserInfoRe
 
         if (user == null)
         {
-            user = await _userManager.FindByIdAsync(query.UserId.ToString());
+            user = await _dbContext.User
+                .Include(u => u.CompanyDetails)
+                .FirstOrDefaultAsync(u => u.Id == query.UserId);
 
             if (user == null)
             {
