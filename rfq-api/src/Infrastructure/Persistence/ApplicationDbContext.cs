@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Domain.Entities.Categories;
 using Domain.Entities.Languages;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
@@ -26,6 +27,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Language> Language => Set<Language>();
     public DbSet<Submission> Submission => Set<Submission>();
     public DbSet<UserCompanyDetails> UserCompanyDetails => Set<UserCompanyDetails>();
+    public DbSet<Category> Category => Set<Category>();
+    public DbSet<Subcategory> Subcategory => Set<Subcategory>();
 
 
     protected override void OnModelCreating(ModelBuilder builder)

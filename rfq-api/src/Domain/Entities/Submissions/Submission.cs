@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Base;
+using Domain.Entities.Categories;
 using Domain.Entities.Medias;
 using Domain.Entities.User;
 using Domain.Events;
@@ -18,9 +19,12 @@ namespace Domain.Entities.Submissions
         public SubmissionStatus Status { get; private set; } = SubmissionStatus.PendingReview;
         public string JobLocation { get; private set; } = null!;
         public int UserId { get; private set; }
-        public Media Media { get; private set; }
+        public Media Media { get; private set; } = null!;
 
         public ApplicationUser User { get; private set; } = null!;
+
+        public IReadOnlyCollection<Category> Categories { get; private set; } = new List<Category>();
+        public IReadOnlyCollection<Subcategory> Subcategories { get; private set; } = new List<Subcategory>();
 
         private Submission() { }
 

@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Languages;
+﻿using Domain.Entities.Categories;
+using Domain.Entities.Languages;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.User;
@@ -17,4 +18,6 @@ public interface IApplicationDbContext
     DbSet<Language> Language { get; }
     DbSet<Submission> Submission { get; }
     DbSet<UserCompanyDetails> UserCompanyDetails { get; }
+    DbSet<Category> Category { get; }
+    DbSet<Subcategory> Subcategory { get; }
 }
