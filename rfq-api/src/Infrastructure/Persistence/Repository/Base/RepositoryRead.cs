@@ -16,6 +16,10 @@ public class RepositoryRead<T> : IRepositoryRead<T>
         _dbContext = dbContext;
     }
 
+    public async Task<bool> ExistsAsync(int? id, CancellationToken cancellation = default)
+    {
+        return await _dbContext.Set<T>().AnyAsync(e => id == null || e.Id == id, cancellation);
+    }
     public async Task<T?> GetAsync(int id, CancellationToken cancellation = default)
     {
         return await _dbContext.Set<T>().FirstOrDefaultAsync(e => e.Id == id, cancellation);

@@ -1,4 +1,4 @@
-﻿using DTO.Enums.Company;
+﻿ using DTO.Enums.Company;
 
 namespace Domain.Entities.Users.CompanyDetails;
 
