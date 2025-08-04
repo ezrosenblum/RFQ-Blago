@@ -1,7 +1,6 @@
 ﻿using DTO.Medias;
 using DTO.Response;
 using DTO.User;
-
 namespace DTO.Submission;
 
 public record SubmissionBaseResponse
@@ -16,4 +15,8 @@ public record SubmissionBaseResponse
     public DateTime SubmissionDate { get; init; }
     public bool IsValid { get; init; }
     public MediaResponse Media { get; init; } = new();
+    public string? StreetAddress { get; init; }
+    public double? LatitudeAddress { get; init; }
+    public double? LongitudeAddress { get; init; }
+
 }

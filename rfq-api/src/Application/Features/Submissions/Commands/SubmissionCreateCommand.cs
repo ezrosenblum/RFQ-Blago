@@ -13,7 +13,10 @@ public sealed record SubmissionCreateCommand(
     string Description,
     int Quantity,
     SubmissionUnit Unit,
-    string JobLocation) : ISubmissionInsertData, ICommand;
+    string JobLocation,
+    string? StreetAddress,
+    double? LatitudeAddress,
+    double? LongitudeAddress) : ISubmissionInsertData, ICommand;
 
 public sealed class SubmissionCreateCommandHandler : ICommandHandler<SubmissionCreateCommand>
 {

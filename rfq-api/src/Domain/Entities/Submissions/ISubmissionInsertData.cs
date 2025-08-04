@@ -8,4 +8,8 @@ public interface ISubmissionInsertData
     int Quantity { get; }
     SubmissionUnit Unit { get; }
     string JobLocation { get; }
+    string? StreetAddress { get; }
+    double? LatitudeAddress { get; }
+    double? LongitudeAddress { get; }
+
 }

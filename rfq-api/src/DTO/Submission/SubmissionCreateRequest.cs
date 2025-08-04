@@ -8,4 +8,8 @@ public sealed record SubmissionCreateRequest
     public int Quantity { get; init; }
     public SubmissionUnit Unit { get; init; }
     public string JobLocation { get; init; } = null!;
+    public string? StreetAddress { get; init; }
+    public double? LatitudeAddress { get; init; }
+    public double? LongitudeAddress { get; init; }
+
 }

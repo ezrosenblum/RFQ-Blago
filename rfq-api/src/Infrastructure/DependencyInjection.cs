@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddSingleton<IEncryption, EncryptionService>();
         services.AddScoped<IIdentityImpersonator, IdentityImpersonator>();
+        services.AddScoped<IGeoCoverageService, GeoCoverageService>();
         services.AddMessageBroker(assembly, true);
         services.AddMediaStorage(configuration);
         services.AddCaching(configuration);
