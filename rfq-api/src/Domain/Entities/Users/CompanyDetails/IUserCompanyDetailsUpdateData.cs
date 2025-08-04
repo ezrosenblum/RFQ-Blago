@@ -2,7 +2,7 @@
 
 namespace Domain.Entities.Users.CompanyDetails;
 
-public interface IUserComapnyDetailsUpdateData : IUserCompanyDetailsInsertData
+public interface IUserCompanyDetailsUpdateData : IUserCompanyDetailsInsertData
 {
     IFormFile? Certificate { get; }
 }

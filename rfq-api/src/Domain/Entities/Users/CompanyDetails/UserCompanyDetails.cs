@@ -61,7 +61,7 @@ public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMe
         return userCompanyDetails;
     }
 
-    public void Update(IUserComapnyDetailsUpdateData data)
+    public void Update(IUserCompanyDetailsUpdateData data)
     {
         Name = data.Name;
         ContactPersonFirstName = data.ContactPersonFirstName;

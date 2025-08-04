@@ -23,7 +23,7 @@ public sealed record UserUpdateCommand(
     string LastName,
     string Email,
     string? PhoneNumber,
-    UserCompanyDetailsUpdateRequest? ComapnyDetails
+    UserCompanyDetailsUpdateRequest? CompanyDetails
     ) : IUserUpdateData, ICommand<UserResponse>;
 
 
@@ -68,9 +68,9 @@ public sealed class UserUpdateCommandHandler : ICommandHandler<UserUpdateCommand
 
         UserCompanyDetailsUpdateCommand? companyCommand = null;
 
-        if (command.ComapnyDetails is not null)
+        if (command.CompanyDetails is not null)
         {
-            var details = command.ComapnyDetails;
+            var details = command.CompanyDetails;
 
             companyCommand = new UserCompanyDetailsUpdateCommand(
                 Id: user.CompanyDetails!.Id,

@@ -8,5 +8,5 @@ public sealed record UserUpdateRequest
     public string LastName { get; init; } = null!;
     public string Email { get; init; } = null!;
     public string? PhoneNumber { get; init; }
-    public UserCompanyDetailsUpdateRequest? CompanyDetails { get; init; } = null!;
+    public UserCompanyDetailsUpdateRequest? CompanyDetails { get; init; }
 }
