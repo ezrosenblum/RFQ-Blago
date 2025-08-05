@@ -50,15 +50,18 @@ export class Signup implements OnInit {
       next: (roles) => {
         this.userRoles = roles;
       },
-      error: (err) => {
-        console.error('Failed to load user roles:', err);
+      error: () => {
+        this.userRoles = [];
       },
     });
 
-    // Load company sizes
     this.userService.getCompanySizes().subscribe({
-      next: (sizes) => (this.companySizes = sizes),
-      error: (err) => console.error('Failed to load company sizes', err),
+      next: (sizes) => {
+        this.companySizes = sizes;
+      },
+      error: () => {
+        this.companySizes = [];
+      },
     });
   }
 
