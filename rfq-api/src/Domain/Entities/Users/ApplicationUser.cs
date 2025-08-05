@@ -199,5 +199,46 @@ namespace Domain.Entities.User
         {
             CompanyDetails = company;
         }
+
+        public void SetCategories(
+            IReadOnlyCollection<Category> categories,
+            IReadOnlyCollection<Subcategory> subcategories)
+        {
+            // Update Categories
+            if (Categories == null)
+            {
+                Categories = new List<Category>(categories);
+            }
+            else
+            {
+                var existingCategories = Categories
+                    .Where(current => categories.Any(newCategory => newCategory.Id == current.Id))
+                    .ToList();
+
+                var newCategories = categories
+                    .Where(newCategory => !Categories.Any(current => current.Id == newCategory.Id))
+                    .ToList();
+
+                Categories = existingCategories.Concat(newCategories).ToList();
+            }
+
+            // Update Subcategories
+            if (Subcategories == null)
+            {
+                Subcategories = new List<Subcategory>(subcategories);
+            }
+            else
+            {
+                var existingSubcategories = Subcategories
+                    .Where(current => subcategories.Any(newSub => newSub.Id == current.Id))
+                    .ToList();
+
+                var newSubcategories = subcategories
+                    .Where(newSub => !Subcategories.Any(current => current.Id == newSub.Id))
+                    .ToList();
+
+                Subcategories = existingSubcategories.Concat(newSubcategories).ToList();
+            }
+        }
     }
 }

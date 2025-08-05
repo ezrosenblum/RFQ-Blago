@@ -116,6 +116,13 @@ public class UserController : ApiControllerBase
         return Ok();
     }
 
+    [HttpPut("categories")]
+    public async Task<IActionResult> Update([FromBody] UserUpdateCategoriesCommand command)
+    {
+        await Mediator.Send(command);
+        return Ok();
+    }
+
     [Authorize(Roles = "Administrator")]
     [HttpGet("status")]
     public async Task<IReadOnlyCollection<ListItemBaseResponse>> GetStatuses()
