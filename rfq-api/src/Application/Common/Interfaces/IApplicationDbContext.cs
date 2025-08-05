@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Languages;
+﻿using Domain.Entities.Categories;
+using Domain.Entities.Languages;
 using Domain.Entities.Notifications;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
@@ -21,4 +22,6 @@ public interface IApplicationDbContext
     DbSet<Submission> Submission { get; }
     DbSet<SubmissionQuote> SubmissionQuote { get; }
     DbSet<UserCompanyDetails> UserCompanyDetails { get; }
+    DbSet<Category> Category { get; }
+    DbSet<Subcategory> Subcategory { get; }
 }
