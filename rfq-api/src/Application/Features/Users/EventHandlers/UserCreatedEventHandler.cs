@@ -15,18 +15,15 @@ namespace Application.Features.Users.EventHandlers;
 public sealed class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 {
     private readonly IMessagePublisher _messagePublisher;
-    private readonly ISender _mediatr;
     private readonly ILogger<UserCreatedEventHandler> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
 
     public UserCreatedEventHandler(
         IMessagePublisher messagePublisher,
-        ISender mediatr,
         ILogger<UserCreatedEventHandler> logger,
         UserManager<ApplicationUser> userManager)
     {
         _messagePublisher = messagePublisher;
-        _mediatr = mediatr;
         _logger = logger;
         _userManager = userManager;
     }
@@ -51,8 +48,6 @@ public sealed class UserCreatedEventHandler : INotificationHandler<UserCreatedEv
             EmailVerificationCode = tokenEncoded,
             Uid = eventData.User.Uid
         });
-
-        await _mediatr.Send(new VerifyEmailCommand(tokenEncoded, eventData.User.Uid), cancellationToken);
 
         await _messagePublisher.PublishAsync(new IndexUserMessage(eventData.User.Id));
     }
