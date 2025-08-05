@@ -46,13 +46,13 @@ public static class SearchIndexInitializer
     {
         try
         {
-            logger.LogDebug("STARTED BUILDING SEARCH INDEX FOR  Notification");
+            logger.LogDebug("STARTED BUILDING SEARCH INDEX FOR Notification");
             await mediatr.Send(new NotificationRebuildSearchIndexCommand());
-            logger.LogDebug("FINISHED BUILDING SEARCH INDEX FOR  Notification");
+            logger.LogDebug("FINISHED BUILDING SEARCH INDEX FOR Notification");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR  Notification");
+            logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR Notification");
         }
     }
 }
