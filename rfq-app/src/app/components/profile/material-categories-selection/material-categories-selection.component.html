@@ -139,43 +139,8 @@
             
             <h4 class="font-medium text-gray-800 dark:text-gray-200">{{ subcategory.name }}</h4>
           </div>
-          
-          <div class="ml-8 grid grid-cols-2 md:grid-cols-3 gap-2">
-            <label 
-              *ngFor="let material of subcategory.materials" 
-              class="flex items-center space-x-2 cursor-pointer"
-              [hidden]="!shouldShowMaterial(subcategory.id, material.id)"
-            >
-              <input
-                type="checkbox"
-                [checked]="isMaterialSelected(subcategory.id, material.id)"
-                (change)="toggleSelection(material.id, 'material', subcategory.id)"
-                class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
-              />
-              <span class="text-sm text-gray-700 dark:text-gray-300">{{ material.name }}</span>
-            </label>
-          </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Selected Summary -->
-  <div *ngIf="selectedItems.size > 0" class="mt-6 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
-    <h3 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">Selected Specialties ({{ getSelectedCount() }} materials)</h3>
-    <div class="flex flex-wrap gap-2">
-      <span 
-        *ngFor="let material of getSelectedMaterials().slice(0, 10)" 
-        class="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs rounded-full"
-      >
-        {{ material }}
-      </span>
-      <span 
-        *ngIf="getSelectedCount() > 10"
-        class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full"
-      >
-        +{{ getSelectedCount() - 10 }} more
-      </span>
     </div>
   </div>
 

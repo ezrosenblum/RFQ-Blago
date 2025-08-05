@@ -6,7 +6,6 @@ interface Material {
 interface Subcategory {
   id: string;
   name: string;
-  materials: Material[];
 }
 
 interface Category {

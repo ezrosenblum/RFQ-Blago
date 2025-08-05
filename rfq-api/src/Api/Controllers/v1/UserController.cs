@@ -1,5 +1,6 @@
 ﻿using Application.Features.Enums.Queries;
 using Application.Features.Users.Commands;
+using Application.Features.Users.CompanyDetails.Commands;
 using Application.Features.Users.Queries;
 using AutoMapper;
 using DTO.Enums.Company;
@@ -23,9 +24,17 @@ public class UserController : ApiControllerBase
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<UserResponse> Create([FromForm] UserCreateCommand request)
+    public async Task<UserResponse> Create([FromBody] UserCreateCommand request)
     {
         return await Mediator.Send(request);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("company/details")]
+    public async Task<IActionResult> CreateUserCompanyDetails([FromForm] UserCompanyDetailsCreateCommand request)
+    {
+        await Mediator.Send(request);
+        return Ok();
     }
 
     [HttpPut]
