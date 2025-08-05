@@ -1,10 +1,7 @@
-﻿using Application.Common.Exceptions;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
-using Application.Common.Localization;
 using Application.Common.Localization.Extensions;
-using Application.Common.Models;
 using Application.Common.Services;
 using Application.Features.Users.Validators;
 using Domain.Entities.Users.CompanyDetails;
@@ -12,7 +9,6 @@ using DTO.Enums.Company;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 
 namespace Application.Features.Users.CompanyDetails.Commands;
 
