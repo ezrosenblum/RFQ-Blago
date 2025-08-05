@@ -1,9 +1,7 @@
 ﻿using Application.Features.Users.Commands;
-using Application.Features.Users.CompanyDetails.Commands;
 using Application.Features.Users.Search;
 using AutoMapper;
 using Domain.Entities.User;
-using DTO.Enums.Company;
 using DTO.User;
 
 namespace Application.Features.Users.Mappings;
@@ -32,22 +30,6 @@ public sealed class UserMapperProfile : Profile
         CreateMap<UserResponse, UserSearchable>();
 
         CreateMap<UserInfoResponse, UserSearchable>();
-
-        CreateMap<UserCreateCommand, UserCompanyDetailsCreateCommand>()
-            .ConstructUsing(src => new UserCompanyDetailsCreateCommand(
-                src.CompanyDetails!.Name!,
-                src.CompanyDetails.UserId,
-                src.CompanyDetails!.ContactPersonFirstName,
-                src.CompanyDetails!.ContactPersonLastName,
-                src.CompanyDetails!.ContactPersonEmail,
-                src.CompanyDetails!.ContactPersonPhone,
-                src.CompanyDetails!.Description,
-                src.CompanyDetails!.StreetAddress,
-                src.CompanyDetails!.LatitudeAddress,
-                src.CompanyDetails!.LongitudeAddress,
-                src.CompanyDetails!.OperatingRadius,
-                (CompanySize?)src.CompanyDetails!.CompanySize,
-                src.Certificate));
 
         CreateMap<UserUpdateRequest, UserUpdateCommand>()
             .ConstructUsing(src => new UserUpdateCommand(
