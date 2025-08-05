@@ -1,5 +1,4 @@
 ﻿using Application.Common.MessageBroker;
-using Application.Features.Authentication.Commands.VerifyEmail.Commands;
 using Domain.Entities.User;
 using Domain.Events.Users;
 using DTO.MessageBroker.Messages.Search;
@@ -34,11 +33,23 @@ public sealed class UserCreatedEventHandler : INotificationHandler<UserCreatedEv
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(eventData.User);
 
+        _logger.LogInformation("Generated Email Confirmation token.");
+
         eventData.User!.SetEmailVerificationToken(token);
+
+        _logger.LogInformation("Set Email Confirmation token.");
+
         await _userManager.UpdateAsync(eventData.User);
 
+        _logger.LogInformation("Updated user.");
+
         byte[] tokenBytes = Encoding.UTF8.GetBytes(token);
+
+        _logger.LogInformation("Token Bytes generated.");
+
         var tokenEncoded = WebEncoders.Base64UrlEncode(tokenBytes);
+
+        _logger.LogInformation("Token Bytes encoded.");
 
         await _messagePublisher.PublishAsync(new UserCreatedMessage
         {
@@ -49,6 +60,11 @@ public sealed class UserCreatedEventHandler : INotificationHandler<UserCreatedEv
             Uid = eventData.User.Uid
         });
 
+        _logger.LogInformation("Message created user sent.");
+
         await _messagePublisher.PublishAsync(new IndexUserMessage(eventData.User.Id));
+
+        _logger.LogInformation("Message index user sent.");
+
     }
 }
