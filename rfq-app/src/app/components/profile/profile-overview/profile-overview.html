@@ -48,5 +48,91 @@
         </span>
       </div>
     </div>
+
+    <!-- Company Details -->
+    <div *ngIf="user.companyDetails">
+      <hr class="my-6 border-gray-300 dark:border-dark-700" />
+      <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-4">Company Information</h4>
+
+      <!-- Company Name -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Company Name</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.name }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Person -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Contact Person</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.contactPersonFirstName }} {{ user.companyDetails.contactPersonLastName }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Email -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Contact Email</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.contactPersonEmail }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Phone -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Contact Phone</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.contactPersonPhone }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Business Description -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Business Description</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.description }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Street Address -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Address</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.streetAddress }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Operating Radius -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Operating Radius</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.operatingRadius }} km
+          </span>
+        </div>
+      </div>
+
+      <!-- Company Size -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">Company Size</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.companySize?.name }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
