@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Medias;
+using Domain.Entities.Notifications;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.Submissions.SubmissionQuotes;
@@ -10,6 +11,7 @@ using Domain.Events.Users;
 using Domain.Interfaces;
 using DTO.Enums.Media;
 using DTO.Enums.User;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -56,6 +58,7 @@ namespace Domain.Entities.User
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
         public virtual ICollection<SubmissionQuote> SubmissionQuotes { get; set; } = new List<SubmissionQuote>();
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
         public static ApplicationUser Create(
             IUserInsertData data,

@@ -2,6 +2,6 @@
 
 public enum NotificationType
 {
-    NewMessage = 1,
-    NewPost = 2,
+    NewRFQ = 1,
+    NewQuote = 2,
 }

@@ -8,11 +8,8 @@
 
   <ItemGroup>
     <Compile Remove="MessageBroker\Messages\AccountProxySetting\**" />
-    <Compile Remove="NewFolder\**" />
     <EmbeddedResource Remove="MessageBroker\Messages\AccountProxySetting\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
     <None Remove="MessageBroker\Messages\AccountProxySetting\**" />
-    <None Remove="NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>

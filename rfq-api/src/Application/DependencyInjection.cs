@@ -69,6 +69,6 @@ public static class DependencyInjection
 
         cfg.CreateMap<TEnum, ListItemBaseResponse>()
             .ForMember(d => d.Id, opt => opt.MapFrom(s => Convert.ToInt32(s)))
-            .ForMember(d => d.Name, opt => opt.MapFrom(s => EnumHelper.ToReadableString(s)));
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => localizationService.GetValue(s)));
     }
 }
