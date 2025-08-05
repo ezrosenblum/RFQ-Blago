@@ -1,4 +1,5 @@
-﻿using Application.Features.Submissions.Search;
+﻿using Application.Features.Notifications.Search;
+using Application.Features.Submissions.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
 using DTO.Pagination;
 
@@ -18,4 +19,5 @@ public interface ISearchClient<T> where T: class, ISearchable
     Task<bool> CreateIndexIfNotExist(string index);
     Task<PaginatedList<SubmissionSearchable>> SearchSubmissionsAsync(ISubmissionFullSearchCriteria criteria);
     Task<PaginatedList<SubmissionQuoteSearchable>> SearchSubmissionQuotesAsync(ISubmissionQuoteFullSearchCriteria criteria);
+    Task<PaginatedList<NotificationSearchable>> SearchNotificationsForUserAsync(INotificationForUserFullSearchCriteria criteria);
 }
