@@ -114,7 +114,7 @@
             />
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
               <svg
-                *ngIf="!isFieldInvalid('Email')"
+                *ngIf="!isFieldInvalid('email')"
                 class="h-5 w-5 text-secondary-400"
                 fill="none"
                 stroke="currentColor"
@@ -477,7 +477,6 @@
               placeholder="{{ 'AUTH.ENTER_CONTACT_EMAIL' | translate }}"
             />
             <p class="mt-1 text-xs text-secondary-500">
-              Defaults to your email if not provided
               {{'AUTH.DEFAULTS_TO_YOUR_EMAIL_IF_NOT_PROVIDED' | translate}}
             </p>
           </div>

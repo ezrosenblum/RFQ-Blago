@@ -58,10 +58,6 @@ export interface CompanyDetails {
   contactPhone: string;
   businessDescription: string;
   companySize: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
 }
 
 export interface UserResponse {
