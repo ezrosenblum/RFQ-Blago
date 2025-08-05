@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -7,64 +13,40 @@ import { Auth } from '../services/auth';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  constructor(private authService: Auth, private router: Router) {}
 
-  constructor(
-    private authService: Auth,
-    private router: Router
-  ) {}
-
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
-    // Get the auth token from the service
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
     const authToken = this.authService.getToken();
+    let headers = req.headers;
 
-    // Clone the request and add the authorization header if token exists
-    let authReq = req;
+    // Add Authorization token
     if (authToken) {
-      authReq = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${authToken}`
-        }
-      });
+      headers = headers.set('Authorization', `Bearer ${authToken}`);
     }
 
-    // Add common headers
-    authReq = authReq.clone({
-      setHeaders: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
+    // 👇 Check custom header
+    const skipContentType = req.headers.get('Skip-Content-Type') === 'true';
 
-    // Handle the request and catch any errors
-    return next.handle(authReq).pipe(
+    // 👇 Only set JSON headers if not skipping
+    if (!skipContentType) {
+      headers = headers
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json');
+    } else {
+      // Remove the custom flag from outgoing request
+      headers = headers.delete('Skip-Content-Type');
+    }
+
+    const clonedRequest = req.clone({ headers });
+
+    return next.handle(clonedRequest).pipe(
       catchError((error: HttpErrorResponse) => {
-
-        // Handle different error status codes
-        switch (error.status) {
-          case 401:
-            // Unauthorized - token expired or invalid
-            this.authService.logout();
-            this.router.navigate(['/auth/login']);
-            break;
-
-          case 403:
-            // Forbidden - user doesn't have permission
-            this.router.navigate(['/auth/login']);
-            break;
-
-          case 500:
-            // Server error
-            console.error('Server error:', error);
-            break;
-
-          default:
-            console.error('HTTP error:', error);
-            break;
-        }
-
+        // Error handling...
         return throwError(() => error);
       })
     );
   }
-};
+}
