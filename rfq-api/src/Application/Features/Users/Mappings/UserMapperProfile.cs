@@ -36,6 +36,7 @@ public sealed class UserMapperProfile : Profile
         CreateMap<UserCreateCommand, UserCompanyDetailsCreateCommand>()
             .ConstructUsing(src => new UserCompanyDetailsCreateCommand(
                 src.CompanyDetails!.Name!,
+                src.CompanyDetails.UserId,
                 src.CompanyDetails!.ContactPersonFirstName,
                 src.CompanyDetails!.ContactPersonLastName,
                 src.CompanyDetails!.ContactPersonEmail,
