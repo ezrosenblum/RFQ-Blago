@@ -96,7 +96,8 @@
       "NUMBER": "one number",
       "UPPER": "one uppercase letter",
       "LOWER": "one lowercase letter",
-      "SPECIAL": "one special character"
+      "SPECIAL": "one special character",
+      "MIN_LENGTH": "at least 8 characters"
     }
   },
 

@@ -303,7 +303,7 @@ export class Signup implements OnInit {
         );
       }
       if (!strength.minLength) {
-        requirements.push('8 characters minimum');
+        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH'));
       }
 
       return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
@@ -452,24 +452,24 @@ export class Signup implements OnInit {
     formData.append('LatitudeAddress', formValue.latitude?.toString() || '');
     formData.append(
       'OperatingRadius',
-      formValue.operatingRadius?.toString() || '5.0'
+      formValue.operatingRadius?.toString() || ''
     );
 
     formData.append(
       'ContactPersonFirstName',
-      formValue.contactPersonFirstName || formValue.firstName || ''
+      formValue.contactPersonFirstName || ''
     );
     formData.append(
       'ContactPersonLastName',
-      formValue.contactPersonLastName || formValue.lastName || ''
+      formValue.contactPersonLastName || ''
     );
     formData.append(
       'ContactPersonEmail',
-      formValue.contactEmail || formValue.email || ''
+      formValue.contactEmail || ''
     );
     formData.append(
       'ContactPersonPhone',
-      formValue.contactPhone || formValue.phoneNumber || ''
+      formValue.contactPhone || ''
     );
     formData.append('Description', formValue.businessDescription || '');
     formData.append('CompanySize', formValue.companySize?.toString() || '1');
