@@ -3,6 +3,7 @@
 public sealed record UserCompanyDetailsCreateRequest
 {
     public string? Name { get; init; }
+    public int UserId { get; init; }
     public string? ContactPersonFirstName { get; init; }
     public string? ContactPersonLastName { get; init; }
     public string? ContactPersonEmail { get; init; }

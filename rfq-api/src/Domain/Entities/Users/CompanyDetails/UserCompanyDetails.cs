@@ -35,6 +35,7 @@ public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMe
         IUserCompanyDetailsInsertData data)
     {
         Name = data.Name;
+        UserId = data.UserId;
         ContactPersonFirstName = data.ContactPersonFirstName;
         ContactPersonLastName = data.ContactPersonLastName ?? string.Empty;
         ContactPersonEmail = data.ContactPersonEmail;
