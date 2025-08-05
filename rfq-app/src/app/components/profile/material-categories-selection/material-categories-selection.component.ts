@@ -12,101 +12,27 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
       id: 'metals',
       name: 'Metals & Alloys',
       subcategories: [
-        {
-          id: 'steel',
-          name: 'Steel & Iron',
-          materials: [
-            { id: 'carbon-steel', name: 'Carbon Steel' },
-            { id: 'stainless-steel', name: 'Stainless Steel' },
-            { id: 'cast-iron', name: 'Cast Iron' },
-          ],
-        },
-        {
-          id: 'aluminum',
-          name: 'Aluminum',
-          materials: [
-            { id: '6061-t6', name: '6061-T6' },
-            { id: '7075-t6', name: '7075-T6' },
-            { id: 'cast-aluminum', name: 'Cast Aluminum' },
-          ],
-        },
-        {
-          id: 'copper',
-          name: 'Copper & Brass',
-          materials: [
-            { id: 'pure-copper', name: 'Pure Copper' },
-            { id: 'brass', name: 'Brass' },
-            { id: 'bronze', name: 'Bronze' },
-          ],
-        },
-        {
-          id: 'titanium',
-          name: 'Titanium',
-          materials: [
-            { id: 'grade-2', name: 'Grade 2' },
-            { id: 'grade-5', name: 'Grade 5' },
-            { id: 'grade-23', name: 'Grade 23' },
-          ],
-        },
+        { id: 'steel', name: 'Steel & Iron' },
+        { id: 'aluminum', name: 'Aluminum' },
+        { id: 'copper', name: 'Copper & Brass' },
+        { id: 'titanium', name: 'Titanium' },
       ],
     },
     {
       id: 'plastics',
       name: 'Plastics & Polymers',
       subcategories: [
-        {
-          id: 'engineering',
-          name: 'Engineering Plastics',
-          materials: [
-            { id: 'abs', name: 'ABS' },
-            { id: 'pom', name: 'POM' },
-            { id: 'peek', name: 'PEEK' },
-            { id: 'pei', name: 'PEI' },
-          ],
-        },
-        {
-          id: 'commodity',
-          name: 'Commodity Plastics',
-          materials: [
-            { id: 'pe', name: 'PE' },
-            { id: 'pp', name: 'PP' },
-            { id: 'ps', name: 'PS' },
-            { id: 'pvc', name: 'PVC' },
-          ],
-        },
-        {
-          id: 'specialty',
-          name: 'Specialty Polymers',
-          materials: [
-            { id: 'ptfe', name: 'PTFE' },
-            { id: 'fep', name: 'FEP' },
-            { id: 'pvdf', name: 'PVDF' },
-          ],
-        },
+        { id: 'engineering', name: 'Engineering Plastics' },
+        { id: 'commodity', name: 'Commodity Plastics' },
+        { id: 'specialty', name: 'Specialty Polymers' },
       ],
     },
     {
       id: 'composites',
       name: 'Composites',
       subcategories: [
-        {
-          id: 'carbon',
-          name: 'Carbon Fiber',
-          materials: [
-            { id: 'woven', name: 'Woven' },
-            { id: 'unidirectional', name: 'Unidirectional' },
-            { id: 'prepreg', name: 'Prepreg' },
-          ],
-        },
-        {
-          id: 'glass',
-          name: 'Fiberglass',
-          materials: [
-            { id: 'e-glass', name: 'E-Glass' },
-            { id: 's-glass', name: 'S-Glass' },
-            { id: 'chopped-strand', name: 'Chopped Strand' },
-          ],
-        },
+        { id: 'carbon', name: 'Carbon Fiber' },
+        { id: 'glass', name: 'Fiberglass' },
       ],
     },
   ];
@@ -122,11 +48,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
   }
 
   // Algorithm 1: Hierarchical Selection Logic
-  toggleSelection(
-    itemId: string,
-    type: 'category' | 'subcategory' | 'material',
-    parentId?: string
-  ): void {
+  toggleSelection(itemId: string, type: 'category' | 'subcategory'): void {
     const newSelected = new Set(this.selectedItems);
 
     if (type === 'category') {
@@ -134,22 +56,16 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
       if (!category) return;
 
       if (newSelected.has(itemId)) {
-        // Deselect category and all children
+        // Deselect category and all subcategories
         newSelected.delete(itemId);
         category.subcategories.forEach((sub) => {
           newSelected.delete(sub.id);
-          sub.materials.forEach((mat) =>
-            newSelected.delete(`${sub.id}-${mat.id}`)
-          );
         });
       } else {
-        // Select category and all children
+        // Select category and all subcategories
         newSelected.add(itemId);
         category.subcategories.forEach((sub) => {
           newSelected.add(sub.id);
-          sub.materials.forEach((mat) =>
-            newSelected.add(`${sub.id}-${mat.id}`)
-          );
         });
       }
     } else if (type === 'subcategory') {
@@ -161,18 +77,12 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
       if (!category || !subcategory) return;
 
       if (newSelected.has(itemId)) {
-        // Deselect subcategory and materials
+        // Deselect subcategory and parent category
         newSelected.delete(itemId);
-        subcategory.materials.forEach((mat) =>
-          newSelected.delete(`${itemId}-${mat.id}`)
-        );
-        newSelected.delete(category.id); // Deselect parent category
+        newSelected.delete(category.id);
       } else {
-        // Select subcategory and materials
+        // Select subcategory
         newSelected.add(itemId);
-        subcategory.materials.forEach((mat) =>
-          newSelected.add(`${itemId}-${mat.id}`)
-        );
 
         // Check if all subcategories are selected to auto-select parent
         const allSubsSelected = category.subcategories.every((s) =>
@@ -180,49 +90,6 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
         );
         if (allSubsSelected) {
           newSelected.add(category.id);
-        }
-      }
-    } else if (type === 'material' && parentId) {
-      const materialKey = `${parentId}-${itemId}`;
-
-      if (newSelected.has(materialKey)) {
-        newSelected.delete(materialKey);
-        newSelected.delete(parentId); // Deselect subcategory
-        const category = this.categories.find((c) =>
-          c.subcategories.some((s) => s.id === parentId)
-        );
-        if (category) {
-          newSelected.delete(category.id); // Deselect category
-        }
-      } else {
-        newSelected.add(materialKey);
-
-        // Check if all materials in subcategory are selected
-        const subcategory = this.categories
-          .flatMap((c) => c.subcategories)
-          .find((s) => s.id === parentId);
-
-        if (subcategory) {
-          const allMatsSelected = subcategory.materials.every((mat) =>
-            newSelected.has(`${parentId}-${mat.id}`)
-          );
-
-          if (allMatsSelected) {
-            newSelected.add(parentId);
-
-            // Check if all subcategories are selected to auto-select parent category
-            const category = this.categories.find((c) =>
-              c.subcategories.some((s) => s.id === parentId)
-            );
-            if (category) {
-              const allSubsSelected = category.subcategories.every((s) =>
-                newSelected.has(s.id)
-              );
-              if (allSubsSelected) {
-                newSelected.add(category.id);
-              }
-            }
-          }
         }
       }
     }
@@ -245,9 +112,6 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
         subcategories: category.subcategories.filter(
           (sub) =>
             sub.name.toLowerCase().includes(searchLower) ||
-            sub.materials.some((mat) =>
-              mat.name.toLowerCase().includes(searchLower)
-            ) ||
             category.name.toLowerCase().includes(searchLower)
         ),
       }))
@@ -263,7 +127,6 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
     this.searchTerm = target.value;
     this.updateFilteredCategories();
   }
-
   getSelectionState(
     itemId: string,
     type: 'category' | 'subcategory'
@@ -280,19 +143,8 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
       );
       return allSelected ? 'full' : someSelected ? 'partial' : 'none';
     } else if (type === 'subcategory') {
-      const subcategory = this.categories
-        .flatMap((c) => c.subcategories)
-        .find((s) => s.id === itemId);
-
-      if (!subcategory) return 'none';
-
-      const allSelected = subcategory.materials.every((mat) =>
-        this.selectedItems.has(`${itemId}-${mat.id}`)
-      );
-      const someSelected = subcategory.materials.some((mat) =>
-        this.selectedItems.has(`${itemId}-${mat.id}`)
-      );
-      return allSelected ? 'full' : someSelected ? 'partial' : 'none';
+      const isSelected = this.selectedItems.has(itemId);
+      return isSelected ? 'full' : 'none';
     }
 
     return 'none';
@@ -331,23 +183,16 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
     ).length;
   }
 
-  getSelectedMaterials(): string[] {
+  getSelectedSubcategories(): string[] {
     return Array.from(this.selectedItems)
-      .filter(
-        (id) =>
-          id.includes('-') &&
-          !this.categories.some((c) => c.id === id) &&
-          !this.categories
-            .flatMap((c) => c.subcategories)
-            .some((s) => s.id === id)
+      .filter((id) =>
+        this.categories.flatMap((c) => c.subcategories).some((s) => s.id === id)
       )
-      .map((materialId) => {
-        const [subId, matId] = materialId.split('-');
+      .map((subId) => {
         const subcategory = this.categories
           .flatMap((c) => c.subcategories)
           .find((s) => s.id === subId);
-        const material = subcategory?.materials.find((m) => m.id === matId);
-        return material?.name || matId;
+        return subcategory?.name || subId;
       });
   }
 
