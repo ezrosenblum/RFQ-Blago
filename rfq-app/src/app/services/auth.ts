@@ -1,18 +1,20 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-import { User, UserRole } from '../models/user.model';
+import { LookupValue, User, UserRole } from '../models/user.model';
 import {
   LoginRequest,
-  SignupRequest,
   TokenPayload,
   Token,
   VerifyData,
   PasswordResetRequest,
+  UserRequest,
+  UserResponse,
+  CompanyDetails,
 } from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
 
@@ -75,38 +77,47 @@ export class Auth {
     );
   }
 
-  signup(userData: SignupRequest): Observable<User> {
-    return this.http.post<User>(`${this.API_URL}User`, userData).pipe(
-      map((response) => {
-        if (response && response.id) {
-          return response;
-        }
-        throw new Error('Signup failed');
-      }),
-      tap((response) => {
-        this.router.navigate(['/auth/login']);
+  createUser(user: UserRequest): Observable<UserResponse> {
+    return this.http.post<UserResponse>(`${environment.apiUrl}User`, user);
+  }
+
+  createCompanyDetails(formData: FormData): Observable<CompanyDetails> {
+    return this.http
+      .post<CompanyDetails>(`${this.API_URL}User/company/details`, formData, {
+        headers: new HttpHeaders({
+          'Skip-Content-Type': 'true',
+        }),
       })
-    );
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
+  getUserRoles(): Observable<LookupValue[]> {
+    return this.http.get<LookupValue[]>(`${this.API_URL}User/role`);
+  }
+
+  getCompanySizes(): Observable<LookupValue[]> {
+    return this.http.get<LookupValue[]>(`${this.API_URL}User/company/size`);
   }
 
   forgotPassword(forgotPassword: { email: string }): Observable<void> {
-    return this.http.post<void>(
-      `${this.API_URL}/User/forgot-password`, forgotPassword
-    ).pipe(
-      catchError(err => {
-        return throwError(() => err);
-      })
-    );
-  }
-
-  public putVerify(postDataResetPass: VerifyData): Observable<VerifyData> {
-    return this.http.put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass)
+    return this.http
+      .post<void>(`${this.API_URL}/User/forgot-password`, forgotPassword)
       .pipe(
         catchError((err) => {
           return throwError(() => err);
         })
-      );;
-  };
+      );
+  }
+
+  public putVerify(postDataResetPass: VerifyData): Observable<VerifyData> {
+    return this.http
+      .put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass)
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
 
   logout(): void {
     this.clearAuthData();

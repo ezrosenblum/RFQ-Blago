@@ -13,7 +13,7 @@ export interface User {
 }
 
 export interface LookupValue {
-  id: string;
+  id: number;
   name: string;
 }
 export enum UserRole {

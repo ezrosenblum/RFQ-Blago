@@ -6,18 +6,19 @@
     <!-- Header -->
     <div class="text-center">
       <h1 class="text-3xl font-bold text-secondary-900 dark:text-secondary-100">
-        RFQ System
+        {{ 'AUTH.RFQ_SYSTEM' | translate }}
       </h1>
       <h2
         class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200"
       >
-        {{ isVendorDetailsStep ? 'Company Information' : 'Create your account'
-        }}
+        {{ isVendorDetailsStep ? ('AUTH.COMPANY_INFORMATION' | translate) :
+        ('AUTH.CREATE_YOUR_ACCOUNT' | translate) }}
       </h2>
       <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
         {{ message }}
       </p>
     </div>
+
     <!-- Success Message -->
     <div
       *ngIf="successMessage"
@@ -62,16 +63,16 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- First Name -->
           <div>
-            <label for="firstName" class="form-label"> First Name * </label>
+            <label for="firstName" class="form-label"
+              >{{ 'AUTH.FIRST_NAME' | translate }}
+            </label>
             <input
-              id="firstName"
-              name="firstName"
               type="text"
               autocomplete="given-name"
               formControlName="firstName"
               class="form-input"
               [class.border-error-500]="isFieldInvalid('firstName')"
-              placeholder="Enter first name"
+              placeholder="{{ 'AUTH.ENTER_FIRST_NAME' | translate }}"
             />
             <div *ngIf="isFieldInvalid('firstName')" class="form-error">
               {{ getFieldError('firstName') }}
@@ -80,16 +81,16 @@
 
           <!-- Last Name -->
           <div>
-            <label for="lastName" class="form-label"> Last Name * </label>
+            <label for="lastName" class="form-label"
+              >{{ 'AUTH.LAST_NAME' | translate }}
+            </label>
             <input
-              id="lastName"
-              name="lastName"
               type="text"
               autocomplete="family-name"
               formControlName="lastName"
               class="form-input"
               [class.border-error-500]="isFieldInvalid('lastName')"
-              placeholder="Enter last name"
+              placeholder="{{ 'AUTH.ENTER_LAST_NAME' | translate }}"
             />
             <div *ngIf="isFieldInvalid('lastName')" class="form-error">
               {{ getFieldError('lastName') }}
@@ -99,21 +100,21 @@
 
         <!-- Email Field -->
         <div>
-          <label for="email" class="form-label"> Email Address * </label>
+          <label for="email" class="form-label"
+            >{{'AUTH.EMAIL' | translate}}</label
+          >
           <div class="relative">
             <input
-              id="email"
-              name="email"
               type="email"
               autocomplete="email"
               formControlName="email"
               class="form-input"
               [class.border-error-500]="isFieldInvalid('email')"
-              placeholder="Enter your email address"
+              placeholder="{{ 'AUTH.ENTER_EMAIL' | translate }}"
             />
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
               <svg
-                *ngIf="!isFieldInvalid('email')"
+                *ngIf="!isFieldInvalid('Email')"
                 class="h-5 w-5 text-secondary-400"
                 fill="none"
                 stroke="currentColor"
@@ -147,18 +148,20 @@
 
         <!-- Role Selection -->
         <div>
-          <label for="role" class="form-label"> Account Type * </label>
+          <label for="role" class="form-label"
+            >{{ 'AUTH.ACCOUNT_TYPE' | translate }} *</label
+          >
           <select
-            id="role"
-            name="role"
             formControlName="role"
             class="form-select"
             [class.border-error-500]="isFieldInvalid('role')"
             (change)="onRoleChange()"
           >
-            <option value="" disabled>Select your role</option>
-            <option *ngFor="let role of userRoles" [value]="role.value">
-              {{ role.label }}
+            <option value="" disabled>
+              {{ 'AUTH.SELECT_YOUR_ROLE' | translate }}
+            </option>
+            <option *ngFor="let role of userRoles" [value]="role.name">
+              {{ role.name }}
             </option>
           </select>
           <div *ngIf="isFieldInvalid('role')" class="form-error">
@@ -168,17 +171,17 @@
 
         <!-- Password Field -->
         <div>
-          <label for="password" class="form-label"> Password * </label>
+          <label for="password" class="form-label"
+            >{{ 'AUTH.PASSWORD' | translate }} *</label
+          >
           <div class="relative">
             <input
-              id="password"
-              name="password"
               [type]="showPassword ? 'text' : 'password'"
               autocomplete="new-password"
               formControlName="password"
               class="form-input"
               [class.border-error-500]="isFieldInvalid('password')"
-              placeholder="Create a strong password"
+              placeholder="{{ 'AUTH.CREATE_STRONG_PASSWORD' | translate }}"
             />
             <button
               type="button"
@@ -251,7 +254,6 @@
               </span>
             </div>
           </div>
-
           <div *ngIf="isFieldInvalid('password')" class="form-error">
             {{ getFieldError('password') }}
           </div>
@@ -260,18 +262,16 @@
         <!-- Confirm Password Field -->
         <div>
           <label for="confirmPassword" class="form-label">
-            Confirm Password *
+            {{ 'AUTH.CONFIRM_PASSWORD' | translate }} *
           </label>
           <div class="relative">
             <input
-              id="confirmPassword"
-              name="confirmPassword"
               [type]="showConfirmPassword ? 'text' : 'password'"
               autocomplete="new-password"
               formControlName="confirmPassword"
               class="form-input"
               [class.border-error-500]="isFieldInvalid('confirmPassword')"
-              placeholder="Confirm your password"
+              placeholder="{{ 'AUTH.CONFIRM_YOUR_PASSWORD' | translate }}"
             />
             <button
               type="button"
@@ -342,76 +342,174 @@
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to account details
+            {{ 'AUTH.BACK_TO_ACCOUNT_DETAILS' | translate }}
           </button>
         </div>
 
         <!-- Company Name -->
         <div>
-          <label for="companyName" class="form-label"> Company Name * </label>
+          <label for="CompanyName" class="form-label"
+            >{{ 'AUTH.COMPANY_NAME' | translate }} *</label
+          >
           <input
-            id="companyName"
-            name="companyName"
             type="text"
-            formControlName="companyName"
+            formControlName="name"
             class="form-input"
-            [class.border-error-500]="isFieldInvalid('companyName')"
-            placeholder="Enter your company name"
+            [class.border-error-500]="isFieldInvalid('name')"
+            placeholder="{{ 'AUTH.ENTER_COMPANY_NAME' | translate }}"
           />
-          <div *ngIf="isFieldInvalid('companyName')" class="form-error">
-            {{ getFieldError('companyName') }}
+          <div *ngIf="isFieldInvalid('name')" class="form-error">
+            {{ getFieldError('name') }}
           </div>
         </div>
 
         <!-- Business Address -->
         <div>
           <label for="businessAddress" class="form-label">
-            Business Address *
+            {{ 'AUTH.BUSINESS_ADDRESS' | translate }} *
           </label>
           <textarea
-            id="businessAddress"
-            name="businessAddress"
             rows="3"
             formControlName="businessAddress"
             class="form-input"
             [class.border-error-500]="isFieldInvalid('businessAddress')"
-            placeholder="Enter your complete business address"
+            placeholder="{{ 'AUTH.ENTER_BUSINESS_ADDRESS' | translate }}"
           ></textarea>
           <div *ngIf="isFieldInvalid('businessAddress')" class="form-error">
             {{ getFieldError('businessAddress') }}
           </div>
         </div>
 
-        <!-- Contact Person -->
+        <!-- Location Coordinates (Optional) -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <!-- Latitude -->
+          <div>
+            <label for="latitude" class="form-label">
+              {{ 'AUTH.LATITUDE_OPTIONAL' | translate }}
+            </label>
+            <input
+              type="number"
+              formControlName="latitude"
+              class="form-input"
+              placeholder="{{ 'AUTH.ENTER_LATITUDE_COORDINATE' | translate }}"
+            />
+          </div>
+
+          <!-- Longitude -->
+          <div>
+            <label for="longitude" class="form-label">
+              {{ 'AUTH.LONGITUDE_OPTIONAL' | translate }}
+            </label>
+            <input
+              type="number"
+              formControlName="longitude"
+              class="form-input"
+              placeholder="{{ 'AUTH.ENTER_LONGITUDE_COORDINATE' | translate }}"
+            />
+          </div>
+        </div>
+
+        <!-- Operating Radius -->
         <div>
-          <label for="contactPerson" class="form-label">
-            Primary Contact Person *
+          <label for="operatingRadius" class="form-label">
+            {{ 'AUTH.OPERATING_RADIUS_OPTIONAL' | translate }}
           </label>
           <input
-            id="contactPerson"
-            name="contactPerson"
-            type="text"
-            formControlName="contactPerson"
+            type="number"
+            min="0"
+            formControlName="operatingRadius"
             class="form-input"
-            [class.border-error-500]="isFieldInvalid('contactPerson')"
-            placeholder="Enter contact person name"
+            placeholder="{{ 'AUTH.ENTER_OPERATING_RADIUS' | translate }}"
           />
-          <div *ngIf="isFieldInvalid('contactPerson')" class="form-error">
-            {{ getFieldError('contactPerson') }}
+        </div>
+
+        <!-- Contact Person -->
+        <div>
+          <label for="contactPersonFirstName" class="form-label">
+            {{ 'AUTH.CONTACT_PERSON_FIRST_NAME' | translate }} *
+          </label>
+          <input
+            type="text"
+            formControlName="contactPersonFirstName"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('contactPersonFirstName')"
+            placeholder="{{ 'AUTH.ENTER_CONTACT_PERSON_FIRST_NAME' | translate }}"
+          />
+          <div
+            *ngIf="isFieldInvalid('contactPersonFirstName')"
+            class="form-error"
+          >
+            {{ getFieldError('contactPersonFirstName') }}
+          </div>
+        </div>
+
+        <!-- Contact Person Last Name -->
+        <div>
+          <label for="contactPersonLastName" class="form-label">
+            {{ 'AUTH.CONTACT_PERSON_LAST_NAME' | translate }} *
+          </label>
+          <input
+            type="text"
+            formControlName="contactPersonLastName"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('contactPersonLastName')"
+            placeholder="{{ 'AUTH.ENTER_CONTACT_PERSON_LAST_NAME' | translate }}"
+          />
+          <div
+            *ngIf="isFieldInvalid('contactPersonLastName')"
+            class="form-error"
+          >
+            {{ getFieldError('contactPersonLastName') }}
+          </div>
+        </div>
+
+        <!-- Contact Details -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <!-- Contact Email -->
+          <div>
+            <label for="contactEmail" class="form-label">
+              {{ 'AUTH.CONTACT_EMAIL_OPTIONAL' | translate }}
+            </label>
+            <input
+              type="email"
+              formControlName="contactEmail"
+              class="form-input"
+              placeholder="{{ 'AUTH.ENTER_CONTACT_EMAIL' | translate }}"
+            />
+            <p class="mt-1 text-xs text-secondary-500">
+              Defaults to your email if not provided
+              {{'AUTH.DEFAULTS_TO_YOUR_EMAIL_IF_NOT_PROVIDED' | translate}}
+            </p>
+          </div>
+
+          <!-- Contact Phone -->
+          <div>
+            <label for="contactPhone" class="form-label">
+              {{ 'AUTH.CONTACT_PHONE_OPTIONAL' | translate }}
+            </label>
+            <input
+              type="text"
+              formControlName="contactPhone"
+              class="form-input"
+              placeholder="{{ 'AUTH.ENTER_CONTACT_PHONE' | translate }}"
+            />
+            <p class="mt-1 text-xs text-secondary-500">
+              {{ 'AUTH.DEFAULTS_TO_YOUR_PHONE_IF_NOT_PROVIDED' | translate }}
+            </p>
           </div>
         </div>
 
         <!-- Phone Number -->
         <div>
-          <label for="phoneNumber" class="form-label"> Phone Number * </label>
+          <label for="phoneNumber" class="form-label">
+            {{ 'AUTH.PHONE_NUMBER' | translate }} *
+          </label>
           <input
-            id="phoneNumber"
-            name="phoneNumber"
-            type="tel"
+            type="text"
             formControlName="phoneNumber"
             class="form-input"
             [class.border-error-500]="isFieldInvalid('phoneNumber')"
-            placeholder="Enter your phone number"
+            placeholder="{{ 'AUTH.ENTER_PHONE_NUMBER' | translate }}"
           />
           <div *ngIf="isFieldInvalid('phoneNumber')" class="form-error">
             {{ getFieldError('phoneNumber') }}
@@ -421,16 +519,14 @@
         <!-- Business Description -->
         <div>
           <label for="businessDescription" class="form-label">
-            Business Description/Specialties *
+            {{ 'AUTH.BUSINESS_DESCRIPTION_SPECIALTIES' | translate }} *
           </label>
           <textarea
-            id="businessDescription"
-            name="businessDescription"
             rows="4"
             formControlName="businessDescription"
             class="form-input"
             [class.border-error-500]="isFieldInvalid('businessDescription')"
-            placeholder="Describe your business and specialties"
+            placeholder="{{ 'AUTH.DESCRIBE_YOUR_BUSINESS_AND_SPECIALTIES' | translate }}"
           ></textarea>
           <div *ngIf="isFieldInvalid('businessDescription')" class="form-error">
             {{ getFieldError('businessDescription') }}
@@ -440,58 +536,35 @@
         <!-- Company Size -->
         <div>
           <label for="companySize" class="form-label">
-            Company Size (Optional)
+            {{ 'AUTH.COMPANY_SIZE_OPTIONAL' | translate }}
           </label>
-          <select
-            id="companySize"
-            name="companySize"
-            formControlName="companySize"
-            class="form-select"
-          >
-            <option value="">Select company size</option>
-            <option value="1-10">1-10 employees</option>
-            <option value="11-50">11-50 employees</option>
-            <option value="51-200">51-200 employees</option>
-            <option value="201-500">201-500 employees</option>
-            <option value="500+">500+ employees</option>
+          <select formControlName="companySize" class="form-select">
+            <option value="">
+              {{ 'AUTH.SELECT_COMPANY_SIZE' | translate }}
+            </option>
+            <option *ngFor="let size of companySizes" [value]="size.id">
+              {{ size.name }}
+            </option>
           </select>
         </div>
-
-        <!-- Years in Business -->
-        <div>
-          <label for="yearsInBusiness" class="form-label">
-            Years in Business (Optional)
-          </label>
-          <input
-            id="yearsInBusiness"
-            name="yearsInBusiness"
-            type="number"
-            min="0"
-            max="100"
-            formControlName="yearsInBusiness"
-            class="form-input"
-            placeholder="Enter years in business"
-          />
-        </div>
-
         <!-- Business License Upload -->
         <div>
           <label for="businessLicense" class="form-label">
-            Business License/Certification (Optional)
+            {{ 'AUTH.BUSINESS_LICENSE_CERTIFICATION_OPTIONAL' | translate }}
           </label>
           <input
-            id="businessLicense"
-            name="businessLicense"
+            formControlName="businessLicense"
             type="file"
             accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
             (change)="onFileSelected($event)"
             class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
           />
           <p class="mt-1 text-xs text-secondary-500">
-            Accepted formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
+            {{ 'AUTH.ACCEPTED_FORMATS' | translate }}: PDF, JPG, PNG, DOC, DOCX
+            (Max 5MB)
           </p>
           <div *ngIf="selectedFileName" class="mt-2 text-sm text-secondary-600">
-            Selected: {{ selectedFileName }}
+            {{ 'AUTH.SELECTED' | translate }}: {{ selectedFileName }}
           </div>
         </div>
       </div>
@@ -500,16 +573,16 @@
       <div>
         <button
           type="submit"
-          [disabled]="isLoading || !isFormValidForCurrentStep()"
           class="btn btn-primary w-full flex justify-center py-3 px-4"
+          [disabled]="isLoading || !isFormValidForCurrentStep()"
         >
           <span *ngIf="!isLoading">{{ getSubmitButtonText() }}</span>
           <div *ngIf="isLoading" class="flex items-center">
             <div class="spinner mr-2"></div>
-            <span
-              >{{ isVendorDetailsStep ? 'Creating account...' : 'Processing...'
-              }}</span
-            >
+            <span>
+              {{ isVendorDetailsStep ? ('AUTH.CREATING_ACCOUNT' | translate) :
+              ('AUTH.PROCESSING' | translate) }}
+            </span>
           </div>
         </button>
       </div>
@@ -517,13 +590,13 @@
       <!-- Login Link -->
       <div class="text-center">
         <p class="text-sm text-secondary-600 dark:text-secondary-400">
-          Already have an account?
+          {{'AUTH.ALREADY_HAVE_ACCOUNT' | translate}}
           <button
             type="button"
             (click)="navigateToLogin()"
             class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 ml-1"
           >
-            Sign in here
+            {{ 'AUTH.SIGN_IN_HERE' | translate }}
           </button>
         </p>
       </div>
@@ -532,9 +605,8 @@
     <!-- Additional Info -->
     <div class="mt-8 text-center">
       <p class="text-xs text-secondary-500 dark:text-secondary-400">
-        Your account will be reviewed and activated within 24 hours
+        {{ 'AUTH.ACCOUNT_REVIEW_INFO' | translate }}
       </p>
     </div>
   </div>
 </div>
-
