@@ -26,7 +26,7 @@ const routes: Routes = [
     component: ForgotPasswordComponent
   },
   {
-    path: 'verify',
+    path: 'verification',
     component: VerifyComponent
   },
   {
