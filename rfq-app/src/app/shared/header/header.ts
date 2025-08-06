@@ -1,10 +1,12 @@
 // src/app/shared/header/header.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Signal, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { User, UserRole } from '../../models/user.model';
 import { TranslateService } from '@ngx-translate/core';
+import { NotificationData } from '../../services/notification-data';
+import { NotificationItem} from '../../models/notifications.model';
 
 @Component({
   selector: 'app-header',
@@ -17,8 +19,17 @@ export class Header implements OnInit, OnDestroy {
   isAuthenticated = false;
   isDarkMode = false;
   isMenuOpen = false;
+  notificationCount: number = 0;
+  notifications: NotificationItem[] = [];
+  showNotificationsDropdown = false;
+  loadingStatusChange: { [notificationId: string]: boolean } = {};
+  currentPage = 1;
+  pageSize = 5;
+  isLoadingMore = false;
+  hasMoreNotifications = true;
 
   private destroy$ = new Subject<void>();
+  @ViewChild('notifContainer') notifContainer!: ElementRef;
 
   // Expose UserRole enum to template
   UserRole = UserRole;
@@ -26,7 +37,8 @@ export class Header implements OnInit, OnDestroy {
   constructor(
     private authService: Auth,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private notificationDataService: NotificationData
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +57,7 @@ export class Header implements OnInit, OnDestroy {
 
     // Initialize theme from localStorage
     this.initializeTheme();
+    this.getNotificationCount();
   }
 
   ngOnDestroy(): void {
@@ -167,5 +180,106 @@ export class Header implements OnInit, OnDestroy {
 
   isCurrentRoute(route: string): boolean {
     return this.router.url === route;
+  }
+
+  getNotificationCount() {
+    this.notificationDataService.getNotificationCount().subscribe({
+      next: (result) => {
+        this.notificationCount = result?.count || 0;
+        this.hasMoreNotifications = true;
+        this.getNotifications(1);
+      },
+      error: err => console.error('Failed to get notification count:', err)
+    })
+  }
+
+  toggleNotificationsDropdown(): void {
+    this.showNotificationsDropdown = !this.showNotificationsDropdown;
+
+    if (this.showNotificationsDropdown) {
+      this.currentPage = 1;
+      this.hasMoreNotifications = true;
+      this.notifications = [];
+      this.getNotifications(1);
+    }
+  }
+
+  getNotifications(page = 1) {
+    if (this.isLoadingMore || !this.hasMoreNotifications) return;
+
+    this.isLoadingMore = true;
+
+    const searchParams = {
+      query: '',
+      paging: {
+        pageNumber: page,
+        pageSize: this.pageSize
+      },
+      sorting: {
+        field: 1,
+        sortOrder: 1
+      }
+    };
+
+    this.notificationDataService.getNotificationsPaged(searchParams).subscribe({
+      next: (result) => {
+        const newNotifications = result?.items || [];
+        if (page === 1) {
+          this.notifications = newNotifications;
+        } else {
+          this.notifications = [...this.notifications, ...newNotifications];
+        }
+
+        this.hasMoreNotifications = newNotifications.length === this.pageSize;
+        this.currentPage = page;
+        this.isLoadingMore = false;
+      },
+      error: (err) => {
+        console.error('Failed to get notifications:', err);
+        this.isLoadingMore = false;
+      }
+    });
+  }
+
+  markAllAsRead(): void {
+    this.notificationDataService.markAllAsReadNotification().subscribe({
+      next: () => {
+        this.getNotificationCount();
+      },
+      error: (err) => console.error('Failed to mark all as read:', err)
+    });
+  }
+
+  toggleNotificationStatus(notification: NotificationItem): void {
+    const currentStatusId = notification.status?.id;
+    const newStatusId = currentStatusId === 1 ? 2 : 1;
+
+    this.loadingStatusChange[notification.id] = true;
+
+    this.notificationDataService.changeStatus(notification.id, newStatusId).subscribe({
+      next: () => {
+        const index = this.notifications.findIndex(n => n.id === notification.id);
+        if (index > -1) {
+          this.notifications[index].status.id = newStatusId;
+        }
+        this.getNotificationCount();
+      },
+      error: (err) => {
+        console.error('Failed to toggle notification status:', err);
+      },
+      complete: () => {
+        this.loadingStatusChange[notification.id] = false;
+      }
+    });
+  }
+
+  onScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    const scrollBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+
+    // If near bottom and has more notifications to load
+    if (scrollBottom < 50 && this.hasMoreNotifications && !this.isLoadingMore) {
+      this.getNotifications(this.currentPage + 1);
+    }
   }
 }

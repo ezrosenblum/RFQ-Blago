@@ -197,7 +197,13 @@
     "SIGN_OUT": "Sign Out",
     "VENDOR": "Vendor",
     "CLIENT": "Client",
-    "MESSAGES": "Messages"
+    "MESSAGES": "Messages",
+    "NOTIFICATIONS": "Notifications",
+    "MARK_ALL_AS_READ": "Mark all as read",
+    "MARK_AS_READ": "Mark as read",
+    "MARK_AS_UNREAD": "Mark as unread",
+    "NO_NOTIFICATIONS": "No notifications",
+    "LOADING_MORE": "Loading more..."
   },
 
   "SERVICE_AREA": {

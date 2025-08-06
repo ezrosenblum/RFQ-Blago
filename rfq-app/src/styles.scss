@@ -7,7 +7,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('./assets/styles/icons.css');
 
-// FilePond drag and drop 
+// FilePond drag and drop
 @import "filepond/dist/filepond.min.css";
 
 // Custom CSS variables for dark theme
@@ -297,3 +297,16 @@ body {
   @apply outline-none ring-2 ring-primary-500 ring-offset-2;
   @apply dark:ring-offset-dark-900;
 }
+
+.notification-snackbar {
+  background-color: var(--color-success) !important;
+  color: white !important;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  border-radius: 6px;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled)
+ {
+    --mat-button-text-state-layer-color: transparent !important;
+ }
