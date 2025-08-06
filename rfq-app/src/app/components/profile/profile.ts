@@ -12,7 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ProfileComponent implements OnInit {
   currentUser: User | null = null;
-  editMode = false;
+  editMode: boolean = false;
+  showInitials: boolean = false;
   selectedTab: string = 'Overview';
   private destroy$ = new Subject<void>();
 
@@ -32,7 +33,12 @@ export class ProfileComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const tab = params.get('tab');
-        if (tab === 'Overview' || tab === 'Settings' || tab === 'Materials' || tab === 'Service_Areas') {
+        if (
+          tab === 'Overview' ||
+          tab === 'Settings' ||
+          tab === 'Materials' ||
+          tab === 'Service_Areas'
+        ) {
           this.selectedTab = tab;
         }
       });
@@ -81,13 +87,20 @@ export class ProfileComponent implements OnInit {
   }
 
   get selectedIndex(): number {
-  switch (this.selectedTab) {
-    case 'Overview': return 0;
-    case 'Settings': return 1;
-    case 'Materials': return 2;
-    case 'Service_Areas': return 3;
-    default: return 0;
+    switch (this.selectedTab) {
+      case 'Overview':
+        return 0;
+      case 'Settings':
+        return 1;
+      case 'Materials':
+        return 2;
+      case 'Service_Areas':
+        return 3;
+      default:
+        return 0;
+    }
   }
-}
-
+  onProfileImageError(): void {
+    this.showInitials = true;
+  }
 }

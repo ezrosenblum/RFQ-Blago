@@ -10,6 +10,8 @@ export interface User {
   updatedAt: Date;
   type: string;
   dateCreated?: Date;
+  picture?: string;
+  suspensionReason?: string;
   companyDetails?: {
     id: number;
     name: string;
@@ -30,12 +32,13 @@ export interface User {
   };
 }
 
-
 export interface LookupValue {
   id: number;
   name: string;
 }
 export enum UserRole {
   VENDOR = 'Vendor',
-  CLIENT = 'Customer'
+  CLIENT = 'Customer',
 }
+
+export type FileType = 'avatar' | 'certificate';
