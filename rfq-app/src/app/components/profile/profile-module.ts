@@ -11,6 +11,7 @@ import { MaterialCategoriesSelectionComponent } from './material-categories-sele
 import { SharedModule } from '../../shared/shared-module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceAreasComponent } from "./service-areas/service-areas.component";
+import { TranslateModule } from '@ngx-translate/core';
 const routes: Routes = [
   {
     path: '',
@@ -34,6 +35,7 @@ const routes: Routes = [
     MatIconModule,
     SharedModule,
     ServiceAreasComponent,
+    TranslateModule,
     RouterModule.forChild(routes),
 ]
 })

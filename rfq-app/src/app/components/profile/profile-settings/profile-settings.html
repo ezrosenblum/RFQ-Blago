@@ -4,7 +4,7 @@
   <div class="cursor-pointer px-6 pt-6" role="button">
     <div>
       <h3 class="text-lg font-bold text-gray-900 dark:text-white m-0">
-        Profile Details
+       {{ 'PROFILE.PROFILE_DETAILS' | translate }}
       </h3>
     </div>
   </div>
@@ -19,7 +19,7 @@
         <label
           class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
         >
-          Avatar
+          {{ 'PROFILE.AVATAR' | translate }}
         </label>
         <div class="md:col-span-8 space-y-2">
           <div
@@ -38,7 +38,7 @@
                 >image</mat-icon
               >
               <span class="text-xs text-gray-500 dark:text-gray-400 mt-1"
-                >Upload</span
+                >{{ 'PROFILE.UPLOAD' | translate }}</span
               >
             </label>
           </div>
@@ -58,7 +58,7 @@
             </button>
           </div>
           <p class="text-xs text-gray-400 dark:text-gray-500">
-            Allowed file types: png, jpg, jpeg
+            {{ 'PROFILE.ALLOWED_FILE_TYPES' | translate }}: png, jpg, jpeg
           </p>
         </div>
       </div>
@@ -68,14 +68,14 @@
         <label
           class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
         >
-          Full Name
+          {{ 'PROFILE.FULL_NAME' | translate }}*
         </label>
         <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
           <div class="flex-1 relative">
             <input
               type="text"
               id="firstName"
-              placeholder="First Name"
+              placeholder="{{ 'PROFILE.FIRST_NAME' | translate }}"
               formControlName="firstName"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
               [class.border-error-500]="isFieldInvalid('firstName')"
@@ -85,7 +85,7 @@
               class="text-xs text-red-500 mt-1"
             >
               <div *ngIf="userForm.get('firstName')?.errors?.['required']">
-                First name is required
+               {{ 'PROFILE.FIRST_NAME_REQUIRED' | translate }}
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@
             <input
               type="text"
               id="lastName"
-              placeholder="Last Name"
+              placeholder="{{ 'PROFILE.LAST_NAME' | translate }}"
               formControlName="lastName"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
               [class.border-error-500]="isFieldInvalid('lastName')"
@@ -104,7 +104,7 @@
               class="text-xs text-red-500 mt-1"
             >
               <div *ngIf="userForm.get('lastName')?.errors?.['required']">
-                Last name is required
+                {{ 'PROFILE.LAST_NAME_REQUIRED' | translate }}
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@
           for="email"
           class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
         >
-          Email Address *
+          {{ 'PROFILE.EMAIL_ADDRESS' | translate }} *
         </label>
         <div class="md:col-span-8 relative">
           <input
@@ -125,7 +125,7 @@
             type="email"
             autocomplete="email"
             formControlName="email"
-            placeholder="Enter your email address"
+            placeholder="{{ 'PROFILE.ENTER_EMAIL' | translate }}"
             class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             [class.border-error-500]="isFieldInvalid('email')"
           />
@@ -143,10 +143,10 @@
         <label
           class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2"
         >
-          Contact Phone
+          {{ 'PROFILE.CONTACT_PHONE' | translate }}
           <i
             class="ki-outline ki-information-5 text-gray-400 text-sm dark:text-gray-500"
-            title="Invalid or missing phone number"
+            title="{{ 'PROFILE.PHONE_VERIFIED' | translate }}"
           ></i>
         </label>
         <div class="md:col-span-8 relative">
@@ -156,10 +156,10 @@
             class="text-xs text-red-500 mt-1"
           >
             <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">
-              Invalid phone number format
+              {{ 'PROFILE.INVALID_PHONE_FORMAT' | translate }}
             </div>
             <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">
-              Phone number is too short
+              {{ 'PROFILE.PHONE_TOO_SHORT' | translate }}
             </div>
           </div>
         </div>
@@ -169,13 +169,13 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >Company Name</label
+            >{{ 'PROFILE.COMPANY_NAME' | translate }}</label
           >
           <div class="md:col-span-8">
             <input
               type="text"
               formControlName="companyName"
-              placeholder="Company Name"
+              placeholder="{{ 'PROFILE.COMPANY_NAME' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
               [class.border-error-500]="isFieldInvalid('companyName')"
             />
@@ -183,7 +183,7 @@
               *ngIf="isFieldInvalid('companyName')"
               class="text-xs text-red-500 mt-1"
             >
-              Company name is required
+              {{ 'PROFILE.COMPANY_NAME_REQUIRED' | translate }}
             </div>
           </div>
         </div>
@@ -192,13 +192,13 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >Business Address</label
+            >{{ 'PROFILE.BUSINESS_ADDRESS' | translate }}</label
           >
           <div class="md:col-span-8">
             <input
               type="text"
               formControlName="businessAddress"
-              placeholder="Business Address"
+              placeholder="{{ 'PROFILE.BUSINESS_ADDRESS' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             />
           </div>
@@ -208,13 +208,13 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >Contact Person</label
+            >{{ 'PROFILE.CONTACT_PERSON' | translate }}</label
           >
           <div class="md:col-span-8">
             <input
               type="text"
               formControlName="contactPerson"
-              placeholder="Contact Person"
+              placeholder="{{ 'PROFILE.CONTACT_PERSON' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             />
           </div>
@@ -224,13 +224,13 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >Business Description</label
+            >{{ 'PROFILE.BUSINESS_DESCRIPTION' | translate }}</label
           >
           <div class="md:col-span-8">
             <textarea
               formControlName="businessDescription"
               rows="4"
-              placeholder="Describe your specialties, services, or products..."
+              placeholder="{{ 'PROFILE.BUSINESS_DESCRIPTION_PLACEHOLDER' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             ></textarea>
           </div>
@@ -241,19 +241,19 @@
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
           >
-            Company Size / Years in Business
+            {{ 'PROFILE.COMPANY_SIZE_YEARS' | translate }}
           </label>
           <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
             <input
               type="text"
               formControlName="companySize"
-              placeholder="Company Size"
+              placeholder="{{ 'PROFILE.COMPANY_SIZE' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             />
             <input
               type="number"
               formControlName="yearsInBusiness"
-              placeholder="Years"
+              placeholder="{{ 'PROFILE.YEARS_IN_BUSINESS' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             />
           </div>
@@ -263,7 +263,7 @@
             for="businessLicense"
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
           >
-            Business License/Certification (Optional)
+            {{ 'PROFILE.BUSINESS_LICENSE' | translate }}
           </label>
           <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
             <div>
@@ -276,13 +276,13 @@
                 class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 block w-full"
               />
               <p class="mt-1 text-xs text-secondary-500">
-                Accepted formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
+                {{ 'PROFILE.ALLOWED_FILE_TYPES' | translate }}: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
               </p>
               <div
                 *ngIf="selectedFileName"
                 class="mt-2 text-sm text-secondary-600"
               >
-                Selected: {{ selectedFileName }}
+                {{ 'PROFILE.SELECTED_FILE' | translate }}: {{ selectedFileName }}
               </div>
             </div>
           </div>
@@ -299,7 +299,7 @@
         [disabled]="!hasChanges()"
         class="px-4 py-2 text-sm rounded-md bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 text-gray-800 dark:text-white disabled:opacity-50"
       >
-        Discard
+        {{ 'PROFILE.DISCARD_CHANGES' | translate }}
       </button>
       <button
         type="submit"
@@ -308,13 +308,13 @@
       >
         <ng-container *ngIf="isSubmitting">
           <span class="flex items-center">
-            Please wait
+            {{ 'PROFILE.PLEASE_WAIT' | translate }}
             <span
               class="ml-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
             ></span>
           </span>
         </ng-container>
-        <ng-container *ngIf="!isSubmitting"> Save Changes </ng-container>
+        <ng-container *ngIf="!isSubmitting"> {{ 'PROFILE.SAVE_CHANGES' | translate }} </ng-container>
       </button>
     </div>
   </form>
