@@ -1,5 +1,3 @@
-import { CompanyDetails } from "./auth.model";
-
 export interface User {
   id: number;
   email: string;
