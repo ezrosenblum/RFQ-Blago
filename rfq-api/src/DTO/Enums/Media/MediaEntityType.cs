@@ -6,4 +6,5 @@ public enum MediaEntityType
     UserCompanyDetails,
     Submission,
     SubmissionQuote,
+    QuoteMessage,
 }

@@ -34,6 +34,8 @@
   "enum.submissionStatus.underReview": "Under Review",
   "enum.submissionStatus.accepted": "Accepted",
   "enum.submissionStatus.rejected": "Rejected",
+  "enum.quoteMessage.status.sent": "Sent",
+  "enum.quoteMessage.status.seen": "Seen",
   "unauthorizedAccess.unverified.error.message": "Account not verified",
   "unauthorizedAccess.locked.error.message": "Account locked",
   "unauthorizedAccess.suspended.error.message": "Account suspended",

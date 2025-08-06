@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Base;
 using Domain.Entities.Medias;
+using Domain.Entities.Submissions.SubmissionQuotes.QuoteMessages;
 using Domain.Entities.User;
 using Domain.Events;
 using Domain.Events.Submissions;
@@ -25,6 +26,8 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
 
     public Submission Submission { get; private set; } = null!;
     public ApplicationUser Vendor { get; private set; } = null!;
+
+    public virtual ICollection<QuoteMessage> QuoteMessages { get; set; } = new List<QuoteMessage>();
 
     private SubmissionQuote() { }
     private SubmissionQuote(ISubmissionQuoteInsertData data)
