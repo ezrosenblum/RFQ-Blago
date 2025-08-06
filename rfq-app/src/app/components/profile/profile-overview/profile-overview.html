@@ -3,14 +3,14 @@
   <!-- Card Header -->
   <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-dark-700">
     <div>
-      <h3 class="text-lg font-bold text-gray-900 dark:text-white m-0">Profile Details</h3>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white m-0">{{'PROFILE.PROFILE_DETAILS' | translate}}</h3>
     </div>
     <a
       routerLink="/profile"
       [queryParams]="{ tab: 'Settings' }"
       class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition"
     >
-      Edit Profile
+      {{'PROFILE.EDIT_PROFILE' | translate}}
     </a>
   </div>
 
@@ -19,7 +19,7 @@
     <!-- Full Name -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
       <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-        Full Name
+         {{'PROFILE.FULL_NAME' | translate}}
       </label>
       <div class="md:col-span-8">
         <span class="text-gray-900 dark:text-white font-medium text-base">
@@ -31,7 +31,7 @@
     <!-- Contact Phone -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
       <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-1">
-        Contact Phone
+         {{'PROFILE.CONTACT_PHONE' | translate}}
         <i
           class="ki-outline ki-information text-gray-400 dark:text-gray-400 text-xs"
           title="Phone is verified"
@@ -44,8 +44,94 @@
         <span
           class="bg-green-200 dark:bg-green-700 text-green-800 dark:text-green-100 text-xs font-semibold px-2 py-0.5 rounded-full"
         >
-          Verified
+          {{'PROFILE.VERIFIED' | translate}}
         </span>
+      </div>
+    </div>
+
+    <!-- Company Details -->
+    <div *ngIf="user.companyDetails">
+      <hr class="my-6 border-gray-300 dark:border-dark-700" />
+      <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-4">{{'PROFILE.COMPANY_INFORMATION' | translate}}</h4>
+
+      <!-- Company Name -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.COMPANY_NAME' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.name }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Person -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.CONTACT_PERSON' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.contactPersonFirstName }} {{ user.companyDetails.contactPersonLastName }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Email -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.CONTACT_EMAIL' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.contactPersonEmail }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contact Phone -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.CONTACT_PHONE' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.contactPersonPhone }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Business Description -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.BUSINESS_DESCRIPTION' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.description }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Street Address -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.STREET_ADDRESS' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.streetAddress }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Operating Radius -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.OPERATING_RADIUS' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.operatingRadius }} {{'PROFILE.UNIT_KM' | translate}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Company Size -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+        <label class="md:col-span-4 text-sm font-medium text-gray-600 dark:text-gray-300">{{'PROFILE.COMPANY_SIZE' | translate}}</label>
+        <div class="md:col-span-8">
+          <span class="text-gray-900 dark:text-white font-medium text-base">
+            {{ user.companyDetails.companySize?.name }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
