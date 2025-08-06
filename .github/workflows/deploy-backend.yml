@@ -68,4 +68,5 @@ jobs:
           -p 8091:80 \
           --restart unless-stopped \
           -e ASPNETCORE_ENVIRONMENT=Production \
+          -e ASPNETCORE_URLS=http://+:80 \
           rfqsubmission/notificationservice
