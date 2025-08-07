@@ -10,6 +10,7 @@ using DTO.Response;
 using DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 
 namespace Api.Controllers.v1;
 
@@ -47,6 +48,13 @@ public class UserController : ApiControllerBase
     public async Task<IActionResult> Update([FromRoute] int customerId, [FromBody] UpdateCustomerRequest request)
     {
         await Mediator.Send(new UpdateCustomerCommand(customerId, request.FirstName, request.LastName, request.PhoneNumber));
+        return Ok();
+    }
+
+    [HttpPut("notification/preferences")]
+    public async Task<IActionResult> UpdateNotificationPreferences([FromBody] UserUpdateNotificationPreferencesCommand request)
+    {
+        await Mediator.Send(request);
         return Ok();
     }
 
