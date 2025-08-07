@@ -3,6 +3,7 @@ using Application.Features.Submissions.Search;
 using AutoMapper;
 using Domain.Entities.Submissions;
 using DTO.Enums.Submission;
+using DTO.Notification;
 using DTO.Submission;
 using DTO.Submission.Report;
 
@@ -33,6 +34,9 @@ public sealed class SubmissionMapperProfile : Profile
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
 
         CreateMap<SubmissionResponse, SubmissionSearchable>();
+
+        CreateMap<Submission, NewSubmissionData>()
+            .ForMember(s => s.SubmissionId, opt => opt.MapFrom(d => d.Id));
 
         CreateMap<List<Submission>, SubmissionReportResponse>()
             .ForMember(s => s.SubmissionsCount, opt => opt.MapFrom(d => d.Count()))

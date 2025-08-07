@@ -2,6 +2,7 @@
 using AutoMapper;
 using Domain.Entities.Submissions.SubmissionQuotes;
 using DTO.Enums.Submission.SubmissionQuote;
+using DTO.Notification;
 using DTO.Submission.SubmissionQuote;
 
 namespace Application.Features.Submissions.Mappings;
@@ -22,6 +23,9 @@ public sealed class SubmissionQuoteMapperProfile : Profile
         CreateMap<SubmissionQuoteBaseResponse, SubmissionQuoteSearchable>();
 
         CreateMap<SubmissionQuoteResponse, SubmissionQuoteSearchable>();
+
+        CreateMap<SubmissionQuote, NewSubmissionQuoteData>()
+            .ForMember(d => d.QuoteId, opt => opt.MapFrom(src => src.Id));
     }
 
     private static DateTime CalculateValidUntil(SubmissionQuote s) =>
