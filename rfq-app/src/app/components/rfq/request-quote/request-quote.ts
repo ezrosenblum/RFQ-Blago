@@ -1,14 +1,15 @@
 import { ActualFileObject, FilePondInitialFile } from 'filepond';
 // src/app/rfq/request-quote/request-quote.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { User, UserRole } from '../../../models/user.model';
-import { LookupValue, RfqRequest } from '../../../models/rfq.model';
+import { GoogleMapsApi, LookupValue, RfqRequest } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
 import { FileItem } from '../../../models/form-validation';
+declare const google: GoogleMapsApi;
 
 @Component({
   selector: 'app-request-quote',
@@ -22,7 +23,9 @@ export class RequestQuote implements OnInit, OnDestroy {
   isSubmitting = false;
   successMessage = '';
   errorMessage = '';
-  currentUser: User | null = null;
+  currentUser: User | null = null;  
+  selectedLocation: string = '';
+  @ViewChild('jobLocationInput') jobLocationInput!: ElementRef;
 
   private destroy$ = new Subject<void>();
 
@@ -59,7 +62,8 @@ export class RequestQuote implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: Auth,
     private rfqService: RfqService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {
     this.initializeForm();
   }
@@ -91,6 +95,36 @@ export class RequestQuote implements OnInit, OnDestroy {
         firstInput.focus();
       }
     }, 100);
+  }
+
+  ngAfterViewInit(): void {
+    const autocomplete = new google.maps.places.Autocomplete(this.jobLocationInput.nativeElement, {
+      types: ['geocode'],
+      fields: ['geometry', 'formatted_address'],
+    });
+
+    autocomplete.addListener('place_changed', () => {
+      this.ngZone.run(() => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry || !place.geometry.location) {
+          console.warn('No geometry available');
+          return;
+        }
+
+        const address = place.formatted_address;
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+
+        this.rfqForm.patchValue({
+          jobLocation: address,
+          latitude: lat,
+          longitude: lng,
+        });
+
+        console.log('Selected location:', { address, lat, lng });
+      });
+    });
+
   }
 
   ngOnDestroy(): void {

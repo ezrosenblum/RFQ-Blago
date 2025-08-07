@@ -10,6 +10,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { VerifyComponent } from './verify/verify.component';
 import { TranslateModule  } from '@ngx-translate/core';
+import { ServiceAreasComponent } from "../components/profile/service-areas/service-areas.component";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { TranslateModule  } from '@ngx-translate/core';
     ReactiveFormsModule,
     FormsModule,
     AuthRoutingModule,
-    TranslateModule
-  ]
+    TranslateModule,
+    ServiceAreasComponent
+]
 })
 export class AuthModule { }
