@@ -53,6 +53,8 @@ namespace Domain.Entities.User
         public string? PasswordResetToken { get; private set; }
         public string? EmailVerificationToken { get; private set; }
         public string? SuspensionReason { get; private set; }
+        public bool ReceivePushNotifications { get; set; } = true;
+        public bool ReceiveEmailNotifications { get; set; } = true;
 
         public virtual UserCompanyDetails? CompanyDetails { get; private set; }
 
@@ -109,6 +111,14 @@ namespace Domain.Entities.User
             FirstName = data.FirstName;
             LastName = data.LastName;
             PhoneNumber = data.PhoneNumber;
+
+            AddDomainEvent(new UserUpdatedEvent(this));
+        }
+
+        public void UpdateUserNotificationPreferences(IUserUpdateNotificationPreferencesData data)
+        {
+            ReceivePushNotifications = data.ReceivePushNotifications;
+            ReceiveEmailNotifications = data.ReceiveEmailNotifications;
 
             AddDomainEvent(new UserUpdatedEvent(this));
         }
