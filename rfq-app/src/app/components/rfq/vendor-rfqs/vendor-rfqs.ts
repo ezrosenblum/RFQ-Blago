@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { LookupValue, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, UnitType } from '../../../models/rfq.model';
+import { LookupValue, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse } from '../../../models/rfq.model';
 import { User, UserRole } from '../../../models/user.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
@@ -61,13 +61,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   // Expose enums to template
   RfqStatus = RfqStatus;
-  UnitType = UnitType;
   UserRole = UserRole;
   userId: number | null = null;
 
   // Filter options
   statusOptions: LookupValue[] = [];
-  unitOptions: LookupValue[] = [];
+  categoryOptions: Category[] = [];
+  subcategoryOptions: Subcategory[] = [];
+  categoryDropdownOpen = false;
+  subcategoryDropdownOpen = false;
 
   sortOptions = [
     { value: 1, label: 'Submission Date' },
@@ -102,7 +104,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.applyFilters();
           this.loadStatistics();
           this.loadStatuses();
-          this.leadUnits();
+          this.loadCategories();
+
+          this.filterForm.get('category')!.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(categoryId => {
+            this.onCategoryChange(Number(categoryId));
+          });
         }
       });
 
@@ -117,34 +123,45 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   loadStatuses() {
     this.rfqService.getRfqStatuses().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (units) => {
-        this.statusOptions = units;
+      next: (statuses) => {
+        this.statusOptions = statuses;
       },
       error: (error) => {
-        console.error('Failed to load RFQ units:', error);
-        this.errorMessage = 'Failed to load unit options. Please try again later.';
+        console.error('Failed to load RFQ statuses:', error);
+        this.errorMessage = 'Failed to load status options. Please try again later.';
       }
     });
   }
 
-
-  leadUnits() {
-    this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (units) => {
-        this.unitOptions = units;
+  loadCategories() {
+    this.rfqService.getRfqSCategories().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (categories) => {
+        this.categoryOptions = categories;
       },
       error: (error) => {
-        console.error('Failed to load RFQ units:', error);
-        this.errorMessage = 'Failed to load unit options. Please try again later.';
+        console.error('Failed to load RFQ categories:', error);
+        this.errorMessage = 'Failed to load category options. Please try again later.';
       }
     });
+  }
+
+  onCategoryChange(categoryId: number) {
+    const selectedCategory = this.categoryOptions.find(c => Number(c.id) === categoryId);
+    if (selectedCategory) {
+      this.subcategoryOptions = selectedCategory.subcategories;
+      this.filterForm.get('subcategory')!.setValue(null);
+    } else {
+      this.subcategoryOptions = [];
+      this.filterForm.get('subcategory')!.setValue(null);
+    }
   }
 
   private initializeFilterForm(): void {
     this.filterForm = this.fb.group({
       search: [''],
       status: [''],
-      unit: [''],
+      category: [[]],
+      subcategory: [[]],
       dateFrom: [''],
       dateTo: ['']
     });
@@ -171,7 +188,14 @@ export class VendorRfqs implements OnInit, OnDestroy {
         this.applyFilters();
       });
 
-    this.filterForm.get('unit')?.valueChanges
+    this.filterForm.get('category')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.applyFilters();
+      });
+
+      this.filterForm.get('subcategory')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.currentPage = 1;
@@ -230,7 +254,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.submissionListRequest.query = this.filterForm.get('search')?.value.trim() || undefined;
     this.submissionListRequest.userId = this.userId!;
     this.submissionListRequest.status = this.filterForm.get('status')?.value.trim() || undefined;
-    this.submissionListRequest.unit = this.filterForm.get('unit')?.value.trim() || undefined;
+    this.submissionListRequest.category = this.filterForm.get('category')?.value || [];
+    this.submissionListRequest.subcategory = this.filterForm.get('subcategory')?.value || [];
     this.submissionListRequest.dateFrom = this.filterForm.get('dateFrom')?.value.trim() || undefined;
     this.submissionListRequest.dateTo = this.filterForm.get('dateTo')?.value.trim() || undefined;
     this.submissionListRequest.paging.pageNumber = this.currentPage;
@@ -349,7 +374,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.filterForm.reset({
       search: '',
       status: '',
-      unit: '',
+      category: '',
+      subcategory: '',
       dateFrom: '',
       dateTo: ''
     });
@@ -368,10 +394,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   getStatusColor(status: LookupValue): string {
     return this.rfqService.getStatusColor(status);
-  }
-
-  getUnitDisplayName(unit: UnitType): string {
-    return this.rfqService.getUnitDisplayName(unit);
   }
 
   formatDate(date: Date | string): string {
@@ -433,7 +455,7 @@ getRelativeTime(date: Date | string): string {
 
   hasActiveFilters(): boolean {
     const values = this.filterForm.value;
-    return !!(values.search || values.status || values.unit || values.dateFrom || values.dateTo);
+    return !!(values.search || values.status || values.category?.length > 0 || values.subcategory?.length > 0 || values.dateFrom || values.dateTo);
   }
 
   getFilterCount(): number {
@@ -441,7 +463,8 @@ getRelativeTime(date: Date | string): string {
     let count = 0;
     if (values.search) count++;
     if (values.status) count++;
-    if (values.unit) count++;
+    if (values.category?.length > 0) count++;
+    if (values.subcategory?.length > 0) count++;
     if (values.dateFrom) count++;
     if (values.dateTo) count++;
     return count;
@@ -466,6 +489,80 @@ getRelativeTime(date: Date | string): string {
     };
 
     return unitColors[unitName.toLowerCase()] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+  }
+
+  toggleCategoryDropdown(): void {
+    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+  }
+
+  toggleSubcategoryDropdown(): void {
+    this.subcategoryDropdownOpen = !this.subcategoryDropdownOpen;
+  }
+
+  onCategoryCheckboxChange(event: any): void {
+    const selected = this.filterForm.value.category || [];
+    const id = +event.target.value;
+
+    if (event.target.checked) {
+      selected.push(id);
+    } else {
+      const index = selected.indexOf(id);
+      if (index > -1) selected.splice(index, 1);
+    }
+
+    this.filterForm.get('category')?.setValue([...selected]);
+    this.updateSubcategoriesFromSelected();
+  }
+
+  onSubcategoryCheckboxChange(event: any): void {
+    const selected = this.filterForm.value.subcategory || [];
+    const id = +event.target.value;
+
+    if (event.target.checked) {
+      selected.push(id);
+    } else {
+      const index = selected.indexOf(id);
+      if (index > -1) selected.splice(index, 1);
+    }
+
+    this.filterForm.get('subcategory')?.setValue([...selected]);
+  }
+
+  updateSubcategoriesFromSelected(): void {
+    const selectedCategoryIds = this.filterForm.value.category || [];
+    const selectedCategories = this.categoryOptions.filter(c => selectedCategoryIds.includes(c.id));
+
+    const allSubcategories = selectedCategories.flatMap(c => c.subcategories || []);
+    this.subcategoryOptions = allSubcategories;
+
+    // Optional cleanup: remove unselected subcategories
+    const selectedSubcatIds = this.filterForm.value.subcategory || [];
+    const validSubcatIds = new Set(allSubcategories.map(sc => sc.id));
+    const filteredSubcats = selectedSubcatIds.filter((id: any) => validSubcatIds.has(id));
+
+    this.filterForm.get('subcategory')?.setValue(filteredSubcats);
+  }
+
+  getCategoryDisplayText(): string {
+    const selectedIds = this.filterForm.value.category || [];
+    if (selectedIds.length === 0) return 'Select categories';
+
+    const selectedNames = this.categoryOptions
+      .filter(option => selectedIds.includes(option.id))
+      .map(option => option.name);
+
+    return selectedNames.join(', ');
+  }
+
+  getSubcategoryDisplayText(): string {
+    const selectedIds = this.filterForm.value.subcategory || [];
+    if (selectedIds.length === 0) return 'Select subcategories';
+
+    const selectedNames = this.subcategoryOptions
+      .filter(option => selectedIds.includes(option.id))
+      .map(option => option.name);
+
+    return selectedNames.join(', ');
   }
   // Expose Math to template
   Math = Math;

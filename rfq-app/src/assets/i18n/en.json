@@ -188,7 +188,9 @@
     "NO_MATCHING_RFQS": "No RFQs match your filters",
     "NO_RFQS_FOUND": "No RFQs found",
     "ADJUST_FILTERS": "Try adjusting your search criteria.",
-    "NO_SUBMISSIONS_YET": "No quote requests have been submitted yet."
+    "NO_SUBMISSIONS_YET": "No quote requests have been submitted yet.",
+    "CATEGORY": "Category",
+    "SUBCATEGORY": "Subcategory"
   },
 
   "HEADER": {

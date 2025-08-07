@@ -1,10 +1,10 @@
 // src/app/services/rfq.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of} from 'rxjs';
-import { map, delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { LookupValue, Rfq, RfqRequest, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, UnitType } from '../models/rfq.model';
+import { LookupValue, Rfq, RfqRequest, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse } from '../models/rfq.model';
 import { Auth } from './auth';
 import { ApiResponse } from '../models/api-response';
 
@@ -98,12 +98,7 @@ getStatusColor(status: LookupValue): string {
   return statusColors[status.id] || 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/20';
 }
 
-  getUnitDisplayName(unit: UnitType): string {
-    const unitNames: { [key in UnitType]: string } = {
-      [UnitType.LF]: 'Linear Feet',
-      [UnitType.SF]: 'Square Feet',
-      [UnitType.EA]: 'Each'
-    };
-    return unitNames[unit];
+  getRfqSCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.API_URL}Categories/categories`)
   }
 }
