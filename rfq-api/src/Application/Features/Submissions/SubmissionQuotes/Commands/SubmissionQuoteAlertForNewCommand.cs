@@ -1,20 +1,18 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
-using Application.Common.Search;
+using Application.Common.MessageBroker;
 using Application.Features.Notifications.Commands;
-using Application.Features.Submissions.SubmissionQuotes.Queries;
-using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using Domain.Entities.Submissions.SubmissionQuotes;
+using Domain.Entities.User;
 using DTO.Enums.Notification;
+using DTO.MessageBroker.Messages.Submission;
+using DTO.MessageBroker.Messages.Submission.SubmissionQuote;
 using DTO.Notification;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Nest;
 using System.Text.Json;
-using System.Threading;
 
 namespace Application.Features.Submissions.SubmissionQuotes.Commands;
 
@@ -25,15 +23,18 @@ public sealed record SubmissionQuoteAlertForNewCommandHandler : ICommandHandler<
     private readonly IApplicationDbContext _dbContext;
     private readonly ISender _mediatr;
     private readonly IMapper _mapper;
+    private readonly IMessagePublisher _messagePublisher;
 
     public SubmissionQuoteAlertForNewCommandHandler(
         IApplicationDbContext dbContext,
         ISender mediatr,
-        IMapper mapper)
+        IMapper mapper,
+        IMessagePublisher messagePublisher)
     {
         _dbContext = dbContext;
         _mediatr = mediatr;
         _mapper = mapper;
+        _messagePublisher = messagePublisher;
     }
 
     public async Task Handle(SubmissionQuoteAlertForNewCommand command, CancellationToken cancellationToken)
@@ -48,6 +49,10 @@ public sealed record SubmissionQuoteAlertForNewCommandHandler : ICommandHandler<
 
         if (quote.Submission.User.ReceivePushNotifications)
             await SendPushNotification(quote, cancellationToken);
+
+        if (quote.Submission.User.ReceiveEmailNotifications)
+            await SendEmailNotification(quote.Id, quote.Submission.User, cancellationToken);
+
     }
 
     private async Task SendPushNotification(SubmissionQuote quote, CancellationToken cancellationToken)
@@ -63,5 +68,14 @@ public sealed record SubmissionQuoteAlertForNewCommandHandler : ICommandHandler<
             data,
             NotificationType.NewQuote),
             cancellationToken);
+    }
+    private async Task SendEmailNotification(int quoteId, ApplicationUser user, CancellationToken cancellationToken)
+    {
+        await _messagePublisher.PublishAsync(
+            new SubmissionQuoteAlertForNewMessage(
+                quoteId,
+                user.FirstName,
+                user.LastName,
+                user.Email!), cancellationToken);
     }
 }
