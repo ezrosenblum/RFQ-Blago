@@ -6,17 +6,20 @@ using Application.Common.Localization;
 using Domain.Entities.Submissions;
 using DTO.Enums.Submission;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Features.Submissions.Commands;
 
 public sealed record SubmissionCreateCommand(
+    string Title,
     string Description,
     int Quantity,
     SubmissionUnit Unit,
     string JobLocation,
     string? StreetAddress,
     double? LatitudeAddress,
-    double? LongitudeAddress) : ISubmissionInsertData, ICommand;
+    double? LongitudeAddress,
+    List<IFormFile>? Files) : ISubmissionInsertData, ICommand;
 
 public sealed class SubmissionCreateCommandHandler : ICommandHandler<SubmissionCreateCommand>
 {
@@ -43,6 +46,7 @@ public sealed class SubmissionCreateCommandHandler : ICommandHandler<SubmissionC
 
         Submission newSubmission = Submission.Create(
             command,
+            command.Files,
             currentUserId);
 
         await _repository.AddAsync(newSubmission, cancellationToken);
@@ -65,6 +69,9 @@ public sealed class NotificationCreateCommandValidator : AbstractValidator<Submi
 {
     public NotificationCreateCommandValidator()
     {
+        RuleFor(cmd => cmd.Title)
+            .NotEmpty();
+
         RuleFor(cmd => cmd.Description)
             .NotEmpty();
 

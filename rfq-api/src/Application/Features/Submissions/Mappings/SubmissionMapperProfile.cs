@@ -15,13 +15,15 @@ public sealed class SubmissionMapperProfile : Profile
     {
         CreateMap<SubmissionCreateRequest, SubmissionCreateCommand>()
             .ConstructUsing(src => new SubmissionCreateCommand(
+                src.Title,
                 src.Description,
                 src.Quantity,
                 src.Unit,
                 src.JobLocation,
                 src.StreetAddress,
                 src.LatitudeAddress,
-                src.LongitudeAddress));
+                src.LongitudeAddress,
+                default));
 
         CreateMap<Submission, SubmissionBaseResponse>()
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
