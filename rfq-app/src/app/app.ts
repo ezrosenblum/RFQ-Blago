@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Auth } from './services/auth';
 import { TranslateService } from '@ngx-translate/core';
+import { SignalRService } from './services/notification-signalr';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,8 @@ export class App implements OnInit {
 
   constructor(
     private authService: Auth,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private signalrService: SignalRService
   ) {}
 
 
