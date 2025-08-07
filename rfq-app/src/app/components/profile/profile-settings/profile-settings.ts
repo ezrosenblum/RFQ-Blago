@@ -315,9 +315,9 @@ export class ProfileSettingsComponent implements OnInit {
     });
   }
   private handleSubmissionError(error: HttpErrorResponse): void {
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 0);
+    });
 
     const message = this.errorHandler.handleError(error);
     this.errorMessage = message;
