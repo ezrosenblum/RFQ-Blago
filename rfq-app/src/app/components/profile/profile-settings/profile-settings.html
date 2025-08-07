@@ -1,10 +1,38 @@
 <!-- Profile Details Card -->
+<div
+  *ngIf="successMessage"
+  class="alert alert-success fade-in mb-5"
+  role="alert"
+>
+  <div class="flex">
+    <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <span>{{ successMessage }}</span>
+  </div>
+</div>
+<div *ngIf="errorMessage" class="alert alert-error fade-in mb-5" role="alert">
+  <div class="flex">
+    <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <span>{{ errorMessage }}</span>
+  </div>
+</div>
 <div class="bg-white card shadow-md rounded-xl mb-10 dark:bg-dark-900">
   <!-- Card Header -->
   <div class="cursor-pointer px-6 pt-6" role="button">
     <div>
       <h3 class="text-lg font-bold text-gray-900 dark:text-white m-0">
-       {{ 'PROFILE.PROFILE_DETAILS' | translate }}
+        {{ 'PROFILE.PROFILE_DETAILS' | translate }}
       </h3>
     </div>
   </div>
@@ -22,6 +50,7 @@
           {{ 'PROFILE.AVATAR' | translate }}
         </label>
         <div class="md:col-span-8 space-y-2">
+          <!-- Upload Button Placeholder -->
           <div
             *ngIf="!previewImageUrl"
             class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md flex items-center justify-center h-32 w-32"
@@ -31,21 +60,25 @@
             >
               <input
                 type="file"
-                (change)="onFileSelected($event)"
+                (change)="onFileSelected($event, 'avatar')"
                 class="hidden"
+                accept="image/*"
               />
               <mat-icon class="text-gray-500 dark:text-gray-400"
                 >image</mat-icon
               >
-              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1"
-                >{{ 'PROFILE.UPLOAD' | translate }}</span
-              >
+              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {{ 'PROFILE.UPLOAD' | translate }}
+              </span>
             </label>
           </div>
+
+          <!-- Image Preview -->
           <div *ngIf="previewImageUrl" class="relative w-32">
             <img
               [src]="previewImageUrl"
               alt="Preview"
+              (error)="onImageLoadError()"
               class="rounded-md border dark:border-gray-700"
             />
             <button
@@ -57,6 +90,8 @@
               &times;
             </button>
           </div>
+
+          <!-- Hint Text -->
           <p class="text-xs text-gray-400 dark:text-gray-500">
             {{ 'PROFILE.ALLOWED_FILE_TYPES' | translate }}: png, jpg, jpeg
           </p>
@@ -85,11 +120,10 @@
               class="text-xs text-red-500 mt-1"
             >
               <div *ngIf="userForm.get('firstName')?.errors?.['required']">
-               {{ 'PROFILE.FIRST_NAME_REQUIRED' | translate }}
+                {{ 'PROFILE.FIRST_NAME_REQUIRED' | translate }}
               </div>
             </div>
           </div>
-
           <div class="flex-1 relative">
             <input
               type="text"
@@ -110,6 +144,7 @@
           </div>
         </div>
       </div>
+
       <!-- Email -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
         <label
@@ -164,13 +199,22 @@
           </div>
         </div>
       </div>
-      <div class="space-y-8" *ngIf="user?.type === 'vendor'">
+
+      <!-- Company Details Section - Only for Vendors -->
+      <div class="space-y-8" *ngIf="user?.type === 'Vendor'">
+        <div class="border-t border-gray-200 dark:border-dark-700 pt-8">
+          <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+            {{ 'PROFILE.COMPANY_DETAILS' | translate }}
+          </h4>
+        </div>
+
         <!-- Company Name -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >{{ 'PROFILE.COMPANY_NAME' | translate }}</label
           >
+            {{ 'PROFILE.COMPANY_NAME' | translate }} *
+          </label>
           <div class="md:col-span-8">
             <input
               type="text"
@@ -188,35 +232,92 @@
           </div>
         </div>
 
-        <!-- Business Address -->
+        <!-- Contact Person Details -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >{{ 'PROFILE.BUSINESS_ADDRESS' | translate }}</label
           >
-          <div class="md:col-span-8">
-            <input
-              type="text"
-              formControlName="businessAddress"
-              placeholder="{{ 'PROFILE.BUSINESS_ADDRESS' | translate }}"
-              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
-            />
+            {{ 'PROFILE.CONTACT_PERSON_NAME' | translate }} *
+          </label>
+          <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+              <input
+                type="text"
+                formControlName="contactPersonFirstName"
+                placeholder="{{ 'PROFILE.CONTACT_FIRST_NAME' | translate }}"
+                class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+                [class.border-error-500]="isFieldInvalid('contactPersonFirstName')"
+              />
+              <div
+                *ngIf="isFieldInvalid('contactPersonFirstName')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ 'PROFILE.CONTACT_FIRST_NAME_REQUIRED' | translate }}
+              </div>
+            </div>
+            <div class="flex-1">
+              <input
+                type="text"
+                formControlName="contactPersonLastName"
+                placeholder="{{ 'PROFILE.CONTACT_LAST_NAME' | translate }}"
+                class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+                [class.border-error-500]="isFieldInvalid('contactPersonLastName')"
+              />
+              <div
+                *ngIf="isFieldInvalid('contactPersonLastName')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ 'PROFILE.CONTACT_LAST_NAME_REQUIRED' | translate }}
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Contact Person -->
+        <!-- Contact Person Email -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >{{ 'PROFILE.CONTACT_PERSON' | translate }}</label
           >
+            {{ 'PROFILE.CONTACT_PERSON_EMAIL' | translate }} *
+          </label>
           <div class="md:col-span-8">
             <input
-              type="text"
-              formControlName="contactPerson"
-              placeholder="{{ 'PROFILE.CONTACT_PERSON' | translate }}"
+              type="email"
+              formControlName="contactPersonEmail"
+              placeholder="{{ 'PROFILE.CONTACT_PERSON_EMAIL' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+              [class.border-error-500]="isFieldInvalid('contactPersonEmail')"
             />
+            <div
+              *ngIf="isFieldInvalid('contactPersonEmail')"
+              class="text-xs text-red-500 mt-1"
+            >
+              {{ getFieldError('contactPersonEmail') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Person Phone -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+          >
+            {{ 'PROFILE.CONTACT_PERSON_PHONE' | translate }} *
+          </label>
+          <div class="md:col-span-8">
+            <input
+              type="tel"
+              formControlName="contactPersonPhone"
+              placeholder="{{ 'PROFILE.CONTACT_PERSON_PHONE' | translate }}"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+              [class.border-error-500]="isFieldInvalid('contactPersonPhone')"
+            />
+            <div
+              *ngIf="isFieldInvalid('contactPersonPhone')"
+              class="text-xs text-red-500 mt-1"
+            >
+              {{ 'PROFILE.CONTACT_PERSON_PHONE_REQUIRED' | translate }}
+            </div>
           </div>
         </div>
 
@@ -224,8 +325,9 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
-            >{{ 'PROFILE.BUSINESS_DESCRIPTION' | translate }}</label
           >
+            {{ 'PROFILE.BUSINESS_DESCRIPTION' | translate }}
+          </label>
           <div class="md:col-span-8">
             <textarea
               formControlName="businessDescription"
@@ -236,59 +338,119 @@
           </div>
         </div>
 
-        <!-- Company Size & Years in Business -->
+        <!-- Business Address -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
           >
-            {{ 'PROFILE.COMPANY_SIZE_YEARS' | translate }}
+            {{ 'PROFILE.BUSINESS_ADDRESS' | translate }}
           </label>
-          <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
+          <div class="md:col-span-8">
             <input
               type="text"
-              formControlName="companySize"
-              placeholder="{{ 'PROFILE.COMPANY_SIZE' | translate }}"
-              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
-            />
-            <input
-              type="number"
-              formControlName="yearsInBusiness"
-              placeholder="{{ 'PROFILE.YEARS_IN_BUSINESS' | translate }}"
+              formControlName="businessAddress"
+              placeholder="{{ 'PROFILE.BUSINESS_ADDRESS' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
             />
           </div>
         </div>
+
+        <!-- Location Coordinates (Hidden fields or map integration) -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-12 gap-6"
+          style="display: none"
+        >
+          <div class="md:col-span-8 md:col-start-5 flex gap-4">
+            <input
+              type="number"
+              formControlName="latitudeAddress"
+              placeholder="{{ 'PROFILE.LATITUDE' | translate }}"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+              step="any"
+            />
+            <input
+              type="number"
+              formControlName="longitudeAddress"
+              placeholder="{{ 'PROFILE.LONGITUDE' | translate }}"
+              class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+              step="any"
+            />
+          </div>
+        </div>
+
+        <!-- Operating Radius -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <label
-            for="businessLicense"
             class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
           >
-            {{ 'PROFILE.BUSINESS_LICENSE' | translate }}
+            {{ 'PROFILE.OPERATING_RADIUS' | translate }}
           </label>
-          <div class="md:col-span-8 flex flex-col md:flex-row gap-4">
-            <div>
+          <div class="md:col-span-8">
+            <div class="relative">
               <input
-                id="businessLicense"
-                name="businessLicense"
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                (change)="onFileSelected($event)"
-                class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 block w-full"
+                type="number"
+                formControlName="operatingRadius"
+                placeholder="{{ 'PROFILE.OPERATING_RADIUS_PLACEHOLDER' | translate }}"
+                class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+                step="0.1"
               />
-              <p class="mt-1 text-xs text-secondary-500">
-                {{ 'PROFILE.ALLOWED_FILE_TYPES' | translate }}: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
-              </p>
-              <div
-                *ngIf="selectedFileName"
-                class="mt-2 text-sm text-secondary-600"
+              <span
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"
+                >km</span
               >
-                {{ 'PROFILE.SELECTED_FILE' | translate }}: {{ selectedFileName }}
-              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Company Size -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+          >
+            {{ 'PROFILE.COMPANY_SIZE' | translate }}
+          </label>
+          <div class="md:col-span-8">
+            <select formControlName="companySize" class="form-select">
+              <option [ngValue]="null" disabled selected>
+                {{ 'PROFILE.SELECT_COMPANY_SIZE' | translate }}
+              </option>
+              <option *ngFor="let size of companySizes" [value]="size.id">
+                {{ size.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <!-- Business Certificate -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <label
+            for="businessCertificate"
+            class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+          >
+            {{ 'PROFILE.BUSINESS_CERTIFICATE' | translate }}
+          </label>
+          <div class="md:col-span-8">
+            <input
+              type="file"
+              formControlName="certificate"
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              (change)="onFileSelected($event, 'certificate')"
+              class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 block w-full dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            />
+            <p class="mt-1 text-xs text-secondary-500">
+              {{ 'PROFILE.ALLOWED_FILE_TYPES' | translate }}: PDF, JPG, PNG,
+              DOC, DOCX (Max 5MB)
+            </p>
+            <div
+              *ngIf="selectedFileName"
+              class="mt-2 text-sm text-secondary-600"
+            >
+              {{ 'PROFILE.SELECTED_FILE' | translate }}: {{ selectedFileName }}
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <!-- Footer Buttons -->
     <div
       class="flex justify-end gap-4 px-6 py-6 border-t border-gray-200 dark:border-dark-700"
@@ -314,7 +476,9 @@
             ></span>
           </span>
         </ng-container>
-        <ng-container *ngIf="!isSubmitting"> {{ 'PROFILE.SAVE_CHANGES' | translate }} </ng-container>
+        <ng-container *ngIf="!isSubmitting">
+          {{ 'PROFILE.SAVE_CHANGES' | translate }}
+        </ng-container>
       </button>
     </div>
   </form>
