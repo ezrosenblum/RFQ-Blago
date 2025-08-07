@@ -302,9 +302,9 @@ export class ProfileSettingsComponent implements OnInit {
     this.userForm.markAsPristine();
     this.resetFileSelections();
 
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 0);
+    });
 
     this.translate.get('ALERTS.PROFILE_UPDATED').subscribe((msg) => {
       this.successMessage = msg;
