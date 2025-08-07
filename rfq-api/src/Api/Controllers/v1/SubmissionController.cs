@@ -28,9 +28,9 @@ namespace Api.Controllers.v1
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] SubmissionCreateRequest request)
+        public async Task<IActionResult> Create([FromForm] SubmissionCreateRequest request, List<IFormFile>? files)
         {
-            await Mediator.Send(_mapper.Map<SubmissionCreateCommand>(request));
+            await Mediator.Send((_mapper.Map<SubmissionCreateCommand>(request)) with { Files = files});
 
             return Ok();
         }

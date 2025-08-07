@@ -21,6 +21,14 @@ public sealed class SubmissionCreatedEventHandler : INotificationHandler<Submiss
 
     public async Task Handle(SubmissionCreatedEvent eventData, CancellationToken cancellationToken)
     {
+        if (eventData.Files != null)
+        {
+            foreach (var file in eventData.Files)
+            {
+                await _mediatr.Send(new SubmissionFileUploadCommand(eventData.Submission.Id, file));
+            }
+        }
+
         await _mediatr.Send(new SubmissionRebuildSearchIndexCommand());
 
         await _messagePublisher.PublishAsync(new NewSubmissionMessage(eventData.Submission.Id), cancellationToken);

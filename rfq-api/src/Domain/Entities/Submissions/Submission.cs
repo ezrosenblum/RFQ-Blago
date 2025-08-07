@@ -9,11 +9,13 @@ using Domain.Interfaces;
 using DTO.Enums.Media;
 using DTO.Enums.Submission;
 using Microsoft.AspNetCore.Http;
+using System.Reflection;
 
 namespace Domain.Entities.Submissions
 {
     public class Submission : BaseAuditableEntity, IHasDomainEvents, IWithMedia
     {
+        public string? Title { get; private set; }
         public string Description { get; private set; } = null!;
         public int Quantity { get; private set; }
         public SubmissionUnit Unit { get; private set; }
@@ -35,8 +37,10 @@ namespace Domain.Entities.Submissions
         private Submission() { }
 
         private Submission(ISubmissionInsertData data,
+                           List<IFormFile>? files,
                            int userId)
         {
+            Title = data.Title;
             Description = data.Description;
             Quantity = data.Quantity;
             Unit = data.Unit;
@@ -48,13 +52,14 @@ namespace Domain.Entities.Submissions
 
             Media = new Media(MediaEntityType.Submission);
 
-            AddDomainEvent(new SubmissionCreatedEvent(this));
+            AddDomainEvent(new SubmissionCreatedEvent(this, files));
         }
 
         public static Submission Create(ISubmissionInsertData data,
+                                        List<IFormFile>? files,
                                         int userId)
         {
-            return new Submission(data, userId);
+            return new Submission(data, files, userId);
         }
 
         public void ChangeStatus(SubmissionStatus newStatus)
