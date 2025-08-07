@@ -1,6 +1,8 @@
 ﻿using Application.Common.Caching;
+using Application.Common.MessageBroker;
 using Application.Features.Submissions.Commands;
 using Domain.Events.Submissions;
+using DTO.MessageBroker.Messages.Submission;
 using MediatR;
 
 namespace Application.Features.Submissions.EventHandlers;
@@ -8,16 +10,19 @@ namespace Application.Features.Submissions.EventHandlers;
 public sealed class SubmissionCreatedEventHandler : INotificationHandler<SubmissionCreatedEvent>
 {
     private readonly IMediator _mediatr;
-
+    private readonly IMessagePublisher _messagePublisher;
     public SubmissionCreatedEventHandler(
-        IMediator mediatr)
+        IMediator mediatr,
+        IMessagePublisher messagePublisher)
     {
         _mediatr = mediatr;
+        _messagePublisher = messagePublisher;
     }
 
     public async Task Handle(SubmissionCreatedEvent eventData, CancellationToken cancellationToken)
     {
-
         await _mediatr.Send(new SubmissionRebuildSearchIndexCommand());
+
+        await _messagePublisher.PublishAsync(new NewSubmissionMessage(eventData.Submission.Id), cancellationToken);
     }
 }

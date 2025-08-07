@@ -45,6 +45,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Templates\SubmissionQuote\NewSubmissionQuoteTemplate.html">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\Submission\NewSubmissionTemplate.html">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Templates\User\PasswordChangedConfirmationTemplate.html">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
