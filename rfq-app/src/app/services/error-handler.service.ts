@@ -28,9 +28,7 @@ export class ErrorHandlerService {
     return this.translate.instant('AUTH.ERROR_GENERIC');
   }
   handleError(error: any): string {
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     return this.extractErrorMessage(error);
   }
