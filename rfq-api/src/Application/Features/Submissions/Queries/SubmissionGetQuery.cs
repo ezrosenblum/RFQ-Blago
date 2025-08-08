@@ -66,7 +66,7 @@ public sealed class SubmissionGetQueryHandler : IQueryHandler<SubmissionGetQuery
         item.VendorStatus = vendorStatus?.Status ?? new ListItemBaseResponse()
         {
             Id = (int)SubmissionStatusHistoryType.New,
-            Name = SubmissionStatusHistoryType.New.ToString()
+            Name = _localizationService.GetValue($"enum.submissionStatusHistoryType.{SubmissionStatusHistoryType.New.ToString().ToLower()}")
         };
 
         return item;

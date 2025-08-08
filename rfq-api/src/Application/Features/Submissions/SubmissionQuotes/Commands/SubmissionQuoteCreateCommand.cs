@@ -52,7 +52,7 @@ public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<Submis
 
         var submission = await _dbContext.Submission.FirstAsync(s => s.Id == command.SubmissionId, cancellationToken);
 
-        if(!submission.StatusHistory.Any(s => s.VendorId == command.VendorId && s.Status == SubmissionStatusHistoryType.Quoted))
+        if(!submission.StatusHistory.Any(s => s.VendorId == _currentUserService.UserId && s.Status == SubmissionStatusHistoryType.Quoted))
         {
             submission.CreateStatusHistory(command.VendorId, SubmissionStatusHistoryType.Quoted, _dateTime);
             _dbContext.Submission.Update(submission);

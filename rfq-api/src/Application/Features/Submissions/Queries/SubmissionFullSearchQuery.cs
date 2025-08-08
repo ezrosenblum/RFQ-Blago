@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
+using Application.Common.Localization;
 using Application.Common.Search;
 using Application.Common.Services;
 using Application.Features.Submissions.Search;
@@ -31,17 +32,20 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
     private readonly ICurrentUserService _currentUserService;
     private readonly IGeoCoverageService _geoCoverageService;
     private readonly IApplicationDbContext _dbContext;
+    private readonly ILocalizationService _localizationService;
 
     public SubmissionFullSearchQueryHandler(
         ISearchClient<SubmissionSearchable> searchClient,
         ICurrentUserService currentUserService,
         IGeoCoverageService geoCoverageService,
-        IApplicationDbContext dbContext)
+        IApplicationDbContext dbContext,
+        ILocalizationService localizationService)
     {
         _currentUserService = currentUserService;
         _searchClient = searchClient;
         _geoCoverageService = geoCoverageService;
         _dbContext = dbContext;
+        _localizationService = localizationService;
     }
 
     public async Task<PaginatedList<SubmissionSearchable>> Handle(SubmissionFullSearchQuery query, CancellationToken cancellationToken)
@@ -101,7 +105,7 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
             item.VendorStatus = vendorStatus?.Status ?? new ListItemBaseResponse()
             {
                 Id = (int)SubmissionStatusHistoryType.New,
-                Name = SubmissionStatusHistoryType.New.ToString()
+                Name = _localizationService.GetValue($"enum.submissionStatusHistoryType.{SubmissionStatusHistoryType.New.ToString().ToLower()}")
             };
         }
 
