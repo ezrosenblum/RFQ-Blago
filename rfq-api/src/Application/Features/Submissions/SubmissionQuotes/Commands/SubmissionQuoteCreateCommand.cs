@@ -6,8 +6,11 @@ using Application.Common.Localization;
 using Application.Features.Validators;
 using Domain.Entities.Submissions;
 using Domain.Entities.Submissions.SubmissionQuotes;
+using Domain.Interfaces;
+using DTO.Enums.Submission;
 using DTO.Enums.Submission.SubmissionQuote;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Submissions.SubmissionQuotes.Commands;
 
@@ -25,21 +28,35 @@ public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<Submis
     private readonly IRepository<SubmissionQuote> _repository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IApplicationDbContext _dbContext;
+    private readonly IDateTime _dateTime;
 
     public SubmissionQuoteCreateCommandHandler(
         IRepository<SubmissionQuote> repository,
         IUnitOfWork unitOfWork,
         ICurrentUserService currentUserService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IApplicationDbContext dbContext,
+        IDateTime dateTime)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
+        _dbContext = dbContext;
+        _dateTime = dateTime;
     }
 
     public async Task Handle(SubmissionQuoteCreateCommand command, CancellationToken cancellationToken)
     {
         SubmissionQuote newSubmissionQuote = SubmissionQuote.Create(command with { VendorId = _currentUserService.UserId!.Value});
+
+        var submission = await _dbContext.Submission.FirstAsync(s => s.Id == command.SubmissionId, cancellationToken);
+
+        if(!submission.StatusHistory.Any(s => s.VendorId == command.VendorId && s.Status == SubmissionStatusHistoryType.Quoted))
+        {
+            submission.CreateStatusHistory(command.VendorId, SubmissionStatusHistoryType.Quoted, _dateTime);
+            _dbContext.Submission.Update(submission);
+        }
 
         await _repository.AddAsync(newSubmissionQuote, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

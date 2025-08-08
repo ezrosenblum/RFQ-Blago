@@ -1,19 +1,20 @@
 ﻿using Domain.Entities.Base;
 using Domain.Entities.Categories;
 using Domain.Entities.Medias;
+using Domain.Entities.Submissions.StatusHistories;
 using Domain.Entities.Submissions.SubmissionQuotes;
 using Domain.Entities.User;
 using Domain.Events;
 using Domain.Events.Submissions;
 using Domain.Interfaces;
+using Domain.Primitives;
 using DTO.Enums.Media;
 using DTO.Enums.Submission;
 using Microsoft.AspNetCore.Http;
-using System.Reflection;
 
 namespace Domain.Entities.Submissions
 {
-    public class Submission : BaseAuditableEntity, IHasDomainEvents, IWithMedia
+    public class Submission : BaseAuditableEntity, IHasDomainEvents, IWithMedia, IWithStatusHistory
     {
         public string? Title { get; private set; }
         public string Description { get; private set; } = null!;
@@ -26,8 +27,9 @@ namespace Domain.Entities.Submissions
         public double? LatitudeAddress { get; private set; }
         public int UserId { get; private set; }
         public Media Media { get; private set; } = null!;
-
         public ApplicationUser User { get; private set; } = null!;
+
+        public List<StatusHistory> StatusHistory { get; set; } = new List<StatusHistory>();
 
         public virtual ICollection<SubmissionQuote> SubmissionQuotes { get; set; } = new List<SubmissionQuote>();
 
@@ -50,6 +52,7 @@ namespace Domain.Entities.Submissions
             LongitudeAddress = data.LongitudeAddress;
             LatitudeAddress = data.LatitudeAddress;
 
+            StatusHistory = new List<StatusHistory>();
             Media = new Media(MediaEntityType.Submission);
 
             AddDomainEvent(new SubmissionCreatedEvent(this, files));
@@ -62,11 +65,24 @@ namespace Domain.Entities.Submissions
             return new Submission(data, files, userId);
         }
 
+        public void CreateStatusHistory(
+            int vendorId,
+            SubmissionStatusHistoryType status,
+            IDateTime dateTimeProvider)
+        {
+            StatusHistory.Add(new StatusHistory()
+            {
+                Status = status,
+                VendorId = vendorId,
+                DateCreated = dateTimeProvider.Now
+            });
+        }
+
         public void ChangeStatus(SubmissionStatus newStatus)
         {
-            if (Status == newStatus) 
+            if (Status == newStatus)
                 return;
-            
+
             Status = newStatus;
 
             AddDomainEvent(new SubmissionUpdatedEvent(this));
