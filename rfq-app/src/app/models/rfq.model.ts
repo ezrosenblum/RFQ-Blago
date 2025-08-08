@@ -28,6 +28,8 @@ export interface SubmissionTableRequest {
   userId?: number;
   status?: number;
   unit?: number;
+  category?: number;
+  subcategory?: number;
   dateFrom?: Date;
   dateTo?: Date;
   paging: {
@@ -49,6 +51,8 @@ export interface Rfq {
   jobLocation?: string;
   user?: User;
   submissionDate?: Date;
+  category?: Category[];
+  subcategory?: Subcategory[];
 }
 
 export interface RfqStatistics {
@@ -90,4 +94,17 @@ export interface GoogleMapsApi {
       Autocomplete: new (input: HTMLInputElement, options: any) => any;
     };
   };
+}
+
+export interface Subcategory {
+  id: number;
+  name: string;
+  note: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  note: string;
+  subcategories: Subcategory[];
 }
