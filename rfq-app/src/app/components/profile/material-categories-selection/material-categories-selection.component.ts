@@ -104,7 +104,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleLoadError(_error: HttpErrorResponse): void {
+  private handleLoadError(error: HttpErrorResponse): void {
     this.isLoading = false;
     this.showErrorMessage('PROFILE.LOAD_CATEGORIES_ERROR_MESSAGE', 5000);
   }
