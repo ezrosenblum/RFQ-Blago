@@ -50,14 +50,14 @@
               <!-- Avatar -->
               <div class="me-7 mb-4">
                 <div class="relative w-24 h-24 sm:w-40 sm:h-40">
-                  <ng-container
-                    *ngIf="currentUser?.picture && !showInitials; else initials"
+                 <ng-container
+                    *ngIf="currentUser?.profilePicture && !imageError; else initials"
                   >
                     <img
-                      [src]="currentUser.picture"
+                      [src]="currentUser.profilePicture"
                       alt="image"
                       class="w-full h-full rounded-full object-cover"
-                      (error)="onProfileImageError()"
+                      (error)="onImageError()"
                     />
                   </ng-container>
 
@@ -151,14 +151,17 @@
             </div>
 
             <!-- Tabs -->
-            <mat-tab-group
+             <mat-tab-group
               (selectedTabChange)="onTabChange($event)"
               class="w-full sm:w-[400px] md:w-[600px]"
               [selectedIndex]="selectedIndex"
             >
               <mat-tab label="{{ 'PROFILE.OVERVIEW' | translate }}"></mat-tab>
               <mat-tab label="{{ 'PROFILE.SETTINGS' | translate }}"></mat-tab>
-              <mat-tab label="{{ 'PROFILE.MATERIALS' | translate }}"></mat-tab>
+              <mat-tab
+                *ngIf="currentUser?.type === 'Vendor'"
+                label="{{ 'PROFILE.MATERIALS' | translate }}"
+              ></mat-tab>
               <mat-tab
                 label="{{ 'PROFILE.SERVICE_AREAS' | translate }}"
               ></mat-tab>
@@ -177,9 +180,12 @@
     <ng-container *ngIf="selectedTab === 'Settings'">
       <app-profile-settings [user]="currentUser"></app-profile-settings>
     </ng-container>
-    <ng-container *ngIf="selectedTab === 'Materials'">
+    <ng-container
+      *ngIf="selectedTab === 'Materials' && currentUser?.type === 'Vendor'"
+    >
       <app-material-categories-selection></app-material-categories-selection>
     </ng-container>
+
     <ng-container *ngIf="selectedTab === 'Service_Areas'">
       <app-service-areas></app-service-areas>
     </ng-container>

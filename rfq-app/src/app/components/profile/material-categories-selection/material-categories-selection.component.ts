@@ -1,4 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ApiCategory,
+  ApiSubcategory,
+  ItemType,
+  SaveUserCategoriesPayload,
+  SelectionState,
+} from '../../../models/material-categories';
+import { CategoriesService } from '../../../services/materials';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: false,
@@ -6,219 +17,393 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './material-categories-selection.component.html',
   styleUrl: './material-categories-selection.component.scss',
 })
-export class MaterialCategoriesSelectionComponent implements OnInit {
-  categories: Category[] = [
-    {
-      id: 'metals',
-      name: 'Metals & Alloys',
-      subcategories: [
-        { id: 'steel', name: 'Steel & Iron' },
-        { id: 'aluminum', name: 'Aluminum' },
-        { id: 'copper', name: 'Copper & Brass' },
-        { id: 'titanium', name: 'Titanium' },
-      ],
-    },
-    {
-      id: 'plastics',
-      name: 'Plastics & Polymers',
-      subcategories: [
-        { id: 'engineering', name: 'Engineering Plastics' },
-        { id: 'commodity', name: 'Commodity Plastics' },
-        { id: 'specialty', name: 'Specialty Polymers' },
-      ],
-    },
-    {
-      id: 'composites',
-      name: 'Composites',
-      subcategories: [
-        { id: 'carbon', name: 'Carbon Fiber' },
-        { id: 'glass', name: 'Fiberglass' },
-      ],
-    },
-  ];
+export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
+  categories: ApiCategory[] = [];
+  filteredCategories: ApiCategory[] = [];
 
-  selectedItems = new Set<string>();
-  expandedCategories = new Set<string>();
-  searchTerm = '';
-  showSelected = false;
-  filteredCategories: Category[] = [];
+  selectedCategoryIds = new Set<number>();
+  selectedSubcategoryIds = new Set<number>();
+  expandedCategories = new Set<number>();
+
+  searchTerm: string = '';
+  showSelected: boolean = false;
+  isLoading: boolean = false;
+  isSaving: boolean = false;
+
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
+
+  private destroy$ = new Subject<void>();
+  private searchInput$ = new Subject<string>();
+
+  constructor(
+    private categoriesService: CategoriesService,
+    private translate: TranslateService
+  ) {
+    this.setupSearchDebounce();
+  }
 
   ngOnInit(): void {
-    this.updateFilteredCategories();
+    this.loadCategories();
   }
 
-  toggleSelection(itemId: string, type: 'category' | 'subcategory'): void {
-    const newSelected = new Set(this.selectedItems);
-
-    if (type === 'category') {
-      const category = this.categories.find((c) => c.id === itemId);
-      if (!category) return;
-
-      if (newSelected.has(itemId)) {
-        newSelected.delete(itemId);
-        category.subcategories.forEach((sub) => {
-          newSelected.delete(sub.id);
-        });
-      } else {
-        newSelected.add(itemId);
-        category.subcategories.forEach((sub) => {
-          newSelected.add(sub.id);
-        });
-      }
-    } else if (type === 'subcategory') {
-      const category = this.categories.find((c) =>
-        c.subcategories.some((s) => s.id === itemId)
-      );
-      const subcategory = category?.subcategories.find((s) => s.id === itemId);
-
-      if (!category || !subcategory) return;
-
-      if (newSelected.has(itemId)) {
-        newSelected.delete(itemId);
-        newSelected.delete(category.id);
-      } else {
-        newSelected.add(itemId);
-        const allSubsSelected = category.subcategories.every((s) =>
-          newSelected.has(s.id)
-        );
-        if (allSubsSelected) {
-          newSelected.add(category.id);
-        }
-      }
-    }
-
-    this.selectedItems = newSelected;
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  updateFilteredCategories(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredCategories = this.categories;
-      return;
-    }
-
-    const searchLower = this.searchTerm.toLowerCase();
-
-    this.filteredCategories = this.categories
-      .map((category) => ({
-        ...category,
-        subcategories: category.subcategories.filter(
-          (sub) =>
-            sub.name.toLowerCase().includes(searchLower) ||
-            category.name.toLowerCase().includes(searchLower)
-        ),
-      }))
-      .filter(
-        (category) =>
-          category.name.toLowerCase().includes(searchLower) ||
-          category.subcategories.length > 0
-      );
-  }
-
-  onInputChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchTerm = target.value;
-    this.updateFilteredCategories();
-  }
-  getSelectionState(
-    itemId: string,
-    type: 'category' | 'subcategory'
-  ): SelectionState {
-    if (type === 'category') {
-      const category = this.categories.find((c) => c.id === itemId);
-      if (!category) return 'none';
-
-      const allSelected = category.subcategories.every((sub) =>
-        this.selectedItems.has(sub.id)
-      );
-      const someSelected = category.subcategories.some((sub) =>
-        this.selectedItems.has(sub.id)
-      );
-      return allSelected ? 'full' : someSelected ? 'partial' : 'none';
-    } else if (type === 'subcategory') {
-      const isSelected = this.selectedItems.has(itemId);
-      return isSelected ? 'full' : 'none';
-    }
-
-    return 'none';
-  }
-
-  isMaterialSelected(subcategoryId: string, materialId: string): boolean {
-    return this.selectedItems.has(`${subcategoryId}-${materialId}`);
-  }
-
-  toggleExpanded(categoryId: string): void {
-    const newExpanded = new Set(this.expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
-    } else {
-      newExpanded.add(categoryId);
-    }
-    this.expandedCategories = newExpanded;
-  }
-
-  isExpanded(categoryId: string): boolean {
-    return this.expandedCategories.has(categoryId);
-  }
-
-  clearSelections(): void {
-    this.selectedItems.clear();
-  }
-
-  getSelectedCount(): number {
-    return Array.from(this.selectedItems).filter(
-      (id) =>
-        id.includes('-') &&
-        !this.categories.some((c) => c.id === id) &&
-        !this.categories
-          .flatMap((c) => c.subcategories)
-          .some((s) => s.id === id)
-    ).length;
-  }
-
-  getSelectedSubcategories(): string[] {
-    return Array.from(this.selectedItems)
-      .filter((id) =>
-        this.categories.flatMap((c) => c.subcategories).some((s) => s.id === id)
-      )
-      .map((subId) => {
-        const subcategory = this.categories
-          .flatMap((c) => c.subcategories)
-          .find((s) => s.id === subId);
-        return subcategory?.name || subId;
+  private setupSearchDebounce(): void {
+    this.searchInput$
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((searchTerm) => {
+        this.searchTerm = searchTerm;
+        this.updateFilteredCategories();
       });
   }
 
-  shouldShowCategory(category: Category): boolean {
+  private loadCategories(): void {
+    this.isLoading = true;
+    this.clearMessages();
+
+    this.categoriesService
+      .getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => this.handleCategoriesLoaded(categories),
+        error: (error) => this.handleLoadError(error),
+      });
+  }
+
+  private handleCategoriesLoaded(categories: ApiCategory[]): void {
+    this.isLoading = false;
+    this.categories = categories || [];
+    this.updateFilteredCategories();
+  }
+
+  private handleLoadError(error: HttpErrorResponse): void {
+    this.isLoading = false;
+    this.showErrorMessage('PROFILE.LOAD_CATEGORIES_ERROR_MESSAGE', 5000);
+  }
+
+  toggleSelection(itemId: number, type: ItemType): void {
+    this.clearMessages();
+
+    if (type === 'category') {
+      this.toggleCategorySelection(itemId);
+    } else {
+      this.toggleSubcategorySelection(itemId);
+    }
+  }
+
+  private toggleCategorySelection(categoryId: number): void {
+    const category = this.findCategoryById(categoryId);
+    if (!category) return;
+
+    if (this.selectedCategoryIds.has(categoryId)) {
+      this.deselectCategory(categoryId);
+    } else {
+      this.selectCategory(categoryId, category);
+    }
+  }
+
+  private selectCategory(categoryId: number, category: ApiCategory): void {
+    this.selectedCategoryIds.add(categoryId);
+
+    // Select ALL subcategories when category is selected
+    if (category.subcategories.length > 0) {
+      category.subcategories.forEach((subcategory) => {
+        this.selectedSubcategoryIds.add(subcategory.id);
+      });
+    }
+  }
+
+  private deselectCategory(categoryId: number): void {
+    this.selectedCategoryIds.delete(categoryId);
+
+    // Deselect ALL subcategories when category is deselected
+    const category = this.findCategoryById(categoryId);
+    if (category) {
+      category.subcategories.forEach((subcategory) => {
+        this.selectedSubcategoryIds.delete(subcategory.id);
+      });
+    }
+  }
+
+  private toggleSubcategorySelection(subcategoryId: number): void {
+    const parentCategory = this.findParentCategory(subcategoryId);
+    if (!parentCategory) return;
+
+    if (this.selectedSubcategoryIds.has(subcategoryId)) {
+      this.deselectSubcategory(subcategoryId, parentCategory);
+    } else {
+      this.selectSubcategory(subcategoryId, parentCategory);
+    }
+  }
+
+  private selectSubcategory(
+    subcategoryId: number,
+    parentCategory: ApiCategory
+  ): void {
+    this.selectedSubcategoryIds.add(subcategoryId);
+    this.selectedCategoryIds.add(parentCategory.id);
+  }
+
+  private deselectSubcategory(
+    subcategoryId: number,
+    parentCategory: ApiCategory
+  ): void {
+    this.selectedSubcategoryIds.delete(subcategoryId);
+
+    const hasRemainingSelectedSubs = parentCategory.subcategories.some((sub) =>
+      this.selectedSubcategoryIds.has(sub.id)
+    );
+
+    if (!hasRemainingSelectedSubs) {
+      this.selectedCategoryIds.delete(parentCategory.id);
+    }
+  }
+
+  getSelectionState(itemId: number, type: ItemType): SelectionState {
+    if (type === 'subcategory') {
+      return this.selectedSubcategoryIds.has(itemId) ? 'full' : 'none';
+    }
+
+    // For categories: check if category is fully selected
+    if (this.selectedCategoryIds.has(itemId)) {
+      const category = this.findCategoryById(itemId);
+      if (!category) return 'none';
+
+      // If category has no subcategories, it's fully selected
+      if (category.subcategories.length === 0) {
+        return 'full';
+      }
+
+      // Check if ALL subcategories are selected
+      const allSubcategoriesSelected = category.subcategories.every((sub) =>
+        this.selectedSubcategoryIds.has(sub.id)
+      );
+
+      // Check if SOME subcategories are selected
+      const someSubcategoriesSelected = category.subcategories.some((sub) =>
+        this.selectedSubcategoryIds.has(sub.id)
+      );
+
+      if (allSubcategoriesSelected) {
+        return 'full';
+      } else if (someSubcategoriesSelected) {
+        return 'partial';
+      } else {
+        return 'none';
+      }
+    }
+
+    // Category is not selected but check if some subcategories are selected
+    const category = this.findCategoryById(itemId);
+    if (!category) return 'none';
+
+    const hasSelectedSubcategories = category.subcategories.some((sub) =>
+      this.selectedSubcategoryIds.has(sub.id)
+    );
+
+    return hasSelectedSubcategories ? 'partial' : 'none';
+  }
+
+  toggleExpanded(categoryId: number): void {
+    if (this.expandedCategories.has(categoryId)) {
+      this.expandedCategories.delete(categoryId);
+    } else {
+      this.expandedCategories.add(categoryId);
+    }
+  }
+
+  isExpanded(categoryId: number): boolean {
+    return this.expandedCategories.has(categoryId);
+  }
+
+  onInputChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchInput$.next(input.value || '');
+  }
+
+  private updateFilteredCategories(): void {
+    const searchQuery = this.searchTerm.trim().toLowerCase();
+
+    if (!searchQuery) {
+      this.filteredCategories = [...this.categories];
+      return;
+    }
+
+    this.filteredCategories = this.categories
+      .map((category) => this.filterCategory(category, searchQuery))
+      .filter((category) => this.shouldIncludeCategory(category, searchQuery));
+  }
+
+  private filterCategory(
+    category: ApiCategory,
+    searchQuery: string
+  ): ApiCategory {
+    const matchingSubcategories = category.subcategories.filter(
+      (sub) =>
+        this.matchesSearchQuery(sub.name, searchQuery) ||
+        this.matchesSearchQuery(category.name, searchQuery)
+    );
+
+    return {
+      ...category,
+      subcategories: matchingSubcategories,
+    };
+  }
+
+  private shouldIncludeCategory(
+    category: ApiCategory,
+    searchQuery: string
+  ): boolean {
+    return (
+      this.matchesSearchQuery(category.name, searchQuery) ||
+      category.subcategories.length > 0
+    );
+  }
+
+  private matchesSearchQuery(text: string, query: string): boolean {
+    return text.toLowerCase().includes(query);
+  }
+
+  shouldShowCategory(category: ApiCategory): boolean {
     if (!this.showSelected) return true;
     return this.getSelectionState(category.id, 'category') !== 'none';
   }
 
-  shouldShowSubcategory(subcategory: Subcategory): boolean {
+  shouldShowSubcategory(subcategory: ApiSubcategory): boolean {
     if (!this.showSelected) return true;
     return this.getSelectionState(subcategory.id, 'subcategory') !== 'none';
   }
 
-  shouldShowMaterial(subcategoryId: string, materialId: string): boolean {
-    if (!this.showSelected) return true;
-    return this.isMaterialSelected(subcategoryId, materialId);
+  clearSelections(): void {
+    this.selectedCategoryIds.clear();
+    this.selectedSubcategoryIds.clear();
+    this.clearMessages();
+  }
+
+  getSelectedCount(): number {
+    return this.selectedSubcategoryIds.size;
+  }
+
+  private findCategoryById(categoryId: number): ApiCategory | undefined {
+    return this.categories.find((category) => category.id === categoryId);
+  }
+
+  private findParentCategory(subcategoryId: number): ApiCategory | undefined {
+    return this.categories.find((category) =>
+      category.subcategories.some((sub) => sub.id === subcategoryId)
+    );
   }
 
   onSaveSpecialties(): void {
-    const selectedData = {
-      categories: Array.from(this.selectedItems).filter((id) =>
-        this.categories.some((c) => c.id === id)
-      ),
-      subcategories: Array.from(this.selectedItems).filter((id) =>
-        this.categories.flatMap((c) => c.subcategories).some((s) => s.id === id)
-      ),
-      materials: Array.from(this.selectedItems).filter(
-        (id) =>
-          id.includes('-') &&
-          !this.categories.some((c) => c.id === id) &&
-          !this.categories
-            .flatMap((c) => c.subcategories)
-            .some((s) => s.id === id)
-      ),
+    if (this.isSaving) return;
+    this.clearMessages();
+    const payload = this.buildSavePayload();
+    this.performSave(payload);
+  }
+
+  private buildSavePayload(): SaveUserCategoriesPayload {
+    const parentCategoriesFromSubs = new Set<number>();
+
+    for (const category of this.categories) {
+      const hasSelectedSubcategory = category.subcategories.some((sub) =>
+        this.selectedSubcategoryIds.has(sub.id)
+      );
+
+      if (hasSelectedSubcategory) {
+        parentCategoriesFromSubs.add(category.id);
+      }
+    }
+
+    const allCategoryIds = new Set([
+      ...this.selectedCategoryIds,
+      ...parentCategoriesFromSubs,
+    ]);
+
+    return {
+      categoriesIds: Array.from(allCategoryIds),
+      subcategoriesIds: Array.from(this.selectedSubcategoryIds),
     };
+  }
+
+  private performSave(payload: SaveUserCategoriesPayload): void {
+    this.isSaving = true;
+
+    this.categoriesService
+      .save(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.handleSaveSuccess(),
+        error: (error) => this.handleSaveError(error),
+      });
+  }
+
+  private handleSaveSuccess(): void {
+    this.isSaving = false;
+    this.showSuccessMessage('PROFILE.SAVE_SUCCESS_MESSAGE', 3000);
+  }
+
+  private handleSaveError(error: HttpErrorResponse): void {
+    this.isSaving = false;
+    let messageKey = 'PROFILE.SAVE_ERROR_MESSAGE';
+
+    if (error.status === 400) {
+      messageKey = 'PROFILE.VALIDATION_ERROR_MESSAGE';
+    } else if (error.status === 403) {
+      messageKey = 'PROFILE.PERMISSION_ERROR_MESSAGE';
+    } else if (error.status >= 500) {
+      messageKey = 'PROFILE.SERVER_ERROR_MESSAGE';
+    }
+
+    this.showErrorMessage(messageKey, 3000);
+  }
+
+  // Centralized message handling methods
+  private showErrorMessage(messageKey: string, duration: number = 3000): void {
+    this.scrollToTop();
+
+    this.translate.get(messageKey).subscribe((msg: string) => {
+      this.errorMessage = msg;
+      this.clearMessageAfterDelay(duration, 'error');
+    });
+  }
+
+  private showSuccessMessage(
+    messageKey: string,
+    duration: number = 3000
+  ): void {
+    this.scrollToTop();
+
+    this.translate.get(messageKey).subscribe((msg: string) => {
+      this.successMessage = msg;
+      this.clearMessageAfterDelay(duration, 'success');
+    });
+  }
+
+  private scrollToTop(): void {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  private clearMessageAfterDelay(
+    delay: number,
+    messageType: 'error' | 'success'
+  ): void {
+    setTimeout(() => {
+      if (messageType === 'error') {
+        this.errorMessage = null;
+      } else {
+        this.successMessage = null;
+      }
+    }, delay);
+  }
+
+  private clearMessages(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 }

@@ -1,17 +1,21 @@
-interface Material {
-  id: string;
+// models/category.models.ts
+export interface ApiSubcategory {
+  id: number;
   name: string;
+  note?: string | null;
 }
 
-interface Subcategory {
-  id: string;
+export interface ApiCategory {
+  id: number;
   name: string;
+  note?: string | null;
+  subcategories: ApiSubcategory[];
+}
+export interface SaveUserCategoriesPayload {
+  categoriesIds: number[];
+  subcategoriesIds: number[];
 }
 
-interface Category {
-  id: string;
-  name: string;
-  subcategories: Subcategory[];
-}
+export type ItemType = 'category' | 'subcategory';
 
-type SelectionState = 'full' | 'partial' | 'none';
+export type SelectionState = 'full' | 'partial' | 'none';
