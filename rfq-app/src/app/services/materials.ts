@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
-  ApiCategory,
+  Category,
   SaveUserCategoriesPayload,
 } from '../models/material-categories';
 
@@ -15,8 +15,8 @@ export class CategoriesService {
   private readonly baseUrl = `${environment.apiUrl}Categories`;
 
   constructor(private http: HttpClient) {}
-  getAll(): Observable<ApiCategory[]> {
-    return this.http.get<ApiCategory[]>(`${this.baseUrl}/categories`);
+  getAll(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.baseUrl}/categories`);
   }
   getCategory(id: number) {
     return this.http.get(`${this.baseUrl}/category/${id}`);
