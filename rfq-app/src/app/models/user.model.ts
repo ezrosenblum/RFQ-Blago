@@ -12,8 +12,8 @@ export interface User {
   dateCreated?: Date;
   picture?: string;
   suspensionReason?: string;
-  categories?: LookupValue[];
-  subcategories?: LookupValue[];
+  categories: LookupValue[];
+  subcategories: LookupValue[];
   companyDetails?: {
     id: number;
     name: string;

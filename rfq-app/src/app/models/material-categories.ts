@@ -1,15 +1,15 @@
 // models/category.models.ts
-export interface ApiSubcategory {
+export interface Subcategory {
   id: number;
   name: string;
   note?: string | null;
 }
 
-export interface ApiCategory {
+export interface Category {
   id: number;
   name: string;
   note?: string | null;
-  subcategories: ApiSubcategory[];
+  subcategories: Subcategory[];
 }
 export interface SaveUserCategoriesPayload {
   categoriesIds: number[];

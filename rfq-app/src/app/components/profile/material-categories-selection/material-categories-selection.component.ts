@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import {
-  ApiCategory,
-  ApiSubcategory,
+  Category,
+  Subcategory,
   ItemType,
   SaveUserCategoriesPayload,
   SelectionState,
@@ -30,8 +30,8 @@ import { ErrorHandlerService } from '../../../services/error-handler.service';
 export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   @Input() user: User | null = null;
 
-  categories: ApiCategory[] = [];
-  filteredCategories: ApiCategory[] = [];
+  categories: Category[] = [];
+  filteredCategories: Category[] = [];
 
   selectedCategoryIds = new Set<number>();
   selectedSubcategoryIds = new Set<number>();
@@ -40,7 +40,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   private originalCategoryIds = new Set<number>();
   private originalSubcategoryIds = new Set<number>();
 
-  private categoryById = new Map<number, ApiCategory>();
+  private categoryById = new Map<number, Category>();
   private parentBySubId = new Map<number, number>();
 
   searchTerm = '';
@@ -80,11 +80,11 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (categories) => this.handleCategoriesLoaded(categories ?? []),
-        error: (error) => this.handleLoadError(error as HttpErrorResponse),
+        error: (error) => this.handleLoadError(error),
       });
   }
 
-  private handleCategoriesLoaded(categories: ApiCategory[]): void {
+  private handleCategoriesLoaded(categories: Category[]): void {
     this.isLoading = false;
     this.categories = categories;
     this.rebuildIndexes(categories);
@@ -92,7 +92,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     this.updateFilteredCategories();
   }
 
-  private rebuildIndexes(categories: ApiCategory[]): void {
+  private rebuildIndexes(categories: Category[]): void {
     this.categoryById.clear();
     this.parentBySubId.clear();
 
@@ -188,44 +188,44 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  private selectCategory(category: ApiCategory): void {
+  private selectCategory(category: Category): void {
     this.selectedCategoryIds.add(category.id);
     for (const sub of category.subcategories ?? [])
       this.selectedSubcategoryIds.add(sub.id);
   }
 
-  private deselectCategory(category: ApiCategory): void {
+  private deselectCategory(category: Category): void {
     this.selectedCategoryIds.delete(category.id);
     for (const sub of category.subcategories ?? [])
       this.selectedSubcategoryIds.delete(sub.id);
   }
 
   private toggleSubcategorySelection(subcategoryId: number): void {
-    const parentId = this.parentBySubId.get(subcategoryId);
-    if (parentId == null) return;
+    const parentCategoryId = this.parentBySubId.get(subcategoryId);
+    if (parentCategoryId == null) return;
 
     if (this.selectedSubcategoryIds.has(subcategoryId)) {
-      this.deselectSubcategory(subcategoryId, parentId);
+      this.deselectSubcategory(subcategoryId, parentCategoryId);
     } else {
-      this.selectSubcategory(subcategoryId, parentId);
+      this.selectSubcategory(subcategoryId, parentCategoryId);
     }
   }
 
-  private selectSubcategory(subId: number, parentId: number): void {
+  private selectSubcategory(subId: number, parentCategoryId: number): void {
     this.selectedSubcategoryIds.add(subId);
-    this.selectedCategoryIds.add(parentId);
+    this.selectedCategoryIds.add(parentCategoryId);
   }
 
-  private deselectSubcategory(subId: number, parentId: number): void {
+  private deselectSubcategory(subId: number, parentCategoryId: number): void {
     this.selectedSubcategoryIds.delete(subId);
 
-    const parent = this.categoryById.get(parentId);
+    const parent = this.categoryById.get(parentCategoryId);
     if (!parent) return;
 
     const anyRemaining = (parent.subcategories ?? []).some((s) =>
       this.selectedSubcategoryIds.has(s.id)
     );
-    if (!anyRemaining) this.selectedCategoryIds.delete(parentId);
+    if (!anyRemaining) this.selectedCategoryIds.delete(parentCategoryId);
   }
 
   getSelectionState(itemId: number, type: ItemType): SelectionState {
@@ -270,7 +270,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
       .filter((category) => this.shouldIncludeCategory(category, q));
   }
 
-  private filterCategory(category: ApiCategory, q: string): ApiCategory {
+  private filterCategory(category: Category, q: string): Category {
     const subs = category.subcategories ?? [];
     const matchingSubs = subs.filter(
       (s) => this.matches(q, s.name) || this.matches(q, category.name)
@@ -278,7 +278,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     return { ...category, subcategories: matchingSubs };
   }
 
-  private shouldIncludeCategory(category: ApiCategory, q: string): boolean {
+  private shouldIncludeCategory(category: Category, q: string): boolean {
     return (
       this.matches(q, category.name) ||
       (category.subcategories?.length ?? 0) > 0
@@ -289,14 +289,14 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     return (text ?? '').toLowerCase().includes(q);
   }
 
-  shouldShowCategory(category: ApiCategory): boolean {
+  shouldShowCategory(category: Category): boolean {
     return (
       !this.showSelected ||
       this.getSelectionState(category.id, 'category') !== 'none'
     );
   }
 
-  shouldShowSubcategory(sub: ApiSubcategory): boolean {
+  shouldShowSubcategory(sub: Subcategory): boolean {
     return (
       !this.showSelected ||
       this.getSelectionState(sub.id, 'subcategory') !== 'none'
@@ -338,8 +338,8 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   private buildSavePayload(): SaveUserCategoriesPayload {
     const parentCategoriesFromSubs = new Set<number>();
     for (const subId of this.selectedSubcategoryIds) {
-      const parentId = this.parentBySubId.get(subId);
-      if (parentId != null) parentCategoriesFromSubs.add(parentId);
+      const parentCategoryId = this.parentBySubId.get(subId);
+      if (parentCategoryId != null) parentCategoriesFromSubs.add(parentCategoryId);
     }
 
     const allCategoryIds = new Set<number>([
