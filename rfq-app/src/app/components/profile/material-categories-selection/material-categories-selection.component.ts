@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   ApiCategory,
   ApiSubcategory,
@@ -17,7 +17,7 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './material-categories-selection.component.html',
   styleUrl: './material-categories-selection.component.scss',
 })
-export class MaterialCategoriesSelectionComponent implements OnInit {
+export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   categories: ApiCategory[] = [];
   filteredCategories: ApiCategory[] = [];
 
@@ -348,8 +348,6 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
 
   private handleSaveError(error: HttpErrorResponse): void {
     this.isSaving = false;
-
-    // Handle specific HTTP status codes
     let messageKey = 'PROFILE.SAVE_ERROR_MESSAGE';
 
     if (error.status === 400) {

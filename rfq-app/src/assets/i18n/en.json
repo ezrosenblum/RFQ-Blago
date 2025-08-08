@@ -276,6 +276,9 @@
     "SAVE": "Save Specialties",
     "SAVE_ERROR_MESSAGE": "Failed to save specialties. Please try again.",
     "SAVE_SUCCESS_MESSAGE": "Specialties saved successfully.",
-    "LOAD_CATEGORIES_ERROR_MESSAGE": "Failed to load categories. Please try again."
+    "LOAD_CATEGORIES_ERROR_MESSAGE": "Failed to load categories. Please try again.",
+    "VALIDATION_ERROR_MESSAGE": "Please select at least one material and category.",
+    "PERMISSION_ERROR_MESSAGE": "You do not have permission to save specialties.",
+    "SERVER_ERROR_MESSAGE": "An error occurred while saving specialties. Please try again."
   }
 }

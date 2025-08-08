@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class ProfileComponent implements OnInit {
   currentUser: User | null = null;
   editMode = false;
+  imageError = false;
   selectedTab: string = 'Overview';
   private destroy$ = new Subject<void>();
 
@@ -32,7 +33,12 @@ export class ProfileComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const tab = params.get('tab');
-        if (tab === 'Overview' || tab === 'Settings' || tab === 'Materials' || tab === 'Service_Areas') {
+        if (
+          tab === 'Overview' ||
+          tab === 'Settings' ||
+          tab === 'Materials' ||
+          tab === 'Service_Areas'
+        ) {
           this.selectedTab = tab;
         }
       });
@@ -70,9 +76,14 @@ export class ProfileComponent implements OnInit {
         return '';
     }
   }
+  get tabLabels(): string[] {
+    return this.currentUser?.type === UserRole.VENDOR
+      ? ['Overview', 'Settings', 'Materials', 'Service_Areas']
+      : ['Overview', 'Settings', 'Service_Areas'];
+  }
+
   onTabChange(event: any) {
-    const tabLabels = ['Overview', 'Settings', 'Materials', 'Service_Areas'];
-    this.selectedTab = tabLabels[event.index];
+    this.selectedTab = this.tabLabels[event.index];
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: this.selectedTab },
@@ -81,13 +92,11 @@ export class ProfileComponent implements OnInit {
   }
 
   get selectedIndex(): number {
-  switch (this.selectedTab) {
-    case 'Overview': return 0;
-    case 'Settings': return 1;
-    case 'Materials': return 2;
-    case 'Service_Areas': return 3;
-    default: return 0;
+    return this.tabLabels.indexOf(this.selectedTab) !== -1
+      ? this.tabLabels.indexOf(this.selectedTab)
+      : 0;
   }
-}
-
+  onImageError(): void {
+    this.imageError = true;
+  }
 }
