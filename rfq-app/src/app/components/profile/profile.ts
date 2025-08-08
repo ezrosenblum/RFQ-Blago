@@ -12,6 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ProfileComponent implements OnInit {
   currentUser: User | null = null;
+
   editMode = false;
   imageError = false;
   selectedTab: string = 'Overview';
@@ -82,7 +83,7 @@ export class ProfileComponent implements OnInit {
       : ['Overview', 'Settings', 'Service_Areas'];
   }
 
-  onTabChange(event: any) {
+ onTabChange(event: any) {
     this.selectedTab = this.tabLabels[event.index];
     this.router.navigate([], {
       relativeTo: this.route,

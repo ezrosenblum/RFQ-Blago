@@ -10,22 +10,22 @@ import { RouterModule, Routes } from '@angular/router';
 import { MaterialCategoriesSelectionComponent } from './material-categories-selection/material-categories-selection.component';
 import { SharedModule } from '../../shared/shared-module';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ServiceAreasComponent } from "./service-areas/service-areas.component";
+import { ServiceAreasComponent } from './service-areas/service-areas.component';
 import { TranslateModule } from '@ngx-translate/core';
+
 const routes: Routes = [
   {
     path: '',
-    component: ProfileComponent
-  }
+    component: ProfileComponent,
+  },
 ];
-
 
 @NgModule({
   declarations: [
     ProfileComponent,
     ProfileOverviewComponent,
     ProfileSettingsComponent,
-    MaterialCategoriesSelectionComponent
+    MaterialCategoriesSelectionComponent,
   ],
   imports: [
     CommonModule,
@@ -37,6 +37,6 @@ const routes: Routes = [
     ServiceAreasComponent,
     TranslateModule,
     RouterModule.forChild(routes),
-]
+  ],
 })
-export class ProfileModule { }
+export class ProfileModule {}

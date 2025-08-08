@@ -91,6 +91,36 @@ export class Auth {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
+  updateUserProfile(formData: FormData): Observable<UserResponse> {
+    const headers = new HttpHeaders({
+      'Skip-Content-Type': 'true',
+    });
+
+    return this.http
+      .put<UserResponse>(`${this.API_URL}User`, formData, { headers })
+      .pipe(
+        tap(() => {
+          this.getUserData().subscribe({
+            next: (user) => this.currentUserSubject.next(user),
+          });
+        })
+      );
+  }
+
+  uploadProfilePicture(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('Picture', file);
+
+    const headers = new HttpHeaders({
+      'Skip-Content-Type': 'true',
+      Language: 'en',
+    });
+
+    return this.http.put(`${this.API_URL}User/profile-picture`, formData, {
+      headers,
+    });
+  }
+
   getUserRoles(): Observable<LookupValue[]> {
     return this.http.get<LookupValue[]>(`${this.API_URL}User/role`);
   }

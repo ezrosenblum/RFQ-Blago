@@ -6,6 +6,7 @@ namespace DTO.Submission;
 public record SubmissionBaseResponse
 {
     public int Id { get; init; }
+    public string Title { get; init; } = null!;
     public string Description { get; init; } = null!;
     public int Quantity { get; init; }
     public ListItemBaseResponse Unit { get; init; } = new();

@@ -4,6 +4,7 @@ namespace Domain.Entities.Submissions;
 
 public interface ISubmissionInsertData
 {
+    string Title { get; }
     string Description { get; }
     int Quantity { get; }
     SubmissionUnit Unit { get; }

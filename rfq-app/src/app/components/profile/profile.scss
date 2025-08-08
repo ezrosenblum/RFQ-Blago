@@ -33,3 +33,23 @@
 ::ng-deep .mat-mdc-tab-label-container {
   border: none!important;
 }
+
+::ng-deep .swal2-confirm {
+  order: 2;
+  border-radius: 0.65rem;
+}
+
+::ng-deep .swal2-cancel {
+  order: 1;
+  color: black;
+  border-radius: 0.65rem;
+}
+
+::ng-deep div:where(.swal2-container) div:where(.swal2-html-container) {
+  font-size: 1.1rem !important;
+}
+::ng-deep div:where(.swal2-container) h2:where(.swal2-title) {
+  font-weight: 200 !important;
+  font-size: 1.5rem !important;
+  color: #252f4a;
+}
