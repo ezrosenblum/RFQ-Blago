@@ -35,7 +35,7 @@ public sealed class SubmissionGetQueryHandler : IQueryHandler<SubmissionGetQuery
     }
     public async Task<SubmissionResponse> Handle(SubmissionGetQuery query, CancellationToken cancellationToken)
     {
-        var submission = await _dbContext.Submission.Include(s => s.User)
+        var submission = await _dbContext.Submission
                              .AsNoTracking()
                              .Include(s => s.User)
                              .Include(s => s.Categories)

@@ -64,7 +64,7 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
             response = SetVendorStatuses(response);
         }
 
-        else
+        if(_currentUserService.UserRole == UserRole.Administrator)
             response = await _searchClient.SearchSubmissionsAsync(query);
 
         response = RemoveHistoryItems(response);
