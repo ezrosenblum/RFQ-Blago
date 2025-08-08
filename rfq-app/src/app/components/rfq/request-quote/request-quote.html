@@ -221,6 +221,7 @@
           </label>
           <div class="relative">
             <input
+              #jobLocationInput
               id="jobLocation"
               name="jobLocation"
               type="text"
@@ -228,6 +229,7 @@
               class="form-input"
               [class.border-error-500]="isFieldInvalid('jobLocation')"
               placeholder="Enter job site address or location"
+              autocomplete="off"
             >
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,6 +245,8 @@
             {{ 'REQUEST.JOB_LOCATION_HELPER' | translate }}
           </div>
         </div>
+
+        <app-material-categories-selection></app-material-categories-selection>
 
         <!-- FilePond drag and drop input -->
         <file-pond
@@ -339,6 +343,6 @@
       </div>
     </div>
 
-    <app-file-view [files]="attachedFiles"></app-file-view>
+    <!-- <app-file-view [files]="attachedFiles"></app-file-view> -->
   </div>
 </div>

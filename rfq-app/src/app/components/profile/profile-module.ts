@@ -26,7 +26,6 @@ const routes: Routes = [
     ProfileComponent,
     ProfileOverviewComponent,
     ProfileSettingsComponent,
-    MaterialCategoriesSelectionComponent,
     ProfileSettingsChangePasswordComponent
   ],
   imports: [
@@ -39,6 +38,7 @@ const routes: Routes = [
     ServiceAreasComponent,
     TranslateModule,
     RouterModule.forChild(routes),
-  ],
+    MaterialCategoriesSelectionComponent
+]
 })
 export class ProfileModule {}

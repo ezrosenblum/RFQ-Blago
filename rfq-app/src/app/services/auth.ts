@@ -43,17 +43,23 @@ export class Auth {
   }
 
   private initializeAuthState(): void {
-    const token = this.getToken();
-    if (token) {
-      this.getUserData().pipe(
-        map((user) => {
-          this.currentUserSubject.next(user);
-          this.isAuthenticatedSubject.next(true);
-
-          return user;
-        })
-      );
-    }
+    setTimeout(() => {
+      const token = this.getToken();
+      if (token) {
+        this.getUserData().pipe(
+          map((user) => {
+            this.currentUserSubject.next(user);
+            this.isAuthenticatedSubject.next(true);
+            return user;
+          }),
+          catchError((err) => {
+            console.error('[Auth] getUserData error:', err);
+            this.logout();
+            return of(null);
+          })
+        ).subscribe();
+      }
+    }, 0);
   }
 
   login(credentials: LoginRequest): Observable<Token> {

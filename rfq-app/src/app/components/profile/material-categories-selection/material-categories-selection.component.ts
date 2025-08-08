@@ -22,8 +22,8 @@ import { AlertService } from '../../../services/alert.service';
 import { ErrorHandlerService } from '../../../services/error-handler.service';
 
 @Component({
-  standalone: false,
   selector: 'app-material-categories-selection',
+  standalone: true,
   templateUrl: './material-categories-selection.component.html',
   styleUrl: './material-categories-selection.component.scss',
 })

@@ -14,6 +14,8 @@ export interface User {
   suspensionReason?: string;
   categories: LookupValue[];
   subcategories: LookupValue[];
+  receiveEmailNotifications?: boolean;
+  receivePushNotifications?: boolean;
   companyDetails?: {
     id: number;
     name: string;
