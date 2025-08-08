@@ -266,6 +266,13 @@
     "COMPANY_INFORMATION": "Company Information",
     "CONTACT_EMAIL": "Contact Email",
     "STREET_ADDRESS": "Street Address",
-    "OPERATING_RADIUS": "Operating Radius"
+    "OPERATING_RADIUS": "Operating Radius",
+    "MATERIALS_SPECIALTIES_SELECTION_DESCRIPTION": "Select the materials and categories you specialize in to receive relevant RFQs",
+    "MATERIALS_SPECIALTIES_SELECTION": "Material Specialties Selection",
+    "SEARCH_CATEGORIES_AND_SUBCATEGORIES": "Search categories or subcategories...",
+    "SHOW_SELECTED": "Show Selected Only",
+    "CLEAR_ALL": "Clear All",
+    "SAVING": "Saving...",
+    "SAVE": "Save Specialties"
   }
 }
