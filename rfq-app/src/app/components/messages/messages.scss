@@ -1,0 +1,56 @@
+.spinner {
+    position: absolute;
+    z-index: 1;
+    top: 100px;
+    left: calc(50% - 10px); 
+}
+
+.messages-section {
+    max-height: calc(100% - 250px);
+}
+
+.dir-rtl {
+    direction: rtl;
+}
+
+.dir-ltr {
+    direction: ltr;
+}
+
+.mr-10 {
+    margin-right: 10px !important;
+}
+
+.min-width-50 {
+    min-width: 50px;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.bg-dark {
+    background-color: #111827 !important;
+}
+
+.bg-light {
+    background-color: white !important;
+}
+
+::ng-deep {
+    .mat-mdc-menu-content {
+        padding: 0 !important;
+    }
+
+    .filepond--credits {
+        display: none !important;
+    }
+}
+
+.upload-files-panel {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    overflow-y: auto;
+}

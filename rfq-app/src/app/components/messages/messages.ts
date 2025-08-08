@@ -1,5 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { Activity, Conversation, Message } from '../../models/messages.model';
+import { MessagesService } from '../../services/messages';
+import { take } from 'rxjs';
+import {
+  MatDialog,
+} from '@angular/material/dialog';
+import { ActualFileObject, FilePondInitialFile } from 'filepond';
+import { FileItem } from '../../models/form-validation';
+import { FilePondComponent } from 'ngx-filepond';
 
 @Component({
   standalone: false,
@@ -12,128 +20,13 @@ export class MessagesComponent implements OnInit {
   filteredConversations: Conversation[] = [];
   newMessage: string = '';
   selectedChatIndex: number = 0;
-
-  conversations: Conversation[] = [
-    {
-      id: 1,
-      company: 'Apex Digital Marketing',
-      initials: 'AD',
-      project: 'E-commerce platform redesign and optimization',
-      lastMessage: 'Apex: The analytics dashboard integration looks perfect...',
-      time: '2:15 PM',
-      bgColor: 'bg-blue-500',
-      hasIndicator: true,
-    },
-    {
-      id: 2,
-      company: 'Stellar Logistics Corp',
-      initials: 'SL',
-      project: 'Supply chain management system development',
-      lastMessage: 'You: When can we schedule the final deployment?',
-      time: '1:42 PM',
-      bgColor: 'bg-green-500',
-    },
-    {
-      id: 3,
-      company: 'Phoenix Healthcare',
-      initials: 'PH',
-      project: 'Patient management system with AI diagnostics',
-      lastMessage: 'Phoenix: The HIPAA compliance review is complete...',
-      time: '1:18 PM',
-      bgColor: 'bg-purple-500',
-    },
-    {
-      id: 4,
-      company: 'Zenith Financial',
-      initials: 'ZF',
-      project: 'Cryptocurrency trading platform development',
-      lastMessage: 'You: The security audit results look excellent...',
-      time: '12:55 PM',
-      bgColor: 'bg-orange-500',
-    },
-    {
-      id: 5,
-      company: 'Nova Entertainment',
-      initials: 'NE',
-      project: 'Streaming platform with content management',
-      lastMessage: 'Nova: We need to discuss the CDN implementation...',
-      time: 'Yesterday',
-      bgColor: 'bg-red-500',
-    },
-    {
-      id: 6,
-      company: 'Vortex Automotive',
-      initials: 'VA',
-      project: 'Fleet management and tracking system',
-      lastMessage: 'You: The GPS integration is working flawlessly...',
-      time: 'Yesterday',
-      bgColor: 'bg-indigo-500',
-    },
-    {
-      id: 7,
-      company: 'Meridian Real Estate',
-      initials: 'MR',
-      project: 'Property listing platform with VR tours',
-      lastMessage: 'Meridian: Can we add the mortgage calculator feature?',
-      time: 'Tuesday',
-      bgColor: 'bg-teal-500',
-    },
-    {
-      id: 8,
-      company: 'Cosmos EdTech',
-      initials: 'CE',
-      project: 'Online learning platform with gamification',
-      lastMessage: 'You: The student progress tracking is implemented...',
-      time: 'Monday',
-      bgColor: 'bg-pink-500',
-    },
-  ];
-
-  currentMessages: Message[] = [
-    {
-      sender: 'Apex Digital Marketing',
-      content:
-        "Hi there! We've reviewed your development proposal for our e-commerce platform redesign. The timeline looks good, but we'd like to discuss some additional features for the analytics dashboard. Could we schedule a call this week?",
-      time: '1:45 PM',
-      isUser: false,
-      initials: 'AD',
-      bgColor: 'bg-blue-500',
-    },
-    {
-      sender: 'Apex Digital Marketing',
-      content:
-        "Perfect! Here's our project repository access: https://github.com/apex-digital/ecommerce-v2. Please review the current codebase and let us know your thoughts on the integration approach. Looking forward to working together!",
-      time: '1:52 PM',
-      isUser: false,
-      initials: 'AD',
-      bgColor: 'bg-blue-500',
-      hasPreview: true,
-      preview: {
-        title: 'apex-digital/ecommerce-v2 - Overview',
-        description:
-          'Apex Digital Marketing e-commerce platform v2.0 with advanced analytics and user personalization features.',
-        platform: 'GitHub',
-      },
-    },
-    {
-      sender: 'You',
-      content:
-        "Thanks for sharing the repository! I've had a chance to review the codebase and I'm impressed with the current architecture. The analytics integration should be straightforward with the existing structure. I can definitely complete this within the proposed timeline.",
-      time: '2:08 PM',
-      isUser: true,
-      initials: 'YU',
-      bgColor: 'bg-gray-500',
-    },
-    {
-      sender: 'Apex Digital Marketing',
-      content:
-        "Excellent! We're excited to move forward with this project. The analytics dashboard integration looks perfect for our needs. When can we expect the first milestone deliverable? We're particularly interested in the real-time reporting features.",
-      time: '2:15 PM',
-      isUser: false,
-      initials: 'AD',
-      bgColor: 'bg-blue-500',
-    },
-  ];
+  loadingConversations: boolean = true;
+  loadingChatMessages: boolean = true;
+  isDarkMode: boolean = true;
+  readonly dialog = inject(MatDialog);
+  
+  conversations: Conversation[] = [];
+  currentMessages: Message[] = [];
 
   activities: Activity[] = [
     {
@@ -161,9 +54,40 @@ export class MessagesComponent implements OnInit {
       bgColor: 'bg-orange-500',
     },
   ];
+  
+  showUploadFilesPanel: boolean = false;
+  pondOptions = {
+      allowMultiple: true,
+      maxFiles: 5,
+      labelIdle: 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+    };
+  
+  pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
+
+  @ViewChild('myPond') myPond!: FilePondComponent;
+  uploadedFilesCount = 0;
+
+  constructor(
+    private _messageService: MessagesService
+  ){
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      this.isDarkMode = savedTheme === 'dark';
+    }
+  }
 
   ngOnInit(): void {
-    this.filteredConversations = this.conversations;
+    this._messageService.getMessageConversations().pipe(take(1)).subscribe({
+      next: (data: Conversation[]) => {
+        this.conversations = data;
+        this.filteredConversations = this.conversations;
+        this.loadingConversations = false;
+        this.selectChat(0);
+      },
+      error: (error) => {
+        this.loadingConversations = false;
+      },
+    })
   }
 
   onSearchChange(event: Event): void {
@@ -201,48 +125,88 @@ export class MessagesComponent implements OnInit {
         bgColor: 'bg-gray-500',
       };
 
-      this.currentMessages.push(message);
-      this.newMessage = '';
+      // this._messageService.sendMessage(message).pipe(take(1)).subscribe({
+      //   next: (data) => {
+          this.currentMessages.push(message);
+          this.newMessage = '';
 
-      this.conversations[
-        this.selectedChatIndex
-      ].lastMessage = `You: ${message.content}`;
-      this.conversations[this.selectedChatIndex].time = message.time;
+          this.conversations[
+            this.selectedChatIndex
+          ].lastMessage = `You: ${message.content}`;
+          this.conversations[this.selectedChatIndex].time = message.time;
+        // },
+        // error: (error) => {},
+      //})
     }
   }
 
   private loadMessagesForConversation(index: number): void {
-    const conversation = this.conversations[index];
-    if (index === 0) {
-    } else {
-      this.currentMessages = [
-        {
-          sender: conversation.company,
-          content: `Hello! Thanks for reaching out about the ${conversation.project} project. We're excited to work with you on this.`,
-          time: '10:30 AM',
-          isUser: false,
-          initials: conversation.initials,
-          bgColor: conversation.bgColor,
-        },
-        {
-          sender: 'You',
-          content:
-            "Great! I've reviewed your proposal and it looks comprehensive. When can we start?",
-          time: '10:45 AM',
-          isUser: true,
-          initials: 'YU',
-          bgColor: 'bg-gray-500',
-        },
-        {
-          sender: conversation.company,
-          content:
-            'We can start as early as next week. Let me know what works best for your timeline.',
-          time: '11:00 AM',
-          isUser: false,
-          initials: conversation.initials,
-          bgColor: conversation.bgColor,
-        },
-      ];
+    // Dummy test data
+    let url;
+    switch(index) { 
+      case 0: { 
+          url = 'https://api.npoint.io/7b44e477a68e814b29c5';
+          break; 
+      } 
+      case 1: { 
+          url = 'https://api.npoint.io/592d1831918d41b892d1';
+          break; 
+      } 
+      case 2: { 
+          url = 'https://api.npoint.io/f26e5eeda168713955f6'; 
+          break; 
+      }
+      case 3: { 
+          url = 'https://api.npoint.io/1046ff931f6f34f482ec'; 
+          break; 
+      }
+      default: { 
+          url = 'https://api.npoint.io/7b44e477a68e814b29c5';
+          break; 
+      } 
     }
+
+    this._messageService.getChatMessages(index, url).pipe(take(1)).subscribe({
+      next: (data: Message[]) => {
+      this.currentMessages = data;
+      this.loadingChatMessages = false;
+      },
+      error: (error) => {
+        this.loadingChatMessages = false;
+      },
+    })
+  }
+
+  openFileUploadDialog(){
+    this.showUploadFilesPanel = true;
+  }
+
+  pondHandleInit() {
+  }
+
+pondHandleAddFile(event: any) {
+  this.uploadedFilesCount++;
+}
+
+onFileRemoved(event: any) {
+  this.uploadedFilesCount = Math.max(0, this.uploadedFilesCount - 1);
+}
+
+  pondHandleActivateFile(event: any) {
+  }
+
+  onFilesUpdated(files: (string| FilePondInitialFile | Blob | ActualFileObject)[]): void {
+    this.pondFiles = files;
+
+    const rawFiles: File[] = files
+    .map(file => {
+      if (typeof file === 'string') return null;
+      if ('file' in file) return file.file as File;
+      if (file instanceof Blob) return file as File;
+      return null;
+    })
+    .filter((f): f is File => f !== null);
+
+    console.log('raw files', rawFiles)
   }
 }

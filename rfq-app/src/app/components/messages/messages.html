@@ -61,7 +61,8 @@
     </div>
 
     <!-- Conversations -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto relative">
+      <div class="spinner mr-2" *ngIf="loadingConversations"></div>
       <div
         *ngFor="let conv of filteredConversations; let i = index"
         (click)="selectChat(i)"
@@ -75,20 +76,47 @@
         <div class="flex items-start space-x-3">
           <div
             [class]="
-              'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
               conv.bgColor
-            "
-          >
+            ">
             {{ conv.initials }}
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
-              <h3 class="font-medium text-gray-900 dark:text-white truncate">
+              <h3 class="font-medium text-gray-900 dark:text-white truncate" [matTooltip]="conv.company">
                 {{ conv.company }}
               </h3>
-              <span class="text-xs text-gray-500 dark:text-gray-400"
-                >{{ conv.time }}</span
-              >
+              <div class="flex">
+                <div class="text-xs text-gray-500 dark:text-gray-400 min-width-50 align-right ml-2">
+                  {{ conv.time }}
+                </div>
+                <svg
+                  [matMenuTriggerFor]="menu"
+                  class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  ></path>
+                </svg>
+                <mat-menu #menu="matMenu">
+                  <div class="p-3" [ngClass]="isDarkMode ? 'bg-dark' : 'bg-light'">
+                    <button mat-menu-item>
+                      <i class="ki-outline ki-sms text-base me-1 mr-2"></i>
+                      <span class="text-sm">Mark as read</span>
+                    </button>
+                    <button mat-menu-item>
+                      <i class="ki-outline ki-archive-tick text-base me-1 mr-2"></i>
+                      <span class="text-sm">Archive</span>
+                    </button>
+                  </div>
+                </mat-menu>
+              </div>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {{ conv.project }}
@@ -188,10 +216,12 @@
     </div>
 
     <!-- Messages -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 relative messages-section">
+      <div class="spinner mr-2" *ngIf="loadingChatMessages"></div>
       <div
         *ngFor="let msg of currentMessages"
         class="flex items-start space-x-3"
+          [ngClass]="msg.isUser ? 'dir-rtl' : 'dir-ltr'"
       >
         <div
           [class]="
@@ -203,14 +233,14 @@
         </div>
         <div class="flex-1">
           <div class="flex items-center space-x-2 mb-1">
-            <span class="font-medium text-gray-900 dark:text-white"
+            <span class="font-medium text-gray-900 dark:text-white mr-10"
               >{{ msg.sender }}</span
             >
-            <span class="text-xs text-gray-500 dark:text-gray-400"
+            <span class="text-xs text-gray-500 dark:text-gray-400 mr-10"
               >{{ msg.time }}</span
             >
           </div>
-          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl">
+          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10">
             <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
           </div>
           <div
@@ -236,8 +266,26 @@
 
     <!-- Message Input - Fixed height, no scrolling -->
     <div
-      class="border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900"
+      class="border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900 relative"
     >
+      <div 
+        class="upload-files-panel bg-white dark:bg-gray-900"
+        [ngStyle]="{
+          height: uploadedFilesCount > 2 ? '150px' : '100px',
+          top: uploadedFilesCount > 2 ? '-150px' : '-100px'
+        }"
+        *ngIf="showUploadFilesPanel"
+      >
+        <file-pond 
+          #myPond 
+          [options]="pondOptions" 
+          [files]="pondFiles"
+          (oninit)="pondHandleInit()"
+          (onaddfile)="pondHandleAddFile($event)"
+          (onremovefile)="onFileRemoved($event)"
+          (onactivatefile)="pondHandleActivateFile($event)">
+        </file-pond>
+      </div>
       <div class="flex items-center space-x-3">
         <svg
           class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
@@ -253,6 +301,7 @@
           ></path>
         </svg>
         <svg
+          (click)="openFileUploadDialog()"
           class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
           fill="none"
           stroke="currentColor"
