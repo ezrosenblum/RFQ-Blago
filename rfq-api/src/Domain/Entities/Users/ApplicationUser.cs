@@ -249,6 +249,8 @@ namespace Domain.Entities.User
 
                 Subcategories = existingSubcategories.Concat(newSubcategories).ToList();
             }
+
+            AddDomainEvent(new UserUpdatedEvent(this));
         }
     }
 }

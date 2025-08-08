@@ -50,6 +50,8 @@ public sealed class UserGetCurrentDetailsQueryHandler : IQueryHandler<UserGetCur
         {
             user = await _dbContext.User
                 .Include(u => u.CompanyDetails)
+                .Include(u => u.Categories)
+                .Include(u => u.Subcategories)
                 .FirstOrDefaultAsync(u => u.Id == _currentUserService.UserId);
 
             if (user == null)
