@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import {
   ApiCategory,
   ApiSubcategory,
@@ -7,9 +7,19 @@ import {
   SelectionState,
 } from '../../../models/material-categories';
 import { CategoriesService } from '../../../services/materials';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
+import { User } from '../../../models/user.model';
+import { AlertService } from '../../../services/alert.service';
+import { ErrorHandlerService } from '../../../services/error-handler.service';
 
 @Component({
   standalone: false,
@@ -18,6 +28,8 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrl: './material-categories-selection.component.scss',
 })
 export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
+  @Input() user: User | null = null;
+
   categories: ApiCategory[] = [];
   filteredCategories: ApiCategory[] = [];
 
@@ -25,20 +37,27 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   selectedSubcategoryIds = new Set<number>();
   expandedCategories = new Set<number>();
 
-  searchTerm: string = '';
-  showSelected: boolean = false;
-  isLoading: boolean = false;
-  isSaving: boolean = false;
+  private originalCategoryIds = new Set<number>();
+  private originalSubcategoryIds = new Set<number>();
 
+  private categoryById = new Map<number, ApiCategory>();
+  private parentBySubId = new Map<number, number>();
+
+  searchTerm = '';
+  showSelected = false;
+  isLoading = false;
+  isSaving = false;
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
   private destroy$ = new Subject<void>();
-  private searchInput$ = new Subject<string>();
+  private searchInput$ = new BehaviorSubject<string>('');
 
   constructor(
     private categoriesService: CategoriesService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private alertService: AlertService,
+    private errorHandlerService: ErrorHandlerService
   ) {
     this.setupSearchDebounce();
   }
@@ -52,15 +71,6 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private setupSearchDebounce(): void {
-    this.searchInput$
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((searchTerm) => {
-        this.searchTerm = searchTerm;
-        this.updateFilteredCategories();
-      });
-  }
-
   private loadCategories(): void {
     this.isLoading = true;
     this.clearMessages();
@@ -69,213 +79,228 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
       .getAll()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (categories) => this.handleCategoriesLoaded(categories),
-        error: (error) => this.handleLoadError(error),
+        next: (categories) => this.handleCategoriesLoaded(categories ?? []),
+        error: (error) => this.handleLoadError(error as HttpErrorResponse),
       });
   }
 
   private handleCategoriesLoaded(categories: ApiCategory[]): void {
     this.isLoading = false;
-    this.categories = categories || [];
+    this.categories = categories;
+    this.rebuildIndexes(categories);
+    this.initializeUserSelections();
     this.updateFilteredCategories();
   }
 
-  private handleLoadError(error: HttpErrorResponse): void {
+  private rebuildIndexes(categories: ApiCategory[]): void {
+    this.categoryById.clear();
+    this.parentBySubId.clear();
+
+    for (const c of categories) {
+      this.categoryById.set(c.id, c);
+      for (const s of c.subcategories ?? []) {
+        this.parentBySubId.set(s.id, c.id);
+      }
+    }
+  }
+
+  private handleLoadError(_error: HttpErrorResponse): void {
     this.isLoading = false;
     this.showErrorMessage('PROFILE.LOAD_CATEGORIES_ERROR_MESSAGE', 5000);
   }
 
+  private setupSearchDebounce(): void {
+    this.searchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap((term) => (this.searchTerm = term.trim())),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.updateFilteredCategories());
+  }
+
+  onInputChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchInput$.next(input.value ?? '');
+  }
+
+  private initializeUserSelections(): void {
+    if (!this.user) return;
+
+    const userCategoryIds = new Set<number>(
+      this.user.categories?.map((c) => c.id) ?? []
+    );
+    const userSubcategoryIds = new Set<number>(
+      this.user.subcategories?.map((s) => s.id) ?? []
+    );
+
+    this.selectedCategoryIds.clear();
+    this.selectedSubcategoryIds.clear();
+    this.originalCategoryIds.clear();
+    this.originalSubcategoryIds.clear();
+
+    for (const category of this.categories) {
+      if (userCategoryIds.has(category.id)) {
+        this.selectedCategoryIds.add(category.id);
+        this.originalCategoryIds.add(category.id);
+      }
+
+      for (const sub of category.subcategories ?? []) {
+        if (userSubcategoryIds.has(sub.id)) {
+          this.selectedSubcategoryIds.add(sub.id);
+          this.originalSubcategoryIds.add(sub.id);
+          this.selectedCategoryIds.add(category.id);
+          this.originalCategoryIds.add(category.id);
+        }
+      }
+    }
+
+    this.autoExpandSelectedCategories();
+  }
+
+  private autoExpandSelectedCategories(): void {
+    for (const category of this.categories) {
+      const hasSelectedSub = (category.subcategories ?? []).some((s) =>
+        this.selectedSubcategoryIds.has(s.id)
+      );
+      if (hasSelectedSub || this.selectedCategoryIds.has(category.id)) {
+        this.expandedCategories.add(category.id);
+      }
+    }
+  }
+
   toggleSelection(itemId: number, type: ItemType): void {
     this.clearMessages();
-
-    if (type === 'category') {
-      this.toggleCategorySelection(itemId);
-    } else {
-      this.toggleSubcategorySelection(itemId);
-    }
+    type === 'category'
+      ? this.toggleCategorySelection(itemId)
+      : this.toggleSubcategorySelection(itemId);
   }
 
   private toggleCategorySelection(categoryId: number): void {
-    const category = this.findCategoryById(categoryId);
+    const category = this.categoryById.get(categoryId);
     if (!category) return;
 
     if (this.selectedCategoryIds.has(categoryId)) {
-      this.deselectCategory(categoryId);
+      this.deselectCategory(category);
     } else {
-      this.selectCategory(categoryId, category);
+      this.selectCategory(category);
     }
   }
 
-  private selectCategory(categoryId: number, category: ApiCategory): void {
-    this.selectedCategoryIds.add(categoryId);
-
-    // Select ALL subcategories when category is selected
-    if (category.subcategories.length > 0) {
-      category.subcategories.forEach((subcategory) => {
-        this.selectedSubcategoryIds.add(subcategory.id);
-      });
-    }
+  private selectCategory(category: ApiCategory): void {
+    this.selectedCategoryIds.add(category.id);
+    for (const sub of category.subcategories ?? [])
+      this.selectedSubcategoryIds.add(sub.id);
   }
 
-  private deselectCategory(categoryId: number): void {
-    this.selectedCategoryIds.delete(categoryId);
-
-    // Deselect ALL subcategories when category is deselected
-    const category = this.findCategoryById(categoryId);
-    if (category) {
-      category.subcategories.forEach((subcategory) => {
-        this.selectedSubcategoryIds.delete(subcategory.id);
-      });
-    }
+  private deselectCategory(category: ApiCategory): void {
+    this.selectedCategoryIds.delete(category.id);
+    for (const sub of category.subcategories ?? [])
+      this.selectedSubcategoryIds.delete(sub.id);
   }
 
   private toggleSubcategorySelection(subcategoryId: number): void {
-    const parentCategory = this.findParentCategory(subcategoryId);
-    if (!parentCategory) return;
+    const parentId = this.parentBySubId.get(subcategoryId);
+    if (parentId == null) return;
 
     if (this.selectedSubcategoryIds.has(subcategoryId)) {
-      this.deselectSubcategory(subcategoryId, parentCategory);
+      this.deselectSubcategory(subcategoryId, parentId);
     } else {
-      this.selectSubcategory(subcategoryId, parentCategory);
+      this.selectSubcategory(subcategoryId, parentId);
     }
   }
 
-  private selectSubcategory(
-    subcategoryId: number,
-    parentCategory: ApiCategory
-  ): void {
-    this.selectedSubcategoryIds.add(subcategoryId);
-    this.selectedCategoryIds.add(parentCategory.id);
+  private selectSubcategory(subId: number, parentId: number): void {
+    this.selectedSubcategoryIds.add(subId);
+    this.selectedCategoryIds.add(parentId);
   }
 
-  private deselectSubcategory(
-    subcategoryId: number,
-    parentCategory: ApiCategory
-  ): void {
-    this.selectedSubcategoryIds.delete(subcategoryId);
+  private deselectSubcategory(subId: number, parentId: number): void {
+    this.selectedSubcategoryIds.delete(subId);
 
-    const hasRemainingSelectedSubs = parentCategory.subcategories.some((sub) =>
-      this.selectedSubcategoryIds.has(sub.id)
+    const parent = this.categoryById.get(parentId);
+    if (!parent) return;
+
+    const anyRemaining = (parent.subcategories ?? []).some((s) =>
+      this.selectedSubcategoryIds.has(s.id)
     );
-
-    if (!hasRemainingSelectedSubs) {
-      this.selectedCategoryIds.delete(parentCategory.id);
-    }
+    if (!anyRemaining) this.selectedCategoryIds.delete(parentId);
   }
 
   getSelectionState(itemId: number, type: ItemType): SelectionState {
-    if (type === 'subcategory') {
+    if (type === 'subcategory')
       return this.selectedSubcategoryIds.has(itemId) ? 'full' : 'none';
-    }
 
-    // For categories: check if category is fully selected
-    if (this.selectedCategoryIds.has(itemId)) {
-      const category = this.findCategoryById(itemId);
-      if (!category) return 'none';
-
-      // If category has no subcategories, it's fully selected
-      if (category.subcategories.length === 0) {
-        return 'full';
-      }
-
-      // Check if ALL subcategories are selected
-      const allSubcategoriesSelected = category.subcategories.every((sub) =>
-        this.selectedSubcategoryIds.has(sub.id)
-      );
-
-      // Check if SOME subcategories are selected
-      const someSubcategoriesSelected = category.subcategories.some((sub) =>
-        this.selectedSubcategoryIds.has(sub.id)
-      );
-
-      if (allSubcategoriesSelected) {
-        return 'full';
-      } else if (someSubcategoriesSelected) {
-        return 'partial';
-      } else {
-        return 'none';
-      }
-    }
-
-    // Category is not selected but check if some subcategories are selected
-    const category = this.findCategoryById(itemId);
+    const category = this.categoryById.get(itemId);
     if (!category) return 'none';
 
-    const hasSelectedSubcategories = category.subcategories.some((sub) =>
-      this.selectedSubcategoryIds.has(sub.id)
-    );
+    const subs = category.subcategories ?? [];
+    if (subs.length === 0)
+      return this.selectedCategoryIds.has(itemId) ? 'full' : 'none';
 
-    return hasSelectedSubcategories ? 'partial' : 'none';
+    let selectedCount = 0;
+    for (const s of subs)
+      if (this.selectedSubcategoryIds.has(s.id)) selectedCount++;
+
+    if (selectedCount === 0) return 'none';
+    if (selectedCount === subs.length) return 'full';
+    return 'partial';
   }
 
   toggleExpanded(categoryId: number): void {
-    if (this.expandedCategories.has(categoryId)) {
+    if (this.expandedCategories.has(categoryId))
       this.expandedCategories.delete(categoryId);
-    } else {
-      this.expandedCategories.add(categoryId);
-    }
+    else this.expandedCategories.add(categoryId);
   }
 
   isExpanded(categoryId: number): boolean {
     return this.expandedCategories.has(categoryId);
   }
 
-  onInputChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchInput$.next(input.value || '');
-  }
-
   private updateFilteredCategories(): void {
-    const searchQuery = this.searchTerm.trim().toLowerCase();
-
-    if (!searchQuery) {
-      this.filteredCategories = [...this.categories];
+    const q = this.searchTerm.toLowerCase();
+    if (!q) {
+      this.filteredCategories = this.categories.slice();
       return;
     }
 
     this.filteredCategories = this.categories
-      .map((category) => this.filterCategory(category, searchQuery))
-      .filter((category) => this.shouldIncludeCategory(category, searchQuery));
+      .map((category) => this.filterCategory(category, q))
+      .filter((category) => this.shouldIncludeCategory(category, q));
   }
 
-  private filterCategory(
-    category: ApiCategory,
-    searchQuery: string
-  ): ApiCategory {
-    const matchingSubcategories = category.subcategories.filter(
-      (sub) =>
-        this.matchesSearchQuery(sub.name, searchQuery) ||
-        this.matchesSearchQuery(category.name, searchQuery)
+  private filterCategory(category: ApiCategory, q: string): ApiCategory {
+    const subs = category.subcategories ?? [];
+    const matchingSubs = subs.filter(
+      (s) => this.matches(q, s.name) || this.matches(q, category.name)
     );
-
-    return {
-      ...category,
-      subcategories: matchingSubcategories,
-    };
+    return { ...category, subcategories: matchingSubs };
   }
 
-  private shouldIncludeCategory(
-    category: ApiCategory,
-    searchQuery: string
-  ): boolean {
+  private shouldIncludeCategory(category: ApiCategory, q: string): boolean {
     return (
-      this.matchesSearchQuery(category.name, searchQuery) ||
-      category.subcategories.length > 0
+      this.matches(q, category.name) ||
+      (category.subcategories?.length ?? 0) > 0
     );
   }
 
-  private matchesSearchQuery(text: string, query: string): boolean {
-    return text.toLowerCase().includes(query);
+  private matches(q: string, text: string): boolean {
+    return (text ?? '').toLowerCase().includes(q);
   }
 
   shouldShowCategory(category: ApiCategory): boolean {
-    if (!this.showSelected) return true;
-    return this.getSelectionState(category.id, 'category') !== 'none';
+    return (
+      !this.showSelected ||
+      this.getSelectionState(category.id, 'category') !== 'none'
+    );
   }
 
-  shouldShowSubcategory(subcategory: ApiSubcategory): boolean {
-    if (!this.showSelected) return true;
-    return this.getSelectionState(subcategory.id, 'subcategory') !== 'none';
+  shouldShowSubcategory(sub: ApiSubcategory): boolean {
+    return (
+      !this.showSelected ||
+      this.getSelectionState(sub.id, 'subcategory') !== 'none'
+    );
   }
 
   clearSelections(): void {
@@ -288,37 +313,36 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     return this.selectedSubcategoryIds.size;
   }
 
-  private findCategoryById(categoryId: number): ApiCategory | undefined {
-    return this.categories.find((category) => category.id === categoryId);
-  }
-
-  private findParentCategory(subcategoryId: number): ApiCategory | undefined {
-    return this.categories.find((category) =>
-      category.subcategories.some((sub) => sub.id === subcategoryId)
+  hasSelectionChanged(): boolean {
+    return (
+      !this.setsEqual(this.selectedCategoryIds, this.originalCategoryIds) ||
+      !this.setsEqual(this.selectedSubcategoryIds, this.originalSubcategoryIds)
     );
   }
 
+  isSaveDisabled(): boolean {
+    return this.isSaving || !this.hasSelectionChanged();
+  }
+
+  private setsEqual(a: Set<number>, b: Set<number>): boolean {
+    if (a.size !== b.size) return false;
+    for (const v of a) if (!b.has(v)) return false;
+    return true;
+  }
   onSaveSpecialties(): void {
     if (this.isSaving) return;
     this.clearMessages();
-    const payload = this.buildSavePayload();
-    this.performSave(payload);
+    this.performSave(this.buildSavePayload());
   }
 
   private buildSavePayload(): SaveUserCategoriesPayload {
     const parentCategoriesFromSubs = new Set<number>();
-
-    for (const category of this.categories) {
-      const hasSelectedSubcategory = category.subcategories.some((sub) =>
-        this.selectedSubcategoryIds.has(sub.id)
-      );
-
-      if (hasSelectedSubcategory) {
-        parentCategoriesFromSubs.add(category.id);
-      }
+    for (const subId of this.selectedSubcategoryIds) {
+      const parentId = this.parentBySubId.get(subId);
+      if (parentId != null) parentCategoriesFromSubs.add(parentId);
     }
 
-    const allCategoryIds = new Set([
+    const allCategoryIds = new Set<number>([
       ...this.selectedCategoryIds,
       ...parentCategoriesFromSubs,
     ]);
@@ -330,57 +354,52 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   }
 
   private performSave(payload: SaveUserCategoriesPayload): void {
-    this.isSaving = true;
+    this.alertService.confirm('ALERTS.CONFIRM_SAVE').then((result) => {
+      if (result.isConfirmed) {
+        this.isSaving = true;
 
-    this.categoriesService
-      .save(payload)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => this.handleSaveSuccess(),
-        error: (error) => this.handleSaveError(error),
-      });
+        this.categoriesService
+          .save(payload)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => this.handleSaveSuccess(),
+            error: (error) => {
+              this.isSaving = false;
+              const message = this.errorHandlerService.handleError(error);
+              this.showErrorMessage(message);
+            },
+          });
+      }
+    });
   }
 
   private handleSaveSuccess(): void {
     this.isSaving = false;
     this.showSuccessMessage('PROFILE.SAVE_SUCCESS_MESSAGE', 3000);
+    this.originalCategoryIds = new Set(this.selectedCategoryIds);
+    this.originalSubcategoryIds = new Set(this.selectedSubcategoryIds);
   }
 
-  private handleSaveError(error: HttpErrorResponse): void {
-    this.isSaving = false;
-    let messageKey = 'PROFILE.SAVE_ERROR_MESSAGE';
-
-    if (error.status === 400) {
-      messageKey = 'PROFILE.VALIDATION_ERROR_MESSAGE';
-    } else if (error.status === 403) {
-      messageKey = 'PROFILE.PERMISSION_ERROR_MESSAGE';
-    } else if (error.status >= 500) {
-      messageKey = 'PROFILE.SERVER_ERROR_MESSAGE';
-    }
-
-    this.showErrorMessage(messageKey, 3000);
-  }
-
-  // Centralized message handling methods
-  private showErrorMessage(messageKey: string, duration: number = 3000): void {
+  private showErrorMessage(messageKey: string, duration = 3000): void {
     this.scrollToTop();
-
-    this.translate.get(messageKey).subscribe((msg: string) => {
-      this.errorMessage = msg;
-      this.clearMessageAfterDelay(duration, 'error');
-    });
+    this.translate
+      .get(messageKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((msg) => {
+        this.errorMessage = msg;
+        this.clearMessageAfterDelay(duration, 'error');
+      });
   }
 
-  private showSuccessMessage(
-    messageKey: string,
-    duration: number = 3000
-  ): void {
+  private showSuccessMessage(messageKey: string, duration = 3000): void {
     this.scrollToTop();
-
-    this.translate.get(messageKey).subscribe((msg: string) => {
-      this.successMessage = msg;
-      this.clearMessageAfterDelay(duration, 'success');
-    });
+    this.translate
+      .get(messageKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((msg) => {
+        this.successMessage = msg;
+        this.clearMessageAfterDelay(duration, 'success');
+      });
   }
 
   private scrollToTop(): void {
@@ -391,14 +410,11 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
 
   private clearMessageAfterDelay(
     delay: number,
-    messageType: 'error' | 'success'
+    type: 'error' | 'success'
   ): void {
     setTimeout(() => {
-      if (messageType === 'error') {
-        this.errorMessage = null;
-      } else {
-        this.successMessage = null;
-      }
+      if (type === 'error') this.errorMessage = null;
+      else this.successMessage = null;
     }, delay);
   }
 

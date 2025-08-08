@@ -183,7 +183,7 @@
     <ng-container
       *ngIf="selectedTab === 'Materials' && currentUser?.type === 'Vendor'"
     >
-      <app-material-categories-selection></app-material-categories-selection>
+      <app-material-categories-selection [user]="currentUser"></app-material-categories-selection>
     </ng-container>
 
     <ng-container *ngIf="selectedTab === 'Service_Areas'">

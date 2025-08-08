@@ -237,8 +237,8 @@
   <div class="mt-6 flex justify-end">
     <button
       (click)="onSaveSpecialties()"
-      class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-      [disabled]="isSaving"
+      class="px-4 py-2 text-sm rounded-md bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 flex items-center"
+      [disabled]="isSaveDisabled()"
     >
       {{
         isSaving ? ("PROFILE.SAVING" | translate) : ("PROFILE.SAVE" | translate)
