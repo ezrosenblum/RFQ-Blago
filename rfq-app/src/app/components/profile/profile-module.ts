@@ -12,6 +12,7 @@ import { SharedModule } from '../../shared/shared-module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceAreasComponent } from './service-areas/service-areas.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ProfileSettingsChangePasswordComponent } from './profile-settings/profile-settings-change-password/profile-settings-change-password.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,7 @@ const routes: Routes = [
     ProfileOverviewComponent,
     ProfileSettingsComponent,
     MaterialCategoriesSelectionComponent,
+    ProfileSettingsChangePasswordComponent
   ],
   imports: [
     CommonModule,

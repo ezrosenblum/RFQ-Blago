@@ -5,7 +5,13 @@ import { map, tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-import { LookupValue, User, UserRole } from '../models/user.model';
+import {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  LookupValue,
+  User,
+  UserRole,
+} from '../models/user.model';
 import {
   LoginRequest,
   TokenPayload,
@@ -121,6 +127,14 @@ export class Auth {
     });
   }
 
+  changePassword(
+    request: ChangePasswordRequest
+  ): Observable<ChangePasswordResponse> {
+    return this.http.put<ChangePasswordResponse>(
+      `${this.API_URL}User/change-password`,
+      request
+    );
+  }
   getUserRoles(): Observable<LookupValue[]> {
     return this.http.get<LookupValue[]>(`${this.API_URL}User/role`);
   }

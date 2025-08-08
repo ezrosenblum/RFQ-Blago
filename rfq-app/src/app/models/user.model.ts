@@ -42,3 +42,15 @@ export enum UserRole {
 }
 
 export type FileType = 'avatar' | 'certificate';
+
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message?: string;
+  data?: any;
+}
