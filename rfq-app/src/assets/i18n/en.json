@@ -273,6 +273,9 @@
     "SHOW_SELECTED": "Show Selected Only",
     "CLEAR_ALL": "Clear All",
     "SAVING": "Saving...",
-    "SAVE": "Save Specialties"
+    "SAVE": "Save Specialties",
+    "SAVE_ERROR_MESSAGE": "Failed to save specialties. Please try again.",
+    "SAVE_SUCCESS_MESSAGE": "Specialties saved successfully.",
+    "LOAD_CATEGORIES_ERROR_MESSAGE": "Failed to load categories. Please try again."
   }
 }

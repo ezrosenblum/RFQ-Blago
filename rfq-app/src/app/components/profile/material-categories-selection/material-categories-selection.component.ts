@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   ApiCategory,
   ApiSubcategory,
@@ -8,6 +8,8 @@ import {
 } from '../../../models/material-categories';
 import { CategoriesService } from '../../../services/materials';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: false,
@@ -28,13 +30,16 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
   isLoading: boolean = false;
   isSaving: boolean = false;
 
-  errorMsg: string = '';
-  successMsg: string = '';
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
 
   private destroy$ = new Subject<void>();
   private searchInput$ = new Subject<string>();
 
-  constructor(private categoriesService: CategoriesService) {
+  constructor(
+    private categoriesService: CategoriesService,
+    private translate: TranslateService
+  ) {
     this.setupSearchDebounce();
   }
 
@@ -75,9 +80,9 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
     this.updateFilteredCategories();
   }
 
-  private handleLoadError(error: any): void {
+  private handleLoadError(error: HttpErrorResponse): void {
     this.isLoading = false;
-    this.errorMsg = 'Failed to load categories. Please try again.';
+    this.showErrorMessage('PROFILE.LOAD_CATEGORIES_ERROR_MESSAGE', 5000);
   }
 
   toggleSelection(itemId: number, type: ItemType): void {
@@ -104,17 +109,24 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
   private selectCategory(categoryId: number, category: ApiCategory): void {
     this.selectedCategoryIds.add(categoryId);
 
-    const hasSelectedSubcategory = category.subcategories.some((sub) =>
-      this.selectedSubcategoryIds.has(sub.id)
-    );
-
-    if (!hasSelectedSubcategory && category.subcategories.length > 0) {
-      this.selectedSubcategoryIds.add(category.subcategories[0].id);
+    // Select ALL subcategories when category is selected
+    if (category.subcategories.length > 0) {
+      category.subcategories.forEach((subcategory) => {
+        this.selectedSubcategoryIds.add(subcategory.id);
+      });
     }
   }
 
   private deselectCategory(categoryId: number): void {
     this.selectedCategoryIds.delete(categoryId);
+
+    // Deselect ALL subcategories when category is deselected
+    const category = this.findCategoryById(categoryId);
+    if (category) {
+      category.subcategories.forEach((subcategory) => {
+        this.selectedSubcategoryIds.delete(subcategory.id);
+      });
+    }
   }
 
   private toggleSubcategorySelection(subcategoryId: number): void {
@@ -156,10 +168,36 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
       return this.selectedSubcategoryIds.has(itemId) ? 'full' : 'none';
     }
 
+    // For categories: check if category is fully selected
     if (this.selectedCategoryIds.has(itemId)) {
-      return 'full';
+      const category = this.findCategoryById(itemId);
+      if (!category) return 'none';
+
+      // If category has no subcategories, it's fully selected
+      if (category.subcategories.length === 0) {
+        return 'full';
+      }
+
+      // Check if ALL subcategories are selected
+      const allSubcategoriesSelected = category.subcategories.every((sub) =>
+        this.selectedSubcategoryIds.has(sub.id)
+      );
+
+      // Check if SOME subcategories are selected
+      const someSubcategoriesSelected = category.subcategories.some((sub) =>
+        this.selectedSubcategoryIds.has(sub.id)
+      );
+
+      if (allSubcategoriesSelected) {
+        return 'full';
+      } else if (someSubcategoriesSelected) {
+        return 'partial';
+      } else {
+        return 'none';
+      }
     }
 
+    // Category is not selected but check if some subcategories are selected
     const category = this.findCategoryById(itemId);
     if (!category) return 'none';
 
@@ -260,48 +298,11 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
     );
   }
 
-  private clearMessages(): void {
-    this.errorMsg = '';
-    this.successMsg = '';
-  }
-
   onSaveSpecialties(): void {
     if (this.isSaving) return;
-
     this.clearMessages();
-
-    const validationError = this.validateSelections();
-    if (validationError) {
-      this.errorMsg = validationError;
-      return;
-    }
-
     const payload = this.buildSavePayload();
     this.performSave(payload);
-  }
-
-  private validateSelections(): string | null {
-    if (this.selectedCategoryIds.size === 0) {
-      return 'Please select at least one category.';
-    }
-
-    const categoriesWithoutSubcategories = Array.from(
-      this.selectedCategoryIds
-    ).filter((categoryId) => {
-      const category = this.findCategoryById(categoryId);
-      return (
-        category &&
-        !category.subcategories.some((sub) =>
-          this.selectedSubcategoryIds.has(sub.id)
-        )
-      );
-    });
-
-    if (categoriesWithoutSubcategories.length > 0) {
-      return 'Please select at least one subcategory for each selected category.';
-    }
-
-    return null;
   }
 
   private buildSavePayload(): SaveUserCategoriesPayload {
@@ -342,14 +343,69 @@ export class MaterialCategoriesSelectionComponent implements OnInit {
 
   private handleSaveSuccess(): void {
     this.isSaving = false;
-    this.successMsg = 'Specialties saved successfully!';
-    setTimeout(() => {
-      this.successMsg = '';
-    }, 3000);
+    this.showSuccessMessage('PROFILE.SAVE_SUCCESS_MESSAGE', 3000);
   }
 
-  private handleSaveError(error: any): void {
+  private handleSaveError(error: HttpErrorResponse): void {
     this.isSaving = false;
-    this.errorMsg = 'Failed to save specialties. Please try again.';
+
+    // Handle specific HTTP status codes
+    let messageKey = 'PROFILE.SAVE_ERROR_MESSAGE';
+
+    if (error.status === 400) {
+      messageKey = 'PROFILE.VALIDATION_ERROR_MESSAGE';
+    } else if (error.status === 403) {
+      messageKey = 'PROFILE.PERMISSION_ERROR_MESSAGE';
+    } else if (error.status >= 500) {
+      messageKey = 'PROFILE.SERVER_ERROR_MESSAGE';
+    }
+
+    this.showErrorMessage(messageKey, 3000);
+  }
+
+  // Centralized message handling methods
+  private showErrorMessage(messageKey: string, duration: number = 3000): void {
+    this.scrollToTop();
+
+    this.translate.get(messageKey).subscribe((msg: string) => {
+      this.errorMessage = msg;
+      this.clearMessageAfterDelay(duration, 'error');
+    });
+  }
+
+  private showSuccessMessage(
+    messageKey: string,
+    duration: number = 3000
+  ): void {
+    this.scrollToTop();
+
+    this.translate.get(messageKey).subscribe((msg: string) => {
+      this.successMessage = msg;
+      this.clearMessageAfterDelay(duration, 'success');
+    });
+  }
+
+  private scrollToTop(): void {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  private clearMessageAfterDelay(
+    delay: number,
+    messageType: 'error' | 'success'
+  ): void {
+    setTimeout(() => {
+      if (messageType === 'error') {
+        this.errorMessage = null;
+      } else {
+        this.successMessage = null;
+      }
+    }, delay);
+  }
+
+  private clearMessages(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 }
