@@ -26,6 +26,8 @@ public sealed class SubmissionGetAllQueryHandler : IQueryHandler<SubmissionGetAl
         var submissions = await _dbContext.Submission
             .AsNoTracking()
             .Include(s => s.User)
+            .Include(s => s.Categories)
+            .Include(s => s.Subcategories)
             .ToListAsync(cancellationToken);
 
         var response = _mapper.Map<IReadOnlyCollection<SubmissionResponse>>(submissions);
