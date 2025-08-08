@@ -10,4 +10,6 @@ public interface ISubmissionFullSearchCriteria : IFullSearchCriteria<SubmissionF
     public int? Unit { get; }
     public DateTime? DateFrom { get; }
     public DateTime? DateTo { get; }
+    public List<int>? Category { get; }
+    public List<int>? Subcategory { get; }
 }

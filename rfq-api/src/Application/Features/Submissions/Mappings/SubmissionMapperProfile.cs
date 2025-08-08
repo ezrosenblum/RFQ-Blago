@@ -2,10 +2,13 @@
 using Application.Features.Submissions.Search;
 using AutoMapper;
 using Domain.Entities.Submissions;
+using Domain.Primitives;
 using DTO.Enums.Submission;
 using DTO.Notification;
+using DTO.Response;
 using DTO.Submission;
 using DTO.Submission.Report;
+using DTO.Submission.SubmissionStatusHistory;
 
 namespace Application.Features.Submissions.Mappings;
 
@@ -23,17 +26,44 @@ public sealed class SubmissionMapperProfile : Profile
                 src.StreetAddress,
                 src.LatitudeAddress,
                 src.LongitudeAddress,
+                src.CategoriesIds,
+                src.SubCategoriesIds,
                 default));
 
         CreateMap<Submission, SubmissionBaseResponse>()
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
 
         CreateMap<Submission, SubmissionResponse>()
+            .ForMember(s => s.StatusHistoryCount, opt => opt.MapFrom(d => d.StatusHistory.GroupBy(s => s.Status)
+                                                                                         .Select(s => new SubmissionStatusHistoryCountResponse()
+                                                                                         {
+                                                                                             Status = new ListItemBaseResponse()
+                                                                                             {
+                                                                                                 Id = (int)s.Key,
+                                                                                                 Name = s.Key.ToString()
+                                                                                             },
+                                                                                             Count = s.Count()
+                                                                                         })
+                                                                                         .ToList()))
             .ForMember(s => s.Quotes, opt => opt.MapFrom(d => d.SubmissionQuotes))
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
+
         CreateMap<Submission, SubmissionSearchable>()
+            .ForMember(s => s.StatusHistoryCount, opt => opt.MapFrom(d => d.StatusHistory.GroupBy(s => s.Status)
+                                                                                         .Select(s => new SubmissionStatusHistoryCountResponse()
+                                                                                         {
+                                                                                             Status = new ListItemBaseResponse()
+                                                                                             {
+                                                                                                 Id = (int)s.Key,
+                                                                                                 Name = s.Key.ToString()
+                                                                                             },
+                                                                                             Count = s.Count()
+                                                                                         })
+                                                                                         .ToList()))
             .ForMember(s => s.Quotes, opt => opt.MapFrom(d => d.SubmissionQuotes))
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
+
+        CreateMap<StatusHistory, SubmissionStatusHistoryResponse>();
 
         CreateMap<SubmissionResponse, SubmissionSearchable>();
 

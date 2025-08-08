@@ -12,5 +12,8 @@ public class SubmissionConfiguration : IEntityTypeConfiguration<Submission>
     {
         builder.Property(e => e.Media)
             .HasConversion<MediaToDbJsonConverter>();
+
+        builder.Property(e => e.StatusHistory)
+            .HasConversion<StatusHistoryToDbJsonConverter>();
     }
 }

@@ -1,19 +1,20 @@
 ﻿using Domain.Entities.Base;
 using Domain.Entities.Categories;
 using Domain.Entities.Medias;
+using Domain.Entities.Submissions.StatusHistories;
 using Domain.Entities.Submissions.SubmissionQuotes;
 using Domain.Entities.User;
 using Domain.Events;
 using Domain.Events.Submissions;
 using Domain.Interfaces;
+using Domain.Primitives;
 using DTO.Enums.Media;
 using DTO.Enums.Submission;
 using Microsoft.AspNetCore.Http;
-using System.Reflection;
 
 namespace Domain.Entities.Submissions
 {
-    public class Submission : BaseAuditableEntity, IHasDomainEvents, IWithMedia
+    public class Submission : BaseAuditableEntity, IHasDomainEvents, IWithMedia, IWithStatusHistory
     {
         public string? Title { get; private set; }
         public string Description { get; private set; } = null!;
@@ -26,8 +27,9 @@ namespace Domain.Entities.Submissions
         public double? LatitudeAddress { get; private set; }
         public int UserId { get; private set; }
         public Media Media { get; private set; } = null!;
-
         public ApplicationUser User { get; private set; } = null!;
+
+        public List<StatusHistory> StatusHistory { get; set; } = new List<StatusHistory>();
 
         public virtual ICollection<SubmissionQuote> SubmissionQuotes { get; set; } = new List<SubmissionQuote>();
 
@@ -37,6 +39,8 @@ namespace Domain.Entities.Submissions
         private Submission() { }
 
         private Submission(ISubmissionInsertData data,
+                           IReadOnlyCollection<Category> categories,
+                           IReadOnlyCollection<Subcategory> subcategories,
                            List<IFormFile>? files,
                            int userId)
         {
@@ -50,23 +54,42 @@ namespace Domain.Entities.Submissions
             LongitudeAddress = data.LongitudeAddress;
             LatitudeAddress = data.LatitudeAddress;
 
+            StatusHistory = new List<StatusHistory>();
             Media = new Media(MediaEntityType.Submission);
+
+            Categories = categories;
+            Subcategories = subcategories;
 
             AddDomainEvent(new SubmissionCreatedEvent(this, files));
         }
 
         public static Submission Create(ISubmissionInsertData data,
+                                        IReadOnlyCollection<Category> categories,
+                                        IReadOnlyCollection<Subcategory> subcategories,
                                         List<IFormFile>? files,
                                         int userId)
         {
-            return new Submission(data, files, userId);
+            return new Submission(data, categories, subcategories, files, userId);
+        }
+
+        public void CreateStatusHistory(
+            int vendorId,
+            SubmissionStatusHistoryType status,
+            IDateTime dateTimeProvider)
+        {
+            StatusHistory.Add(new StatusHistory()
+            {
+                Status = status,
+                VendorId = vendorId,
+                DateCreated = dateTimeProvider.Now
+            });
         }
 
         public void ChangeStatus(SubmissionStatus newStatus)
         {
-            if (Status == newStatus) 
+            if (Status == newStatus)
                 return;
-            
+
             Status = newStatus;
 
             AddDomainEvent(new SubmissionUpdatedEvent(this));
@@ -82,6 +105,48 @@ namespace Domain.Entities.Submissions
         public async Task RemoveFile(Guid fileId, IMediaStorage mediaStorage)
         {
             await Media.Delete(fileId, Id, mediaStorage);
+
+            AddDomainEvent(new SubmissionUpdatedEvent(this));
+        }
+        public void SetCategories(
+            IReadOnlyCollection<Category> categories,
+            IReadOnlyCollection<Subcategory> subcategories)
+        {
+            // Update Categories
+            if (Categories == null)
+            {
+                Categories = new List<Category>(categories);
+            }
+            else
+            {
+                var existingCategories = Categories
+                    .Where(current => categories.Any(newCategory => newCategory.Id == current.Id))
+                    .ToList();
+
+                var newCategories = categories
+                    .Where(newCategory => !Categories.Any(current => current.Id == newCategory.Id))
+                    .ToList();
+
+                Categories = existingCategories.Concat(newCategories).ToList();
+            }
+
+            // Update Subcategories
+            if (Subcategories == null)
+            {
+                Subcategories = new List<Subcategory>(subcategories);
+            }
+            else
+            {
+                var existingSubcategories = Subcategories
+                    .Where(current => subcategories.Any(newSub => newSub.Id == current.Id))
+                    .ToList();
+
+                var newSubcategories = subcategories
+                    .Where(newSub => !Subcategories.Any(current => current.Id == newSub.Id))
+                    .ToList();
+
+                Subcategories = existingSubcategories.Concat(newSubcategories).ToList();
+            }
 
             AddDomainEvent(new SubmissionUpdatedEvent(this));
         }

@@ -46,5 +46,9 @@
   "submission.notFound.error.message": "Submission not found",
   "submissionQuote.notFound.error.message": "Submission quote was not found.",
   "value.notFound.error.message": "Entity with the provided Id doesn't exist.",
-  "user.companyDetails.alreadyExists.message": "This user already has company details, try updating them."
+  "user.companyDetails.alreadyExists.message": "This user already has company details, try updating them.",
+  "enum.submissionStatusHistoryType.new": "New",
+  "enum.submissionStatusHistoryType.viewed": "Viewed",
+  "enum.submissionStatusHistoryType.quoted": "Quoted",
+  "enum.submissionStatusHistoryType.engaged": "Engaged"
 }

@@ -1,10 +1,12 @@
 ﻿using Application.Common.Helpers;
+using Application.Features.Notifications.Commands;
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.Queries;
 using Application.Features.Submissions.Search;
 using Application.Features.Submissions.SubmissionQuotes.Commands;
 using Application.Features.Submissions.SubmissionQuotes.Queries;
 using Application.Features.Submissions.SubmissionQuotes.Search;
+using Application.Features.Users.Commands;
 using AutoMapper;
 using DTO.Authentication;
 using DTO.Enums.Submission;
@@ -35,6 +37,12 @@ namespace Api.Controllers.v1
             return Ok();
         }
 
+        [HttpGet("{id:int}")]
+        public async Task<SubmissionResponse> GetSubmission([FromRoute] int id)
+        {
+            return await Mediator.Send(new SubmissionGetQuery(id, true));
+        }
+
         [Authorize(Policy = AuthorizationPolicies.Vendor)]
         [HttpGet]
         public async Task<IReadOnlyCollection<SubmissionResponse>> GetAll()
@@ -42,10 +50,25 @@ namespace Api.Controllers.v1
             return await Mediator.Send(new SubmissionGetAllQuery());
         }
 
+        [HttpPut("categories")]
+        public async Task<IActionResult> UpdateCategories([FromBody] SubmissionUpdateCategoriesCommand command)
+        {
+            await Mediator.Send(command);
+            return Ok();
+        }
+
         [HttpPost("search")]
         public async Task<PaginatedList<SubmissionSearchable>> FullSearch([FromBody] SubmissionFullSearchQuery request)
         {
             return await Mediator.Send(request);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPut("search/rebuild")]
+        public async Task<IActionResult> RebuildSearchIndex()
+        {
+            await Mediator.Send(new SubmissionInitiateSearchIndexRebuildCommand());
+            return Ok();
         }
 
         [Authorize(Policy = AuthorizationPolicies.Vendor)]
@@ -108,6 +131,14 @@ namespace Api.Controllers.v1
         public async Task<PaginatedList<SubmissionQuoteSearchable>> FullQuoteSearch([FromBody] SubmissionQuoteFullSearchQuery request)
         {
             return await Mediator.Send(request);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPut("quote/search/rebuild")]
+        public async Task<IActionResult> RebuildQuoteSearchIndex()
+        {
+            await Mediator.Send(new SubmissionQuoteInitiateSearchIndexRebuildCommand());
+            return Ok();
         }
 
         [HttpPut("quote/{id:int}/file")]
