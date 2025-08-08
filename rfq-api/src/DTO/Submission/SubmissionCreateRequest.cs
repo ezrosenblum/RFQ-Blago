@@ -12,5 +12,6 @@ public sealed record SubmissionCreateRequest
     public string? StreetAddress { get; init; }
     public double? LatitudeAddress { get; init; }
     public double? LongitudeAddress { get; init; }
-
+    public IReadOnlyCollection<int>? CategoriesIds { get; init; }
+    public IReadOnlyCollection<int>? SubCategoriesIds { get; init; }
 }

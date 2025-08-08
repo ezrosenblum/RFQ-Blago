@@ -63,9 +63,9 @@ public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<Submis
     }
 }
 
-public sealed class NotificationCreateCommandValidator : AbstractValidator<SubmissionQuoteCreateCommand>
+public sealed class SubmissionQuoteCreateCommandValidator : AbstractValidator<SubmissionQuoteCreateCommand>
 {
-    public NotificationCreateCommandValidator(
+    public SubmissionQuoteCreateCommandValidator(
         IRepository<Submission> submissionRepository,
         ILocalizationService localizationService)
     {

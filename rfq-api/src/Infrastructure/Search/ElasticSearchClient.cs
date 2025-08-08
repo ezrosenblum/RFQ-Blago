@@ -160,6 +160,24 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
                               BuildWildcardQuery("jobLocation", criteria.Query));
         }
 
+        if (criteria.Category?.Any() == true)
+        {
+            combinedQuery &= new TermsQuery
+            {
+                Field = "categories.id",
+                Terms = criteria.Category.Select(id => (object)id)
+            };
+        }
+
+        if (criteria.Subcategory?.Any() == true)
+        {
+            combinedQuery &= new TermsQuery
+            {
+                Field = "subcategories.id",
+                Terms = criteria.Subcategory.Select(id => (object)id)
+            };
+        }
+
         if (criteria.UserId.HasValue)
         {
             combinedQuery &= new TermQuery

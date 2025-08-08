@@ -23,6 +23,8 @@ public sealed record SubmissionFullSearchQuery(
     int? Unit,
     DateTime? DateFrom,
     DateTime? DateTo,
+    List<int>? Category,
+    List<int>? Subcategory,
     PaginationOptions Paging,
     SortOptions<SubmissionFullSearchSortField>? Sorting) : ISubmissionFullSearchCriteria, IQuery<PaginatedList<SubmissionSearchable>>;
 
@@ -57,26 +59,69 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
 
         if (_currentUserService.UserRole == UserRole.Vendor)
         {
-            response = await FilterSubmissionsByVendorGeoLocation(query, cancellationToken);
+            response = await FilterSubmissionsByVendorGeoLocationAndCategories(query, cancellationToken);
 
             response = SetVendorStatuses(response);
         }
+
+        else
+            response = await _searchClient.SearchSubmissionsAsync(query);
 
         response = RemoveHistoryItems(response);
 
         return response;
     }
-    private async Task<PaginatedList<SubmissionSearchable>> FilterSubmissionsByVendorGeoLocation(SubmissionFullSearchQuery query, CancellationToken cancellationToken)
+
+    private async Task<List<int>> FetchVendorCategories(CancellationToken cancellationToken)
+    {
+        var user = await _dbContext.User
+            .Where(s => s.Id == _currentUserService.UserId)
+            .Include(s => s.Categories)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user == null)
+            return new List<int>();
+
+        return user.Categories.Select(s => s.Id).ToList();
+    }
+
+    private async Task<List<int>> FetchVendorSubcategories(CancellationToken cancellationToken)
+    {
+        var user = await _dbContext.User
+            .Where(s => s.Id == _currentUserService.UserId)
+            .Include(s => s.Subcategories)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user == null)
+            return new List<int>();
+
+        return user.Subcategories.Select(s => s.Id).ToList();
+    }
+    private async Task<PaginatedList<SubmissionSearchable>> FilterSubmissionsByVendorGeoLocationAndCategories(SubmissionFullSearchQuery query, CancellationToken cancellationToken)
     {
         var company = await _dbContext.UserCompanyDetails
             .FirstOrDefaultAsync(d => d.UserId == _currentUserService.UserId, cancellationToken);
+
+        var categories = query.Category;
+        var subcategories = query.Subcategory;
+
+        if (query.Category == null || query.Category.Count == 0)
+            categories = await FetchVendorCategories(cancellationToken);
+
+        if (query.Subcategory == null || query.Subcategory.Count == 0)
+            subcategories = await FetchVendorSubcategories(cancellationToken);
 
         if (company != null &&
             company.LatitudeAddress.HasValue &&
             company.LongitudeAddress.HasValue &&
             company.OperatingRadius.HasValue)
         {
-            var result = await _searchClient.SearchSubmissionsAsync(query with { Paging = new PaginationOptions(1, 10000) });
+            var result = await _searchClient.SearchSubmissionsAsync(query with
+            {
+                Category = categories,
+                Subcategory = subcategories,
+                Paging = new PaginationOptions(1, 10000)
+            });
 
             var filteredItems = result.Items.Where(s =>
                 _geoCoverageService.IsPointWithinCoverage(
@@ -92,7 +137,11 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
             return new PaginatedList<SubmissionSearchable>(filteredItems, filteredItems.Count, query.Paging.PageNumber, query.Paging.PageSize);
         }
 
-        return await _searchClient.SearchSubmissionsAsync(query);
+        return await _searchClient.SearchSubmissionsAsync(query with
+        {
+            Category = categories,
+            Subcategory = subcategories
+        });
     }
     private PaginatedList<SubmissionSearchable> SetVendorStatuses(PaginatedList<SubmissionSearchable> response)
     {

@@ -6,6 +6,7 @@ using Application.Features.Submissions.Search;
 using Application.Features.Submissions.SubmissionQuotes.Commands;
 using Application.Features.Submissions.SubmissionQuotes.Queries;
 using Application.Features.Submissions.SubmissionQuotes.Search;
+using Application.Features.Users.Commands;
 using AutoMapper;
 using DTO.Authentication;
 using DTO.Enums.Submission;
@@ -47,6 +48,13 @@ namespace Api.Controllers.v1
         public async Task<IReadOnlyCollection<SubmissionResponse>> GetAll()
         {
             return await Mediator.Send(new SubmissionGetAllQuery());
+        }
+
+        [HttpPut("categories")]
+        public async Task<IActionResult> UpdateCategories([FromBody] SubmissionUpdateCategoriesCommand command)
+        {
+            await Mediator.Send(command);
+            return Ok();
         }
 
         [HttpPost("search")]

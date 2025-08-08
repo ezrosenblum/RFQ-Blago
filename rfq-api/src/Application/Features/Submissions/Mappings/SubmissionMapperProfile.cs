@@ -26,6 +26,8 @@ public sealed class SubmissionMapperProfile : Profile
                 src.StreetAddress,
                 src.LatitudeAddress,
                 src.LongitudeAddress,
+                src.CategoriesIds,
+                src.SubCategoriesIds,
                 default));
 
         CreateMap<Submission, SubmissionBaseResponse>()

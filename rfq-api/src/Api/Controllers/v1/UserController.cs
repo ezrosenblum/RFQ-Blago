@@ -125,7 +125,7 @@ public class UserController : ApiControllerBase
     }
 
     [HttpPut("categories")]
-    public async Task<IActionResult> Update([FromBody] UserUpdateCategoriesCommand command)
+    public async Task<IActionResult> UpdateCategories([FromBody] UserUpdateCategoriesCommand command)
     {
         await Mediator.Send(command);
         return Ok();
