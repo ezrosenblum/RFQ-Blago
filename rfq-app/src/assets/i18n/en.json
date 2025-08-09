@@ -149,7 +149,9 @@
     "MATCH": "Match",
     "MATCH_DESCRIPTION": "We connect you with qualified vendors",
     "RECEIVE": "Receive",
-    "RECEIVE_DESCRIPTION": "Get competitive quotes within 24-48 hours"
+    "RECEIVE_DESCRIPTION": "Get competitive quotes within 24-48 hours",
+    "TITLE": "Title",
+    "TITLE_PLACEHOLDER": "Enter a title for your project"
   },
 
   "VENDOR": {

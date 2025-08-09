@@ -197,7 +197,7 @@ export class ServiceAreasComponent {
     this.marker.setPosition(location);
 
     this.circle.setCenter(location);
-    this.circle.setRadius(this.rangeMiles * 1000);
+    this.circle.setRadius(this.rangeMiles * 1609.34);
 
     this.emitServiceAreaData();
   }

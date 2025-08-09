@@ -127,6 +127,26 @@
       </div>
 
       <form class="card-body space-y-6" [formGroup]="rfqForm" >
+        <div>
+          <label for="title">
+            {{ 'REQUEST.TITLE' | translate }} *
+            <span class="text-xs font-normal text-secondary-500 dark:text-secondary-400 ml-2">
+              ({{ getCharacterCount('title') }}/{{ getMaxLength('title') }})
+            </span>
+          </label>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            formControlName="title"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('title')"
+            placeholder="{{ 'REQUEST.TITLE_PLACEHOLDER' | translate }}"
+          />
+          <div *ngIf="isFieldInvalid('title')" class="form-error">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
         <!-- Description Field -->
         <div>
           <label for="description" class="form-label">

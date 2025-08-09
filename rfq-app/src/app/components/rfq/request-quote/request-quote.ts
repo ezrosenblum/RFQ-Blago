@@ -149,6 +149,7 @@ export class RequestQuote implements OnInit, OnDestroy {
         Validators.maxLength(200),
         this.noOnlyWhitespaceValidator
       ]],
+      title: ['', [Validators.required, Validators.maxLength(100)]],
       latitude: [null],
       longitude: [null], 
       attachments: [null]
@@ -193,17 +194,15 @@ export class RequestQuote implements OnInit, OnDestroy {
         rfqFormData.append('files', file, (file as File).name);
       });
 
-      let categoriesIds: number[] = [];
-      let subcategoriesIds: number[] = [];
-      selection.categoriesIds.forEach((id: number) => {
-        categoriesIds.push(id);
+      selection.categoriesIds.forEach((id: number, index) => {
+        rfqFormData.append(`CategoriesIds[${index}]`, id.toString());
       });
 
-      selection.subcategoriesIds.forEach((id: number) => {
-        subcategoriesIds.push(id);
+      selection.subcategoriesIds.forEach((id: number, index) => {
+        rfqFormData.append(`SubcategoriesIds[${index}]`, id.toString());
       });
 
-      rfqFormData.append('Title', this.rfqForm.value.title || ' ');
+      rfqFormData.append('Title', this.rfqForm.value.title || '');
       rfqFormData.append('Description', `${this.rfqForm.value.description}` || '');
       rfqFormData.append('Quantity', `${this.rfqForm.value.quantity?.toString()}` || '0');
       rfqFormData.append('Unit', this.rfqForm.get('unit')?.value || 0);
@@ -211,8 +210,6 @@ export class RequestQuote implements OnInit, OnDestroy {
       rfqFormData.append('StreetAddress', `${this.rfqForm.value.jobLocation}` || '');
       rfqFormData.append('LatitudeAddress', this.rfqForm.value.latitude?.toString() || '0');
       rfqFormData.append('LongitudeAddress', this.rfqForm.value.longitude?.toString() || '0');
-      // rfqFormData.append('CategoriesIds', JSON.stringify(categoriesIds));
-      // rfqFormData.append('SubcategoriesIds', JSON.stringify(subcategoriesIds));
 
       this.rfqService.createRfq(rfqFormData)
         .pipe(takeUntil(this.destroy$))
@@ -265,7 +262,11 @@ export class RequestQuote implements OnInit, OnDestroy {
       description: '',
       quantity: '',
       unit: '',
-      jobLocation: ''
+      jobLocation: '',
+      title: '',
+      latitude: '',
+      longitude: '',
+      streetAddress: ''
     });
 
     this.rfqForm.markAsUntouched();
@@ -325,7 +326,8 @@ export class RequestQuote implements OnInit, OnDestroy {
   getMaxLength(fieldName: string): number {
     const maxLengths: { [key: string]: number } = {
       description: 1000,
-      jobLocation: 200
+      jobLocation: 200,
+      title: 100
     };
     return maxLengths[fieldName] || 0;
   }
