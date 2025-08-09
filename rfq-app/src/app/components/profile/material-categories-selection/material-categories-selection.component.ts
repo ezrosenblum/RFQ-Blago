@@ -16,19 +16,22 @@ import {
   tap,
 } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { User } from '../../../models/user.model';
 import { AlertService } from '../../../services/alert.service';
 import { ErrorHandlerService } from '../../../services/error-handler.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-material-categories-selection',
   standalone: true,
+  imports: [TranslateModule, CommonModule],
   templateUrl: './material-categories-selection.component.html',
   styleUrl: './material-categories-selection.component.scss',
 })
 export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   @Input() user: User | null = null;
+  @Input() isRequestQuote!: boolean;
 
   categories: Category[] = [];
   filteredCategories: Category[] = [];
@@ -421,5 +424,9 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   private clearMessages(): void {
     this.errorMessage = null;
     this.successMessage = null;
+  }
+
+  public getSelectedData(): SaveUserCategoriesPayload {
+    return this.buildSavePayload();
   }
 }

@@ -1,11 +1,17 @@
 import { User } from "./user.model";
 
 export interface RfqRequest {
+  title: string;
   description: string;
   quantity: number;
   unit: number;
   jobLocation: string;
-  attachments: File[];
+  streetAddress: string;
+  latitudeAddress: number;
+  longitudeAddress: number;
+  categoriesIds: number[];
+  subcategoriesIds: number[];
+  files: File[];
 }
 
 

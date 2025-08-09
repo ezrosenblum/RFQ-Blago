@@ -13,6 +13,7 @@ import { environment } from '../../../../environments/environment';
 import * as FilePond from 'filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+import { MaterialCategoriesSelectionComponent } from '../../profile/material-categories-selection/material-categories-selection.component';
 
 FilePond.registerPlugin(
   FilePondPluginFileValidateType,
@@ -39,6 +40,8 @@ export class RequestQuote implements OnInit, OnDestroy {
   public selectedPlace: any = null;
   @ViewChild('jobLocationInput', { static: false }) jobLocationInput!: ElementRef;
   options: any;
+  @ViewChild(MaterialCategoriesSelectionComponent)
+  categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
 
   private destroy$ = new Subject<void>();
 
@@ -99,7 +102,7 @@ export class RequestQuote implements OnInit, OnDestroy {
     this.authService.currentUser$
     .pipe(takeUntil(this.destroy$))
     .subscribe(user => {
-      this.currentUser = user
+      this.currentUser = user;
       if (this.currentUser?.type === UserRole.CLIENT) {
           this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
           next: (units) => {
@@ -168,22 +171,50 @@ export class RequestQuote implements OnInit, OnDestroy {
     return null;
   }
 
-  onSubmit(): void {debugger
+  onSubmit(): void {
+    const selection = this.categoriesSelectionComp.getSelectedData();
     if (this.rfqForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       this.errorMessage = '';
       this.successMessage = '';
 
-      const uploadedFiles = this.rfqForm.value.attachments;
-      const rfqData: RfqRequest = {
-        description: this.rfqForm.value.description.trim(),
-        quantity: parseFloat(this.rfqForm.value.quantity),
-        unit: Number(this.rfqForm.value.unit),
-        jobLocation: this.rfqForm.value.jobLocation.trim(),
-        attachments: uploadedFiles
-      };
+      const rfqFormData: FormData = new FormData();
+      this.pondFiles.forEach((fileItem: any) => {
+        let file: File | Blob;
 
-      this.rfqService.createRfq(rfqData)
+        if (fileItem.file) {
+          file = fileItem.file;
+        } else if (fileItem instanceof File || fileItem instanceof Blob) {
+          file = fileItem;
+        } else {
+          return;
+        }
+
+        rfqFormData.append('files', file, (file as File).name);
+      });
+
+      let categoriesIds: number[] = [];
+      let subcategoriesIds: number[] = [];
+      selection.categoriesIds.forEach((id: number) => {
+        categoriesIds.push(id);
+      });
+
+      selection.subcategoriesIds.forEach((id: number) => {
+        subcategoriesIds.push(id);
+      });
+
+      rfqFormData.append('Title', this.rfqForm.value.title || ' ');
+      rfqFormData.append('Description', `${this.rfqForm.value.description}` || '');
+      rfqFormData.append('Quantity', `${this.rfqForm.value.quantity?.toString()}` || '0');
+      rfqFormData.append('Unit', this.rfqForm.get('unit')?.value || 0);
+      rfqFormData.append('JobLocation', this.rfqForm.value.jobLocation || '');
+      rfqFormData.append('StreetAddress', `${this.rfqForm.value.jobLocation}` || '');
+      rfqFormData.append('LatitudeAddress', this.rfqForm.value.latitude?.toString() || '0');
+      rfqFormData.append('LongitudeAddress', this.rfqForm.value.longitude?.toString() || '0');
+      // rfqFormData.append('CategoriesIds', JSON.stringify(categoriesIds));
+      // rfqFormData.append('SubcategoriesIds', JSON.stringify(subcategoriesIds));
+
+      this.rfqService.createRfq(rfqFormData)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {

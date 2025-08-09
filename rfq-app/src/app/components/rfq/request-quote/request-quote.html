@@ -126,7 +126,7 @@
         </p>
       </div>
 
-      <form class="card-body space-y-6" [formGroup]="rfqForm" (ngSubmit)="onSubmit()">
+      <form class="card-body space-y-6" [formGroup]="rfqForm" >
         <!-- Description Field -->
         <div>
           <label for="description" class="form-label">
@@ -246,7 +246,7 @@
           </div>
         </div>
 
-        <app-material-categories-selection></app-material-categories-selection>
+        <app-material-categories-selection [isRequestQuote]="true"></app-material-categories-selection>
 
         <!-- FilePond drag and drop input -->
         <file-pond
@@ -263,6 +263,7 @@
             type="submit"
             [disabled]="isSubmitting || rfqForm.invalid"
             class="btn btn-primary flex-1 sm:flex-none px-8 py-3 text-base font-medium"
+            (click)="onSubmit()"
           >
             <span *ngIf="!isSubmitting" class="flex items-center justify-center">
               <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
