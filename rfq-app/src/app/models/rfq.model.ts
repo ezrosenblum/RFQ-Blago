@@ -51,8 +51,9 @@ export interface Rfq {
   jobLocation?: string;
   user?: User;
   submissionDate?: Date;
-  category?: Category[];
-  subcategory?: Subcategory[];
+  categories?: Category[];
+  subcategories?: Subcategory[];
+  media: Media;
 }
 
 export interface RfqStatistics {
@@ -107,4 +108,19 @@ export interface Category {
   name: string;
   note: string;
   subcategories: Subcategory[];
+}
+
+export interface MediaItem {
+  id: string;
+  name: string;
+  isMain: boolean;
+  sortOrder: number;
+  size: number;
+  url: string;
+  type: number;
+  extension: string;
+}
+
+export interface Media {
+  items: MediaItem[];
 }

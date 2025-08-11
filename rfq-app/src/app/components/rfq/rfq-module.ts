@@ -8,12 +8,14 @@ import { VendorRfqs } from './vendor-rfqs/vendor-rfqs';
 import { FilePondModule } from 'ngx-filepond';
 import { TranslateModule } from '@ngx-translate/core';
 import { FileViewComponent } from "../../shared/file-view/file-view.component";
+import { RfqDetails } from './rfq-details/rfq-details';
 
 
 @NgModule({
   declarations: [
     RequestQuote,
-    VendorRfqs
+    VendorRfqs,
+    RfqDetails
   ],
   imports: [
     CommonModule,

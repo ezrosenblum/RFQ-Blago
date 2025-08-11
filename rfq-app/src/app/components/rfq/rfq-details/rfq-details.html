@@ -1,0 +1,112 @@
+<div class="min-h-screen bg-secondary-50 dark:bg-dark-900 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto card">
+    <div class="mb-6">
+      <button
+        type="button"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-800"
+        [routerLink]="['/vendor-rfqs']"
+      >
+        ← {{ 'SHARED.BACK' | translate }}
+      </button>
+    </div>
+    <div class="card-body space-y-6">
+
+      <!-- Status and Submission Date -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center space-x-3">
+          <span
+            *ngIf="rfq?.status"
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+            [ngClass]="getStatusColor(rfq?.status)"
+          >
+            {{ rfq?.status?.name }}
+          </span>
+          <span class="text-sm text-secondary-500 dark:text-secondary-400">
+            {{ rfq?.submissionDate | date:'mediumDate' }}
+          </span>
+        </div>
+        <div class="text-sm text-secondary-500 dark:text-secondary-400">
+          {{ 'VENDOR.ID' | translate }} {{ rfq?.id }}
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <h2 class="text-lg font-bold text-secondary-900 dark:text-secondary-100 mb-1">
+          {{ 'VENDOR.PROJECT_DESCRIPTION' | translate }}
+        </h2>
+        <p class="text-secondary-700 dark:text-secondary-300 leading-relaxed">
+          {{ rfq?.description }}
+        </p>
+      </div>
+
+      <!-- Quantity & Unit -->
+      <div class="flex items-center space-x-2">
+        <span class="text-sm font-medium text-secondary-700 dark:text-secondary-300">
+          {{ 'VENDOR.QTY' | translate }}
+        </span>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300"
+        >
+          {{ rfq?.quantity | number:'1.0-2' }}
+        </span>
+        <span class="text-sm">{{ 'VENDOR.UNIT_COLON' | translate }}</span>
+        <span
+          *ngIf="rfq?.unit?.name"
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+          [ngClass]="getUnitColor(rfq?.unit?.name)"
+        >
+          {{ rfq?.unit?.name }}
+        </span>
+      </div>
+
+      <!-- Location -->
+      <div *ngIf="rfq?.jobLocation">
+        <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400">
+          {{ 'VENDOR.LOCATION' | translate }}
+        </div>
+        <div class="text-secondary-900 dark:text-secondary-100">
+          {{ rfq?.jobLocation }}
+        </div>
+      </div>
+
+      <!-- Submitted By -->
+      <div *ngIf="rfq?.user" class="mb-6">
+        <h4 class="text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+          {{ 'VENDOR.SUBMITTED_BY' | translate }}
+        </h4>
+        <div class="flex items-center gap-3">
+          <div
+            class="flex items-center justify-center w-10 h-10 rounded-full bg-secondary-200 dark:bg-dark-700 text-secondary-900 dark:text-secondary-200 text-sm font-medium"
+            [title]="rfq?.user?.firstName + ' ' + rfq?.user?.lastName"
+          >
+            {{ getInitials(rfq?.user?.firstName, rfq?.user?.lastName) }}
+          </div>
+          <div>
+            <div class="font-medium text-secondary-900 dark:text-secondary-100">
+              {{ rfq?.user?.firstName }} {{ rfq?.user?.lastName }}
+            </div>
+            <div class="text-sm text-secondary-500 dark:text-secondary-400">
+              {{ rfq?.user?.email }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Media Section -->
+      <div *ngIf="(rfq?.media?.items?.length ?? 0) > 0">
+        <div class="text-sm font-medium text-secondary-500 dark:text-secondary-400 mb-2">
+          {{ 'VENDOR.ATTACHMENTS' | translate }}
+        </div>
+        <ul class="list-disc pl-5 space-y-1 text-sm text-primary-700 dark:text-primary-300">
+          <li *ngFor="let file of rfq?.media?.items">
+            <a [href]="file.url" target="_blank" class="hover:underline">
+              {{ file?.name }} ({{ (file?.size ?? 0) / 1024 | number:'1.0-0' }} KB)
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
