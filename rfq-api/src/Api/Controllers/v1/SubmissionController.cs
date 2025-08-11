@@ -121,6 +121,12 @@ namespace Api.Controllers.v1
             return Ok();
         }
 
+        [HttpGet("quote/{id:int}")]
+        public async Task<SubmissionQuoteResponse> GetSubmissionQuote([FromRoute] int id)
+        {
+            return await Mediator.Send(new SubmissionQuoteGetQuery(id));
+        }
+
         [HttpGet("quote")]
         public async Task<IReadOnlyCollection<SubmissionQuoteResponse>> GetAllQuotes()
         {
