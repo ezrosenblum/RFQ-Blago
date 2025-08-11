@@ -190,6 +190,10 @@ export class Auth {
     return localStorage.getItem('rfqTokenAcc');
   }
 
+  getRefreshToken() {
+    return localStorage.getItem('rfqTokenRef');
+  }
+
   isAuthenticated(): boolean {
     const token = this.getToken();
     return token !== null && !this.isTokenExpired(token);
@@ -235,6 +239,18 @@ export class Auth {
 
   isClient(): boolean {
     return this.hasRole(UserRole.CLIENT);
+  }
+
+ generateRefreshToken(): Observable<any> {
+    let token = new Token(this.getToken()!, this.getRefreshToken()!);
+    return this.http.post<Token>(
+      `${environment.apiUrl}Authenticate/refresh-token`,
+      token
+    ).pipe(
+      catchError(err => {
+        return throwError(() => err);
+      })
+    );
   }
 
   // Update user profile

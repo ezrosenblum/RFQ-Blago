@@ -6,7 +6,7 @@
 }
 
 .messages-section {
-    max-height: calc(100% - 250px);
+    max-height: calc(100% - 190px);
 }
 
 .dir-rtl {
@@ -53,4 +53,112 @@
     width: 100%;
     height: 150px;
     overflow-y: auto;
+}
+
+.h-screen {
+    height: 92vh !important;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.m-0 {
+    margin: 0 !important;
+}
+
+.pl-42 {
+    padding-left: 42px;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.hide {
+    opacity: 0;
+}
+
+.fs-24 {
+    font-size: 24px;
+}
+
+:host::ng-deep {
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+    }
+
+    .mat-mdc-form-field-infix {
+        padding: 0 !important;
+        max-height: 42px !important;
+    }
+
+    input, .mat-mdc-form-field-flex {
+        height: 42px !important;
+        font-size: 14px !important;
+        background-color: #1f2937 !important;
+    }
+
+    .mdc-notched-outline__leading {
+        border-left: 1px solid #4b5563 !important;
+        border-top: 1px solid #4b5563 !important;
+        border-bottom: 1px solid #4b5563 !important;
+        width: 10px !important;
+        border-top-left-radius: 7px !important;
+        border-bottom-left-radius: 7px !important;
+    }
+
+    .mdc-notched-outline__trailing {
+       border-right: 1px solid #4b5563 !important;
+        border-top: 1px solid #4b5563 !important;
+        border-bottom: 1px solid #4b5563 !important;
+        border-top-right-radius: 7px !important;
+        border-bottom-right-radius: 7px !important; 
+    }
+}
+
+.top-20 {
+    top: 20px;
+}
+
+.mr-10 {
+    margin-right: 10px !important;
+}
+
+.pl-35 {
+    padding-left: 35px;
+}
+
+@media (max-width: 900px) {
+    .messages-panel {
+        position: absolute;
+        top: 65px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 65px);
+        z-index: 10;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidenav-panel {
+        width: 100% !important;
+    }
+}
+
+@media (min-width: 900px) {
+    .ki-abstract-11 {
+        display: none;
+    }
+
+    .messages-panel {
+        opacity: 1 !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .company-panel {
+        display: none;
+    }
+
+
 }

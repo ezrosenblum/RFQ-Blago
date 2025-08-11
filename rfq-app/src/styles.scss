@@ -310,3 +310,15 @@ body {
  {
     --mat-button-text-state-layer-color: transparent !important;
  }
+ 
+.cdk-overlay-pane {
+    background-color: white !important;
+ }
+ 
+ .dark .cdk-overlay-pane {
+    background-color: #111827 !important;
+ }
+
+ .mdc-list-item__primary-text {
+    font-size: 12px !important;
+}

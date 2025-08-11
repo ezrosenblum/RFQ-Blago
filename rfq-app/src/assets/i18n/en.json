@@ -348,5 +348,12 @@
     "MANDATORY_FIELDS_REQUIRED": "Mandatory fields must be filled in!",
     "INVALID_STATUS": "Invalid status",
     "PROFILE_UPDATED": "Profile updated successfully"
+  },
+  "MESSAGES": {
+    "NO_CONVERSATIONS_FOUND": "No conversations found",
+    "MARK_AS_READ": "Mark as read",
+    "MARK_AS_UNREAD": "Mark as unread",
+    "ARCHIVE": "Archive",
+    "MESSAGES": "Messages"
   }
 }

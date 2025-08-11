@@ -1,29 +1,15 @@
 <div class="flex h-screen bg-white dark:bg-gray-900">
   <!-- Sidebar -->
-  <div
-    class="w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900"
+  <div class="w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900 sidenav-panel"
   >
     <!-- Header -->
-    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 chat-header">
       <div class="flex items-center justify-between mb-4">
         <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-          Messages
+          {{'MESSAGES.MESSAGES' | translate}}
         </h1>
-        <svg
-          class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-          ></path>
-        </svg>
       </div>
-      <div class="relative">
+      <div class="relative" *ngIf="!isAdmin">
         <svg
           class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
           fill="none"
@@ -43,9 +29,61 @@
           (input)="onSearchChange($event)"
           class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
         />
+      </div>
 
+      <div class="relative flex align-items-center mb-2" *ngIf="isAdmin">
+          <p class="mb-0 mr-10 flex-1">Vendor</p>       
+          <mat-form-field appearance="outline" class="flex-2">
+            <svg
+              class="absolute left-3 top-20 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+            <input type="text" matInput [formControl]="vendorSearchControl" [matAutocomplete]="auto" placeholder="Search" class="pl-35">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+              @for (option of filteredVendorOptions | async; track option) {
+                <mat-option [value]="option">{{option.name}}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+      </div>
+
+      <div class="relative flex align-items-center" *ngIf="isAdmin">
+          <p class="mb-0 mr-10 flex-1">Customer</p>       
+          <mat-form-field appearance="outline" class="flex-2">
+            <svg
+              class="absolute left-3 top-20 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+            <input type="text" matInput [formControl]="customerSearchControl" [matAutocomplete]="auto" placeholder="Search" class="pl-35">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+              @for (option of filteredCustomerOptions | async; track option) {
+                <mat-option [value]="option">{{option.name}}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+      </div>
+
+      <div class="relative mt-3" *ngIf="isAdmin">
         <svg
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 cursor-pointer"
+          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -54,14 +92,21 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m0 0L9 8.25m0 0L7.5 6M9 8.25L7.5 9.75M9 8.25H12m-4.5 6h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 12H7.5m0 0l1.5 2.25M9 12l-1.5 2.25"
+            d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           ></path>
         </svg>
+        <input
+          type="text"
+          placeholder="Search"
+          (input)="onSearchChange($event)"
+          class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+        />
       </div>
     </div>
 
     <!-- Conversations -->
-    <div class="flex-1 overflow-y-auto relative">
+    <!-- Vendor & Customer -->
+    <div class="flex-1 overflow-y-auto relative" *ngIf="!isAdmin">
       <div class="spinner mr-2" *ngIf="loadingConversations"></div>
       <div
         *ngFor="let conv of filteredConversations; let i = index"
@@ -73,23 +118,30 @@
             : '')
         "
       >
-        <div class="flex items-start space-x-3">
-          <div
+        <div class="flex flex-wrap items-start space-x-3">
+          <div (click)="triggerMessagesMobile()" matTooltip="{{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}" *ngIf="isAdmin"
             [class]="
               'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
-              conv.bgColor
+              mapLetterToElement(conv.vendor.firstName)
             ">
-            {{ conv.initials }}
+            {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
+          </div>
+          <div (click)="triggerMessagesMobile()" matTooltip="{{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}"
+            [class]="
+              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              mapLetterToElement(conv.submission.user.firstName)
+            ">
+            {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
-              <h3 class="font-medium text-gray-900 dark:text-white truncate" [matTooltip]="conv.company">
-                {{ conv.company }}
+              <h3 class="font-medium text-gray-900 dark:text-white truncate" matTooltip="{{ conv.title }}" (click)="triggerMessagesMobile()">
+                {{ conv.title }}
               </h3>
               <div class="flex">
-                <div class="text-xs text-gray-500 dark:text-gray-400 min-width-50 align-right ml-2">
+                <!-- <div class="text-xs text-gray-500 dark:text-gray-400 min-width-50 align-right ml-2">
                   {{ conv.time }}
-                </div>
+                </div> -->
                 <svg
                   [matMenuTriggerFor]="menu"
                   class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
@@ -108,74 +160,151 @@
                   <div class="p-3" [ngClass]="isDarkMode ? 'bg-dark' : 'bg-light'">
                     <button mat-menu-item>
                       <i class="ki-outline ki-sms text-base me-1 mr-2"></i>
-                      <span class="text-sm">Mark as read</span>
+                      <span class="text-sm">{{'MESSAGES.MARK_AS_READ' | translate}}</span>
                     </button>
                     <button mat-menu-item>
                       <i class="ki-outline ki-archive-tick text-base me-1 mr-2"></i>
-                      <span class="text-sm">Archive</span>
+                      <span class="text-sm">{{'MESSAGES.ARCHIVE' | translate}}</span>
                     </button>
                   </div>
                 </mat-menu>
               </div>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              {{ conv.project }}
+          </div>
+          <div class="w-100 m-0" [ngClass]="{'pl-42': !isAdmin}">
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1" (click)="triggerMessagesMobile()">
+              {{ conv.submission.title }}
             </p>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
+            <!-- <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate" (click)="triggerMessagesMobile()">
               {{ conv.lastMessage }}
-            </p>
+            </p> -->
           </div>
         </div>
-        <div
+
+        <!-- <div
           *ngIf="conv.hasIndicator"
           class="flex items-center justify-end mt-2"
         >
           <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+        </div> -->
+      </div>
+    </div>
+    <!-- Admin -->
+    <div class="flex-1 overflow-y-auto relative" *ngIf="isAdmin">
+      <div class="spinner mr-2" *ngIf="loadingConversations"></div>
+      <div
+        *ngFor="let conv of filteredAdminConversations; let i = index"
+        (click)="selectChat(i)"
+        [class]="
+          'p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ' +
+          (selectedChatIndex === i
+            ? 'bg-blue-50 dark:bg-blue-900/20 border-r-2 border-r-blue-500'
+            : '')
+        "
+      >
+        <div class="flex flex-wrap items-start space-x-3">
+          <div (click)="triggerMessagesMobile()" matTooltip="{{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}" *ngIf="isAdmin"
+            [class]="
+              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              mapLetterToElement(conv.vendor.firstName)
+            ">
+            {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
+          </div>
+          <div (click)="triggerMessagesMobile()" matTooltip="{{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}"
+            [class]="
+              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              mapLetterToElement(conv.vendor.firstName)
+            ">
+            {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h3 class="font-medium text-gray-900 dark:text-white truncate" [matTooltip]="conv.title" (click)="triggerMessagesMobile()">
+                {{ conv.title }}
+              </h3>
+              <div class="flex">
+                <!-- <div class="text-xs text-gray-500 dark:text-gray-400 min-width-50 align-right ml-2">
+                  {{ conv.time }}
+                </div> -->
+                <svg
+                  [matMenuTriggerFor]="menu"
+                  class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  ></path>
+                </svg>
+                <mat-menu #menu="matMenu">
+                  <div class="p-3" [ngClass]="isDarkMode ? 'bg-dark' : 'bg-light'">
+                    <button mat-menu-item>
+                      <i class="ki-outline ki-sms text-base me-1 mr-2"></i>
+                      <span class="text-sm">{{'MESSAGES.MARK_AS_READ' | translate}}</span>
+                    </button>
+                    <button mat-menu-item>
+                      <i class="ki-outline ki-archive-tick text-base me-1 mr-2"></i>
+                      <span class="text-sm">{{'MESSAGES.ARCHIVE' | translate}}</span>
+                    </button>
+                  </div>
+                </mat-menu>
+              </div>
+            </div>
+          </div>
+          <div class="w-100 m-0" [ngClass]="{'pl-42': !isAdmin}">
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1" (click)="triggerMessagesMobile()">
+              {{ conv.submission.title }}
+            </p>
+            <!-- <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate" (click)="triggerMessagesMobile()">
+              {{ conv.title }}
+            </p> -->
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Empty data -->
+    <div
+      *ngIf="!loadingConversations && filteredConversations.length === 0 && filteredAdminConversations.length === 0"
+      class="flex items-start justify-center h-full text-gray-500 dark:text-gray-400 pt-10">
+          <i class="ki-outline ki-messages text-base me-1 mr-2 fs-24"></i>
+          <span class="text-sm">{{'MESSAGES.NO_CONVERSATIONS_FOUND' | translate}}</span>
+    </div>
+
   </div>
 
   <!-- Main Chat Area -->
-  <div class="flex-1 flex flex-col bg-white dark:bg-gray-900">
+  <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 messages-panel" [@messagesSidenavMobile]="sidenavTrigger">
     <!-- Chat Header -->
-    <div
+    <div  
       class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div
+          <div *ngIf="selectedConversation"
             [class]="
               'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-              selectedConversation.bgColor
+              mapLetterToElement(selectedConversation.vendor.firstName)
             "
           >
-            {{ selectedConversation.initials }}
+            {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
           </div>
-          <div>
+          <div *ngIf="selectedConversation">
             <h2 class="font-semibold text-gray-900 dark:text-white">
-              {{ selectedConversation.company }}
+              {{ selectedConversation.submission.title }}
             </h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ selectedConversation.project }}
+              {{ selectedConversation.title }}
             </p>
           </div>
         </div>
         <div class="flex items-center space-x-2">
           <svg
-            class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <svg
+            (click)="removeConversation()"
             class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
             fill="none"
             stroke="currentColor"
@@ -188,30 +317,13 @@
               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
             ></path>
           </svg>
-          <svg
-            class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-            ></path>
-          </svg>
+          <i class="ki-outline ki-abstract-11 cursor-pointer text-base me-1 mr-2" (click)="sidenavTrigger = 'out'"></i>
         </div>
       </div>
       <div class="flex items-center space-x-4 mt-2 text-sm">
         <span class="text-gray-500 dark:text-gray-400"
           >🟢 2:16 PM GMT+1 (1 h behind)</span
         >
-        <button
-          class="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium"
-        >
-          View proposal
-        </button>
       </div>
     </div>
 
@@ -229,7 +341,7 @@
             msg.bgColor
           "
         >
-          {{ msg.initials }}
+          {{ transform(msg.sender) }}
         </div>
         <div class="flex-1">
           <div class="flex items-center space-x-2 mb-1">
@@ -288,19 +400,6 @@
       </div>
       <div class="flex items-center space-x-3">
         <svg
-          class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 4.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
-          ></path>
-        </svg>
-        <svg
           (click)="openFileUploadDialog()"
           class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
           fill="none"
@@ -312,32 +411,6 @@
             stroke-linejoin="round"
             stroke-width="2"
             d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
-          ></path>
-        </svg>
-        <svg
-          class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"
-          ></path>
-        </svg>
-        <svg
-          class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
           ></path>
         </svg>
         <div class="flex-1">
@@ -363,173 +436,27 @@
   </div>
 
   <!-- Right Sidebar -->
-  <div
-    class="w-80 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
+  <div class="w-80 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 company-panel"
   >
     <!-- Profile Section -->
     <div
       class="p-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
     >
-      <div class="text-center">
+      <div class="text-center" *ngIf="selectedConversation">
         <div
           [class]="
             'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium ' +
-            selectedConversation.bgColor
+            mapLetterToElement(selectedConversation.vendor.firstName)
           "
         >
-          {{ selectedConversation.initials }}
+          {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
         </div>
         <h3 class="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
-          {{ selectedConversation.company }}
+          {{ selectedConversation.submission.title }}
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-          {{ selectedConversation.project }}
+          {{ selectedConversation.title }}
         </p>
-      </div>
-    </div>
-
-    <!-- Activity Timeline -->
-    <div class="p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h4 class="font-medium text-gray-900 dark:text-white">
-          Activity timeline
-        </h4>
-        <svg
-          class="w-4 h-4 text-gray-400 dark:text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m19 9-7 7-7-7"
-          ></path>
-        </svg>
-      </div>
-      <div class="space-y-4">
-        <div
-          *ngFor="let activity of activities"
-          class="flex items-start space-x-3"
-        >
-          <div
-            [class]="
-              'w-6 h-6 rounded-full flex items-center justify-center ' +
-              activity.bgColor
-            "
-          >
-            <svg
-              class="w-3 h-3 text-white"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                *ngIf="activity.icon === 'check'"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-              <path
-                *ngIf="activity.icon === 'x'"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-              <path
-                *ngIf="activity.icon === 'settings'"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-              ></path>
-              <path
-                *ngIf="activity.icon === 'play'"
-                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10v4a2 2 0 002 2h2a2 2 0 002-2v-4M9 10a2 2 0 012-2h2a2 2 0 012 2m-6 9h6"
-              ></path>
-            </svg>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-gray-900 dark:text-white">
-              {{ activity.title }}
-            </p>
-            <p
-              *ngIf="activity.subtitle"
-              class="text-xs text-gray-500 dark:text-gray-400"
-            >
-              {{ activity.subtitle }}
-            </p>
-            <p
-              *ngIf="activity.date"
-              class="text-xs text-gray-500 dark:text-gray-400"
-            >
-              {{ activity.date }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Search Messages -->
-    <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-      <div
-        class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-800 dark:hover:text-gray-100"
-      >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          ></path>
-        </svg>
-        <span>Search messages</span>
-        <svg
-          class="w-4 h-4 ml-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m19 9-7 7-7-7"
-          ></path>
-        </svg>
-      </div>
-    </div>
-
-    <!-- Client Profile -->
-    <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-      <div
-        class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-800 dark:hover:text-gray-100"
-      >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          ></path>
-        </svg>
-        <span>Client profile</span>
-        <svg
-          class="w-4 h-4 ml-auto"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m19 9-7 7-7-7"
-          ></path>
-        </svg>
       </div>
     </div>
   </div>

@@ -133,6 +133,7 @@ export class Header implements OnInit, OnDestroy {
     this.authService.logout();
   }
 
+
   getUserDisplayName(): string {
     if (!this.currentUser) return '';
 
