@@ -113,7 +113,8 @@
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
     "UNKNOWN_ERROR": "Unknown error",
-    "TRY_AGAIN_LATER": "Please try again later."
+    "TRY_AGAIN_LATER": "Please try again later.",
+    "BACK": "Back"
   },
   "REQUEST": {
     "WELCOME_BACK": "Welcome back,",
@@ -194,8 +195,12 @@
     "NO_RFQS_FOUND": "No RFQs found",
     "ADJUST_FILTERS": "Try adjusting your search criteria.",
     "NO_SUBMISSIONS_YET": "No quote requests have been submitted yet.",
-    "CATEGORY": "Category",
-    "SUBCATEGORY": "Subcategory"
+    "CATEGORIES": "Categories",
+    "SUBCATEGORIES": "Subcategories",
+    "VIEW_DETAILS": "View Details",
+    "ATTACHMENTS": "Attachments",
+    "SHOW_MORE": "Show More",
+    "SHOW_LESS": "Show Less"
   },
 
   "HEADER": {
@@ -322,8 +327,7 @@
     "PASSWORD_CHANGE_FAILED": "Failed to change password",
     "INCORRECT_CURRENT_PASSWORD": "Current password is incorrect.",
     "INVALID_PASSWORD_FORMAT": "Invalid password format.",
-    "CONFIRM_PASSWORD_CHANGE": "Are you sure you want to change your password?",
-    "CHANGE_PASSWORD": "Change Password"
+    "CONFIRM_PASSWORD_CHANGE": "Are you sure you want to change your password?"
   },
   "ALERTS": {
     "CONFIRM": "Confirm",

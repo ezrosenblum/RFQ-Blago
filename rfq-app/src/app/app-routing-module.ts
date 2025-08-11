@@ -2,23 +2,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth-guard';
-import { VendorRfqs } from './components/rfq/vendor-rfqs/vendor-rfqs';
 import { MessagesComponent } from './components/messages/messages';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/request-quote',
-    pathMatch: 'full',
+    loadChildren: () =>
+      import('./components/rfq/rfq-module').then(m => m.RfqModule),
   },
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth-module').then((m) => m.AuthModule),
-  },
-  {
-    path: 'request-quote',
-    loadChildren: () =>
-      import('./components/rfq/rfq-module').then((m) => m.RfqModule),
   },
   {
     path: 'profile',
@@ -29,11 +23,6 @@ const routes: Routes = [
     path: 'messages',
     component: MessagesComponent,
     canActivate: [AuthGuard]
-  },
-  {
-    path: 'vendor-rfqs',
-    component: VendorRfqs,
-    canActivate: [AuthGuard],
   },
   {
     path: '**',

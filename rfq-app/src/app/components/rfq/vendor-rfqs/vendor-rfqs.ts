@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { LookupValue, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse } from '../../../models/rfq.model';
+import { Category, LookupValue, Rfq, RfqStatistics, RfqStatus, Subcategory, SubmissionTableRequest, TableResponse } from '../../../models/rfq.model';
 import { User, UserRole } from '../../../models/user.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
@@ -70,6 +70,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
   subcategoryOptions: Subcategory[] = [];
   categoryDropdownOpen = false;
   subcategoryDropdownOpen = false;
+  showAllCategories = false;
+  showAllSubcategories = false;
 
   sortOptions = [
     { value: 1, label: 'Submission Date' },
