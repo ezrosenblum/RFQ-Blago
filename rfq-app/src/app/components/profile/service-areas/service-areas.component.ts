@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, NgZone, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
@@ -15,9 +15,15 @@ declare var google: GoogleMapsApi;
 export class ServiceAreasComponent {
   @ViewChild('locationInput') locationInput!: ElementRef;
   @ViewChild('mapContainer') mapContainer!: ElementRef;
+  @Output() serviceAreaChange = new EventEmitter<{
+    streetAddress: string;
+    latitude: number;
+    longitude: number;
+    radius: number;
+  }>();
 
   selectedLocation: string = '';
-  rangeKm: number = 10;
+  rangeMiles: number = 10;
   
   private map: any;
   private autocomplete: any;
@@ -25,10 +31,16 @@ export class ServiceAreasComponent {
   private circle: any;
   selectedPlaceDetails: any = null;
 
+  StreetAddress: string = '';
+  LatitudeAddress: number = 0;
+  LongitudeAddress: number = 0;
+  OperatingRadius: number = 0;
+
   constructor(private ngZone: NgZone) {}
 
-  ngOnInit() {
-    this.loadGoogleMaps();
+
+  ngAfterViewInit() {
+   this.loadGoogleMaps();
   }
 
   private loadGoogleMaps() {
@@ -38,7 +50,7 @@ export class ServiceAreasComponent {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.apiUrl}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
@@ -138,8 +150,8 @@ export class ServiceAreasComponent {
     this.autocomplete = new google.maps.places.Autocomplete(
       this.locationInput.nativeElement,
       {
-        types: ['(cities)'],
-        fields: ['place_id', 'geometry', 'name', 'formatted_address']
+        types: ['geocode'],
+        fields: ['place_id', 'geometry', 'name', 'formatted_address', 'address_components']
       }
     );
 
@@ -157,7 +169,7 @@ export class ServiceAreasComponent {
     this.circle = new google.maps.Circle({
       map: this.map,
       center: defaultLocation,
-      radius: this.rangeKm * 1000,
+      radius: this.rangeMiles * 1609.34,
       fillColor: '#3B82F6',
       fillOpacity: 0.1,
       strokeColor: '#3B82F6',
@@ -185,17 +197,19 @@ export class ServiceAreasComponent {
     this.marker.setPosition(location);
 
     this.circle.setCenter(location);
-    this.circle.setRadius(this.rangeKm * 1000);
+    this.circle.setRadius(this.rangeMiles * 1609.34);
+
+    this.emitServiceAreaData();
   }
 
   onRangeChange() {
-    if (this.circle && this.rangeKm) {
-      this.circle.setRadius(this.rangeKm * 1000);
+    if (this.circle && this.rangeMiles) {
+      this.circle.setRadius(this.rangeMiles * 1609.34);
 
       let zoom = 12;
-      if (this.rangeKm <= 5) zoom = 14;
-      else if (this.rangeKm <= 15) zoom = 12;
-      else if (this.rangeKm <= 50) zoom = 10;
+      if (this.rangeMiles <= 5) zoom = 14;
+      else if (this.rangeMiles <= 15) zoom = 12;
+      else if (this.rangeMiles <= 50) zoom = 10;
       else zoom = 8;
       
       this.map.setZoom(zoom);
@@ -207,7 +221,7 @@ export class ServiceAreasComponent {
   }
 
   getCurrentRange(): number {
-    return this.rangeKm;
+    return this.rangeMiles;
   }
 
   getLocationCoordinates(): { lat: number, lng: number } | null {
@@ -218,5 +232,19 @@ export class ServiceAreasComponent {
       };
     }
     return null;
+  }
+
+  emitServiceAreaData() {
+    this.StreetAddress = this.selectedPlaceDetails.formatted_address;
+    this.LatitudeAddress = this.selectedPlaceDetails.geometry.location.lat();
+    this.LongitudeAddress = this.selectedPlaceDetails.geometry.location.lng();
+    this.OperatingRadius = this.rangeMiles;
+
+    this.serviceAreaChange.emit({
+      streetAddress: this.StreetAddress,
+      latitude: this.LatitudeAddress,
+      longitude: this.LongitudeAddress,
+      radius: this.OperatingRadius,
+    });
   }
 }

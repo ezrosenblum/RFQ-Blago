@@ -24,7 +24,7 @@ export class RfqService {
     private authService: Auth
   ) {}
 
-  createRfq(rfqData: RfqRequest): Observable<boolean | null> {
+  createRfq(rfqData: FormData): Observable<boolean | null> {
     return this.http.post<boolean>(`${this.API_URL}Submission`, rfqData)
       .pipe(
         map(response => {

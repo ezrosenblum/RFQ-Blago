@@ -9,6 +9,7 @@ import { FilePondModule } from 'ngx-filepond';
 import { TranslateModule } from '@ngx-translate/core';
 import { FileViewComponent } from "../../shared/file-view/file-view.component";
 import { RfqDetails } from './rfq-details/rfq-details';
+import { MaterialCategoriesSelectionComponent } from '../profile/material-categories-selection/material-categories-selection.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { RfqDetails } from './rfq-details/rfq-details';
     RfqRoutingModule,
     FilePondModule,
     TranslateModule,
-    FileViewComponent
+    FileViewComponent,
+    MaterialCategoriesSelectionComponent
   ]
 })
 

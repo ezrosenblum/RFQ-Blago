@@ -126,7 +126,27 @@
         </p>
       </div>
 
-      <form class="card-body space-y-6" [formGroup]="rfqForm" (ngSubmit)="onSubmit()">
+      <form class="card-body space-y-6" [formGroup]="rfqForm" >
+        <div>
+          <label for="title">
+            {{ 'REQUEST.TITLE' | translate }} *
+            <span class="text-xs font-normal text-secondary-500 dark:text-secondary-400 ml-2">
+              ({{ getCharacterCount('title') }}/{{ getMaxLength('title') }})
+            </span>
+          </label>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            formControlName="title"
+            class="form-input"
+            [class.border-error-500]="isFieldInvalid('title')"
+            placeholder="{{ 'REQUEST.TITLE_PLACEHOLDER' | translate }}"
+          />
+          <div *ngIf="isFieldInvalid('title')" class="form-error">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
         <!-- Description Field -->
         <div>
           <label for="description" class="form-label">
@@ -221,6 +241,7 @@
           </label>
           <div class="relative">
             <input
+              #jobLocationInput
               id="jobLocation"
               name="jobLocation"
               type="text"
@@ -228,6 +249,7 @@
               class="form-input"
               [class.border-error-500]="isFieldInvalid('jobLocation')"
               placeholder="Enter job site address or location"
+              autocomplete="off"
             >
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,6 +266,8 @@
           </div>
         </div>
 
+        <app-material-categories-selection [isRequestQuote]="true"></app-material-categories-selection>
+
         <!-- FilePond drag and drop input -->
         <file-pond
           class="mt-5"
@@ -259,6 +283,7 @@
             type="submit"
             [disabled]="isSubmitting || rfqForm.invalid"
             class="btn btn-primary flex-1 sm:flex-none px-8 py-3 text-base font-medium"
+            (click)="onSubmit()"
           >
             <span *ngIf="!isSubmitting" class="flex items-center justify-center">
               <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,6 +364,6 @@
       </div>
     </div>
 
-    <app-file-view [files]="attachedFiles"></app-file-view>
+    <!-- <app-file-view [files]="attachedFiles"></app-file-view> -->
   </div>
 </div>

@@ -13,11 +13,11 @@
             <label for="range" class="block text-sm font-medium text-gray-100 mb-2">
                 {{ 'SERVICE_AREA.RANGE' | translate }}
             </label>
-            <input type="number" id="range" [(ngModel)]="rangeKm" (ngModelChange)="onRangeChange()" min="1" max="1000"
+            <input type="number" id="range" [(ngModel)]="rangeMiles" (ngModelChange)="onRangeChange()" min="1" max="1000"
                 [placeholder]="'SERVICE_AREA.RANGE_PLACEHOLDER' | translate"
                 class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             <div class="mt-1 text-xs text-gray-400">
-                {{ 'SERVICE_AREA.RANGE_INFO' | translate }}: {{ rangeKm || 0 }} {{ 'SERVICE_AREA.KM' | translate }}
+                {{ 'SERVICE_AREA.RANGE_INFO' | translate }}: {{ rangeMiles || 0 }} {{ 'SERVICE_AREA.MI' | translate }}
             </div>
         </div>
     </div>
@@ -33,7 +33,7 @@
             <div><strong>{{ 'SERVICE_AREA.ADDRESS' | translate }}:</strong> {{ selectedPlaceDetails.formatted_address }}</div>
             <div><strong>{{ 'SERVICE_AREA.COORDINATES' | translate }}:</strong> {{ selectedPlaceDetails.geometry.location.lat() }}, {{
                 selectedPlaceDetails.geometry.location.lng() }}</div>
-            <div *ngIf="rangeKm"><strong>{{ 'SERVICE_AREA.RANGE' | translate }}:</strong> {{ rangeKm }} {{ 'SERVICE_AREA.KM_RADIUS' | translate }}</div>
+            <div *ngIf="rangeMiles"><strong>{{ 'SERVICE_AREA.RANGE' | translate }}:</strong> {{ rangeMiles }} {{ 'SERVICE_AREA.MI_RADIUS' | translate }}</div>
         </div>
     </div>
 </div>

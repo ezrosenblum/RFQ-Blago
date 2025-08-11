@@ -1,14 +1,24 @@
 import { ActualFileObject, FilePondInitialFile } from 'filepond';
 // src/app/rfq/request-quote/request-quote.component.ts
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { User, UserRole } from '../../../models/user.model';
-import { LookupValue, RfqRequest } from '../../../models/rfq.model';
+import { GoogleMapsApi, LookupValue, RfqRequest } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
 import { FileItem } from '../../../models/form-validation';
+import { environment } from '../../../../environments/environment';
+import * as FilePond from 'filepond';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+import { MaterialCategoriesSelectionComponent } from '../../profile/material-categories-selection/material-categories-selection.component';
+
+FilePond.registerPlugin(
+  FilePondPluginFileValidateType,
+  FilePondPluginFileValidateSize
+);
 
 @Component({
   selector: 'app-request-quote',
@@ -22,11 +32,19 @@ export class RequestQuote implements OnInit, OnDestroy {
   isSubmitting = false;
   successMessage = '';
   errorMessage = '';
-  currentUser: User | null = null;
+  currentUser: User | null = null;  
+  selectedLocation: string = '';
+
+  private isGoogleMapsLoaded = false;
+  private autocomplete: any;
+  public selectedPlace: any = null;
+  @ViewChild('jobLocationInput', { static: false }) jobLocationInput!: ElementRef;
+  options: any;
+  @ViewChild(MaterialCategoriesSelectionComponent)
+  categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
 
   private destroy$ = new Subject<void>();
 
-  // Unit options for dropdown
   unitOptions: LookupValue[] = [];
 
   pondOptions = {
@@ -37,7 +55,6 @@ export class RequestQuote implements OnInit, OnDestroy {
 
   pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
 
-  // Dummy data for file view component
   attachedFiles: FileItem[] = [
     {
       id: '1',
@@ -59,32 +76,45 @@ export class RequestQuote implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: Auth,
     private rfqService: RfqService,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
-    // Subscribe to current user
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.currentUser = user;
+    this.loadData(); 
+  }
 
-        if (this.currentUser?.type === UserRole.CLIENT) {
-           this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
-            next: (units) => {
-              this.unitOptions = units;
-            },
-            error: (error) => {
-              console.error('Failed to load RFQ units:', error);
-              this.errorMessage = 'Failed to load unit options. Please try again later.';
-            }
-          });
-        }
+  ngAfterViewInit(): void {
+    this.loadGoogleMapsAPI()
+      .then(() => {
+        this.isGoogleMapsLoaded = true;
+        this.initializeOptions();
+        this.initializeAutocomplete();
+      })
+      .catch(error => {
+        console.error('Failed to load Google Maps API:', error);
       });
+  }
 
-    // Auto-focus first field
+  loadData(): void {
+    this.authService.currentUser$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(user => {
+      this.currentUser = user;
+      if (this.currentUser?.type === UserRole.CLIENT) {
+          this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
+          next: (units) => {
+            this.unitOptions = units;
+          },
+          error: (error) => {
+            this.errorMessage = 'Failed to load unit options. Please try again later.';
+          }
+        });
+      }
+    });
+
     setTimeout(() => {
       const firstInput = document.getElementById('description');
       if (firstInput) {
@@ -119,12 +149,13 @@ export class RequestQuote implements OnInit, OnDestroy {
         Validators.maxLength(200),
         this.noOnlyWhitespaceValidator
       ]],
+      title: ['', [Validators.required, Validators.maxLength(100)]],
+      latitude: [null],
+      longitude: [null], 
       attachments: [null]
     });
-
   }
 
-  // Custom validator for positive numbers
   private positiveNumberValidator(control: any) {
     const value = control.value;
     if (value !== null && (isNaN(value) || value <= 0)) {
@@ -133,7 +164,6 @@ export class RequestQuote implements OnInit, OnDestroy {
     return null;
   }
 
-  // Custom validator to prevent only whitespace
   private noOnlyWhitespaceValidator(control: any) {
     const value = control.value;
     if (value && typeof value === 'string' && value.trim().length === 0) {
@@ -143,21 +173,45 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    const selection = this.categoriesSelectionComp.getSelectedData();
     if (this.rfqForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       this.errorMessage = '';
       this.successMessage = '';
 
-      const uploadedFiles = this.rfqForm.value.attachments;
-      const rfqData: RfqRequest = {
-        description: this.rfqForm.value.description.trim(),
-        quantity: parseFloat(this.rfqForm.value.quantity),
-        unit: Number(this.rfqForm.value.unit),
-        jobLocation: this.rfqForm.value.jobLocation.trim(),
-        attachments: uploadedFiles
-      };
+      const rfqFormData: FormData = new FormData();
+      this.pondFiles.forEach((fileItem: any) => {
+        let file: File | Blob;
 
-      this.rfqService.createRfq(rfqData)
+        if (fileItem.file) {
+          file = fileItem.file;
+        } else if (fileItem instanceof File || fileItem instanceof Blob) {
+          file = fileItem;
+        } else {
+          return;
+        }
+
+        rfqFormData.append('files', file, (file as File).name);
+      });
+
+      selection.categoriesIds.forEach((id: number, index) => {
+        rfqFormData.append(`CategoriesIds[${index}]`, id.toString());
+      });
+
+      selection.subcategoriesIds.forEach((id: number, index) => {
+        rfqFormData.append(`SubcategoriesIds[${index}]`, id.toString());
+      });
+
+      rfqFormData.append('Title', this.rfqForm.value.title || '');
+      rfqFormData.append('Description', `${this.rfqForm.value.description}` || '');
+      rfqFormData.append('Quantity', `${this.rfqForm.value.quantity?.toString()}` || '0');
+      rfqFormData.append('Unit', this.rfqForm.get('unit')?.value || 0);
+      rfqFormData.append('JobLocation', this.rfqForm.value.jobLocation || '');
+      rfqFormData.append('StreetAddress', `${this.rfqForm.value.jobLocation}` || '');
+      rfqFormData.append('LatitudeAddress', this.rfqForm.value.latitude?.toString() || '0');
+      rfqFormData.append('LongitudeAddress', this.rfqForm.value.longitude?.toString() || '0');
+
+      this.rfqService.createRfq(rfqFormData)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -165,9 +219,7 @@ export class RequestQuote implements OnInit, OnDestroy {
             this.successMessage = 'Your quote request has been submitted successfully! We will review it and get back to you soon.';
             this.resetForm();
 
-            // Auto-scroll to success message
             setTimeout(() => {
-              console.log(this.successMessage)
               const successElement = document.querySelector('.alert-success');
               if (successElement) {
                 successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -210,10 +262,13 @@ export class RequestQuote implements OnInit, OnDestroy {
       description: '',
       quantity: '',
       unit: '',
-      jobLocation: ''
+      jobLocation: '',
+      title: '',
+      latitude: '',
+      longitude: '',
+      streetAddress: ''
     });
 
-    // Reset form state
     this.rfqForm.markAsUntouched();
     this.rfqForm.markAsPristine();
   }
@@ -234,7 +289,6 @@ export class RequestQuote implements OnInit, OnDestroy {
     }, 100);
   }
 
-  // Helper methods for template
   isFieldInvalid(fieldName: string): boolean {
     const field = this.rfqForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
@@ -272,7 +326,8 @@ export class RequestQuote implements OnInit, OnDestroy {
   getMaxLength(fieldName: string): number {
     const maxLengths: { [key: string]: number } = {
       description: 1000,
-      jobLocation: 200
+      jobLocation: 200,
+      title: 100
     };
     return maxLengths[fieldName] || 0;
   }
@@ -293,7 +348,6 @@ export class RequestQuote implements OnInit, OnDestroy {
     }
   }
 
-  // Get form completion percentage
   getFormCompletionPercentage(): number {
     const totalFields = Object.keys(this.rfqForm.controls).length;
     let filledFields = 0;
@@ -322,18 +376,123 @@ export class RequestQuote implements OnInit, OnDestroy {
     return unitOption?.name || '';
   }
 
-  onFilesUpdated(files: (string| FilePondInitialFile | Blob | ActualFileObject)[]): void {
+  onFilesUpdated(files: any): void {
+    if (!files || !Array.isArray(files)) {
+      this.pondFiles = [];
+      this.rfqForm.get('attachments')?.setValue([]);
+      return;
+    }
+
     this.pondFiles = files;
 
-    const rawFiles: File[] = files
-    .map(file => {
-      if (typeof file === 'string') return null;
-      if ('file' in file) return file.file as File;
-      if (file instanceof Blob) return file as File;
-      return null;
-    })
-    .filter((f): f is File => f !== null);
+    const rawFiles = files
+      .map(f => {
+        if (typeof f === 'string') return null;
+        if ('file' in f) return f.file as File;
+        if (f instanceof Blob) return f as File;
+        return null;
+      })
+      .filter((f): f is File => f !== null);
 
     this.rfqForm.get('attachments')?.setValue(rawFiles);
+  }
+
+  private loadGoogleMapsAPI(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+        resolve(google);
+        return;
+      }
+
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(google));
+        existingScript.addEventListener('error', reject);
+        return;
+      }
+
+      (window as any).initMap = () => {
+        resolve(google);
+      };
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&libraries=places&callback=initMap`;
+      script.async = true;
+      script.defer = true;
+
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  private initializeAutocomplete() {
+    if (!this.isGoogleMapsLoaded || typeof google === 'undefined' || !google.maps || !google.maps.places) return;
+
+    if (!this.jobLocationInput?.nativeElement) return;
+
+    const input = this.jobLocationInput.nativeElement;
+
+    let options: google.maps.places.AutocompleteOptions = {
+      fields: [
+        'place_id',
+        'formatted_address',
+        'name',
+        'geometry.location',
+        'address_components'
+      ]
+    };
+
+    this.autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    this.autocomplete.addListener('place_changed', () => {
+      this.ngZone.run(() => {
+        const place = this.autocomplete.getPlace();
+        this.onPlaceSelected(place);
+      });
+    });
+  }
+
+  public isGoogleMapsReady(): boolean {
+    return Boolean(
+      this.isGoogleMapsLoaded &&
+      typeof google !== 'undefined' &&
+      google.maps &&
+      google.maps.places
+    );
+  }
+
+  private initializeOptions(): void {
+    if (typeof google !== 'undefined' && google.maps) {
+      this.options = {
+        types: ['address', 'establishment', 'geocode', 'postal_code', '(cities)', '(regions)'],
+        fields: [
+          'place_id', 
+          'formatted_address', 
+          'name', 
+          'geometry.location',
+          'address_components',
+          'types',
+          'vicinity'
+        ]
+      };
+    }
+  }
+
+  private onPlaceSelected(place: google.maps.places.PlaceResult) {
+    if (!place.geometry) {
+      return;
+    }
+
+    const addressComponents = place.address_components || [];
+    const city = addressComponents.find(c => c.types.includes('locality'))?.long_name || '';
+    const state = addressComponents.find(c => c.types.includes('administrative_area_level_1'))?.long_name || '';
+    const postalCode = addressComponents.find(c => c.types.includes('postal_code'))?.long_name || '';
+    const country = addressComponents.find(c => c.types.includes('country'))?.long_name || '';
+
+    this.rfqForm.patchValue({
+      jobLocation: place.formatted_address,
+      latitude: place.geometry.location?.lat(),
+      longitude: place.geometry.location?.lng()
+    });
   }
 }

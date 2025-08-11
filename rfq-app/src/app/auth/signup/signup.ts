@@ -540,4 +540,18 @@ export class Signup implements OnInit {
   navigateToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
+
+  handleServiceAreaChange(data: {
+    streetAddress: string;
+    latitude: number;
+    longitude: number;
+    radius: number;
+  }) {
+    this.signupForm.patchValue({
+      businessAddress: data.streetAddress,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      operatingRadius: data.radius,
+    })
+  }
 }
