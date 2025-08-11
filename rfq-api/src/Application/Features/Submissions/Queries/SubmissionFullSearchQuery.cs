@@ -164,10 +164,17 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
     {
         foreach (var item in response.Items)
         {
-            item.StatusHistory = new List<SubmissionStatusHistoryResponse>();
-
             if (_currentUserService.UserRole == UserRole.Vendor)
+            {
+                item.StatusHistory = item.StatusHistory
+                    .Where(s => s.VendorId == _currentUserService.UserId)
+                    .OrderByDescending(s => s.DateCreated)
+                    .ToList();
                 item.StatusHistoryCount = new List<SubmissionStatusHistoryCountResponse>();
+            }
+
+            else
+                item.StatusHistory = new List<SubmissionStatusHistoryResponse>();
         }
 
         return response;

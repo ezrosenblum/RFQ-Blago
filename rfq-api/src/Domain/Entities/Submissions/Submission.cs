@@ -75,7 +75,8 @@ namespace Domain.Entities.Submissions
         public void CreateStatusHistory(
             int vendorId,
             SubmissionStatusHistoryType status,
-            IDateTime dateTimeProvider)
+            IDateTime dateTimeProvider,
+            bool addDomainEvent = false)
         {
             StatusHistory.Add(new StatusHistory()
             {
@@ -83,6 +84,9 @@ namespace Domain.Entities.Submissions
                 VendorId = vendorId,
                 DateCreated = dateTimeProvider.Now
             });
+
+            if (addDomainEvent)
+                AddDomainEvent(new SubmissionUpdatedEvent(this));
         }
 
         public void ChangeStatus(SubmissionStatus newStatus)

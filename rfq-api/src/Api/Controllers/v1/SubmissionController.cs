@@ -63,6 +63,14 @@ namespace Api.Controllers.v1
             return await Mediator.Send(request);
         }
 
+        [Authorize(Policy = AuthorizationPolicies.Vendor)]
+        [HttpPut("{id:int}/viewed")]
+        public async Task<IActionResult> MarkAsViewed([FromRoute] int id)
+        {
+            await Mediator.Send(new SubmissionMarkAsViewedCommand(id));
+            return Ok();
+        }
+
         [Authorize(Roles = "Administrator")]
         [HttpPut("search/rebuild")]
         public async Task<IActionResult> RebuildSearchIndex()
