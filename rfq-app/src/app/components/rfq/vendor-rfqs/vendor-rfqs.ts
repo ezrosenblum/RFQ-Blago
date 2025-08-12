@@ -16,6 +16,7 @@ import {
 import { User, UserRole } from '../../../models/user.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -93,7 +94,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: Auth,
     private rfqService: RfqService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
     this.initializeFilterForm();
   }
@@ -135,7 +137,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadStatuses() {
+  loadStatuses(): void {
     this.rfqService
       .getRfqStatuses()
       .pipe(takeUntil(this.destroy$))
@@ -143,15 +145,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
         next: (statuses) => {
           this.statusOptions = statuses;
         },
-        error: (error) => {
-          console.error('Failed to load RFQ statuses:', error);
-          this.errorMessage =
-            'Failed to load status options. Please try again later.';
+        error: () => {
+          this.errorMessage = this.translate.instant('VENDOR.LOAD_STATUSES');
         },
       });
   }
 
-  loadCategories() {
+  loadCategories(): void {
     this.rfqService
       .getRfqSCategories()
       .pipe(takeUntil(this.destroy$))
@@ -160,10 +160,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.categoryOptions = categories;
           this.updateSubcategoriesFromSelected();
         },
-        error: (error) => {
-          console.error('Failed to load RFQ categories:', error);
-          this.errorMessage =
-            'Failed to load category options. Please try again later.';
+        error: () => {
+          this.errorMessage = this.translate.instant('VENDOR.LOAD_CATEGORIES');
         },
       });
   }
@@ -281,8 +279,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
         next: (stats) => {
           this.statistics = stats;
         },
-        error: (error) => {
-          console.error('Failed to load statistics:', error);
+        error: () => {
+          this.errorMessage = this.translate.instant('VENDOR.LOAD_STATISTICS');
         },
       });
   }
@@ -358,11 +356,9 @@ export class VendorRfqs implements OnInit, OnDestroy {
       .subscribe({
         next: (updatedRfq) => {
           this.isUpdating = false;
-          this.successMessage = `RFQ status updated!`;
+          this.successMessage = this.translate.instant('VENDOR.STATUS_UPDATED');
           this.loadStatistics();
           this.loadRfqs();
-
-          // Clear success message after 3 seconds
           setTimeout(() => {
             this.successMessage = '';
           }, 3000);
@@ -376,16 +372,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   private handleError(error: any): void {
     if (error.status === 401) {
-      this.errorMessage = 'Your session has expired. Please log in again.';
+      this.errorMessage = this.translate.instant('ERROR.SESSION_EXPIRED');
       this.authService.logout();
     } else if (error.status === 403) {
-      this.errorMessage = 'You do not have permission to view this content.';
+      this.errorMessage = this.translate.instant('ERROR.NO_PERMISSION');
     } else if (error.status === 0) {
-      this.errorMessage =
-        'Unable to connect to server. Please check your internet connection.';
+      this.errorMessage = this.translate.instant('ERROR.NO_CONNECTION');
     } else {
       this.errorMessage =
-        error.error?.message || 'An error occurred while loading RFQs.';
+        error.error?.message || this.translate.instant('ERROR.LOAD_RFQS');
     }
   }
 
@@ -566,7 +561,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
   toggleSubcategoryDropdown(): void {
     if (this.isSubcategoryDisabled) {
-      this.flashInfo('Please first select categories');
+      this.flashInfo(this.translate.instant('VENDOR.PLEASE_SELECT_CATEGORIES'));
       return;
     }
     this.subcategoryDropdownOpen = !this.subcategoryDropdownOpen;
@@ -629,7 +624,9 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   getCategoryDisplayText(): string {
     const selectedIds = this.filterForm.value.category || [];
-    if (selectedIds.length === 0) return 'Select categories';
+    if (selectedIds.length === 0) {
+      return this.translate.instant('VENDOR.SELECT_CATEGORIES');
+    }
 
     const selectedNames = this.categoryOptions
       .filter((option) => selectedIds.includes(option.id))
@@ -640,7 +637,9 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   getSubcategoryDisplayText(): string {
     const selectedIds = this.filterForm.value.subcategory || [];
-    if (selectedIds.length === 0) return 'Select subcategories';
+    if (selectedIds.length === 0) {
+      return this.translate.instant('VENDOR.SELECT_SUBCATEGORIES');
+    }
 
     const selectedNames = this.subcategoryOptions
       .filter((option) => selectedIds.includes(option.id))
@@ -648,6 +647,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
     return selectedNames.join(', ');
   }
+
   // Expose Math to template
   Math = Math;
 }

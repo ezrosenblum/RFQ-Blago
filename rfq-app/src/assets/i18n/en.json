@@ -202,9 +202,21 @@
     "VIEW_DETAILS": "View Details",
     "ATTACHMENTS": "Attachments",
     "SHOW_MORE": "Show More",
-    "SHOW_LESS": "Show Less"
+    "SHOW_LESS": "Show Less",
+    "PLEASE_SELECT_CATEGORIES": "Please select categories.",
+    "SELECT_CATEGORIES": "Select categories",
+    "SELECT_SUBCATEGORIES": "Select subcategories",
+    "STATUS_UPDATED": "RFQ status updated!",
+    "LOAD_STATISTICS": "Failed to load statistics. Please try again later.",
+    "LOAD_CATEGORIES": "Failed to load category options. Please try again later.",
+    "LOAD_STATUSES": "Failed to load status options. Please try again later."
   },
-
+  "ERROR": {
+    "SESSION_EXPIRED": "Your session has expired. Please log in again.",
+    "NO_PERMISSION": "You do not have permission to view this content.",
+    "NO_CONNECTION": "Unable to connect to server. Please check your internet connection.",
+    "LOAD_RFQS": "An error occurred while loading RFQs."
+  },
   "HEADER": {
     "VIEW_RFQS": "View RFQs",
     "SIGN_UP": "Sign Up",
