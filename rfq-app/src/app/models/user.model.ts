@@ -66,8 +66,8 @@ export interface ChangePasswordResponse {
 }
 
 export interface MessageConevrsationRequest {
-  vendorId: number,
-  submissionUserId: number,
+  vendorId: number | null,
+  submissionUserId: number | null,
   paging: {
     pageNumber: number,
     pageSize: number
