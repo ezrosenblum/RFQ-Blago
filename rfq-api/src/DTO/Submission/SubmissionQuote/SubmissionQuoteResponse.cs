@@ -5,5 +5,5 @@ namespace DTO.Submission.SubmissionQuote;
 public record SubmissionQuoteResponse : SubmissionQuoteBaseResponse
 {
     public SubmissionBaseResponse Submission { get; init; } = new();
-    public QuoteMessageResponse? LastMesssage { get; init; }
+    public QuoteMessageResponse? LastMessage { get; init; }
 }
