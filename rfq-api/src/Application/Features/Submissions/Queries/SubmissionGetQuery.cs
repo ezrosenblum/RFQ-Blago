@@ -45,6 +45,9 @@ public sealed class SubmissionGetQueryHandler : IQueryHandler<SubmissionGetQuery
         if (submission == null)
             throw new NotFoundException(_localizationService.GetValue("submission.notFound.error.message"));
 
+        if (_currentUserService.UserRole == UserRole.Customer && submission.UserId != _currentUserService.UserId)
+            throw new UnauthorizedAccessException(_localizationService.GetValue("submission.unauthorized.error.message"));
+
         var response = _mapper.Map<SubmissionResponse>(submission);
 
         if (query.ReturnCount)

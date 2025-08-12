@@ -1,11 +1,22 @@
 import { ActualFileObject, FilePondInitialFile } from 'filepond';
 // src/app/rfq/request-quote/request-quote.component.ts
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  ViewChild,
+  NgZone,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { User, UserRole } from '../../../models/user.model';
-import { GoogleMapsApi, LookupValue, RfqRequest } from '../../../models/rfq.model';
+import {
+  GoogleMapsApi,
+  LookupValue,
+  RfqRequest,
+} from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
 import { FileItem } from '../../../models/form-validation';
@@ -14,6 +25,7 @@ import * as FilePond from 'filepond';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import { MaterialCategoriesSelectionComponent } from '../../profile/material-categories-selection/material-categories-selection.component';
+import { TranslateService } from '@ngx-translate/core';
 
 FilePond.registerPlugin(
   FilePondPluginFileValidateType,
@@ -24,7 +36,7 @@ FilePond.registerPlugin(
   selector: 'app-request-quote',
   standalone: false,
   templateUrl: './request-quote.html',
-  styleUrls: ['./request-quote.scss']
+  styleUrls: ['./request-quote.scss'],
 })
 export class RequestQuote implements OnInit, OnDestroy {
   rfqForm!: FormGroup;
@@ -32,13 +44,15 @@ export class RequestQuote implements OnInit, OnDestroy {
   isSubmitting = false;
   successMessage = '';
   errorMessage = '';
-  currentUser: User | null = null;  
+  currentUser: User | null = null;
   selectedLocation: string = '';
+  clearData: Subject<boolean> = new Subject<boolean>();
 
   private isGoogleMapsLoaded = false;
   private autocomplete: any;
   public selectedPlace: any = null;
-  @ViewChild('jobLocationInput', { static: false }) jobLocationInput!: ElementRef;
+  @ViewChild('jobLocationInput', { static: false })
+  jobLocationInput!: ElementRef;
   options: any;
   @ViewChild(MaterialCategoriesSelectionComponent)
   categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
@@ -50,7 +64,7 @@ export class RequestQuote implements OnInit, OnDestroy {
   pondOptions = {
     allowMultiple: true,
     maxFiles: 5,
-    labelIdle: 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+    labelIdle: '',
   };
 
   pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
@@ -61,15 +75,15 @@ export class RequestQuote implements OnInit, OnDestroy {
       name: 'document.pdf',
       size: 2048576,
       lastModified: new Date('2024-01-15'),
-      type: 'application/pdf'
+      type: 'application/pdf',
     },
     {
-      id: '2',  
+      id: '2',
       name: 'image.png',
       size: 1024000,
       lastModified: new Date('2024-01-16'),
-      type: 'image/png'
-    }
+      type: 'image/png',
+    },
   ];
 
   constructor(
@@ -77,13 +91,23 @@ export class RequestQuote implements OnInit, OnDestroy {
     private authService: Auth,
     private rfqService: RfqService,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private translate: TranslateService
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
-    this.loadData(); 
+    this.loadData();
+    this.setLabelIdleTranslations();
+
+    this.translate.onLangChange
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.setLabelIdleTranslations());
+  }
+
+  private setLabelIdleTranslations(): void {
+    this.pondOptions.labelIdle = this.translate.instant('VENDOR.LABEL_IDLE');
   }
 
   ngAfterViewInit(): void {
@@ -93,27 +117,30 @@ export class RequestQuote implements OnInit, OnDestroy {
         this.initializeOptions();
         this.initializeAutocomplete();
       })
-      .catch(error => {
-        console.error('Failed to load Google Maps API:', error);
+      .catch(() => {
+        this.errorMessage = this.translate.instant('VENDOR.LOAD_GOOGLE_MAPS');
       });
   }
 
   loadData(): void {
     this.authService.currentUser$
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(user => {
-      this.currentUser = user;
-      if (this.currentUser?.type === UserRole.CLIENT) {
-          this.rfqService.getRfqUnits().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (units) => {
-            this.unitOptions = units;
-          },
-          error: (error) => {
-            this.errorMessage = 'Failed to load unit options. Please try again later.';
-          }
-        });
-      }
-    });
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => {
+        this.currentUser = user;
+        if (this.currentUser?.type === UserRole.CLIENT) {
+          this.rfqService
+            .getRfqUnits()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (units) => {
+                this.unitOptions = units;
+              },
+              error: () => {
+                this.errorMessage = this.translate.instant('VENDOR.LOAD_UNITS');
+              },
+            });
+        }
+      });
 
     setTimeout(() => {
       const firstInput = document.getElementById('description');
@@ -124,35 +151,45 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearData.complete();
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   private initializeForm(): void {
     this.rfqForm = this.fb.group({
-      description: ['', [
-        Validators.required,
-        Validators.minLength(10),
-        Validators.maxLength(1000),
-        this.noOnlyWhitespaceValidator
-      ]],
-      quantity: ['', [
-        Validators.required,
-        Validators.min(0.01),
-        Validators.max(1000000),
-        this.positiveNumberValidator
-      ]],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(1000),
+          this.noOnlyWhitespaceValidator,
+        ],
+      ],
+      quantity: [
+        '',
+        [
+          Validators.required,
+          Validators.min(0.01),
+          Validators.max(1000000),
+          this.positiveNumberValidator,
+        ],
+      ],
       unit: ['', [Validators.required]],
-      jobLocation: ['', [
-        Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(200),
-        this.noOnlyWhitespaceValidator
-      ]],
+      jobLocation: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(200),
+          this.noOnlyWhitespaceValidator,
+        ],
+      ],
       title: ['', [Validators.required, Validators.maxLength(100)]],
       latitude: [null],
-      longitude: [null], 
-      attachments: [null]
+      longitude: [null],
+      attachments: [null],
     });
   }
 
@@ -203,26 +240,48 @@ export class RequestQuote implements OnInit, OnDestroy {
       });
 
       rfqFormData.append('Title', this.rfqForm.value.title || '');
-      rfqFormData.append('Description', `${this.rfqForm.value.description}` || '');
-      rfqFormData.append('Quantity', `${this.rfqForm.value.quantity?.toString()}` || '0');
+      rfqFormData.append(
+        'Description',
+        `${this.rfqForm.value.description}` || ''
+      );
+      rfqFormData.append(
+        'Quantity',
+        `${this.rfqForm.value.quantity?.toString()}` || '0'
+      );
       rfqFormData.append('Unit', this.rfqForm.get('unit')?.value || 0);
       rfqFormData.append('JobLocation', this.rfqForm.value.jobLocation || '');
-      rfqFormData.append('StreetAddress', `${this.rfqForm.value.jobLocation}` || '');
-      rfqFormData.append('LatitudeAddress', this.rfqForm.value.latitude?.toString() || '0');
-      rfqFormData.append('LongitudeAddress', this.rfqForm.value.longitude?.toString() || '0');
+      rfqFormData.append(
+        'StreetAddress',
+        `${this.rfqForm.value.jobLocation}` || ''
+      );
+      rfqFormData.append(
+        'LatitudeAddress',
+        this.rfqForm.value.latitude?.toString() || '0'
+      );
+      rfqFormData.append(
+        'LongitudeAddress',
+        this.rfqForm.value.longitude?.toString() || '0'
+      );
 
-      this.rfqService.createRfq(rfqFormData)
+      this.rfqService
+        .createRfq(rfqFormData)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
             this.isSubmitting = false;
-            this.successMessage = 'Your quote request has been submitted successfully! We will review it and get back to you soon.';
+            this.successMessage = this.translate.instant(
+              'VENDOR.SUBMIT_SUCCESS'
+            );
+
             this.resetForm();
 
             setTimeout(() => {
               const successElement = document.querySelector('.alert-success');
               if (successElement) {
-                successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                successElement.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center',
+                });
               }
             }, 1000);
 
@@ -233,7 +292,7 @@ export class RequestQuote implements OnInit, OnDestroy {
           error: (error) => {
             this.isSubmitting = false;
             this.handleSubmissionError(error);
-          }
+          },
         });
     } else {
       this.markFormGroupTouched();
@@ -243,16 +302,18 @@ export class RequestQuote implements OnInit, OnDestroy {
 
   private handleSubmissionError(error: any): void {
     if (error.status === 401) {
-      this.errorMessage = 'Your session has expired. Please log in again.';
+      this.errorMessage = this.translate.instant('ERROR.SESSION_EXPIRED');
       this.authService.logout();
     } else if (error.status === 400) {
-      this.errorMessage = 'Invalid data provided. Please check your inputs and try again.';
+      this.errorMessage = this.translate.instant('ERROR.INVALID_DATA');
     } else if (error.status === 429) {
-      this.errorMessage = 'Too many requests. Please wait a moment and try again.';
+      this.errorMessage = this.translate.instant('ERROR.TOO_MANY_REQUESTS');
     } else if (error.status === 0) {
-      this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      this.errorMessage = this.translate.instant('ERROR.NO_CONNECTION');
     } else {
-      this.errorMessage = error.error?.message || 'Failed to submit request. Please try again.';
+      this.errorMessage =
+        error.error?.message ||
+        this.translate.instant('ERROR.SUBMISSION_FAILED');
     }
   }
 
@@ -266,7 +327,7 @@ export class RequestQuote implements OnInit, OnDestroy {
       title: '',
       latitude: '',
       longitude: '',
-      streetAddress: ''
+      streetAddress: '',
     });
 
     this.rfqForm.markAsUntouched();
@@ -274,7 +335,7 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.rfqForm.controls).forEach(key => {
+    Object.keys(this.rfqForm.controls).forEach((key) => {
       const control = this.rfqForm.get(key);
       control?.markAsTouched();
     });
@@ -297,13 +358,30 @@ export class RequestQuote implements OnInit, OnDestroy {
   getFieldError(fieldName: string): string {
     const field = this.rfqForm.get(fieldName);
     if (field && field.errors && field.touched) {
-      if (field.errors['required']) return `${this.getFieldDisplayName(fieldName)} is required`;
-      if (field.errors['minlength']) return `${this.getFieldDisplayName(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
-      if (field.errors['maxlength']) return `${this.getFieldDisplayName(fieldName)} must not exceed ${field.errors['maxlength'].requiredLength} characters`;
-      if (field.errors['min']) return `${this.getFieldDisplayName(fieldName)} must be greater than ${field.errors['min'].min}`;
-      if (field.errors['max']) return `${this.getFieldDisplayName(fieldName)} must not exceed ${field.errors['max'].max}`;
-      if (field.errors['positiveNumber']) return `${this.getFieldDisplayName(fieldName)} must be a positive number`;
-      if (field.errors['onlyWhitespace']) return `${this.getFieldDisplayName(fieldName)} cannot be only spaces`;
+      if (field.errors['required'])
+        return `${this.getFieldDisplayName(fieldName)} is required`;
+      if (field.errors['minlength'])
+        return `${this.getFieldDisplayName(fieldName)} must be at least ${
+          field.errors['minlength'].requiredLength
+        } characters`;
+      if (field.errors['maxlength'])
+        return `${this.getFieldDisplayName(fieldName)} must not exceed ${
+          field.errors['maxlength'].requiredLength
+        } characters`;
+      if (field.errors['min'])
+        return `${this.getFieldDisplayName(fieldName)} must be greater than ${
+          field.errors['min'].min
+        }`;
+      if (field.errors['max'])
+        return `${this.getFieldDisplayName(fieldName)} must not exceed ${
+          field.errors['max'].max
+        }`;
+      if (field.errors['positiveNumber'])
+        return `${this.getFieldDisplayName(
+          fieldName
+        )} must be a positive number`;
+      if (field.errors['onlyWhitespace'])
+        return `${this.getFieldDisplayName(fieldName)} cannot be only spaces`;
     }
     return '';
   }
@@ -313,7 +391,7 @@ export class RequestQuote implements OnInit, OnDestroy {
       description: 'Description',
       quantity: 'Quantity',
       unit: 'Unit',
-      jobLocation: 'Job Location'
+      jobLocation: 'Job Location',
     };
     return fieldNames[fieldName] || fieldName;
   }
@@ -327,7 +405,7 @@ export class RequestQuote implements OnInit, OnDestroy {
     const maxLengths: { [key: string]: number } = {
       description: 1000,
       jobLocation: 200,
-      title: 100
+      title: 100,
     };
     return maxLengths[fieldName] || 0;
   }
@@ -341,10 +419,16 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   clearForm(): void {
-    if (confirm('Are you sure you want to clear all fields? This action cannot be undone.')) {
+    if (
+      confirm(
+        'Are you sure you want to clear all fields? This action cannot be undone.'
+      )
+    ) {
+      this.clearData.next(true);
       this.resetForm();
       this.successMessage = '';
       this.errorMessage = '';
+      this.clearData.next(false);
     }
   }
 
@@ -352,7 +436,7 @@ export class RequestQuote implements OnInit, OnDestroy {
     const totalFields = Object.keys(this.rfqForm.controls).length;
     let filledFields = 0;
 
-    Object.keys(this.rfqForm.controls).forEach(key => {
+    Object.keys(this.rfqForm.controls).forEach((key) => {
       const control = this.rfqForm.get(key);
       if (control?.value && control.value.toString().trim()) {
         filledFields++;
@@ -363,7 +447,10 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   isFormPartiallyFilled(): boolean {
-    return this.getFormCompletionPercentage() > 0 && this.getFormCompletionPercentage() < 100;
+    return (
+      this.getFormCompletionPercentage() > 0 &&
+      this.getFormCompletionPercentage() < 100
+    );
   }
 
   getUnitOptions() {
@@ -372,7 +459,9 @@ export class RequestQuote implements OnInit, OnDestroy {
 
   getUnitDescription(): string {
     const selectedUnit = this.rfqForm.get('unit')?.value;
-    const unitOption = this.unitOptions.find(option => option.id === selectedUnit);
+    const unitOption = this.unitOptions.find(
+      (option) => option.id === selectedUnit
+    );
     return unitOption?.name || '';
   }
 
@@ -386,7 +475,7 @@ export class RequestQuote implements OnInit, OnDestroy {
     this.pondFiles = files;
 
     const rawFiles = files
-      .map(f => {
+      .map((f) => {
         if (typeof f === 'string') return null;
         if ('file' in f) return f.file as File;
         if (f instanceof Blob) return f as File;
@@ -404,7 +493,9 @@ export class RequestQuote implements OnInit, OnDestroy {
         return;
       }
 
-      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      const existingScript = document.querySelector(
+        'script[src*="maps.googleapis.com"]'
+      );
       if (existingScript) {
         existingScript.addEventListener('load', () => resolve(google));
         existingScript.addEventListener('error', reject);
@@ -426,7 +517,13 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   private initializeAutocomplete() {
-    if (!this.isGoogleMapsLoaded || typeof google === 'undefined' || !google.maps || !google.maps.places) return;
+    if (
+      !this.isGoogleMapsLoaded ||
+      typeof google === 'undefined' ||
+      !google.maps ||
+      !google.maps.places
+    )
+      return;
 
     if (!this.jobLocationInput?.nativeElement) return;
 
@@ -438,8 +535,8 @@ export class RequestQuote implements OnInit, OnDestroy {
         'formatted_address',
         'name',
         'geometry.location',
-        'address_components'
-      ]
+        'address_components',
+      ],
     };
 
     this.autocomplete = new google.maps.places.Autocomplete(input, options);
@@ -455,25 +552,32 @@ export class RequestQuote implements OnInit, OnDestroy {
   public isGoogleMapsReady(): boolean {
     return Boolean(
       this.isGoogleMapsLoaded &&
-      typeof google !== 'undefined' &&
-      google.maps &&
-      google.maps.places
+        typeof google !== 'undefined' &&
+        google.maps &&
+        google.maps.places
     );
   }
 
   private initializeOptions(): void {
     if (typeof google !== 'undefined' && google.maps) {
       this.options = {
-        types: ['address', 'establishment', 'geocode', 'postal_code', '(cities)', '(regions)'],
+        types: [
+          'address',
+          'establishment',
+          'geocode',
+          'postal_code',
+          '(cities)',
+          '(regions)',
+        ],
         fields: [
-          'place_id', 
-          'formatted_address', 
-          'name', 
+          'place_id',
+          'formatted_address',
+          'name',
           'geometry.location',
           'address_components',
           'types',
-          'vicinity'
-        ]
+          'vicinity',
+        ],
       };
     }
   }
@@ -484,15 +588,24 @@ export class RequestQuote implements OnInit, OnDestroy {
     }
 
     const addressComponents = place.address_components || [];
-    const city = addressComponents.find(c => c.types.includes('locality'))?.long_name || '';
-    const state = addressComponents.find(c => c.types.includes('administrative_area_level_1'))?.long_name || '';
-    const postalCode = addressComponents.find(c => c.types.includes('postal_code'))?.long_name || '';
-    const country = addressComponents.find(c => c.types.includes('country'))?.long_name || '';
+    const city =
+      addressComponents.find((c) => c.types.includes('locality'))?.long_name ||
+      '';
+    const state =
+      addressComponents.find((c) =>
+        c.types.includes('administrative_area_level_1')
+      )?.long_name || '';
+    const postalCode =
+      addressComponents.find((c) => c.types.includes('postal_code'))
+        ?.long_name || '';
+    const country =
+      addressComponents.find((c) => c.types.includes('country'))?.long_name ||
+      '';
 
     this.rfqForm.patchValue({
       jobLocation: place.formatted_address,
       latitude: place.geometry.location?.lat(),
-      longitude: place.geometry.location?.lng()
+      longitude: place.geometry.location?.lng(),
     });
   }
 }

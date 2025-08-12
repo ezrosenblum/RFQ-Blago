@@ -39,14 +39,18 @@ public sealed record SubmissionMarkAsViewedCommandHandler : ICommandHandler<Subm
 
         if (_currentUserService.UserRole == UserRole.Vendor)
         {
+            if (submission.StatusHistory.Any(s => s.VendorId == _currentUserService.UserId &&
+                                                 s.Status == SubmissionStatusHistoryType.Viewed))
+                return;
+
             submission.CreateStatusHistory(_currentUserService.UserId!.Value,
                                            SubmissionStatusHistoryType.Viewed,
                                            _dateTime,
                                            true);
-        }
 
-        _submissionRepository.Update(submission);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+            _submissionRepository.Update(submission);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
     }
 }
 

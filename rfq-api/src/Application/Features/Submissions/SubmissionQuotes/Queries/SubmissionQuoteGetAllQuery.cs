@@ -24,6 +24,8 @@ public sealed class SubmissionQuoteGetAllQueryHandler : IQueryHandler<Submission
     {
         var submissionQuotes = await _dbContext.SubmissionQuote
             .AsNoTracking()
+            .Include(s => s.QuoteMessages)
+                .ThenInclude(s => s.Sender)
             .Include(s => s.Vendor)
                 .ThenInclude(s => s.CompanyDetails)
             .Include(s => s.Submission)

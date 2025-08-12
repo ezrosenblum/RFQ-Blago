@@ -19,44 +19,28 @@ public sealed class UserGetQueryHandler : IQueryHandler<UserGetQuery, UserInfoRe
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IApplicationDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly ICacheService _cacheService;
 
     public UserGetQueryHandler(
         UserManager<ApplicationUser> userManager,
         IApplicationDbContext dbContext,
-        IMapper mapper,
-        ICacheService cacheService)
+        IMapper mapper)
     {
         _userManager = userManager;
         _dbContext = dbContext;
         _mapper = mapper;
-        _cacheService = cacheService;
     }
     public async Task<UserInfoResponse> Handle(UserGetQuery query, CancellationToken cancellationToken)
     {
-        var cacheKey = $"{CacheKeys.User}-{query.UserId}";
+        var user = await _dbContext.User
+            .Include(u => u.CompanyDetails)
+            .FirstOrDefaultAsync(u => u.Id == query.UserId);
 
-        var user = await _cacheService.GetAsync<ApplicationUser>(cacheKey, cancellationToken);
-
-        if (user == null)
-        {
-            user = await _dbContext.User
-                .Include(u => u.CompanyDetails)
-                .FirstOrDefaultAsync(u => u.Id == query.UserId);
-
-            if (user == null)
-            {
-                throw new NotFoundException("User not found");
-            }
-
-            await _cacheService.AddAsync(cacheKey, user, cancellationToken);
-        }
 
         var result = _mapper.Map<UserInfoResponse>(user!);
 
         var roles = await _userManager.GetRolesAsync(user);
         if (roles.Any())
-          result.Type = roles.First();
+            result.Type = roles.First();
 
         return result;
     }

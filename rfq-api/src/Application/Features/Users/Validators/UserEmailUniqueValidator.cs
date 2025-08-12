@@ -17,6 +17,7 @@ public sealed class UserEmailUniqueValidator : AbstractValidator<UserEmailUnique
                     var user = userManager.FindByNameAsync(data.Email).Result;
                     return user == null || user.Id == data.UserId;
                 })
-            .WithLocalizationKey("userEmailUniqueValidator.message", data => new object[] { data.Email });
+            .WithLocalizationKey("userEmailUniqueValidator.message");
+
     }
 }

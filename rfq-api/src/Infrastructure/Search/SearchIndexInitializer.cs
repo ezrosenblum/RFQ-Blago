@@ -1,6 +1,7 @@
 ﻿using Application.Features.Notifications.Commands;
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.SubmissionQuotes.Commands;
+using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Commands;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Persistence;
@@ -14,6 +15,7 @@ public static class SearchIndexInitializer
         await InitializeSubmissionIndex(mediatr, logger);
         await InitializeSubmissionQuoteIndex(mediatr, logger);
         await InitializeNotificationIndex(mediatr, logger);
+        await InitializeQuoteMessageIndex(mediatr, logger);
     }
 
     private static async Task InitializeSubmissionIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
@@ -40,6 +42,20 @@ public static class SearchIndexInitializer
         catch (Exception ex)
         {
             logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR SUBMISSION QUOTE");
+        }
+    }
+
+    private static async Task InitializeQuoteMessageIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
+    {
+        try
+        {
+            logger.LogDebug("STARTED BUILDING SEARCH INDEX FOR QUOTE MESSAGE");
+            await mediatr.Send(new QuoteMessageRebuildSearchIndexCommand());
+            logger.LogDebug("FINISHED BUILDING SEARCH INDEX FOR QUOTE MESSAGE");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR QUOTE MESSAGE");
         }
     }
     private static async Task InitializeNotificationIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)

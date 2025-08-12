@@ -302,7 +302,6 @@ namespace Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Created")
@@ -321,13 +320,18 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("QuoteStatus")
+                    b.Property<int>("QuoteMessageStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SenderId")
                         .HasColumnType("integer");
 
                     b.Property<int>("SubmissionQuoteId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
 
                     b.HasIndex("SubmissionQuoteId");
 
@@ -816,11 +820,19 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Submissions.SubmissionQuotes.QuoteMessages.QuoteMessage", b =>
                 {
+                    b.HasOne("Domain.Entities.User.ApplicationUser", "Sender")
+                        .WithMany("QuoteMessages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Submissions.SubmissionQuotes.SubmissionQuote", "SubmissionQuote")
                         .WithMany("QuoteMessages")
                         .HasForeignKey("SubmissionQuoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Sender");
 
                     b.Navigation("SubmissionQuote");
                 });
@@ -936,6 +948,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("CompanyDetails");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("QuoteMessages");
 
                     b.Navigation("RefreshTokens");
 

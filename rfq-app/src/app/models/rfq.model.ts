@@ -16,7 +16,7 @@ export interface RfqRequest {
 
 
 export interface LookupValue {
-  id: string;
+  id: number;
   name: string;
 }
 

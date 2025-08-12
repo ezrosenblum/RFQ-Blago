@@ -5,5 +5,6 @@ public static class SearchIndex
     public const string Default = "rfqsubmission-default";
     public const string Submission = "submission";
     public const string SubmissionQuote = "submission-quote";
+    public const string QuoteMessage = "quote-message";
     public const string Notification = "notification";
 }

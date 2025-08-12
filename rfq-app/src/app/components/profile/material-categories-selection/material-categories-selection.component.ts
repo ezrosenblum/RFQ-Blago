@@ -31,7 +31,8 @@ import { CommonModule } from '@angular/common';
 })
 export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
   @Input() user: User | null = null;
-  @Input() isRequestQuote!: boolean;
+  @Input() isRequestQuote: boolean = false;
+  @Input() clearData: Subject<boolean> = new Subject<boolean>();
 
   categories: Category[] = [];
   filteredCategories: Category[] = [];
@@ -67,6 +68,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategories();
+    this.clearData.pipe(takeUntil(this.destroy$)).subscribe(() => this.clearSelections());
   }
 
   ngOnDestroy(): void {

@@ -1,9 +1,8 @@
 ﻿using Application.Common.Search;
 using Application.Features.Notifications.Search;
 using Application.Features.Submissions.Search;
+using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
-using Application.Features.Users.Search;
-using Domain.Entities.Submissions.SubmissionQuotes;
 using DTO.Notification.Search;
 using DTO.Pagination;
 using DTO.Sorting;
@@ -114,6 +113,18 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
         .Size(criteria.Paging.PageSize));
 
         return new PaginatedList<SubmissionQuoteSearchable>(searchResponse.Documents.ToList(), (int)searchResponse.Total, criteria.Paging.PageNumber, criteria.Paging.PageSize);
+    }
+
+    public async Task<PaginatedList<QuoteMessageSearchable>> SearchQuoteMessagesAsync(IQuoteMessageFullSearchCriteria criteria)
+    {
+        var searchResponse = await _elasticClient.SearchAsync<QuoteMessageSearchable>(s => s
+            .Index(_index)
+            .Query(q => BuildQuoteMessageSearchQuery(q, criteria))
+            .Sort(so => BuildSort(so, criteria.Sorting!))
+            .From((criteria.Paging.PageNumber - 1) * criteria.Paging.PageSize)
+        .Size(criteria.Paging.PageSize));
+
+        return new PaginatedList<QuoteMessageSearchable>(searchResponse.Documents.ToList(), (int) searchResponse.Total, criteria.Paging.PageNumber, criteria.Paging.PageSize);
     }
 
     private QueryContainer BuildNotificationSearchQuery(QueryContainerDescriptor<NotificationSearchable> descriptor, INotificationFullSearchCriteria criteria)
@@ -305,6 +316,28 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
             {
                 Field = "validUntil",
                 LessThan = date,
+            };
+        }
+
+        return combinedQuery;
+    }
+
+    private QueryContainer BuildQuoteMessageSearchQuery(QueryContainerDescriptor<QuoteMessageSearchable> descriptor, IQuoteMessageFullSearchCriteria criteria)
+    {
+        var combinedQuery = new QueryContainer();
+
+        if (!string.IsNullOrWhiteSpace(criteria.Query))
+        {
+            combinedQuery &= (BuildTextQuery(criteria.Query) ||
+                              BuildWildcardQuery("content", criteria.Query));
+        }
+
+        if (criteria.SubmissionQuoteId.HasValue)
+        {
+            combinedQuery &= new TermQuery
+            {
+                Field = "submissionQuoteId",
+                Value = criteria.SubmissionQuoteId.Value
             };
         }
 

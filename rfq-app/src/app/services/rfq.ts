@@ -1,6 +1,6 @@
 // src/app/services/rfq.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -25,7 +25,10 @@ export class RfqService {
   ) {}
 
   createRfq(rfqData: FormData): Observable<boolean | null> {
-    return this.http.post<boolean>(`${this.API_URL}Submission`, rfqData)
+    const headers = new HttpHeaders({
+      'Skip-Content-Type': 'true'
+    });
+    return this.http.post<boolean>(`${this.API_URL}Submission`, rfqData, { headers })
       .pipe(
         map(response => {
           return true

@@ -304,6 +304,7 @@
         </div>
         <div class="flex items-center space-x-2">
           <svg
+            *ngIf="selectedConversation"
             (click)="removeConversation()"
             class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer"
             fill="none"
@@ -400,7 +401,7 @@
       </div>
       <div class="flex items-center space-x-3">
         <svg
-          (click)="openFileUploadDialog()"
+          (click)="toggleFileUploadPanel()"
           class="w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer mb-2"
           fill="none"
           stroke="currentColor"

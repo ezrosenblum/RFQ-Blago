@@ -202,9 +202,28 @@
     "VIEW_DETAILS": "View Details",
     "ATTACHMENTS": "Attachments",
     "SHOW_MORE": "Show More",
-    "SHOW_LESS": "Show Less"
+    "SHOW_LESS": "Show Less",
+    "PLEASE_SELECT_CATEGORIES": "Please select categories.",
+    "SELECT_CATEGORIES": "Select categories",
+    "SELECT_SUBCATEGORIES": "Select subcategories",
+    "STATUS_UPDATED": "RFQ status updated!",
+    "LOAD_STATISTICS": "Failed to load statistics. Please try again later.",
+    "LOAD_CATEGORIES": "Failed to load category options. Please try again later.",
+    "LOAD_STATUSES": "Failed to load status options. Please try again later.",
+    "LOAD_GOOGLE_MAPS": "Failed to load Google Maps. Please try again later.",
+    "LOAD_UNITS": "Failed to load unit options. Please try again later.",
+    "SUBMIT_SUCCESS": "Your quote request has been submitted successfully! We will review it and get back to you soon.",
+    "LABEL_IDLE": "Drag & Drop your files or <span class=\"filepond--label-action\">Browse</span>"
   },
-
+  "ERROR": {
+    "SESSION_EXPIRED": "Your session has expired. Please log in again.",
+    "NO_PERMISSION": "You do not have permission to view this content.",
+    "NO_CONNECTION": "Unable to connect to server. Please check your internet connection.",
+    "LOAD_RFQS": "An error occurred while loading RFQs.",
+    "INVALID_DATA": "Invalid data provided. Please check your inputs and try again.",
+    "TOO_MANY_REQUESTS": "Too many requests. Please wait a moment and try again.",
+    "SUBMISSION_FAILED": "Failed to submit request. Please try again."
+  },
   "HEADER": {
     "VIEW_RFQS": "View RFQs",
     "SIGN_UP": "Sign Up",
@@ -355,6 +374,7 @@
     "MARK_AS_READ": "Mark as read",
     "MARK_AS_UNREAD": "Mark as unread",
     "ARCHIVE": "Archive",
-    "MESSAGES": "Messages"
+    "MESSAGES": "Messages",
+    "VIEW_CONVERSATION": "View Conversation"
   }
 }

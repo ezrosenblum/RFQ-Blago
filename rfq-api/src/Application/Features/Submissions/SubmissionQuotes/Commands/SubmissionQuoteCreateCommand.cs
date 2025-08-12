@@ -54,7 +54,7 @@ public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<Submis
 
         if(!submission.StatusHistory.Any(s => s.VendorId == _currentUserService.UserId && s.Status == SubmissionStatusHistoryType.Quoted))
         {
-            submission.CreateStatusHistory((int)_currentUserService.UserId, SubmissionStatusHistoryType.Quoted, _dateTime);
+            submission.CreateStatusHistory((int)_currentUserService.UserId, SubmissionStatusHistoryType.Quoted, _dateTime, true);
             _dbContext.Submission.Update(submission);
         }
 
