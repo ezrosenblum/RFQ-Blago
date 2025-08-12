@@ -641,12 +641,23 @@
                 </select>
               </div>
 
-              <button
-                [routerLink]="['/vendor-rfqs', rfq.id]"
-                class="btn btn-secondary mt-5"
-              >
-                {{ 'VENDOR.VIEW_DETAILS' | translate }}
-              </button>
+              <div class="flex">
+                <button *ngIf="currentUser && currentUser.type == 'Vendor' && (!rfq.quotes || !rfq.quotes[0] || !rfq.quotes[0].vendorId || rfq.quotes[0].vendorId != currentUser.id)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                  class="btn btn-secondary mt-5 mr-3"
+                >
+                  {{ 'VENDOR.SEND_QUOTE' | translate }}
+                </button>
+                <div class="quote-sent mt-5 mr-3" *ngIf="currentUser && currentUser.type == 'Vendor' && (rfq.quotes && rfq.quotes[0] && rfq.quotes[0].vendorId && rfq.quotes[0].vendorId == currentUser.id)">
+                  {{ 'VENDOR.QUOTE_SENT' | translate }}
+                </div>
+
+                <button
+                  [routerLink]="['/vendor-rfqs', rfq.id]"
+                  class="btn btn-secondary mt-5"
+                >
+                  {{ 'VENDOR.VIEW_DETAILS' | translate }}
+                </button>
+              </div>
             </div>
           </div>
         </div>

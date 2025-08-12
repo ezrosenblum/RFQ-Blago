@@ -10,13 +10,15 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FileViewComponent } from "../../shared/file-view/file-view.component";
 import { RfqDetails } from './rfq-details/rfq-details';
 import { MaterialCategoriesSelectionComponent } from '../profile/material-categories-selection/material-categories-selection.component';
-
+import { QuoteFormDialog } from './vendor-rfqs/quote-form-dialog/quote-form-dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
     RequestQuote,
     VendorRfqs,
-    RfqDetails
+    RfqDetails,
+    QuoteFormDialog
   ],
   imports: [
     CommonModule,
@@ -26,7 +28,8 @@ import { MaterialCategoriesSelectionComponent } from '../profile/material-catego
     FilePondModule,
     TranslateModule,
     FileViewComponent,
-    MaterialCategoriesSelectionComponent
+    MaterialCategoriesSelectionComponent,
+    MatDialogModule
   ]
 })
 

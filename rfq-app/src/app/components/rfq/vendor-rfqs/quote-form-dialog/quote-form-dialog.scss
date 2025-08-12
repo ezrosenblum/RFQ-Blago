@@ -1,0 +1,25 @@
+::ng-deep {
+    .mat-mdc-dialog-container {
+        min-width: 100% !important;
+    }
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.ki-abstract-11 {
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    top: 10px;
+}
+
+h1 {
+    font-size: 22px !important;
+    padding: 0 40px;
+}
+
+mat-dialog-actions {
+    padding: 20px 50px !important;
+}

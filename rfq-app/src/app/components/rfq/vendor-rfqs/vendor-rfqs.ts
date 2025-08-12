@@ -17,6 +17,8 @@ import { User, UserRole } from '../../../models/user.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
 import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+import { QuoteFormDialog } from './quote-form-dialog/quote-form-dialog';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -95,7 +97,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     private authService: Auth,
     private rfqService: RfqService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private _dialog: MatDialog,
   ) {
     this.initializeFilterForm();
   }
@@ -648,6 +651,45 @@ export class VendorRfqs implements OnInit, OnDestroy {
     return selectedNames.join(', ');
   }
 
-  // Expose Math to template
-  Math = Math;
+  openQuoteFormDialog(id: number, customerId: number, edit: boolean){
+    const dialogRef = this._dialog.open(QuoteFormDialog, {
+      width: '60%',
+      maxWidth: '60%',
+      height: 'auto',
+      panelClass: 'add-quote-dialog',
+      autoFocus: false,
+      data: {
+        action: edit? 'Edit' : 'Add',
+        rfqId: id,
+        customerId: customerId,
+        vendorId: this.currentUser?.id,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe((result: any) => {
+        if (result) {
+          this.loadStatistics();
+          setTimeout(() => {
+            let findRfqIndex = this.filteredRfqs.findIndex(rfq => rfq.id === id);
+            if (findRfqIndex > -1) {
+              this.filteredRfqs[findRfqIndex].quotes.push(
+                {
+                  title: result.title,
+                  description: result.description,
+                  price: result.price,
+                  quoteValidityIntervalType: result.quoteValidityIntervalType,
+                  quoteValidityInterval: result.quoteValidityInterval,
+                  vendorId: this.currentUser?.id!,
+                  submissionId: id
+                }
+              )
+            }
+          })
+        }
+      });
+  }
+
+  Math = Math; // Expose Math for use in templates
 }
