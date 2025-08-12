@@ -213,7 +213,7 @@
     "LOAD_GOOGLE_MAPS": "Failed to load Google Maps. Please try again later.",
     "LOAD_UNITS": "Failed to load unit options. Please try again later.",
     "SUBMIT_SUCCESS": "Your quote request has been submitted successfully! We will review it and get back to you soon.",
-     "LABEL_IDLE": "Drag & Drop your files or <span class=\"filepond--label-action\">Browse</span>"
+    "LABEL_IDLE": "Drag & Drop your files or <span class=\"filepond--label-action\">Browse</span>"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
