@@ -99,7 +99,7 @@
   </div>
 
   <!-- Category Tree -->
-  <div class="space-y-2">
+  <div class="space-y-2" [class]="isRequestQuote ? 'max-h-[300px] overflow-auto' : 'max-h-none'">
     <div
       *ngFor="let category of filteredCategories"
       class="border border-gray-200 dark:border-gray-700 rounded-lg"
@@ -234,7 +234,7 @@
   </div>
 
   <!-- Save Button -->
-  <div class="mt-6 flex justify-end">
+  <div class="mt-6 flex justify-end" *ngIf="!isRequestQuote">
     <button
       (click)="onSaveSpecialties()"
       class="px-4 py-2 text-sm rounded-md bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 flex items-center"

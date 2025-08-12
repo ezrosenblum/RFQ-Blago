@@ -46,6 +46,7 @@ export class RequestQuote implements OnInit, OnDestroy {
   errorMessage = '';
   currentUser: User | null = null;
   selectedLocation: string = '';
+  clearData: Subject<boolean> = new Subject<boolean>();
 
   private isGoogleMapsLoaded = false;
   private autocomplete: any;
@@ -150,6 +151,7 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearData.complete();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -422,9 +424,11 @@ export class RequestQuote implements OnInit, OnDestroy {
         'Are you sure you want to clear all fields? This action cannot be undone.'
       )
     ) {
+      this.clearData.next(true);
       this.resetForm();
       this.successMessage = '';
       this.errorMessage = '';
+      this.clearData.next(false);
     }
   }
 

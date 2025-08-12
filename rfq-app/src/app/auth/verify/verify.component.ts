@@ -13,6 +13,8 @@ export class VerifyComponent {
 
   verifyData: VerifyData = {};
   showSpinner: boolean = true;
+  timeOut: number = 5000;
+  timeOutError: number = 3000;
 
   constructor(private _router: Router, private _authService: Auth) { this.getData();}
 
@@ -34,12 +36,16 @@ export class VerifyComponent {
         .putVerify(this.verifyData)
         .subscribe(
           (data: any) => {
-            this.showSpinner = false;
-            this._router.navigate(['auth/login']);
+            setTimeout(() => {
+              this.showSpinner = false;
+              this._router.navigate(['auth/login']);
+            }, this.timeOut);
           },
           (error) => {
-            this.showSpinner = false;
-            this._router.navigate(['auth/login']);
+            setTimeout(() => {
+              this.showSpinner = false;
+              this._router.navigate(['auth/login']);
+            }, this.timeOutError);
           }
         );
     }
