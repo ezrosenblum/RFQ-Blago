@@ -155,10 +155,7 @@
         </label>
         <div class="md:col-span-8 relative">
           <input
-            id="email"
-            name="email"
             type="email"
-            autocomplete="email"
             formControlName="email"
             placeholder="{{ 'PROFILE.ENTER_EMAIL' | translate }}"
             class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
@@ -185,17 +182,25 @@
           ></i>
         </label>
         <div class="md:col-span-8 relative">
-          <app-phone-input formControlName="phoneNumber"></app-phone-input>
+          <input
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="{{ 'PROFILE.CONTACT_PERSON_PHONE' | translate }}"
+            class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            [class.border-error-500]="isFieldInvalid('phoneNumber')"
+            (input)="onPhoneInput($event, 'phoneNumber')"
+            maxlength="17"
+          />
           <div
             *ngIf="isFieldInvalid('phoneNumber')"
-            class="text-xs text-red-500 mt-1"
+            class="form-error text-red-500 text-xs"
           >
-            <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">
-              {{ 'PROFILE.INVALID_PHONE_FORMAT' | translate }}
-            </div>
-            <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">
-              {{ 'PROFILE.PHONE_TOO_SHORT' | translate }}
-            </div>
+            {{ getFieldError("phoneNumber") }}
+          </div>
+          <div class="md:col-span-8">
+            <p class="text-xs text-gray-500 mt-1">
+              {{ 'PROFILE.PHONE_FORMAT_HINT' | translate }}
+            </p>
           </div>
         </div>
       </div>
@@ -311,12 +316,19 @@
               placeholder="{{ 'PROFILE.CONTACT_PERSON_PHONE' | translate }}"
               class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
               [class.border-error-500]="isFieldInvalid('contactPersonPhone')"
+              (input)="onPhoneInput($event, 'contactPersonPhone')"
+              maxlength="17"
             />
             <div
               *ngIf="isFieldInvalid('contactPersonPhone')"
-              class="text-xs text-red-500 mt-1"
+              class="form-error text-red-500 text-xs"
             >
-              {{ 'PROFILE.CONTACT_PERSON_PHONE_REQUIRED' | translate }}
+              {{ getFieldError("contactPersonPhone") }}
+            </div>
+            <div class="md:col-span-8">
+              <p class="text-xs text-gray-500 mt-1">
+                {{ 'PROFILE.PHONE_FORMAT_HINT' | translate }}
+              </p>
             </div>
           </div>
         </div>
@@ -431,7 +443,7 @@
           <div class="md:col-span-8">
             <input
               type="file"
-              formControlName="certificate"
+              formControlName="certificateUrl"
               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
               (change)="onFileSelected($event, 'certificate')"
               class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 block w-full dark:bg-dark-800 dark:text-white dark:border-gray-700"
@@ -456,16 +468,16 @@
       class="flex justify-end gap-4 px-6 py-6 border-t border-gray-200 dark:border-dark-700"
     >
       <button
-        type="reset"
+        type="button"
         (click)="discardChanges()"
-        [disabled]="!hasChanges()"
+        [disabled]="!isFormChanged"
         class="px-4 py-2 text-sm rounded-md bg-gray-100 dark:bg-dark-700 hover:bg-gray-200 text-gray-800 dark:text-white disabled:opacity-50"
       >
         {{ 'PROFILE.DISCARD_CHANGES' | translate }}
       </button>
       <button
         type="submit"
-        [disabled]="!hasChanges() || isSubmitting"
+        [disabled]="!userForm.valid || !isFormChanged || isSubmitting"
         class="px-4 py-2 text-sm rounded-md bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 flex items-center"
       >
         <ng-container *ngIf="isSubmitting">

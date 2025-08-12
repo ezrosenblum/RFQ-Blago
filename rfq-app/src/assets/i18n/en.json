@@ -348,7 +348,10 @@
     "PASSWORD_CHANGE_FAILED": "Failed to change password",
     "INCORRECT_CURRENT_PASSWORD": "Current password is incorrect.",
     "INVALID_PASSWORD_FORMAT": "Invalid password format.",
-    "CONFIRM_PASSWORD_CHANGE": "Are you sure you want to change your password?"
+    "CONFIRM_PASSWORD_CHANGE": "Are you sure you want to change your password?",
+    "UNIT_MI": "mi",
+    "INVALID_US_PHONE_FORMAT": "Invalid US phone format",
+    "PHONE_FORMAT_HINT": "Example: (123) 456-7890"
   },
   "ALERTS": {
     "CONFIRM": "Confirm",

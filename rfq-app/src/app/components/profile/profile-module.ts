@@ -34,7 +34,6 @@ const routes: Routes = [
     FormsModule,
     MatTabsModule,
     MatIconModule,
-    SharedModule,
     ServiceAreasComponent,
     TranslateModule,
     RouterModule.forChild(routes),

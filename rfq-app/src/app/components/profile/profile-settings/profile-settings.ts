@@ -12,6 +12,8 @@ import { AlertService } from '../../../services/alert.service';
 import { ErrorHandlerService } from '../../../services/error-handler.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { usPhoneValidator } from '../../../shared/validators/phone.validators';
+import { PhoneNumberFormatter } from '../../../shared/utils/phone-formatter.util';
 @Component({
   standalone: false,
   selector: 'app-profile-settings',
@@ -24,16 +26,20 @@ export class ProfileSettingsComponent implements OnInit {
   userForm: FormGroup;
   errors: ValidationErrors | null = null;
 
-  isSubmitting = false;
-  initialUserData: User | null = null;
+  isSubmitting: boolean = false;
+  isFormChanged: boolean = false;
 
   selectedFile: File | null = null;
-  previewImageUrl: string | null = null;
   selectedCertificate: File | null = null;
+
+  accountExistingAvatar: string | null = null;
   selectedFileName: string | null = null;
+
+  initialValues: any;
 
   companySizes: LookupValue[] = [];
 
+  previewImageUrl: string | null = null;
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
@@ -52,6 +58,9 @@ export class ProfileSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.subscribeToUserChanges();
     this.loadLookupData();
+    this.userForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.checkIfFormChanged();
+    });
   }
 
   ngOnDestroy(): void {
@@ -63,22 +72,35 @@ export class ProfileSettingsComponent implements OnInit {
     return this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: [null, [Validators.minLength(9)]],
+      email: [{ value: '', disabled: true }],
+      phoneNumber: ['', [usPhoneValidator()]],
       profilePicture: [''],
       companyName: [''],
       contactPersonFirstName: [''],
       contactPersonLastName: [''],
       contactPersonEmail: ['', Validators.email],
-      contactPersonPhone: [''],
+      contactPersonPhone: ['', [usPhoneValidator()]],
       businessDescription: [''],
       businessAddress: [''],
       latitudeAddress: [null],
       longitudeAddress: [null],
       operatingRadius: [null],
       companySize: [null],
-      certificate: [null],
+      certificateUrl: [null],
     });
+  }
+
+  onPhoneInput(event: Event, fieldName: string): void {
+    const input = event.target as HTMLInputElement;
+    const formattedValue = PhoneNumberFormatter.formatUsPhone(input.value);
+
+    // Update the form control
+    this.userForm
+      .get(fieldName)
+      ?.setValue(formattedValue, { emitEvent: false });
+
+    // Update the input display
+    input.value = formattedValue;
   }
 
   private subscribeToUserChanges(): void {
@@ -93,7 +115,6 @@ export class ProfileSettingsComponent implements OnInit {
 
   private initializeUserData(data: User): void {
     this.user = data;
-    this.initialUserData = { ...data };
     this.populateForm(data);
     this.previewImageUrl = data.picture || data.profilePicture || null;
   }
@@ -118,8 +139,9 @@ export class ProfileSettingsComponent implements OnInit {
       longitudeAddress: companyDetails?.longitudeAddress,
       operatingRadius: companyDetails?.operatingRadius,
       companySize: companyDetails?.companySize?.id || null,
-      certificate: companyDetails?.certificateUrl || null,
+      certificateUrl: companyDetails?.certificateUrl || null,
     });
+    this.initialValues = this.userForm.getRawValue();
   }
 
   private loadLookupData(): void {
@@ -132,6 +154,19 @@ export class ProfileSettingsComponent implements OnInit {
       });
   }
 
+  checkIfFormChanged(): void {
+    const currentValues = this.userForm.getRawValue();
+    const formChanged = !this.isEqual(this.initialValues, currentValues);
+
+    const avatarChanged = !!this.selectedFile;
+    const certificateChanged = !!this.selectedCertificate;
+
+    this.isFormChanged = formChanged || avatarChanged || certificateChanged;
+  }
+  isEqual(obj1: any, obj2: any): boolean {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
+
   onFileSelected(event: Event, fileType: FileType = 'avatar'): void {
     const file = this.getSelectedFile(event);
     if (!file) return;
@@ -141,6 +176,7 @@ export class ProfileSettingsComponent implements OnInit {
     } else if (fileType === 'certificate') {
       this.handleCertificateSelection(file);
     }
+    this.checkIfFormChanged();
   }
 
   private getSelectedFile(event: Event): File | null {
@@ -169,6 +205,8 @@ export class ProfileSettingsComponent implements OnInit {
   onDeleteImage(): void {
     this.previewImageUrl = null;
     this.selectedFile = null;
+    this.userForm.patchValue({ profilePicture: null });
+    this.checkIfFormChanged();
   }
 
   onImageLoadError(): void {
@@ -333,24 +371,19 @@ export class ProfileSettingsComponent implements OnInit {
     this.selectedFileName = null;
   }
 
-  // Form state management
-  hasChanges(): boolean {
-    const currentProfilePic =
-      this.initialUserData?.profilePicture || this.initialUserData?.picture;
-
-    return (
-      this.userForm.dirty ||
-      this.previewImageUrl !== currentProfilePic ||
-      this.selectedCertificate !== null
-    );
-  }
-
   discardChanges(): void {
-    if (!this.initialUserData) return;
+    this.userForm.reset(this.initialValues);
+    this.previewImageUrl = this.accountExistingAvatar;
+    this.selectedFile = null;
 
-    this.userForm.reset();
-    this.initializeUserData(this.initialUserData);
-    this.resetFileSelections();
+    const fileInputElement = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement;
+    if (fileInputElement) {
+      fileInputElement.value = '';
+    }
+
+    this.checkIfFormChanged();
   }
 
   // Validation helpers
@@ -390,6 +423,11 @@ export class ProfileSettingsComponent implements OnInit {
 
     if (errors['pattern']) {
       return this.translate.instant('PROFILE.INVALID_PHONE_FORMAT');
+    }
+
+    // Handle US phone validation errors
+    if (errors['usPhone']) {
+      return this.translate.instant('PROFILE.INVALID_US_PHONE_FORMAT');
     }
 
     return '';
