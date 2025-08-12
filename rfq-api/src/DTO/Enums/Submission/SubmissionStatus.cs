@@ -6,10 +6,12 @@ public enum SubmissionStatus
 {
     [LocalizationKey("enum.submissionStatus.pendingReview")]
     PendingReview = 1,
-    [LocalizationKey("enum.submissionStatus.underReview")]
-    UnderReview,
-    [LocalizationKey("enum.submissionStatus.accepted")]
-    Accepted,
+    [LocalizationKey("enum.submissionStatus.approved")]
+    Approved,
     [LocalizationKey("enum.submissionStatus.rejected")]
-    Rejected
+    Rejected,
+    [LocalizationKey("enum.submissionStatus.archived")]
+    Archived,
+    [LocalizationKey("enum.submissionStatus.completed")]
+    Completed
 }

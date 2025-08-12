@@ -54,19 +54,25 @@ public sealed record SubmissionAlertForNewCommandHandler : ICommandHandler<Submi
             .Include(v => v.CompanyDetails)
             .Include(v => v.Categories)
             .Include(v => v.Subcategories)
-            .Where(v => v.CompanyDetails != null &&
-                        _geoCoverageService.IsPointWithinCoverage(
-                            submission.LatitudeAddress ?? 0,
-                            submission.LongitudeAddress ?? 0,
-                            v.CompanyDetails.LatitudeAddress ?? 0,
-                            v.CompanyDetails.LongitudeAddress ?? 0,
-                            v.CompanyDetails.OperatingRadius ?? 0) &&
-                        (v.Categories.Any(s => submission.Categories.Any(d => d.Id == s.Id)) ||
-                         v.Subcategories.Any(s => submission.Subcategories.Any(d => d.Id == s.Id))))
+            .Where(v => v.CompanyDetails != null)
             .ToListAsync(cancellationToken);
 
         foreach (var vendor in vendors)
         {
+            var isPointWithinCoverage = _geoCoverageService.IsPointWithinCoverage(
+                            vendor.CompanyDetails!.LatitudeAddress ?? 0,
+                            vendor.CompanyDetails.LongitudeAddress ?? 0,
+                            vendor.CompanyDetails.OperatingRadius ?? 0,
+                            submission.LatitudeAddress ?? 0,
+                            submission.LongitudeAddress ?? 0);
+
+            if (!vendor.Subcategories.Any() || 
+                !vendor.Subcategories.Any(s => submission.Subcategories.Any(d => d.Id == s.Id)))
+                continue;
+
+            if (!isPointWithinCoverage)
+                continue;
+
             if (vendor.ReceivePushNotifications)
                 await SendPushNotification(submission, vendor.Id, cancellationToken);
 

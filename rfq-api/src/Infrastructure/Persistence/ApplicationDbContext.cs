@@ -5,6 +5,7 @@ using Domain.Entities.Notifications;
 using Domain.Entities.RefreshTokens;
 using Domain.Entities.Submissions;
 using Domain.Entities.Submissions.SubmissionQuotes;
+using Domain.Entities.Submissions.SubmissionQuotes.QuoteMessages;
 using Domain.Entities.User;
 using Domain.Entities.Users.CompanyDetails;
 using MediatR;
@@ -31,6 +32,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Language> Language => Set<Language>();
     public DbSet<Submission> Submission => Set<Submission>();
     public DbSet<SubmissionQuote> SubmissionQuote => Set<SubmissionQuote>();
+    public DbSet<QuoteMessage> QuoteMessage => Set<QuoteMessage>();
     public DbSet<UserCompanyDetails> UserCompanyDetails => Set<UserCompanyDetails>();
     public DbSet<Category> Category => Set<Category>();
     public DbSet<Subcategory> Subcategory => Set<Subcategory>();

@@ -33,6 +33,8 @@ public sealed class SubmissionQuoteGetQueryHandler : IQueryHandler<SubmissionQuo
                                 .ThenInclude(s => s.CompanyDetails)
                              .Include(s => s.Submission)
                                 .ThenInclude(s => s.User)
+                            .Include(s => s.QuoteMessages)
+                                .ThenInclude(s => s.Sender)
                              .AsNoTracking()
                              .FirstOrDefaultAsync(s => s.Id == query.SubmissionQuoteId, cancellationToken);
 

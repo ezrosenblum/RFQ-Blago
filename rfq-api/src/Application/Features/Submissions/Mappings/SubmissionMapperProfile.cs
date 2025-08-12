@@ -75,11 +75,11 @@ public sealed class SubmissionMapperProfile : Profile
             .ForMember(s => s.Last24HoursSubmissionsCount, opt => opt.MapFrom(d => d.Where(s => s.Created.ToUniversalTime() > DateTime.Now.AddDays(-1).ToUniversalTime())
                                                                                     .Count()))
             .ForMember(s => s.ReviewedSubmissionsCount, opt => opt.MapFrom(d => d.Where(s => s.Status == SubmissionStatus.Rejected ||
-                                                                                             s.Status == SubmissionStatus.Accepted)
+                                                                                             s.Status == SubmissionStatus.Approved)
                                                                                  .Count()))
             .ForMember(s => s.RejectedSubmissionsCount, opt => opt.MapFrom(d => d.Where(s => s.Status == SubmissionStatus.Rejected)
                                                                                  .Count()))
-            .ForMember(s => s.AcceptedSubmissionsCount, opt => opt.MapFrom(d => d.Where(s => s.Status == SubmissionStatus.Accepted)
+            .ForMember(s => s.AcceptedSubmissionsCount, opt => opt.MapFrom(d => d.Where(s => s.Status == SubmissionStatus.Approved)
                                                                                  .Count()))
             .ForMember(s => s.PendingSubmissionsCount, opt => opt.MapFrom(d => d.Where(s => s.Status == SubmissionStatus.PendingReview)
                                                                                 .Count()));

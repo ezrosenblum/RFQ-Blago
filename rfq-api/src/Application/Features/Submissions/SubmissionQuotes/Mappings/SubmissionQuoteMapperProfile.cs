@@ -12,12 +12,18 @@ public sealed class SubmissionQuoteMapperProfile : Profile
     public SubmissionQuoteMapperProfile()
     {
         CreateMap<SubmissionQuote, SubmissionQuoteResponse>()
+            .ForMember(d => d.LastMessage, opt => opt.MapFrom(src => src.QuoteMessages
+                                                                         .OrderByDescending(s => s.Created)
+                                                                         .FirstOrDefault()))
             .ForMember(d => d.ValidUntil, opt => opt.MapFrom(src => CalculateValidUntil(src)));
 
         CreateMap<SubmissionQuote, SubmissionQuoteBaseResponse>()
             .ForMember(d => d.ValidUntil, opt => opt.MapFrom(src => CalculateValidUntil(src)));
 
         CreateMap<SubmissionQuote, SubmissionQuoteSearchable>()
+            .ForMember(d => d.LastMessage, opt => opt.MapFrom(src => src.QuoteMessages
+                                                                         .OrderByDescending(s => s.Created)
+                                                                         .FirstOrDefault()))
             .ForMember(d => d.ValidUntil, opt => opt.MapFrom(src => CalculateValidUntil(src)));
 
         CreateMap<SubmissionQuoteBaseResponse, SubmissionQuoteSearchable>();

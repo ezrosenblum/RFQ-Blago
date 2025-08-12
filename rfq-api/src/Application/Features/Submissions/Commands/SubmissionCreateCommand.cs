@@ -77,9 +77,9 @@ public sealed class SubmissionCreateCommandHandler : ICommandHandler<SubmissionC
     }
 }
 
-public sealed class NotificationCreateCommandValidator : AbstractValidator<SubmissionCreateCommand>
+public sealed class SubmissionCreateCommandValidator : AbstractValidator<SubmissionCreateCommand>
 {
-    public NotificationCreateCommandValidator()
+    public SubmissionCreateCommandValidator()
     {
         RuleFor(cmd => cmd.Title)
             .NotEmpty();
