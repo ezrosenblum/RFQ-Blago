@@ -1,12 +1,14 @@
 ﻿using Application.Common.Helpers;
-using Application.Features.Notifications.Commands;
+using Application.Common.Interfaces;
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.Queries;
 using Application.Features.Submissions.Search;
 using Application.Features.Submissions.SubmissionQuotes.Commands;
 using Application.Features.Submissions.SubmissionQuotes.Queries;
+using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Commands;
+using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Queries;
+using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
-using Application.Features.Users.Commands;
 using AutoMapper;
 using DTO.Authentication;
 using DTO.Enums.Submission;
@@ -16,6 +18,7 @@ using DTO.Response;
 using DTO.Submission;
 using DTO.Submission.Report;
 using DTO.Submission.SubmissionQuote;
+using DTO.Submission.SubmissionQuote.QuoteMessage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +27,13 @@ namespace Api.Controllers.v1
     public class SubmissionController : ApiControllerBase
     {
         private readonly IMapper _mapper;
-        public SubmissionController(IMapper mapper)
+        private readonly ICurrentUserService _currentUserService;
+        public SubmissionController(
+            IMapper mapper,
+            ICurrentUserService currentUserService)
         {
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         [HttpPost]
@@ -135,6 +142,7 @@ namespace Api.Controllers.v1
             return await Mediator.Send(new SubmissionQuoteGetQuery(id));
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet("quote")]
         public async Task<IReadOnlyCollection<SubmissionQuoteResponse>> GetAllQuotes()
         {
@@ -174,5 +182,41 @@ namespace Api.Controllers.v1
             return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>();
         }
 
+        [HttpPost("quote/message")]
+        public async Task<IActionResult> QuoteMessageCreate([FromForm] QuoteMessageCreateRequest request)
+        {
+            var command = _mapper.Map<QuoteMessageCreateCommand>(request);
+
+            await Mediator.Send(command with { SenderId = (int)_currentUserService.UserId!});
+
+            return Ok();
+        }
+
+        [HttpGet("quote/message/{id:int}")]
+        public async Task<QuoteMessageResponse> GetQuoteMessage([FromRoute] int id)
+        {
+            return await Mediator.Send(new QuoteMessageGetQuery(id));
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpGet("quote/message")]
+        public async Task<IReadOnlyCollection<QuoteMessageResponse>> GetAllQuoteMessages()
+        {
+            return await Mediator.Send(new QuoteMessageGetAllQuery());
+        }
+
+        [HttpPost("quote/message/search")]
+        public async Task<PaginatedList<QuoteMessageSearchable>> FullQuoteMessageSearch([FromBody] QuoteMessageFullSearchQuery request)
+        {
+            return await Mediator.Send(request);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPut("quote/message/search/rebuild")]
+        public async Task<IActionResult> RebuildQuoteMessageSearchIndex()
+        {
+            await Mediator.Send(new QuoteMessageInitiateSearchIndexRebuildCommand());
+            return Ok();
+        }
     }
 }

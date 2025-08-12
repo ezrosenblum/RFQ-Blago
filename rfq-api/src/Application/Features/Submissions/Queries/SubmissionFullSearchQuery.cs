@@ -105,9 +105,6 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
         var categories = query.Category;
         var subcategories = query.Subcategory;
 
-        if (query.Category == null || query.Category.Count == 0)
-            categories = await FetchVendorCategories(cancellationToken);
-
         if (query.Subcategory == null || query.Subcategory.Count == 0)
             subcategories = await FetchVendorSubcategories(cancellationToken);
 
