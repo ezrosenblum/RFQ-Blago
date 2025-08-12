@@ -1,0 +1,164 @@
+<div class="flex justify-between pl-25 pr-25 bg-secondary-50 dark:bg-dark-900">
+  <h1 mat-dialog-title>
+    <span *ngIf="action === 'Add'" class="text-secondary-900 dark:text-secondary-100">
+      {{ "VENDOR.SEND_QUOTE" | translate }}
+    </span>
+    <span *ngIf="action === 'Edit'" class="text-secondary-900 dark:text-secondary-100">
+      {{ "VENDOR.EDIT_QUOTE" | translate }}
+    </span>
+  </h1>
+
+  <i class="ki-outline ki-abstract-11 text-base me-1 mr-2 text-secondary-900 dark:text-secondary-100" [mat-dialog-close]="false"></i>
+</div>
+
+<mat-dialog-content class="p-relative bg-secondary-50 dark:bg-dark-900">
+  <form [formGroup]="quoteForm" class="card-body">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Title -->
+      <div class="md:col-span-2">
+        <label for="title" class="form-label">
+          {{ 'REQUEST.TITLE' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          class="form-input"
+          [class.border-red-500]="isFieldInvalid('title')"
+          placeholder="Enter quote title..."
+        />
+        <div *ngIf="isFieldInvalid('title')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('title')?.errors?.['required']">
+            {{ 'VENDOR.TITLE_REQUIRED' | translate }}
+          </span>
+          <span *ngIf="quoteForm.get('title')?.errors?.['maxlength']">
+            {{ 'VENDOR.TITLE_MAX_LENGTH' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="md:col-span-2">
+        <label for="description" class="form-label">
+          {{ 'VENDOR.DESCRIPTION' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          class="form-input resize-none"
+          [class.border-red-500]="isFieldInvalid('description')"
+          placeholder="Enter detailed description..."
+        ></textarea>
+        <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('description')?.errors?.['required']">
+            {{ 'VENDOR.DESCRIPTION_REQUIRED' | translate }}
+          </span>
+          <span *ngIf="quoteForm.get('description')?.errors?.['maxlength']">
+            {{ 'VENDOR.DESCRIPTION_MAX_LENGTH' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Quote Validity Interval Type -->
+      <div>
+        <label for="quoteValidityIntervalType" class="form-label">
+          {{ 'VENDOR.VALIDITY_TYPE' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <select 
+          id="quoteValidityIntervalType" 
+          formControlName="quoteValidityIntervalType" 
+          class="form-select"
+          [class.border-red-500]="isFieldInvalid('quoteValidityIntervalType')"
+        >
+          <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_VALIDITY_TYPE' | translate }}</option>
+          <option 
+            *ngFor="let option of validityTypeOptions" 
+            [ngValue]="option.id"
+          >
+            {{ option.name }}
+          </option>
+        </select>
+        <div *ngIf="isFieldInvalid('quoteValidityIntervalType')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('quoteValidityIntervalType')?.errors?.['required']">
+            {{ 'VENDOR.VALIDITY_TYPE_REQUIRED' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Quote Validity Interval -->
+      <div>
+        <label for="quoteValidityInterval" class="form-label">
+          {{ 'VENDOR.VALIDITY_INTERVAL' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="quoteValidityInterval"
+          type="number"
+          formControlName="quoteValidityInterval"
+          class="form-input"
+          [class.border-red-500]="isFieldInvalid('quoteValidityInterval')"
+          placeholder="Enter number..."
+          min="1"
+        />
+        <div *ngIf="isFieldInvalid('quoteValidityInterval')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['required']">
+            {{ 'VENDOR.VALIDITY_INTERVAL_REQUIRED' | translate }}
+          </span>
+          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['min']">
+            {{ 'VENDOR.VALIDITY_INTERVAL_MIN' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div>
+        <label for="price" class="form-label">
+          {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <input
+            id="price"
+            type="number"
+            formControlName="price"
+            class="form-input pl-8"
+            [class.border-red-500]="isFieldInvalid('price')"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+          />
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-secondary-500 text-sm">$</span>
+          </div>
+        </div>
+        <div *ngIf="isFieldInvalid('price')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('price')?.errors?.['required']">
+            {{ 'VENDOR.PRICE_REQUIRED' | translate }}
+          </span>
+          <span *ngIf="quoteForm.get('price')?.errors?.['min']">
+            {{ 'VENDOR.PRICE_MIN' | translate }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class=" bg-secondary-50 dark:bg-dark-900">
+  <div class="w-100 flex justify-between">
+    <button class="btn btn-error" [mat-dialog-close]="false">
+        {{ "SHARED.CANCEL" | translate }}
+    </button>
+
+
+    <button (click)="onSubmit()"
+        class="btn btn-success ml-5"
+    >
+      <span *ngIf="!isSubmitting">{{ 'AUTH.SUBMIT' | translate }}</span>
+      <div *ngIf="isSubmitting" class="flex items-center">
+        <div class="spinner mr-2"></div>
+        <span>{{ 'AUTH.SUBMIT' | translate }}</span>
+      </div>
+    </button>
+  </div>
+</mat-dialog-actions>

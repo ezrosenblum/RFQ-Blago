@@ -60,6 +60,7 @@ export interface Rfq {
   categories?: Category[];
   subcategories?: Subcategory[];
   media: Media;
+  quotes: QuoteRequest[];
 }
 
 export interface RfqStatistics {
@@ -129,4 +130,14 @@ export interface MediaItem {
 
 export interface Media {
   items: MediaItem[];
+}
+
+export interface QuoteRequest {
+  title: string,
+  description: string,
+  price: number,
+  quoteValidityIntervalType: number,
+  quoteValidityInterval: number,
+  submissionId: number,
+  vendorId: number
 }

@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Category, LookupValue, Rfq, RfqRequest, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse } from '../models/rfq.model';
+import { Category, LookupValue, QuoteRequest, Rfq, RfqRequest, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse } from '../models/rfq.model';
 import { Auth } from './auth';
 import { ApiResponse } from '../models/api-response';
 
@@ -75,6 +75,24 @@ export class RfqService {
             return response;
           }
           throw new Error('Failed to get statistics');
+        })
+      );
+  }
+
+  getRfqQuoteValidityType(): Observable<LookupValue[]> {
+    return this.http.get<LookupValue[]>(`${this.API_URL}Submission/quote/validity-type`)
+      .pipe(
+        map(response => {
+          return response;
+        })
+      );
+  }
+
+  saveQuote(request: QuoteRequest): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}Submission/quote`, request)
+      .pipe(
+        map((response: any) => {
+          return response;
         })
       );
   }
