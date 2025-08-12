@@ -12,6 +12,8 @@ import { AlertService } from '../../../services/alert.service';
 import { ErrorHandlerService } from '../../../services/error-handler.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { usPhoneValidator } from '../../../shared/validators/phone.validators';
+import { PhoneNumberFormatter } from '../../../shared/utils/phone-formatter.util';
 @Component({
   standalone: false,
   selector: 'app-profile-settings',
@@ -70,14 +72,14 @@ export class ProfileSettingsComponent implements OnInit {
     return this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: [null, [Validators.minLength(9)]],
+      email: [{ value: '', disabled: true }],
+      phoneNumber: ['', [usPhoneValidator()]],
       profilePicture: [''],
       companyName: [''],
       contactPersonFirstName: [''],
       contactPersonLastName: [''],
       contactPersonEmail: ['', Validators.email],
-      contactPersonPhone: [''],
+      contactPersonPhone: ['', [usPhoneValidator()]],
       businessDescription: [''],
       businessAddress: [''],
       latitudeAddress: [null],
@@ -86,6 +88,19 @@ export class ProfileSettingsComponent implements OnInit {
       companySize: [null],
       certificateUrl: [null],
     });
+  }
+
+  onPhoneInput(event: Event, fieldName: string): void {
+    const input = event.target as HTMLInputElement;
+    const formattedValue = PhoneNumberFormatter.formatUsPhone(input.value);
+
+    // Update the form control
+    this.userForm
+      .get(fieldName)
+      ?.setValue(formattedValue, { emitEvent: false });
+
+    // Update the input display
+    input.value = formattedValue;
   }
 
   private subscribeToUserChanges(): void {
@@ -408,6 +423,11 @@ export class ProfileSettingsComponent implements OnInit {
 
     if (errors['pattern']) {
       return this.translate.instant('PROFILE.INVALID_PHONE_FORMAT');
+    }
+
+    // Handle US phone validation errors
+    if (errors['usPhone']) {
+      return this.translate.instant('PROFILE.INVALID_US_PHONE_FORMAT');
     }
 
     return '';
