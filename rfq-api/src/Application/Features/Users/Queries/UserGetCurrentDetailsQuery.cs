@@ -21,7 +21,6 @@ public sealed class UserGetCurrentDetailsQueryHandler : IQueryHandler<UserGetCur
     private readonly IMapper _mapper;
     private readonly IApplicationDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ICacheService _cacheService;
     private readonly ILocalizationService _localizationService;
 
     public UserGetCurrentDetailsQueryHandler(
@@ -29,39 +28,28 @@ public sealed class UserGetCurrentDetailsQueryHandler : IQueryHandler<UserGetCur
         IMapper mapper,
         IApplicationDbContext dbContext,
         UserManager<ApplicationUser> userManager,
-        ICacheService cacheService,
         ILocalizationService localizationService)
     {
         _currentUserService = currentUserService;
         _mapper = mapper;
         _dbContext = dbContext;
         _userManager = userManager;
-        _cacheService = cacheService;
         _localizationService = localizationService;
     }
 
     public async Task<MeResponse> Handle(UserGetCurrentDetailsQuery request, CancellationToken cancellationToken)
     {
-        var cacheKey = $"{CacheKeys.User}-me-{_currentUserService.UserId!}";
-
-        ApplicationUser? user = await _cacheService.GetAsync<ApplicationUser>(cacheKey, cancellationToken);
+        var user = await _dbContext.User
+            .Include(u => u.CompanyDetails)
+            .Include(u => u.Categories)
+            .Include(u => u.Subcategories)
+            .FirstOrDefaultAsync(u => u.Id == _currentUserService.UserId);
 
         if (user == null)
-        {
-            user = await _dbContext.User
-                .Include(u => u.CompanyDetails)
-                .Include(u => u.Categories)
-                .Include(u => u.Subcategories)
-                .FirstOrDefaultAsync(u => u.Id == _currentUserService.UserId);
+            throw new NotFoundException(_localizationService.GetValue("user.notFound.error.message"));
 
-            if (user == null)
-                throw new NotFoundException(_localizationService.GetValue("user.notFound.error.message"));
-
-            if (user.Status != UserStatus.Active)
-                throw new UnauthorizedAccessException(_localizationService.GetValue("unauthorizedAccess.inactive.error.message"));
-
-            await _cacheService.AddAsync(cacheKey, user, cancellationToken);
-        }
+        if (user.Status != UserStatus.Active)
+            throw new UnauthorizedAccessException(_localizationService.GetValue("unauthorizedAccess.inactive.error.message"));
 
         var result = _mapper.Map<MeResponse>(user);
         var roles = await _userManager.GetRolesAsync(user);

@@ -1,11 +1,11 @@
 ﻿{
-  "userEmailUniqueValidator.message": "User email: {0} is already in use",
+  "userEmailUniqueValidator.message": "Provided email is already in use",
   "disallowedFileExtensionValidator.message": "File extension: {0} is disallowed",
   "fileSizeValidator.message": "File size: {0} exceed limit of {1}",
   "userStatusAllowed.message": "Status '{0}' is not allowed. Allowed statuses are: {1}",
   "currentPasswordValidator.message": "Invalid user password",
   "preventAdminModificationValidator.message": "Modifications to administrator accounts are not allowed.",
-  "emailConfirmationValidator.message": "Invalid email confirmation link",
+  "emailConfirmationValidator.message": "Invalid email confirmation link",  
   "enum.status.active": "Active",
   "enum.status.inactive": "Inactive",
   "enum.status.deleted": "Deleted",
