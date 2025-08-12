@@ -4,17 +4,33 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FilePondModule } from 'ngx-filepond';
 import { TranslateModule } from '@ngx-translate/core';
 import { MessagesComponent } from './messages';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { AsyncPipe } from '@angular/common';
 
 @NgModule({
   declarations: [
-    MessagesComponent
+    MessagesComponent,
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
     FilePondModule,
-    TranslateModule
+    TranslateModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MatIconModule,
+    MatDialogModule,
+    MatAutocompleteModule,
+    MatFormFieldModule,
+    MatInputModule,
+    AsyncPipe
   ]
 })
 export class MessagesModule { }

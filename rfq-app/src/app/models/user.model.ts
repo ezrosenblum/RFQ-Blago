@@ -36,6 +36,12 @@ export interface User {
   };
 }
 
+export interface userChat {
+  name: string;
+  email: string;
+  id: number;
+}
+
 export interface LookupValue {
   id: number;
   name: string;
@@ -57,4 +63,94 @@ export interface ChangePasswordResponse {
   success: boolean;
   message?: string;
   data?: any;
+}
+
+export interface MessageConevrsationRequest {
+  vendorId: number,
+  submissionUserId: number,
+  paging: {
+    pageNumber: number,
+    pageSize: number
+  },
+  sorting: {
+    field: 1,
+    sortOrder: 1
+  }
+}
+
+export interface MessageAdminConversationList {
+    items: MessageAdminConversationEntry[],
+    pageNumber: number,
+    totalPages: number,
+    totalCount: number,
+    hasPreviousPage: boolean,
+    hasNextPage: boolean
+}
+
+export interface MessageAdminConversationEntry {
+  submission: {
+    id: number;
+    title: string;
+    description: string;
+    quantity: number;
+    unit: {
+      id: number;
+      name: string;
+    };
+    status: {
+      id: number;
+      name: string;
+    };
+    jobLocation: string;
+    user: {
+      id: number;
+      firstName: string;
+      lastName: string;
+      email: string;
+      picture: string;
+      receiveEmailNotifications: boolean;
+      receivePushNotifications: boolean;
+    };
+    submissionDate: string;
+    isValid: boolean;
+    media: {
+      items: any[];
+    };
+    streetAddress: string;
+    latitudeAddress: number;
+    longitudeAddress: number;
+  };
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  quoteValidityIntervalType: {
+    id: number;
+    name: string;
+  };
+  quoteValidityInterval: number;
+  validUntil: string; 
+  submissionId: number;
+  vendorId: number;
+  vendor: {
+    phoneNumber: string | null;
+    suspensionReason: string | null;
+    dateCreated: string;
+    status: {
+      id: number;
+      name: string;
+    };
+    companyDetails: any | null;
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    picture: string | null;
+    receiveEmailNotifications: boolean;
+    receivePushNotifications: boolean;
+  };
+  created: string; 
+  media: {
+    items: any[];
+  };
 }

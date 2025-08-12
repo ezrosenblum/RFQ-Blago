@@ -17,7 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     Header,
     Footer,
     LoadingSpinner,
-    PhoneInputComponent
+    PhoneInputComponent,
   ],
   imports: [
     CommonModule,
@@ -32,7 +32,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     Header,
     Footer,
     LoadingSpinner,
-    PhoneInputComponent
+    PhoneInputComponent,
+    MatTooltipModule,
   ],
 })
 export class SharedModule { }

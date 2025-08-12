@@ -55,20 +55,20 @@
             <div *ngFor="let notif of notifications"
               class="flex items-start px-4 py-3 border-b border-secondary-100 dark:border-secondary-700 text-sm text-secondary-800 dark:text-secondary-200 hover:bg-secondary-50 dark:hover:bg-secondary-900/30"
               [ngClass]="{
-                        'bg-primary-100 dark:bg-dark-700': notif.status?.name === 'Unread'
+                        'bg-primary-100 dark:bg-dark-700': notif.status.name === 'Unread'
                       }">
               <!-- Type Badge + Dot Container -->
               <div class="flex flex-col items-center mt-1 mr-2 space-y-1">
                 <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full" [ngClass]="{
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300': notif.type?.name === 'NewRFQ',
-                            'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300': notif.type?.name === 'NewQuote',
-                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300': notif.type?.name !== 'NewRFQ' && notif.type?.name !== 'NewQuote'
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300': notif.type.name === 'NewRFQ',
+                            'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300': notif.type.name === 'NewQuote',
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300': notif.type.name !== 'NewRFQ' && notif.type.name !== 'NewQuote'
                           }">
-                  {{ notif.type?.name }}
+                  {{ notif.type.name }}
                 </span>
 
                 <!-- Unread Dot below badge -->
-                <span *ngIf="notif.status?.name === 'Unread'" class="w-2 h-2 rounded-full bg-primary-600 block"
+                <span *ngIf="notif.status.name === 'Unread'" class="w-2 h-2 rounded-full bg-primary-600 block"
                   aria-label="Unread notification indicator"></span>
               </div>
 
@@ -86,16 +86,16 @@
                 class="ml-2 text-xs text-primary-600 hover:underline whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
                 (click)="toggleNotificationStatus(notif)" [disabled]="loadingStatusChange[notif.id]">
                 <ng-container *ngIf="!loadingStatusChange[notif.id]; else loading">
-                  <svg *ngIf="notif.status?.name === 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                  <svg *ngIf="notif.status.name === 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  <svg *ngIf="notif.status?.name !== 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                  <svg *ngIf="notif.status.name !== 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                   {{
-                  notif.status?.name === 'Unread'
+                  notif.status.name === 'Unread'
                   ? ('HEADER.MARK_AS_READ' | translate)
                   : ('HEADER.MARK_AS_UNREAD' | translate)
                   }}
@@ -220,20 +220,20 @@
             <div *ngFor="let notif of notifications"
               class="flex items-start px-4 py-3 border-b border-secondary-100 dark:border-secondary-700 text-sm text-secondary-800 dark:text-secondary-200 hover:bg-secondary-50 dark:hover:bg-secondary-900/30"
               [ngClass]="{
-                        'bg-primary-100 dark:bg-dark-700': notif.status?.name === 'Unread'
+                        'bg-primary-100 dark:bg-dark-700': notif.status.name === 'Unread'
                       }">
               <!-- Type Badge + Dot Container -->
               <div class="flex flex-col items-center mt-1 mr-2 space-y-1">
                 <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full" [ngClass]="{
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300': notif.type?.name === 'NewRFQ',
-                            'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300': notif.type?.name === 'NewQuote',
-                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300': notif.type?.name !== 'NewRFQ' && notif.type?.name !== 'NewQuote'
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300': notif.type.name === 'NewRFQ',
+                            'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300': notif.type.name === 'NewQuote',
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300': notif.type.name !== 'NewRFQ' && notif.type.name !== 'NewQuote'
                           }">
-                  {{ notif.type?.name }}
+                  {{ notif.type.name }}
                 </span>
 
                 <!-- Unread Dot below badge -->
-                <span *ngIf="notif.status?.name === 'Unread'" class="w-2 h-2 rounded-full bg-primary-600 block"
+                <span *ngIf="notif.status.name === 'Unread'" class="w-2 h-2 rounded-full bg-primary-600 block"
                   aria-label="Unread notification indicator"></span>
               </div>
 
@@ -251,16 +251,16 @@
                 class="ml-2 text-xs text-primary-600 hover:underline whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
                 (click)="toggleNotificationStatus(notif)" [disabled]="loadingStatusChange[notif.id]">
                 <ng-container *ngIf="!loadingStatusChange[notif.id]; else loading">
-                  <svg *ngIf="notif.status?.name === 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                  <svg *ngIf="notif.status.name === 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  <svg *ngIf="notif.status?.name !== 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                  <svg *ngIf="notif.status.name !== 'Unread'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                   {{
-                  notif.status?.name === 'Unread'
+                  notif.status.name === 'Unread'
                   ? ('HEADER.MARK_AS_READ' | translate)
                   : ('HEADER.MARK_AS_UNREAD' | translate)
                   }}
