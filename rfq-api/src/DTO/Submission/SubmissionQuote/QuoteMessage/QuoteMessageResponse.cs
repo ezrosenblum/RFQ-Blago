@@ -8,7 +8,7 @@ namespace DTO.Submission.SubmissionQuote.QuoteMessage;
 public record QuoteMessageResponse
 {
     public int Id { get; init; }
-    public string Content { get; init; } = null!;
+    public string? Content { get; init; }
     public int SubmissionQuoteId { get; init; }
     public int SenderId { get; init; }
     public DateTime Created { get; init; }
