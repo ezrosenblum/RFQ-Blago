@@ -373,6 +373,7 @@
     "MARK_AS_READ": "Mark as read",
     "MARK_AS_UNREAD": "Mark as unread",
     "ARCHIVE": "Archive",
-    "MESSAGES": "Messages"
+    "MESSAGES": "Messages",
+    "VIEW_CONVERSATION": "View Conversation"
   }
 }

@@ -12,6 +12,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Auth } from '../../services/auth';
 import { FormControl } from '@angular/forms';
 import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, User, userChat } from '../../models/user.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: false,
@@ -34,20 +35,53 @@ import { MessageAdminConversationEntry, MessageAdminConversationList, MessageCon
   ]
 })
 export class MessagesComponent implements OnInit {
-  searchTerm: string = '';
-  filteredConversations: MessageAdminConversationEntry[] = [];
-  newMessage: string = '';
-  selectedChatIndex: number = 0;
-  loadingConversations: boolean = true;
-  loadingChatMessages: boolean = false;
+  // General properties
+  currentUser: User | null = null;
+  isAdmin: boolean = false;
   isDarkMode: boolean = true;
-  readonly dialog = inject(MatDialog);
-  
+  errorMessage = '';
+  colorPalette: Array<string> = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500', 'bg-indigo-500', 'bg-teal-500', 'bg-pink-500'];
+  sidenavTrigger: string = 'out';
+
+  // Left sidenav conversations
   conversations: MessageAdminConversationEntry[] = [];
+  filteredConversations: MessageAdminConversationEntry[] = [];
   adminConversations: MessageAdminConversationEntry[] = [];
   filteredAdminConversations: MessageAdminConversationEntry[] = [];
+  loadingConversations: boolean = true;
+  selectedChatIndex: number = 0;
+  pageSize: number = 10;
+  pageNumber: number = 1;
+
+  // Autocomplete controls - Left sidenav
+  vendorSearchControl = new FormControl();
+  vendorItems: userChat[] = [{name: 'Mary', email: 'marry@email.com', id: 12}, {name: 'Shelley', email: 'shelley@email.com', id: 13}, {name: 'Igor', email: 'igor@email.com', id: 14}];
+  filteredVendorOptions!: Observable<userChat[]>;
+
+  customerSearchControl = new FormControl();
+  customerItems: userChat[] = [{name: 'Mary', email: 'marry@email.com', id: 12}, {name: 'Shelley', email: 'shelley@email.com', id: 13}, {name: 'Igor', email: 'igor@email.com', id: 14}];
+  filteredCustomerOptions!: Observable<userChat[]>;
+
+  // Search conversations - Left sidenav
+  searchTerm: string = '';
+
+  // Main chat properties
+  newMessage: string = '';
+  loadingChatMessages: boolean = false;
   currentMessages: Message[] = [];
 
+  // File upload properties - Main chat
+  showUploadFilesPanel: boolean = false;
+  pondOptions = {
+      allowMultiple: true,
+      maxFiles: 5,
+      labelIdle: 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+  };
+  pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
+  @ViewChild('myPond') myPond!: FilePondComponent;
+  uploadedFilesCount = 0;
+
+  // Right sidenav properties
   activities: Activity[] = [
     {
       icon: 'check',
@@ -75,41 +109,19 @@ export class MessagesComponent implements OnInit {
     },
   ];
   
-  showUploadFilesPanel: boolean = false;
-  pondOptions = {
-      allowMultiple: true,
-      maxFiles: 5,
-      labelIdle: 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
-    };
-  
-  pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
-
-  @ViewChild('myPond') myPond!: FilePondComponent;
-  uploadedFilesCount = 0;
-  sidenavTrigger: string = 'out';
-  errorMessage = '';
-  isAdmin: boolean = false;
-  currentUser: User | null = null;
-
-  vendorSearchControl = new FormControl();
-  vendorItems: userChat[] = [{name: 'Mary', email: 'marry@email.com', id: 12}, {name: 'Shelley', email: 'shelley@email.com', id: 13}, {name: 'Igor', email: 'igor@email.com', id: 14}];
-  filteredVendorOptions!: Observable<userChat[]>;
-
-  customerSearchControl = new FormControl();
-  customerItems: userChat[] = [{name: 'Mary', email: 'marry@email.com', id: 12}, {name: 'Shelley', email: 'shelley@email.com', id: 13}, {name: 'Igor', email: 'igor@email.com', id: 14}];
-  filteredCustomerOptions!: Observable<userChat[]>;
-  colorPalette: Array<string> = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500', 'bg-indigo-500', 'bg-teal-500', 'bg-pink-500'];
 
   constructor(
     private _messageService: MessagesService,
     private _authService: Auth,
+    private route: ActivatedRoute
   ){
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       this.isDarkMode = savedTheme === 'dark';
-    }
+    };
   }
 
+  // Lifecycle Hooks
   ngOnInit(): void {
     this._authService.currentUserSubject.subscribe({
       next: (user) => {
@@ -121,18 +133,77 @@ export class MessagesComponent implements OnInit {
           } else {
             this.loadConversations();
           }
+
+          this.getQueryParams();
         }
       },
       error: (error) => {
         this.handleError(error);
       }
-    })
-
-    this.getUserData();
+    });
+    this.loadUsersListsAndSubscribeChanges();
   }
 
-  getUserData(): void {
-        this._messageService.getAllVendorsWithConversations().pipe(take(1)).subscribe({
+  ngAfterViewChecked() {
+    if (window.innerWidth > 900) {
+      this.sidenavTrigger = 'out';
+    }
+  }
+
+  getQueryParams(): void {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      if (Object.keys(params).length > 0) {
+        switch(this.currentUser?.type) { 
+          case 'Vendor': { 
+              if (params['customerId']) {
+                let request: MessageConevrsationRequest;
+                request = {
+                  vendorId: null,
+                  submissionUserId: params['customerId'],
+                  paging: {
+                    pageNumber: this.pageNumber,
+                    pageSize: this.pageSize
+                  },
+                  sorting: {
+                    field: 1,
+                    sortOrder: 1
+                  }
+                };
+              }
+              break; 
+          } 
+          case 'Customer': { 
+              if (params['vendorId']) {
+                let request: MessageConevrsationRequest;
+                request = {
+                  vendorId: params['vendorId'],
+                  submissionUserId: null,
+                  paging: {
+                    pageNumber: this.pageNumber,
+                    pageSize: this.pageSize
+                  },
+                  sorting: {
+                    field: 1,
+                    sortOrder: 1
+                  }
+                };
+              }
+              break; 
+          } 
+          case 'Administrator': { 
+               if (params['customerId']) {
+                
+              }
+              break; 
+          } 
+        } 
+      }
+    });
+  }
+
+  // API Data Fetching & Sending
+  private loadUsersListsAndSubscribeChanges(): void {
+    this._messageService.getAllVendorsWithConversations().pipe(take(1)).subscribe({
       next: (data: userChat[]) => {
         this.vendorItems = data.map(conv => ({
           name: conv.name,
@@ -181,82 +252,8 @@ export class MessagesComponent implements OnInit {
     });
 
     this.customerSearchControl.valueChanges.subscribe(data => {
-      debugger
+      this.loadConversations();
     });
-  }
-
-  displayFn(user: userChat): string {
-    return user && user.name ? user.name : '';
-  }
-
-  private _filterVendors(name: string): userChat[] {
-    const filterValue = name.toLowerCase();
-
-    return this.vendorItems.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-
-  private _filterCustomers(name: string): userChat[] {
-    const filterValue = name.toLowerCase();
-
-    return this.customerItems.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-
-  onSearchChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const value = input?.value || '';
-    this.searchTerm = value.toLowerCase();
-    this.filteredConversations = this.conversations.filter(
-      (conv) =>
-        conv.title.toLowerCase().includes(this.searchTerm) ||
-        conv.vendor.firstName.toLowerCase().includes(this.searchTerm) ||
-        conv.vendor.lastName.toLowerCase().includes(this.searchTerm) ||
-        conv.submission.title.toLowerCase().includes(this.searchTerm)
-    );
-  }
-
-  get selectedConversation(): MessageAdminConversationEntry | null {
-    if (this.isAdmin && this.adminConversations.length > 0) {
-      return this.adminConversations[this.selectedChatIndex];
-    } else if (this.conversations.length > 0 && this.selectedChatIndex >= 0) {
-      return this.conversations[this.selectedChatIndex];
-    } else {
-      this.loadingChatMessages
-      return null;
-    }
-  }
-
-  selectChat(index: number): void {
-    this.selectedChatIndex = index;
-    //this.loadMessagesForConversation(index);
-  }
-
-  sendMessage(): void {
-    if (this.newMessage.trim()) {
-      const message: Message = {
-        sender: 'You',
-        content: this.newMessage,
-        time: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        isUser: true,
-        initials: 'YU',
-        bgColor: 'bg-gray-500',
-      };
-
-      this._messageService.sendMessage(message).pipe(take(1)).subscribe({
-         next: (data) => {
-          this.currentMessages.push(message);
-          this.newMessage = '';
-
-          // this.conversations[
-          //   this.selectedChatIndex
-          // ].lastMessage = `You: ${message.content}`;
-          // this.conversations[this.selectedChatIndex].time = message.time;
-         },
-         error: (error) => {},
-      })
-    }
   }
 
   private loadAdminConversations(): void {
@@ -352,52 +349,32 @@ export class MessagesComponent implements OnInit {
     })
   }
 
-  openFileUploadDialog(){
-    this.showUploadFilesPanel = !this.showUploadFilesPanel;
-  }
+  sendMessage(): void {
+    if (this.newMessage.trim()) {
+      const message: Message = {
+        sender: 'You',
+        content: this.newMessage,
+        time: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        isUser: true,
+        initials: 'YU',
+        bgColor: 'bg-gray-500',
+      };
 
-  pondHandleInit() {
-  }
+      this._messageService.sendMessage(message).pipe(take(1)).subscribe({
+         next: (data) => {
+          this.currentMessages.push(message);
+          this.newMessage = '';
 
-pondHandleAddFile(event: any) {
-  this.uploadedFilesCount++;
-}
-
-onFileRemoved(event: any) {
-  this.uploadedFilesCount = Math.max(0, this.uploadedFilesCount - 1);
-}
-
-  pondHandleActivateFile(event: any) {
-  }
-
-  onFilesUpdated(files: (string| FilePondInitialFile | Blob | ActualFileObject)[]): void {
-    this.pondFiles = files;
-
-    const rawFiles: File[] = files
-    .map(file => {
-      if (typeof file === 'string') return null;
-      if ('file' in file) return file.file as File;
-      if (file instanceof Blob) return file as File;
-      return null;
-    })
-    .filter((f): f is File => f !== null);
-
-    console.log('raw files', rawFiles)
-  }
-
-  triggerMessagesMobile() {
-    if (window.innerWidth <= 900) {
-      if (this.sidenavTrigger === 'in') {
-        this.sidenavTrigger = 'out';
-      } else {
-        this.sidenavTrigger = 'in';
-      }
-    }
-  } 
-
-  ngAfterViewChecked() {
-    if (window.innerWidth > 900) {
-      this.sidenavTrigger = 'out';
+          // this.conversations[
+          //   this.selectedChatIndex
+          // ].lastMessage = `You: ${message.content}`;
+          // this.conversations[this.selectedChatIndex].time = message.time;
+         },
+         error: (error) => {},
+      })
     }
   }
 
@@ -424,6 +401,99 @@ onFileRemoved(event: any) {
     }
   }
 
+  // Filtering and Selection functions
+  displayFn(user: userChat): string {
+    return user && user.name ? user.name : '';
+  }
+
+  private _filterVendors(name: string): userChat[] {
+    const filterValue = name.toLowerCase();
+
+    return this.vendorItems.filter(option => option.name.toLowerCase().includes(filterValue));
+  }
+
+  private _filterCustomers(name: string): userChat[] {
+    const filterValue = name.toLowerCase();
+
+    return this.customerItems.filter(option => option.name.toLowerCase().includes(filterValue));
+  }
+
+  onSearchChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input?.value || '';
+    this.searchTerm = value.toLowerCase();
+    this.filteredConversations = this.conversations.filter(
+      (conv) =>
+        conv.title.toLowerCase().includes(this.searchTerm) ||
+        conv.vendor.firstName.toLowerCase().includes(this.searchTerm) ||
+        conv.vendor.lastName.toLowerCase().includes(this.searchTerm) ||
+        conv.submission.title.toLowerCase().includes(this.searchTerm)
+    );
+  }
+
+  get selectedConversation(): MessageAdminConversationEntry | null {
+    if (this.isAdmin && this.adminConversations.length > 0) {
+      return this.adminConversations[this.selectedChatIndex];
+    } else if (this.conversations.length > 0 && this.selectedChatIndex >= 0) {
+      return this.conversations[this.selectedChatIndex];
+    } else {
+      this.loadingChatMessages
+      return null;
+    }
+  }
+
+  selectChat(index: number): void {
+    this.selectedChatIndex = index;
+    this.loadMessagesForConversation(index);
+  }
+
+
+  // Upload files 
+  toggleFileUploadPanel(){
+    this.showUploadFilesPanel = !this.showUploadFilesPanel;
+  }
+
+  pondHandleInit() {
+  }
+
+  pondHandleAddFile(event: any) {
+    this.uploadedFilesCount++;
+  }
+
+  onFileRemoved(event: any) {
+    this.uploadedFilesCount = Math.max(0, this.uploadedFilesCount - 1);
+  }
+
+  pondHandleActivateFile(event: any) {
+  }
+
+  onFilesUpdated(files: (string| FilePondInitialFile | Blob | ActualFileObject)[]): void {
+    this.pondFiles = files;
+
+    const rawFiles: File[] = files
+    .map(file => {
+      if (typeof file === 'string') return null;
+      if ('file' in file) return file.file as File;
+      if (file instanceof Blob) return file as File;
+      return null;
+    })
+    .filter((f): f is File => f !== null);
+
+    console.log('raw files', rawFiles)
+  }
+
+
+  // Other formatting and error handling methods
+  triggerMessagesMobile() {
+    if (window.innerWidth <= 900) {
+      if (this.sidenavTrigger === 'in') {
+        this.sidenavTrigger = 'out';
+      } else {
+        this.sidenavTrigger = 'in';
+      }
+    }
+  } 
+
   transform(value: string | undefined | null) {
     if (value) {
       let names = value.split(' ');
@@ -434,20 +504,19 @@ onFileRemoved(event: any) {
     }
   }
 
-mapLetterToElement(name: string): any | undefined {
-  if (!name) return this.colorPalette[0];
+  mapLetterToElement(name: string): any | undefined {
+    if (!name) return this.colorPalette[0];
 
-  const firstLetter = name.charAt(0).toUpperCase();
-  const asciiCode = firstLetter.charCodeAt(0);
+    const firstLetter = name.charAt(0).toUpperCase();
+    const asciiCode = firstLetter.charCodeAt(0);
 
-  if (asciiCode >= 65 && asciiCode <= 90) {
-    const index = (asciiCode - 65) % this.colorPalette.length;
-    return this.colorPalette[index];
+    if (asciiCode >= 65 && asciiCode <= 90) {
+      const index = (asciiCode - 65) % this.colorPalette.length;
+      return this.colorPalette[index];
+    }
+
+    return this.colorPalette[0];
   }
-
-  return this.colorPalette[0];
-}
-
 
   handleError(error: any): void {
     if (error.status === 401) {
