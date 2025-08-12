@@ -107,6 +107,16 @@
         </ul>
       </div>
 
+      <!-- Conversaton -->
+      <button
+        type="button"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-800"
+        (click)="navigateToMessages()"
+      >
+        <i class="ki-outline ki-messages text-base me-1 mr-2 fs-24"></i>
+        {{ 'MESSAGES.VIEW_CONVERSATION' | translate }}
+      </button>
+
     </div>
   </div>
 </div>

@@ -96,6 +96,13 @@
     input, .mat-mdc-form-field-flex {
         height: 42px !important;
         font-size: 14px !important;
+    }
+
+    input {
+        background-color: white;
+    }
+
+    .bg-dark input {
         background-color: #1f2937 !important;
     }
 

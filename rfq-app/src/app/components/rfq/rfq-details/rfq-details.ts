@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RfqService } from '../../../services/rfq';
 import { Subject, take, takeUntil } from 'rxjs';
 import { LookupValue, Rfq } from '../../../models/rfq.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -18,7 +18,8 @@ export class RfqDetails implements OnInit, OnDestroy{
 
   constructor(
     private route: ActivatedRoute,
-    private rfqService: RfqService
+    private rfqService: RfqService,
+    private router: Router
   ) {
   }
 
@@ -83,6 +84,10 @@ export class RfqDetails implements OnInit, OnDestroy{
       (firstName?.charAt(0) || '') +
       (lastName?.charAt(0) || '')
     ).toUpperCase();
+  }
+
+  navigateToMessages(): void {
+    this.router.navigate(['/messages'], {queryParams: { rfqId: this.rfq.id, customerId: this.rfq?.user?.id }});
   }
 
   ngOnDestroy(): void {
