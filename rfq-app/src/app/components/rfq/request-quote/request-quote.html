@@ -266,7 +266,7 @@
           </div>
         </div>
 
-        <app-material-categories-selection [isRequestQuote]="true"></app-material-categories-selection>
+        <app-material-categories-selection [isRequestQuote]="true" [clearData]="clearData"></app-material-categories-selection>
 
         <!-- FilePond drag and drop input -->
         <file-pond
@@ -277,7 +277,17 @@
           (onupdatefiles)="onFilesUpdated($event)">
         </file-pond>
         <!-- Form Actions -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-secondary-200 dark:border-secondary-700">
+        <div class="flex flex-col sm:flex-row justify-between pt-6 border-t border-secondary-200 dark:border-secondary-700">
+          <!-- Clear Button -->
+          <button
+            type="button"
+            (click)="clearForm()"
+            [disabled]="isSubmitting"
+            class="btn btn-outline px-6 py-3 text-base"
+          >
+            {{ 'REQUEST.CLEAR_FORM' | translate }}
+          </button>
+
           <!-- Submit Button -->
           <button
             type="submit"
@@ -295,16 +305,6 @@
               <div class="spinner mr-2"></div>
               <span>{{ 'REQUEST.SUBMITTING' | translate }}</span>
             </div>
-          </button>
-
-          <!-- Clear Button -->
-          <button
-            type="button"
-            (click)="clearForm()"
-            [disabled]="isSubmitting"
-            class="btn btn-outline px-6 py-3 text-base"
-          >
-          {{ 'REQUEST.CLEAR_FORM' | translate }}
           </button>
         </div>
 

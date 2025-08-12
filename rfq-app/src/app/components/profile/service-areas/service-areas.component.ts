@@ -64,7 +64,7 @@ export class ServiceAreasComponent {
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: defaultLocation,
-      zoom: 12,
+      zoom: 8,
       styles: [
         { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
         { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
