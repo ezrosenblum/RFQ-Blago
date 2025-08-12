@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
 using Application.Common.MessageBroker;
+using Application.Common.Services;
 using Application.Features.Notifications.Commands;
 using AutoMapper;
 using Domain.Entities.Submissions;
@@ -23,17 +24,20 @@ public sealed record SubmissionAlertForNewCommandHandler : ICommandHandler<Submi
     private readonly ISender _mediatr;
     private readonly IMapper _mapper;
     private readonly IMessagePublisher _messagePublisher;
+    private readonly IGeoCoverageService _geoCoverageService;
 
     public SubmissionAlertForNewCommandHandler(
         IApplicationDbContext dbContext,
         ISender mediatr,
         IMapper mapper,
-        IMessagePublisher messagePublisher)
+        IMessagePublisher messagePublisher,
+        IGeoCoverageService geoCoverageService)
     {
         _dbContext = dbContext;
         _mediatr = mediatr;
         _mapper = mapper;
         _messagePublisher = messagePublisher;
+        _geoCoverageService = geoCoverageService;
     }
 
     public async Task Handle(SubmissionAlertForNewCommand command, CancellationToken cancellationToken)
@@ -48,7 +52,17 @@ public sealed record SubmissionAlertForNewCommandHandler : ICommandHandler<Submi
 
         var vendors = await _dbContext.User
             .Include(v => v.CompanyDetails)
-            .Where(v => v.CompanyDetails != null)
+            .Include(v => v.Categories)
+            .Include(v => v.Subcategories)
+            .Where(v => v.CompanyDetails != null &&
+                        _geoCoverageService.IsPointWithinCoverage(
+                            submission.LatitudeAddress ?? 0,
+                            submission.LongitudeAddress ?? 0,
+                            v.CompanyDetails.LatitudeAddress ?? 0,
+                            v.CompanyDetails.LongitudeAddress ?? 0,
+                            v.CompanyDetails.OperatingRadius ?? 0) &&
+                        (v.Categories.Any(s => submission.Categories.Any(d => d.Id == s.Id)) ||
+                         v.Subcategories.Any(s => submission.Subcategories.Any(d => d.Id == s.Id))))
             .ToListAsync(cancellationToken);
 
         foreach (var vendor in vendors)

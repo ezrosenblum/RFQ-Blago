@@ -238,7 +238,7 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
         {
             combinedQuery &= (BuildTextQuery(criteria.Query) ||
                               BuildWildcardQuery("title", criteria.Query) ||
-                              BuildWildcardQuery("description", criteria.Query));
+                              BuildWildcardQuery("submission.title", criteria.Query));
         }
 
         if (criteria.VendorId.HasValue)
