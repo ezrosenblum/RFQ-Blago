@@ -79,7 +79,7 @@ export class RfqService {
       );
   }
 
-  getRfqQuoteVilidityType(): Observable<LookupValue[]> {
+  getRfqQuoteValidityType(): Observable<LookupValue[]> {
     return this.http.get<LookupValue[]>(`${this.API_URL}Submission/quote/validity-type`)
       .pipe(
         map(response => {

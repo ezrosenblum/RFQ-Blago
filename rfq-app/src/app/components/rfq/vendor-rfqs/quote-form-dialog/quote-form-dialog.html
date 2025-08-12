@@ -133,10 +133,10 @@
         </div>
         <div *ngIf="isFieldInvalid('price')" class="mt-1 text-sm text-red-500">
           <span *ngIf="quoteForm.get('price')?.errors?.['required']">
-            {{ 'QUOTE.PRICE_REQUIRED' | translate }}
+            {{ 'VENDOR.PRICE_REQUIRED' | translate }}
           </span>
           <span *ngIf="quoteForm.get('price')?.errors?.['min']">
-            {{ 'QUOTE.PRICE_MIN' | translate }}
+            {{ 'VENDOR.PRICE_MIN' | translate }}
           </span>
         </div>
       </div>

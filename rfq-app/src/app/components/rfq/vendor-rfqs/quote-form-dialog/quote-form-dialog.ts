@@ -39,7 +39,7 @@ export class QuoteFormDialog implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rfqService.getRfqQuoteVilidityType().subscribe({
+    this.rfqService.getRfqQuoteValidityType().subscribe({
       next: (response) => {
         this.validityTypeOptions = response;
         // if (this._data && this._data.quote) {

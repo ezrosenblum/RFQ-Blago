@@ -651,6 +651,28 @@ export class VendorRfqs implements OnInit, OnDestroy {
     return selectedNames.join(', ');
   }
 
+  canSendQuote(rfq: Rfq): boolean {
+    if (!this.currentUser || this.currentUser.type !== UserRole.VENDOR) {
+      return false;
+    }
+    if (!rfq.quotes || rfq.quotes.length === 0) {
+      return true;
+    }
+    const firstQuote = rfq.quotes[0];
+    return !firstQuote.vendorId || firstQuote.vendorId !== this.currentUser.id;
+  }
+
+  hasSentQuote(rfq: Rfq): boolean {
+    if (!this.currentUser || this.currentUser.type !== UserRole.VENDOR) { 
+      return false;
+    } 
+    if (!rfq.quotes || rfq.quotes.length === 0) {
+      return false;
+    }
+    const firstQuote = rfq.quotes[0];
+    return firstQuote.vendorId !== undefined && firstQuote.vendorId !== null && firstQuote.vendorId === this.currentUser.id;
+  }
+
   openQuoteFormDialog(id: number, customerId: number, edit: boolean){
     const dialogRef = this._dialog.open(QuoteFormDialog, {
       width: '60%',
