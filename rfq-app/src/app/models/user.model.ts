@@ -49,6 +49,7 @@ export interface LookupValue {
 export enum UserRole {
   VENDOR = 'Vendor',
   CLIENT = 'Customer',
+  ADMIN = 'Administrator'
 }
 
 export type FileType = 'avatar' | 'certificate';
