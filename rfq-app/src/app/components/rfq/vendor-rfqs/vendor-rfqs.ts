@@ -92,6 +92,29 @@ export class VendorRfqs implements OnInit, OnDestroy {
     { value: 4, label: 'JobLocation' },
   ];
 
+  statusStyles: Record<number, { container: string; dot: string }> = {
+    1: { // Pending Review
+      container: 'bg-yellow-100 text-yellow-800 border border-yellow-400',
+      dot: 'text-yellow-500'
+    },
+    2: { // Approved
+      container: 'bg-green-100 text-green-800 border border-green-500',
+      dot: 'text-green-500'
+    },
+    3: { // Rejected
+      container: 'bg-red-100 text-red-800 border border-red-500',
+      dot: 'text-red-500'
+    },
+    4: { // Archived
+      container: 'bg-gray-100 text-gray-800 border border-gray-400',
+      dot: 'text-gray-500'
+    },
+    5: { // Completed
+      container: 'bg-blue-100 text-blue-800 border border-blue-500',
+      dot: 'text-blue-500'
+    }
+  };
+
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
@@ -663,9 +686,9 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   hasSentQuote(rfq: Rfq): boolean {
-    if (!this.currentUser || this.currentUser.type !== UserRole.VENDOR) { 
+    if (!this.currentUser || this.currentUser.type !== UserRole.VENDOR) {
       return false;
-    } 
+    }
     if (!rfq.quotes || rfq.quotes.length === 0) {
       return false;
     }
@@ -712,6 +735,38 @@ export class VendorRfqs implements OnInit, OnDestroy {
         }
       });
   }
+  // Expose Math to template
+  Math = Math;
 
-  Math = Math; // Expose Math for use in templates
+  toggleDescription(id: string, event: Event) {
+    const desc = document.getElementById(id);
+    const btn = event.target as HTMLButtonElement;
+    if (!desc) return;
+
+    if (desc.classList.contains('description-collapsed')) {
+      desc.classList.remove('description-collapsed');
+      desc.classList.add('description-expanded');
+      btn.textContent = this.translate.instant('VENDOR.SHOW_LESS');
+    } else {
+      desc.classList.remove('description-expanded');
+      desc.classList.add('description-collapsed');
+      btn.textContent = this.translate.instant('VENDOR.SHOW_MORE');
+    }
+  }
+
+  scrollLeft(id: string) {
+    document.getElementById(id)?.scrollBy({ left: -200, behavior: 'smooth' });
+  }
+
+  scrollRight(id: string) {
+    document.getElementById(id)?.scrollBy({ left: 200, behavior: 'smooth' });
+  }
+
+  get isTableView(): boolean {
+    return this.viewMode === 'table';
+  }
+
+  navigateToMessages(rfq: Rfq): void {
+    this.router.navigate(['/messages'], {queryParams: { rfqId: rfq.id, customerId: rfq?.user?.id }});
+  }
 }

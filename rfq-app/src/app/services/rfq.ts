@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Category, LookupValue, QuoteRequest, Rfq, RfqRequest, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse } from '../models/rfq.model';
+import { Category, LookupValue, QuoteRequest, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, QuoteSearchRequest, QuoteSearchResponse } from '../models/rfq.model';
 import { Auth } from './auth';
 import { ApiResponse } from '../models/api-response';
 
@@ -125,5 +125,9 @@ export class RfqService {
 
   getRfqDetails(id: number): Observable<Rfq> {
     return this.http.get<Rfq>(`${this.API_URL}Submission/${id}`)
+  }
+
+  getQuotes(request: QuoteSearchRequest): Observable<QuoteSearchResponse> {
+    return this.http.post<QuoteSearchResponse>(`${this.API_URL}Submission/quote/search`, request);
   }
 }

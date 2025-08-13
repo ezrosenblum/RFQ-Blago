@@ -14,7 +14,6 @@ export interface RfqRequest {
   files: File[];
 }
 
-
 export interface LookupValue {
   id: number;
   name: string;
@@ -38,14 +37,31 @@ export interface SubmissionTableRequest {
   subcategory?: number;
   dateFrom?: Date;
   dateTo?: Date;
-  paging: {
-    pageNumber: number;
-    pageSize: number;
-  },
-  sorting?: {
-    field: number;
-    sortOrder: number;
-  };
+  paging: Paging;
+  sorting: Sorting;
+}
+
+export interface QuoteSearchRequest {
+  query?: string;
+  vendorId?: number;
+  submissionId?: number;
+  submissionUserId?: number;
+  priceFrom?: number;
+  priceTo?: number;
+  validFrom?: string;
+  validTo?: string;
+  paging?: Paging;
+  sorting?: Sorting;
+}
+
+export interface Paging {
+  pageNumber: number;
+  pageSize: number;
+}
+
+export interface Sorting {
+  field: number;
+  sortOrder: number;
 }
 
 export interface Rfq {
@@ -61,6 +77,7 @@ export interface Rfq {
   subcategories?: Subcategory[];
   media: Media;
   quotes: QuoteRequest[];
+  title?: string;
 }
 
 export interface RfqStatistics {
@@ -140,4 +157,104 @@ export interface QuoteRequest {
   quoteValidityInterval: number,
   submissionId: number,
   vendorId: number
+}
+
+export interface StatusHistoryItem {
+  vendorId: number;
+  dateCreated: string;
+  status: LookupValue;
+}
+
+export interface UserDetails {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  picture: string;
+  receiveEmailNotifications: boolean;
+  receivePushNotifications: boolean;
+}
+
+export interface Unit extends LookupValue {}
+
+export interface SubmissionStatus extends LookupValue {}
+
+export interface Submission {
+  id: number;
+  title: string;
+  description: string;
+  quantity: number;
+  unit: Unit;
+  status: SubmissionStatus;
+  jobLocation: string;
+  user: UserDetails;
+  submissionDate: string;
+  isValid: boolean;
+  media: Media;
+  streetAddress: string;
+  latitudeAddress: number;
+  longitudeAddress: number;
+}
+
+export interface CompanySize extends LookupValue {}
+
+export interface CompanyDetails {
+  id: number;
+  name: string;
+  contactPersonFirstName: string;
+  contactPersonLastName: string;
+  contactPersonEmail: string;
+  contactPersonPhone: string;
+  description: string;
+  streetAddress: string;
+  latitudeAddress: number;
+  longitudeAddress: number;
+  operatingRadius: number;
+  companySize: CompanySize;
+  certificateUrl: string | null;
+}
+
+export interface VendorStatus extends LookupValue {}
+
+export interface Vendor {
+  phoneNumber: string | null;
+  suspensionReason: string | null;
+  dateCreated: string;
+  status: VendorStatus;
+  companyDetails: CompanyDetails;
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  picture: string;
+  receiveEmailNotifications: boolean;
+  receivePushNotifications: boolean;
+}
+
+export interface QuoteValidityIntervalType extends LookupValue {}
+
+export interface QuoteItem {
+  submission: Submission;
+  lastMessage: string | null;
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  quoteValidityIntervalType: QuoteValidityIntervalType;
+  quoteValidityInterval: number;
+  validUntil: string;
+  submissionId: number;
+  vendorId: number;
+  vendor: Vendor;
+  created: string;
+  media: Media;
+}
+
+export interface QuoteSearchResponse {
+  items: QuoteItem[];
+  pageNumber: number;
+  totalPages: number;
+  totalCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
