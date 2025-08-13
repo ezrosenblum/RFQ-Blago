@@ -25,6 +25,7 @@ public sealed class SubmissionGetAllQueryHandler : IQueryHandler<SubmissionGetAl
     {
         var submissions = await _dbContext.Submission
             .AsNoTracking()
+            .Include(s => s.SubmissionQuotes)
             .Include(s => s.User)
             .Include(s => s.Categories)
             .Include(s => s.Subcategories)

@@ -12,4 +12,5 @@ public record SubmissionResponse : SubmissionBaseResponse
     public List<SubmissionStatusHistoryCountResponse> StatusHistoryCount { get; set; } = new();
     public List<ListItemBaseResponse> Categories { get; init; } = new();
     public List<ListItemBaseResponse> Subcategories { get; init; } = new();
+    public decimal QuotesAveragePrice { get; init; }
 }

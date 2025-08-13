@@ -8,7 +8,9 @@ using DTO.Notification;
 using DTO.Response;
 using DTO.Submission;
 using DTO.Submission.Report;
+using DTO.Submission.SubmissionQuote;
 using DTO.Submission.SubmissionStatusHistory;
+using System.Diagnostics;
 
 namespace Application.Features.Submissions.Mappings;
 
@@ -48,6 +50,8 @@ public sealed class SubmissionMapperProfile : Profile
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
 
         CreateMap<Submission, SubmissionResponse>()
+            .ForMember(s => s.QuotesAveragePrice, opt => opt.MapFrom(d => d.SubmissionQuotes.Any() ? d.SubmissionQuotes.Average(s => s.Price) : 0))
+            .ForMember(s => s.Quotes, opt => opt.MapFrom(d => new List<SubmissionQuoteBaseResponse>()))
             .ForMember(s => s.StatusHistoryCount, opt => opt.MapFrom(d => d.StatusHistory.GroupBy(s => s.Status)
                                                                                          .Select(s => new SubmissionStatusHistoryCountResponse()
                                                                                          {
@@ -63,6 +67,8 @@ public sealed class SubmissionMapperProfile : Profile
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
 
         CreateMap<Submission, SubmissionSearchable>()
+            .ForMember(s => s.QuotesAveragePrice, opt => opt.MapFrom(d => d.SubmissionQuotes.Any() ? d.SubmissionQuotes.Average(s => s.Price) : 0))
+            .ForMember(s => s.Quotes, opt => opt.MapFrom(d => new List<SubmissionQuoteBaseResponse>()))
             .ForMember(s => s.StatusHistoryCount, opt => opt.MapFrom(d => d.StatusHistory.GroupBy(s => s.Status)
                                                                                          .Select(s => new SubmissionStatusHistoryCountResponse()
                                                                                          {
