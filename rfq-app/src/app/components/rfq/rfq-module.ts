@@ -12,13 +12,15 @@ import { RfqDetails } from './rfq-details/rfq-details';
 import { MaterialCategoriesSelectionComponent } from '../profile/material-categories-selection/material-categories-selection.component';
 import { QuoteFormDialog } from './vendor-rfqs/quote-form-dialog/quote-form-dialog';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MyQuotesComponent } from './my-quotes/my-quotes';
 
 @NgModule({
   declarations: [
     RequestQuote,
     VendorRfqs,
     RfqDetails,
-    QuoteFormDialog
+    QuoteFormDialog,
+    MyQuotesComponent
   ],
   imports: [
     CommonModule,

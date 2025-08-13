@@ -237,8 +237,26 @@
     "VENDOR_REQUIRED": "Vendor ID is required",
     "SELECT_VENDOR": "Select vendor",
     "QUOTE_SUBMITTED_SUCCESS": "Quote submitted successfully!",
-    "QUOTE_UPDATED_SUCCESS": "Quote updated successfully!", 
-    "QUOTE_SUBMISSION_FAILED": "Quote submission failed. Please try again."
+    "QUOTE_UPDATED_SUCCESS": "Quote updated successfully!",
+    "QUOTE_SUBMISSION_FAILED": "Quote submission failed. Please try again.",
+    "MY_QUOTES": "My Quotes",
+    "MY_QUOTES_DESCRIPTION": "View and manage your quotes.",
+    "FILTERS_AND_SEARCH": "Filters & Search",
+    "SEARCH_BY_FILTERS": "Search descriptions, locations, emails...",
+    "PRICE_FROM": "Price From",
+    "MIN_PRICE": "Min Price",
+    "PRICE_TO": "Price To",
+    "MAX_PRICE": "Max Price",
+    "LOADING": "Loading quotes...",
+    "QUOTES_FOUND": "Quotes found",
+    "TOTAL_PROJECT_COST": "Total Project Cost",
+    "VENDOR_PROPOSAL": "Vendor Proposal",
+    "MESSAGE": "Message",
+    "TOTAL_COST": "Total Cost",
+    "VENDOR": "Vendor",
+    "QUOTE_ID": "Quote ID",
+    "NO_QUOTES_FOUND": "No quotes found",
+    "TRY_ADJUSTING_YOUR_SEARCH_CRITERIA": "Try adjusting your search criteria."
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
@@ -261,7 +279,9 @@
     "MARK_AS_READ": "Mark as read",
     "MARK_AS_UNREAD": "Mark as unread",
     "NO_NOTIFICATIONS": "No notifications",
-    "LOADING_MORE": "Loading more..."
+    "LOADING_MORE": "Loading more...",
+    "MY_QUOTES": "My Quotes",
+    "MANAGE_PROFILE_INFORMATIONS": "Manage Profile Informations"
   },
 
   "SERVICE_AREA": {
