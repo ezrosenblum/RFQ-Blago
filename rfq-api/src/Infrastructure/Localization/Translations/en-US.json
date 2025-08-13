@@ -5,7 +5,7 @@
   "userStatusAllowed.message": "Status '{0}' is not allowed. Allowed statuses are: {1}",
   "currentPasswordValidator.message": "Invalid user password",
   "preventAdminModificationValidator.message": "Modifications to administrator accounts are not allowed.",
-  "emailConfirmationValidator.message": "Invalid email confirmation link",  
+  "emailConfirmationValidator.message": "Invalid email confirmation link",
   "enum.status.active": "Active",
   "enum.status.inactive": "Inactive",
   "enum.status.deleted": "Deleted",
@@ -13,8 +13,8 @@
   "enum.userStatus.active": "Active",
   "enum.userStatus.deactivated": "Deactivated",
   "enum.userStatus.suspended": "Suspended",
-  "enum.userStatus.awaitingConfirmation": "AwaitingConfirmation",
-  "enum.userStatus.awaitingInvitation": "AwaitingInvitation",
+  "enum.userStatus.awaitingConfirmation": "Awaiting Confirmation",
+  "enum.userStatus.awaitingInvitation": "Awaiting Invitation",
   "enum.gender.female": "Female",
   "enum.gender.male": "Male",
   "enum.notificationStatus.unread": "Unread",
@@ -55,5 +55,8 @@
   "enum.submissionStatusHistoryType.new": "New",
   "enum.submissionStatusHistoryType.viewed": "Viewed",
   "enum.submissionStatusHistoryType.quoted": "Quoted",
-  "enum.submissionStatusHistoryType.engaged": "Engaged"
+  "enum.submissionStatusHistoryType.engaged": "Engaged",
+  "enum.submissionUnit.lf": "Linear Feet",
+  "enum.submissionUnit.sf": "Square Feet",
+  "enum.submissionUnit.ea": "Each"
 }

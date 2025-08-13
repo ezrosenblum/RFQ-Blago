@@ -85,12 +85,37 @@ export class VendorRfqs implements OnInit, OnDestroy {
   showAllCategories = false;
   showAllSubcategories = false;
 
+  carouselScrollStates: { [key: string]: { canScrollLeft: boolean; canScrollRight: boolean; needsScroll: boolean } } = {};
+
   sortOptions = [
     { value: 1, label: 'Submission Date' },
     { value: 2, label: 'Description' },
     { value: 3, label: 'Quantity' },
     { value: 4, label: 'JobLocation' },
   ];
+
+  statusStyles: Record<number, { container: string; dot: string }> = {
+    1: { // Pending Review
+      container: 'bg-yellow-100 text-yellow-800 border border-yellow-400',
+      dot: 'text-yellow-500'
+    },
+    2: { // Approved
+      container: 'bg-green-100 text-green-800 border border-green-500',
+      dot: 'text-green-500'
+    },
+    3: { // Rejected
+      container: 'bg-red-100 text-red-800 border border-red-500',
+      dot: 'text-red-500'
+    },
+    4: { // Archived
+      container: 'bg-gray-100 text-gray-800 border border-gray-400',
+      dot: 'text-gray-500'
+    },
+    5: { // Completed
+      container: 'bg-blue-100 text-blue-800 border border-blue-500',
+      dot: 'text-blue-500'
+    }
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -317,6 +342,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
             : [];
           this.totalItems = response.totalCount!;
           this.totalPages = response.totalPages!;
+          this.initializeCarouselStates();
         },
         error: (error) => {
           this.handleError(error);
@@ -663,9 +689,9 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   hasSentQuote(rfq: Rfq): boolean {
-    if (!this.currentUser || this.currentUser.type !== UserRole.VENDOR) { 
+    if (!this.currentUser || this.currentUser.type !== UserRole.VENDOR) {
       return false;
-    } 
+    }
     if (!rfq.quotes || rfq.quotes.length === 0) {
       return false;
     }
@@ -712,6 +738,81 @@ export class VendorRfqs implements OnInit, OnDestroy {
         }
       });
   }
+  // Expose Math to template
+  Math = Math;
 
-  Math = Math; // Expose Math for use in templates
+  toggleDescription(id: string, event: Event) {
+    const desc = document.getElementById(id);
+    const btn = event.target as HTMLButtonElement;
+    if (!desc) return;
+
+    if (desc.classList.contains('description-collapsed')) {
+      desc.classList.remove('description-collapsed');
+      desc.classList.add('description-expanded');
+      btn.textContent = this.translate.instant('VENDOR.SHOW_LESS');
+    } else {
+      desc.classList.remove('description-expanded');
+      desc.classList.add('description-collapsed');
+      btn.textContent = this.translate.instant('VENDOR.SHOW_MORE');
+    }
+  }
+  get isTableView(): boolean {
+    return this.viewMode === 'table';
+  }
+
+  navigateToMessages(rfq: Rfq): void {
+    this.router.navigate(['/messages'], {queryParams: { rfqId: rfq.id, customerId: rfq?.user?.id }});
+  }
+
+  initializeCarouselStates() {
+    if (this.filteredRfqs) {
+        this.filteredRfqs.forEach(rfq => {
+          this.updateScrollState('carousel' + rfq.id);
+        });
+    }
+  }
+
+  scrollLeft(id: string) {
+    const carousel = document.getElementById(id);
+    if (carousel) {
+      carousel.scrollBy({ left: -200, behavior: 'smooth' });
+      setTimeout(() => this.updateScrollState(id), 300);
+    }
+  }
+
+  scrollRight(id: string) {
+    const carousel = document.getElementById(id);
+    if (carousel) {
+      carousel.scrollBy({ left: 200, behavior: 'smooth' });
+      setTimeout(() => this.updateScrollState(id), 300);
+    }
+  }
+
+  updateScrollState(id: string) {
+    const carousel = document.getElementById(id);
+    if (!carousel) return;
+
+    const scrollLeft = carousel.scrollLeft;
+    const scrollWidth = carousel.scrollWidth;
+    const clientWidth = carousel.clientWidth;
+
+    const needsScroll = scrollWidth > clientWidth;
+
+    const canScrollLeft = scrollLeft > 0;
+    const canScrollRight = scrollLeft < (scrollWidth - clientWidth - 1);
+
+    this.carouselScrollStates[id] = {
+      canScrollLeft: canScrollLeft && needsScroll,
+      canScrollRight: canScrollRight && needsScroll,
+      needsScroll
+    };
+  }
+
+  onCarouselScroll(event: Event, id: string) {
+    this.updateScrollState(id);
+  }
+
+  getScrollState(id: string) {
+    return this.carouselScrollStates[id] || { canScrollLeft: false, canScrollRight: false, needsScroll: false };
+  }
 }

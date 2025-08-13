@@ -2,7 +2,7 @@
 
 namespace DTO.Submission;
 
-public sealed record SubmissionCreateRequest
+public record SubmissionCreateRequest
 {
     public string Title { get; init; } = null!;
     public string Description { get; init; } = null!;

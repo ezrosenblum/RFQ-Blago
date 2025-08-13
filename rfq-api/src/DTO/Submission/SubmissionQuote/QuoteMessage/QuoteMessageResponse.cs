@@ -13,6 +13,6 @@ public record QuoteMessageResponse
     public int SenderId { get; init; }
     public DateTime Created { get; init; }
     public ListItemBaseResponse QuoteMessageStatus { get; init; } = new();
-    public MediaResponse Media { get; private set; } = null!;
-    public UserBaseResponse Sender { get; private set; } = null!;
+    public MediaResponse Media { get; init; } = new();
+    public UserBaseResponse Sender { get; init; } = null!;
 }

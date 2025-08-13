@@ -12,4 +12,5 @@ public interface ISubmissionQuoteFullSearchCriteria : IFullSearchCriteria<Submis
     public decimal? PriceTo { get; }
     public DateTime? ValidFrom { get; }
     public DateTime? ValidTo { get; }
+    public bool HasConversations { get; }
 }

@@ -1,8 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RfqService } from '../../../services/rfq';
 import { Subject, take, takeUntil } from 'rxjs';
-import { LookupValue, Rfq } from '../../../models/rfq.model';
+import { QuoteItem, QuoteSearchRequest, QuoteSearchResponse, Rfq } from '../../../models/rfq.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Auth } from '../../../services/auth';
+import { User } from '../../../models/user.model';
 
 
 @Component({
@@ -13,13 +15,30 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class RfqDetails implements OnInit, OnDestroy{
 
+  loading: boolean = false
   rfq!: Rfq;
   private destroy$ = new Subject<void>();
+  submissionListRequest: QuoteSearchRequest = {
+      paging: {
+        pageNumber: 1,
+        pageSize: 10
+      },
+      sorting: {
+        field: 1,
+        sortOrder: 2
+      }
+    };
+  quotes: QuoteItem[] = [];
+  totalItems = 0;
+  totalPages = 0;
+  currentUser: User | null = null;
+  errorMessage = '';
 
   constructor(
     private route: ActivatedRoute,
     private rfqService: RfqService,
-    private router: Router
+    private router: Router,
+    private _authService: Auth
   ) {
   }
 
@@ -30,6 +49,18 @@ export class RfqDetails implements OnInit, OnDestroy{
         const id = Number(params.get('id'));
         if (id) {
           this.getDetails(id);
+          this.submissionListRequest.submissionId = id
+        }
+      });
+
+      this._authService.currentUserSubject.subscribe({
+        next: (user) => {
+          if (user) {
+            this.currentUser = user;
+          }
+        },
+        error: (error) => {
+          this.handleError(error);
         }
       });
   }
@@ -38,6 +69,7 @@ export class RfqDetails implements OnInit, OnDestroy{
     this.rfqService.getRfqDetails(id).pipe(take(1)).subscribe({
       next: (result) => {
         this.rfq = result
+        this.loadQuotes();
       },
       error: (err) => {
         console.error('Failed to load RFQ details', err);
@@ -46,20 +78,22 @@ export class RfqDetails implements OnInit, OnDestroy{
   }
 
   // Status badge color based on status name/id
-  getStatusColor(status?: LookupValue): string {
+  getStatusColor(status?: { id: number; name: string }): string {
     if (!status) {
       return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
     }
 
-    switch (status.name.toLowerCase()) {
-      case 'pending':
-        return 'bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300';
-      case 'under review':
-        return 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300';
-      case 'accepted':
-        return 'bg-success-100 text-success-800 dark:bg-success-900/30 dark:text-success-300';
-      case 'rejected':
-        return 'bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-300';
+    switch (status.id) {
+      case 1: // Pending Review
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-400';
+      case 2: // Approved
+        return 'bg-green-100 text-green-800 border border-green-500';
+      case 3: // Rejected
+        return 'bg-red-100 text-red-800 border border-red-500';
+      case 4: // Archived
+        return 'bg-gray-100 text-gray-800 border border-gray-400';
+      case 5: // Completed
+        return 'bg-blue-100 text-blue-800 border border-blue-500';
       default:
         return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
     }
@@ -90,9 +124,36 @@ export class RfqDetails implements OnInit, OnDestroy{
     this.router.navigate(['/messages'], {queryParams: { rfqId: this.rfq.id, customerId: this.rfq?.user?.id }});
   }
 
+  loadQuotes(): void {
+      this.rfqService.getQuotes(this.submissionListRequest)
+        .pipe(take(1))
+        .subscribe({
+          next: (response: QuoteSearchResponse) => {
+          this.quotes = Array.isArray(response.items) ? response.items : response.items ? [response.items] : [];
+            this.totalItems = response.totalCount!;
+            this.totalPages = response.totalPages!;
+          },
+          error: (error) => {
+
+          }
+        });
+    }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  handleError(error: any): void {
+    if (error.status === 401) {
+      this.errorMessage = 'Your session has expired. Please log in again.';
+      this._authService.logout();
+    } else if (error.status === 403) {
+      this.errorMessage = 'You do not have permission to view this content.';
+    } else if (error.status === 0) {
+      this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+    } else {
+      this.errorMessage = error.error?.message || 'An error occurred while loading RFQs.';
+    }
+  }
 }
