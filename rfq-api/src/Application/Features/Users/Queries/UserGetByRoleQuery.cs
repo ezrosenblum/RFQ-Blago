@@ -43,7 +43,7 @@ public sealed class UserGetByRoleQueryHandler : IQueryHandler<UserGetByRoleQuery
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            if (roles.Any() && roles.First() == request.Role)
+            if (roles.Contains(request.Role))
                 userResponses.Add(userResponse);
         }
 
