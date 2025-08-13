@@ -12,8 +12,6 @@ using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using DTO.Authentication;
-using DTO.Categories;
-using DTO.Categories.Responses;
 using DTO.Enums.Submission;
 using DTO.Enums.Submission.SubmissionQuote;
 using DTO.Pagination;
@@ -24,7 +22,6 @@ using DTO.Submission.SubmissionQuote;
 using DTO.Submission.SubmissionQuote.QuoteMessage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.NetworkInformation;
 
 namespace Api.Controllers.v1
 {

@@ -21,7 +21,8 @@ public sealed record SubmissionQuoteFullSearchQuery(
     DateTime? ValidFrom,
     DateTime? ValidTo,
     PaginationOptions Paging,
-    SortOptions<SubmissionQuoteFullSearchSortField>? Sorting) : ISubmissionQuoteFullSearchCriteria, IQuery<PaginatedList<SubmissionQuoteSearchable>>;
+    SortOptions<SubmissionQuoteFullSearchSortField>? Sorting,
+    bool HasConversations = false) : ISubmissionQuoteFullSearchCriteria, IQuery<PaginatedList<SubmissionQuoteSearchable>>;
 
 public sealed class SubmissionQuoteFullSearchQueryHandler : IQueryHandler<SubmissionQuoteFullSearchQuery, PaginatedList<SubmissionQuoteSearchable>>
 {
