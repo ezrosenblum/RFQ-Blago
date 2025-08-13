@@ -36,7 +36,8 @@ public class LocalizationService : ILocalizationService
 
         if (CurrentLanguage == null)
         {
-            return enumValue.ToString();
+            SetCulture("en");
+            //return enumValue.ToString();
         }
 
         try

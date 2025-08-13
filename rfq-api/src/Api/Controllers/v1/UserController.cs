@@ -1,26 +1,32 @@
-﻿using Application.Features.Enums.Queries;
+﻿using Application.Common.Helpers;
+using Application.Common.Localization;
+using Application.Features.Enums.Queries;
 using Application.Features.Users.Commands;
 using Application.Features.Users.CompanyDetails.Commands;
 using Application.Features.Users.Queries;
 using AutoMapper;
 using DTO.Enums.Company;
+using DTO.Enums.Submission;
 using DTO.Enums.User;
 using DTO.Medias;
 using DTO.Response;
 using DTO.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 
 namespace Api.Controllers.v1;
 
 public class UserController : ApiControllerBase
 {
     private readonly IMapper _mapper;
+    private readonly ILocalizationService _localizationService;
 
-    public UserController(IMapper mapper)
+    public UserController(
+        IMapper mapper,
+        ILocalizationService localizationService)
     {
         _mapper = mapper;
+        _localizationService = localizationService;
     }
 
     [HttpPost]
@@ -142,7 +148,7 @@ public class UserController : ApiControllerBase
     [HttpGet("status")]
     public async Task<IReadOnlyCollection<ListItemBaseResponse>> GetStatuses()
     {
-        return await Mediator.Send(new GetEnumValuesQuery(typeof(UserStatus)));
+        return EnumHelper.ToListItemBaseResponses<UserStatus>(_localizationService);
     }
 
     [Authorize(Roles = "Administrator")]

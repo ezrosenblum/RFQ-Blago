@@ -1,5 +1,6 @@
 ﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
+using Application.Common.Localization;
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.Queries;
 using Application.Features.Submissions.Search;
@@ -28,12 +29,15 @@ namespace Api.Controllers.v1
     {
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ILocalizationService _localizationService;
         public SubmissionController(
             IMapper mapper,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ILocalizationService localizationService)
         {
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _localizationService = localizationService;
         }
 
         [HttpPost]
@@ -41,6 +45,15 @@ namespace Api.Controllers.v1
         {
             await Mediator.Send((_mapper.Map<SubmissionCreateCommand>(request)) with { Files = files});
 
+            return Ok();
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] SubmissionUpdateRequest request)
+        {
+            var mappedRequest = _mapper.Map<SubmissionUpdateCommand>(request);
+
+            await Mediator.Send(mappedRequest with { Id = id });
             return Ok();
         }
 
@@ -86,7 +99,6 @@ namespace Api.Controllers.v1
             return Ok();
         }
 
-        [Authorize(Policy = AuthorizationPolicies.Vendor)]
         [HttpPut("status/{id:int}")]
         public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromQuery] SubmissionStatus status)
         {
@@ -104,13 +116,13 @@ namespace Api.Controllers.v1
         [HttpGet("units")]
         public IReadOnlyCollection<ListItemBaseResponse> GetUnits()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionUnit>();
+            return EnumHelper.ToListItemBaseResponses<SubmissionUnit>(_localizationService);
         }
 
         [HttpGet("statuses")]
         public IReadOnlyCollection<ListItemBaseResponse> GetStatuses()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionStatus>();
+            return EnumHelper.ToListItemBaseResponses<SubmissionStatus>(_localizationService);
         }
 
         [HttpPut("{id:int}/file")]
@@ -155,6 +167,14 @@ namespace Api.Controllers.v1
             return await Mediator.Send(request);
         }
 
+        [HttpPut("quote/status/{id:int}")]
+        public async Task<IActionResult> ChangeQuoteStatus([FromRoute] int id, [FromQuery] SubmissionQuoteStatus status)
+        {
+            await Mediator.Send(new SubmissionQuoteStatusChangeCommand(id, status));
+
+            return Ok();
+        }
+
         [Authorize(Roles = "Administrator")]
         [HttpPut("quote/search/rebuild")]
         public async Task<IActionResult> RebuildQuoteSearchIndex()
@@ -179,7 +199,13 @@ namespace Api.Controllers.v1
         [HttpGet("quote/validity-type")]
         public IReadOnlyCollection<ListItemBaseResponse> GetQuoteValidityTypes()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>();
+            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>(_localizationService);
+        }
+        
+        [HttpGet("quote/statuses")]
+        public IReadOnlyCollection<ListItemBaseResponse> GetQuoteStatuses()
+        {
+            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteStatus>(_localizationService);
         }
 
         [HttpPost("quote/message")]

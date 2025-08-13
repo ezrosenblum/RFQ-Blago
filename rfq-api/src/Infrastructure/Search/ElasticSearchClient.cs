@@ -261,6 +261,14 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
             };
         }
 
+        if (criteria.HasConversations)
+        {
+            combinedQuery &= new ExistsQuery
+            {
+                Field = "lastMessage"
+            };
+        }
+
         if (criteria.PriceFrom.HasValue)
         {
             combinedQuery &= new NumericRangeQuery

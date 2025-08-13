@@ -72,6 +72,22 @@ namespace Domain.Entities.Submissions
             return new Submission(data, categories, subcategories, files, userId);
         }
 
+        public void Update(ISubmissionInsertData data,
+                                     IReadOnlyCollection<Category> categories,
+                                     IReadOnlyCollection<Subcategory> subcategories)
+        {
+            Title = data.Title;
+            Description = data.Description;
+            Quantity = data.Quantity;
+            Unit = data.Unit;
+            JobLocation = data.JobLocation;
+            StreetAddress = data.StreetAddress;
+            LongitudeAddress = data.LongitudeAddress;
+            LatitudeAddress = data.LatitudeAddress;
+            
+            //Here SubmissionUpdatedEvent is being triggered.
+            SetCategories(categories, subcategories);
+        }
         public void CreateStatusHistory(
             int vendorId,
             SubmissionStatusHistoryType status,
