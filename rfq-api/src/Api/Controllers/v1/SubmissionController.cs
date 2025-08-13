@@ -1,5 +1,6 @@
 ﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
+using Application.Common.Localization;
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.Queries;
 using Application.Features.Submissions.Search;
@@ -23,6 +24,7 @@ using DTO.Submission.SubmissionQuote;
 using DTO.Submission.SubmissionQuote.QuoteMessage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.NetworkInformation;
 
 namespace Api.Controllers.v1
 {
@@ -30,12 +32,15 @@ namespace Api.Controllers.v1
     {
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ILocalizationService _localizationService;
         public SubmissionController(
             IMapper mapper,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ILocalizationService localizationService)
         {
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _localizationService = localizationService;
         }
 
         [HttpPost]
@@ -114,13 +119,13 @@ namespace Api.Controllers.v1
         [HttpGet("units")]
         public IReadOnlyCollection<ListItemBaseResponse> GetUnits()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionUnit>();
+            return EnumHelper.ToListItemBaseResponses<SubmissionUnit>(_localizationService);
         }
 
         [HttpGet("statuses")]
         public IReadOnlyCollection<ListItemBaseResponse> GetStatuses()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionStatus>();
+            return EnumHelper.ToListItemBaseResponses<SubmissionStatus>(_localizationService);
         }
 
         [HttpPut("{id:int}/file")]
@@ -165,6 +170,14 @@ namespace Api.Controllers.v1
             return await Mediator.Send(request);
         }
 
+        [HttpPut("quote/status/{id:int}")]
+        public async Task<IActionResult> ChangeQuoteStatus([FromRoute] int id, [FromQuery] SubmissionQuoteStatus status)
+        {
+            await Mediator.Send(new SubmissionQuoteStatusChangeCommand(id, status));
+
+            return Ok();
+        }
+
         [Authorize(Roles = "Administrator")]
         [HttpPut("quote/search/rebuild")]
         public async Task<IActionResult> RebuildQuoteSearchIndex()
@@ -189,7 +202,13 @@ namespace Api.Controllers.v1
         [HttpGet("quote/validity-type")]
         public IReadOnlyCollection<ListItemBaseResponse> GetQuoteValidityTypes()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>();
+            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>(_localizationService);
+        }
+        
+        [HttpGet("quote/statuses")]
+        public IReadOnlyCollection<ListItemBaseResponse> GetQuoteStatuses()
+        {
+            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteStatus>(_localizationService);
         }
 
         [HttpPost("quote/message")]
