@@ -103,6 +103,13 @@ public class UserController : ApiControllerBase
         }
     }
 
+    [Authorize(Roles = "Administrator")]
+    [HttpGet("by/role")]
+    public async Task<IReadOnlyCollection<UserBaseResponse>> GetUsersByRole([FromQuery] string role)
+    {
+        return await Mediator.Send(new UserGetByRoleQuery(role));
+    }
+
     [HttpPut("profile-picture")]
     public async Task<MediaItemResponse> UpdateProfilePicture([FromForm] UserProfilePictureUpdateRequest request)
     {
