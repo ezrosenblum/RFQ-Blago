@@ -85,6 +85,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
   showAllCategories = false;
   showAllSubcategories = false;
 
+  carouselScrollStates: { [key: string]: { canScrollLeft: boolean; canScrollRight: boolean; needsScroll: boolean } } = {};
+
   sortOptions = [
     { value: 1, label: 'Submission Date' },
     { value: 2, label: 'Description' },
@@ -340,6 +342,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
             : [];
           this.totalItems = response.totalCount!;
           this.totalPages = response.totalPages!;
+          this.initializeCarouselStates();
         },
         error: (error) => {
           this.handleError(error);
@@ -753,20 +756,63 @@ export class VendorRfqs implements OnInit, OnDestroy {
       btn.textContent = this.translate.instant('VENDOR.SHOW_MORE');
     }
   }
-
-  scrollLeft(id: string) {
-    document.getElementById(id)?.scrollBy({ left: -200, behavior: 'smooth' });
-  }
-
-  scrollRight(id: string) {
-    document.getElementById(id)?.scrollBy({ left: 200, behavior: 'smooth' });
-  }
-
   get isTableView(): boolean {
     return this.viewMode === 'table';
   }
 
   navigateToMessages(rfq: Rfq): void {
     this.router.navigate(['/messages'], {queryParams: { rfqId: rfq.id, customerId: rfq?.user?.id }});
+  }
+
+  initializeCarouselStates() {
+    if (this.filteredRfqs) {
+        this.filteredRfqs.forEach(rfq => {
+          this.updateScrollState('carousel' + rfq.id);
+        });
+    }
+  }
+
+  scrollLeft(id: string) {
+    const carousel = document.getElementById(id);
+    if (carousel) {
+      carousel.scrollBy({ left: -200, behavior: 'smooth' });
+      setTimeout(() => this.updateScrollState(id), 300);
+    }
+  }
+
+  scrollRight(id: string) {
+    const carousel = document.getElementById(id);
+    if (carousel) {
+      carousel.scrollBy({ left: 200, behavior: 'smooth' });
+      setTimeout(() => this.updateScrollState(id), 300);
+    }
+  }
+
+  updateScrollState(id: string) {
+    const carousel = document.getElementById(id);
+    if (!carousel) return;
+
+    const scrollLeft = carousel.scrollLeft;
+    const scrollWidth = carousel.scrollWidth;
+    const clientWidth = carousel.clientWidth;
+
+    const needsScroll = scrollWidth > clientWidth;
+
+    const canScrollLeft = scrollLeft > 0;
+    const canScrollRight = scrollLeft < (scrollWidth - clientWidth - 1);
+
+    this.carouselScrollStates[id] = {
+      canScrollLeft: canScrollLeft && needsScroll,
+      canScrollRight: canScrollRight && needsScroll,
+      needsScroll
+    };
+  }
+
+  onCarouselScroll(event: Event, id: string) {
+    this.updateScrollState(id);
+  }
+
+  getScrollState(id: string) {
+    return this.carouselScrollStates[id] || { canScrollLeft: false, canScrollRight: false, needsScroll: false };
   }
 }
