@@ -11,6 +11,8 @@ using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using DTO.Authentication;
+using DTO.Categories;
+using DTO.Categories.Responses;
 using DTO.Enums.Submission;
 using DTO.Enums.Submission.SubmissionQuote;
 using DTO.Pagination;
@@ -41,6 +43,15 @@ namespace Api.Controllers.v1
         {
             await Mediator.Send((_mapper.Map<SubmissionCreateCommand>(request)) with { Files = files});
 
+            return Ok();
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] SubmissionUpdateRequest request)
+        {
+            var mappedRequest = _mapper.Map<SubmissionUpdateCommand>(request);
+
+            await Mediator.Send(mappedRequest with { Id = id });
             return Ok();
         }
 
@@ -86,7 +97,6 @@ namespace Api.Controllers.v1
             return Ok();
         }
 
-        [Authorize(Policy = AuthorizationPolicies.Vendor)]
         [HttpPut("status/{id:int}")]
         public async Task<IActionResult> ChangeStatus([FromRoute] int id, [FromQuery] SubmissionStatus status)
         {

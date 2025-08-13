@@ -30,6 +30,20 @@ public sealed class SubmissionMapperProfile : Profile
                 src.SubCategoriesIds,
                 default));
 
+        CreateMap<SubmissionUpdateRequest, SubmissionUpdateCommand>()
+            .ConstructUsing(src => new SubmissionUpdateCommand(
+                default,
+                src.Title,
+                src.Description,
+                src.Quantity,
+                src.Unit,
+                src.JobLocation,
+                src.StreetAddress,
+                src.LatitudeAddress,
+                src.LongitudeAddress,
+                src.CategoriesIds,
+                src.SubCategoriesIds));
+
         CreateMap<Submission, SubmissionBaseResponse>()
             .ForMember(s => s.SubmissionDate, opt => opt.MapFrom(d => d.Created));
 
