@@ -34,14 +34,13 @@ public class LocalizationService : ILocalizationService
     {
         string localizationKey = enumValue.GetLocalizationKey();
 
-        if (CurrentLanguage == null)
-        {
-            SetCulture("en");
-            //return enumValue.ToString();
-        }
-
         try
         {
+            if (CurrentLanguage == null)
+            {
+                SetCulture("en");
+            }
+
             return _localizationManager.GetValue(localizationKey, CurrentCulture);
         }
         catch (Exception)
