@@ -369,7 +369,9 @@ export class MessagesComponent implements OnInit {
           this.pondFiles = [];
           this.uploadedFilesCount = 0;
           this.showUploadFilesPanel = false;
-          this.loadMessagesForConversation(this.selectedConversation!.id)
+          if (this.selectedConversation) {
+            this.loadMessagesForConversation(this.selectedConversation.id);
+          }
           setTimeout(() => {
             this.isMessageSending = false;
             const container = document.getElementById('chat-scrollable');

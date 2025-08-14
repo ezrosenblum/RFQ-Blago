@@ -155,6 +155,10 @@
   },
 
   "VENDOR": {
+    "MESSAGE": "Messages", 
+    "TIMELINE_TYPE_REQUIRED": "Timeline type is required",
+    "TIMELINE_MIN_ZERO": "Timeline interval must be at least 1 day",
+    "MIN_GREATER_THAN_MAX": "Timeline minimum value must be lower than timeline maximum value",
     "RFQ_MANAGEMENT": "RFQ Management",
     "RFQ_MANAGEMENT_DESCRIPTION": "Review and manage quote requests from clients",
     "REFRESH": "Refresh",

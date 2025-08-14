@@ -169,6 +169,11 @@
     left: 0 !important;
 }
 
+.file-name {
+    font-size: 12px;
+    opacity: 0.5;
+}
+
 @media (max-width: 900px) {
     .messages-panel {
         position: absolute;
