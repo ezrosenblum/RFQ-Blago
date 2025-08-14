@@ -134,4 +134,13 @@ export class RfqService {
   getQuoteDetails(id: number): Observable<QuoteItem> {
     return this.http.get<QuoteItem>(`${this.API_URL}Submission/quote/${id}`);
   }
+
+  rfqChangeStatus(id: number, status: number): Observable<boolean> {
+    return this.http.put<ApiResponse<Rfq>>(`${this.API_URL}Submission/status/${id}?status=${status}`, null)
+      .pipe(
+        map(response => {
+          return true;
+        })
+      );
+  }
 }

@@ -578,6 +578,22 @@
             </div>
 
             <div class="flex gap-2">
+              <div *ngIf="rfq.status?.name !== 'Rejected'" class="flex gap-2">
+                <button
+                  *ngIf="canApprove(rfq)"
+                  (click)="approveRfq(rfq.id!)"
+                  class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-green-500 text-white hover:bg-green-600"
+                >
+                  {{ 'VENDOR.APPROVE' | translate }}
+                </button>
+                <button
+                  *ngIf="canDecline(rfq)"
+                  (click)="declineRfq(rfq.id!)"
+                  class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-red-500 text-white hover:bg-red-600"
+                >
+                  {{ 'VENDOR.REJECT' | translate }}
+                </button>
+              </div>
               <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
                 class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-green-500 text-white hover:bg-green-600">
                 {{ 'VENDOR.SEND_QUOTE' | translate }}
