@@ -3,9 +3,11 @@ using Application.Features.Notifications.Search;
 using Application.Features.Submissions.Search;
 using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
+using Application.Features.Users.Search;
 using DTO.Notification.Search;
 using DTO.Pagination;
 using DTO.Sorting;
+using DTO.User.Search;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -79,6 +81,17 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
         await _elasticClient.DeleteManyAsync(data, _index, cancellationToken);
     }
 
+    public async Task<PaginatedList<UserSearchable>> SearchUsersAsync(IUserFullSearchCriteria criteria)
+    {
+        var searchResponse = await _elasticClient.SearchAsync<UserSearchable>(s => s
+            .Index(_index)
+            .Query(q => BuildUserSearchQuery(q, criteria))
+            .Sort(so => BuildUserSort(so, criteria.Sorting!))
+            .From((criteria.Paging.PageNumber - 1) * criteria.Paging.PageSize)
+        .Size(criteria.Paging.PageSize));
+
+        return new PaginatedList<UserSearchable>(searchResponse.Documents.ToList(), (int)searchResponse.Total, criteria.Paging.PageNumber, criteria.Paging.PageSize);
+    }
     public async Task<PaginatedList<NotificationSearchable>> SearchNotificationsForUserAsync(INotificationForUserFullSearchCriteria criteria)
     {
         var searchResponse = await _elasticClient.SearchAsync<NotificationSearchable>(s => s
@@ -127,6 +140,30 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
         return new PaginatedList<QuoteMessageSearchable>(searchResponse.Documents.ToList(), (int) searchResponse.Total, criteria.Paging.PageNumber, criteria.Paging.PageSize);
     }
 
+    private QueryContainer BuildUserSearchQuery(QueryContainerDescriptor<UserSearchable> descriptor, IUserFullSearchCriteria criteria)
+    {
+        var combinedQuery = new QueryContainer();
+
+        if (!string.IsNullOrWhiteSpace(criteria.Query))
+        {
+            combinedQuery &= (BuildTextQuery(criteria.Query) ||
+                              BuildWildcardQuery("firstName", criteria.Query) ||
+                              BuildWildcardQuery("lastName", criteria.Query) ||
+                              BuildWildcardQuery("email", criteria.Query) ||
+                              BuildWildcardQuery("phoneNumber", criteria.Query));
+        }
+
+        if (criteria.Status.HasValue)
+        {
+            combinedQuery &= new TermQuery
+            {
+                Field = "status.id",
+                Value = criteria.Status
+            };
+        }
+
+        return combinedQuery;
+    }
     private QueryContainer BuildNotificationSearchQuery(QueryContainerDescriptor<NotificationSearchable> descriptor, INotificationFullSearchCriteria criteria)
     {
         var combinedQuery = new QueryContainer();
@@ -351,6 +388,45 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
 
         return combinedQuery;
     }
+
+    private SortDescriptor<UserSearchable> BuildUserSort(SortDescriptor<UserSearchable> descriptor, SortOptions<UserFullSearchSortField> sortOptions)
+    {
+        if (sortOptions != null)
+        {
+            var sortOrder = sortOptions.SortOrder == DTO.Sorting.SortOrder.Asc ? Nest.SortOrder.Ascending : Nest.SortOrder.Descending;
+
+            if (sortOptions.Field == UserFullSearchSortField.Status)
+            {
+                return descriptor.Field("status.id", sortOrder);
+            }
+            else
+            {
+                var fieldName = sortOptions.Field.ToString();
+
+                var propertyInfo = FindProperty(typeof(UserSearchable), fieldName);
+
+                if (propertyInfo != null)
+                {
+                    var lowerFieldName = char.ToLower(fieldName[0]) + fieldName.Substring(1); // Assuming enum values directly correspond to field names
+
+                    // Check if the property is a string and append .keyword
+                    if (propertyInfo.PropertyType == typeof(string))
+                    {
+                        lowerFieldName += ".keyword";
+                    }
+
+                    return descriptor.Field(lowerFieldName, sortOrder);
+                }
+                else
+                {
+                    throw new ArgumentException($"Property {fieldName} not found in type {typeof(UserSearchable)} or its base types.");
+                }
+            }
+        }
+
+        return descriptor;
+    }
+
     private SortDescriptor<NotificationSearchable> BuildNotificationSort(SortDescriptor<NotificationSearchable> descriptor, SortOptions<NotificationFullSearchSortField> sortOptions)
     {
         if (sortOptions != null)

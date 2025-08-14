@@ -195,6 +195,7 @@ namespace Domain.Entities.User
         {
             EmailConfirmed = true;
             Status = UserStatus.Active;
+            AddDomainEvent(new UserUpdatedEvent(this));
         }
 
         public async Task GenereatePasswordResetCode(IAuthCodeProvider codeProvider)

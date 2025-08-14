@@ -4,11 +4,13 @@ using Application.Features.Enums.Queries;
 using Application.Features.Users.Commands;
 using Application.Features.Users.CompanyDetails.Commands;
 using Application.Features.Users.Queries;
+using Application.Features.Users.Search;
 using AutoMapper;
 using DTO.Enums.Company;
 using DTO.Enums.Submission;
 using DTO.Enums.User;
 using DTO.Medias;
+using DTO.Pagination;
 using DTO.Response;
 using DTO.User;
 using Microsoft.AspNetCore.Authorization;
@@ -145,6 +147,29 @@ public class UserController : ApiControllerBase
     }
 
     [Authorize(Roles = "Administrator")]
+    [HttpPut("{id}/suspend")]
+    public async Task<IActionResult> Suspend([FromRoute] int id, [FromBody] UserSuspendRequest request)
+    {
+        await Mediator.Send(new UserSuspendCommand(id, request.SuspensionReason));
+        return Ok();
+    }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPut("{id}/remove-suspension")]
+    public async Task<IActionResult> Unsuspend([FromRoute] int id)
+    {
+        await Mediator.Send(new UserUnsuspendCommand(id));
+        return Ok();
+    }
+
+    [Authorize(Roles = "Administrator")]
+    [HttpPost("search")]
+    public async Task<PaginatedList<UserSearchable>> FullSearch([FromBody] UserFullSearchQuery reqeust)
+    {
+        return await Mediator.Send(reqeust);
+    }
+
+    [Authorize(Roles = "Administrator")]
     [HttpGet("status")]
     public async Task<IReadOnlyCollection<ListItemBaseResponse>> GetStatuses()
     {
@@ -170,5 +195,12 @@ public class UserController : ApiControllerBase
     public async Task<IReadOnlyCollection<ListItemBaseResponse>> GetCompanySizes()
     {
         return await Mediator.Send(new GetEnumValuesQuery(typeof(CompanySize)));
+    }
+    [Authorize(Roles = "Administrator")]
+    [HttpPut("search/rebuild")]
+    public async Task<IActionResult> RebuildSearchIndex()
+    {
+        await Mediator.Send(new UserInitiateSearchIndexRebuildCommand());
+        return Ok();
     }
 }

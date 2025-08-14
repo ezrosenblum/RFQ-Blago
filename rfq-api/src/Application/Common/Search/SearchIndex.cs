@@ -7,4 +7,5 @@ public static class SearchIndex
     public const string SubmissionQuote = "submission-quote";
     public const string QuoteMessage = "quote-message";
     public const string Notification = "notification";
+    public const string User = "user";
 }

@@ -5,12 +5,11 @@ namespace DTO.Enums.Submission.SubmissionQuote;
 public enum SubmissionQuoteStatus
 {
     [LocalizationKey("enum.submissionQuoteStatus.pending")]
-    Pending = 0,
+    Pending = 1,
     [LocalizationKey("enum.submissionQuoteStatus.accepted")]
-    Accepted = 1,
+    Accepted = 2,
     [LocalizationKey("enum.submissionQuoteStatus.rejected")]
-    Rejected = 2,
+    Rejected = 3,
     [LocalizationKey("enum.submissionQuoteStatus.invalid")]
-    Invalid = 3
-
+    Invalid = 4
 }

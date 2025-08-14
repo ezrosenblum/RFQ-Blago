@@ -43,7 +43,7 @@ namespace Api.Controllers.v1
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] SubmissionCreateRequest request, List<IFormFile>? files)
         {
-            await Mediator.Send((_mapper.Map<SubmissionCreateCommand>(request)) with { Files = files});
+            await Mediator.Send((_mapper.Map<SubmissionCreateCommand>(request)) with { Files = files });
 
             return Ok();
         }
@@ -148,6 +148,16 @@ namespace Api.Controllers.v1
             return Ok();
         }
 
+        [HttpPut("quote/{id:int}")]
+        public async Task<IActionResult> UpdateSubmissionQuote([FromRoute] int id, [FromBody] SubmissionQuoteUpdateRequest request)
+        {
+            var command = _mapper.Map<SubmissionQuoteUpdateCommand>(request);
+
+            await Mediator.Send(command with { SubmissionQuoteId = id });
+
+            return Ok();
+        }
+
         [HttpGet("quote/{id:int}")]
         public async Task<SubmissionQuoteResponse> GetSubmissionQuote([FromRoute] int id)
         {
@@ -201,7 +211,7 @@ namespace Api.Controllers.v1
         {
             return EnumHelper.ToListItemBaseResponses<GlobalIntervalType>(_localizationService);
         }
-        
+
         [HttpGet("quote/statuses")]
         public IReadOnlyCollection<ListItemBaseResponse> GetQuoteStatuses()
         {
@@ -213,7 +223,7 @@ namespace Api.Controllers.v1
         {
             var command = _mapper.Map<QuoteMessageCreateCommand>(request);
 
-            await Mediator.Send(command with { SenderId = (int)_currentUserService.UserId!});
+            await Mediator.Send(command with { SenderId = (int)_currentUserService.UserId! });
 
             return Ok();
         }
