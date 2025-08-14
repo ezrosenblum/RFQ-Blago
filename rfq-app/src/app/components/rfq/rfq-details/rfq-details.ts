@@ -120,8 +120,9 @@ export class RfqDetails implements OnInit, OnDestroy{
     ).toUpperCase();
   }
 
-  navigateToMessages(): void {
-    this.router.navigate(['/messages'], {queryParams: { rfqId: this.rfq.id, customerId: this.rfq?.user?.id }});
+  navigateToMessages(quote: QuoteItem): void {
+    debugger
+    this.router.navigate(['/messages'], {queryParams: { rfqId: this.rfq.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
   }
 
   loadQuotes(): void {

@@ -31,3 +31,51 @@ export interface Activity {
   date?: string;
   bgColor: string;
 }
+
+export interface CreateMessage {
+  SubmissionQuoteId: number;
+  Content: string;
+  Files?: File[];
+}
+
+export interface MessageEntry {
+    id: number,
+    content: string,
+    submissionQuoteId: number | null,
+    senderId: number,
+    created: string | Date,
+    quoteMessageStatus: {
+      id: number,
+      name: string
+    },
+    media: {
+      items: MessageMediaEntry[]
+    },
+    sender: {
+      id: number,
+      firstName: string,
+      lastName: string,
+      email: string | null,
+      picture: string | null,
+      receiveEmailNotifications: boolean,
+      receivePushNotifications: boolean
+    }
+}
+
+export interface MessageMediaEntry {
+  id: string;
+  name: string;
+  isMain: boolean;
+  sortOrder: number;
+  size: number;
+  url: string;
+  type: number;
+  extension: string;
+}
+
+export interface ConversationUserEntry {
+  id: number;
+  firstName: string;
+  lastName: string;
+  picture: string | null;
+}

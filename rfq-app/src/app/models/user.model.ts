@@ -69,6 +69,19 @@ export interface ChangePasswordResponse {
 export interface MessageConevrsationRequest {
   vendorId: number | null,
   submissionUserId: number | null,
+  hasConversations: boolean,
+  paging: {
+    pageNumber: number,
+    pageSize: number
+  },
+  sorting: {
+    field: 1,
+    sortOrder: 1
+  }
+}
+
+export interface MessageConversationMessagesRequest {
+  submissionQuoteId: number | null,
   paging: {
     pageNumber: number,
     pageSize: number

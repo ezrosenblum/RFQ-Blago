@@ -57,8 +57,13 @@ export class QuoteFormDialog implements OnInit {
       title: ['', [Validators.required, Validators.maxLength(200)]],
       description: ['', [Validators.required, Validators.maxLength(1000)]],
       price: [0, [Validators.required, Validators.min(0)]],
-      quoteValidityIntervalType: [null, [Validators.required]],
       quoteValidityInterval: [0, [Validators.required, Validators.min(1)]],
+      quoteValidityIntervalType: [null, [Validators.required]],
+      quoteWarranyInterval: [0, [Validators.required, Validators.min(1)]],
+      quoteWarranyIntervalType: [null, [Validators.required]],
+      quoteTimelineIntervalType: [null, [Validators.required]],
+      quoteTimelineMinimumInterval: [0, [Validators.required, Validators.min(0)]],
+      quoteTimelineMaximumInterval: [0, [Validators.required, Validators.min(0)]],
       vendorId: [],
       submissionId: []
     });
@@ -99,4 +104,26 @@ export class QuoteFormDialog implements OnInit {
       });
     }
   }
+
+  private timelineMinMaxValidator() {
+  return (formGroup: FormGroup) => {
+    const min = formGroup.get('quoteTimelineMinimumInterval')?.value;
+    const max = formGroup.get('quoteTimelineMaximumInterval')?.value;
+
+    if (min != null && max != null && min > max) {
+      formGroup.get('quoteTimelineMinimumInterval')?.setErrors({ minGreater: true });
+    } else {
+      if (formGroup.get('quoteTimelineMinimumInterval')?.hasError('minGreater')) {
+        const errors = { ...formGroup.get('quoteTimelineMinimumInterval')?.errors };
+        delete errors['minGreater'];
+        if (Object.keys(errors).length === 0) {
+          formGroup.get('quoteTimelineMinimumInterval')?.setErrors(null);
+        } else {
+          formGroup.get('quoteTimelineMinimumInterval')?.setErrors(errors);
+        }
+      }
+    }
+    return null;
+  };
+}
 }

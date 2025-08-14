@@ -761,6 +761,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   navigateToMessages(rfq: Rfq): void {
+    debugger
     this.router.navigate(['/messages'], {queryParams: { rfqId: rfq.id, customerId: rfq?.user?.id }});
   }
 

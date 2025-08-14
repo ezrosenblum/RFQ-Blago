@@ -12,6 +12,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AsyncPipe } from '@angular/common';
+import { GalleryModule } from 'ng-gallery';
+import { LightboxModule } from 'ng-gallery/lightbox';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { AsyncPipe } from '@angular/common';
     MatAutocompleteModule,
     MatFormFieldModule,
     MatInputModule,
-    AsyncPipe
+    AsyncPipe,
+    GalleryModule,
+    LightboxModule
   ]
 })
 export class MessagesModule { }

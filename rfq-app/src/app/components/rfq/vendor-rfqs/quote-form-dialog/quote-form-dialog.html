@@ -61,6 +61,30 @@
         </div>
       </div>
 
+      <!-- Quote Validity Interval -->
+      <div>
+        <label for="quoteValidityInterval" class="form-label">
+          {{ 'VENDOR.VALIDITY_INTERVAL' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="quoteValidityInterval"
+          type="number"
+          formControlName="quoteValidityInterval"
+          class="form-input"
+          [class.border-red-500]="isFieldInvalid('quoteValidityInterval')"
+          placeholder="Enter number..."
+          min="1"
+        />
+        <div *ngIf="isFieldInvalid('quoteValidityInterval')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['required']">
+            {{ 'VENDOR.VALIDITY_INTERVAL_REQUIRED' | translate }}
+          </span>
+          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['min']">
+            {{ 'VENDOR.VALIDITY_INTERVAL_MIN' | translate }}
+          </span>
+        </div>
+      </div>
+
       <!-- Quote Validity Interval Type -->
       <div>
         <label for="quoteValidityIntervalType" class="form-label">
@@ -87,27 +111,133 @@
         </div>
       </div>
 
-      <!-- Quote Validity Interval -->
+      <!-- Warrany Validity Interval -->
       <div>
-        <label for="quoteValidityInterval" class="form-label">
-          {{ 'VENDOR.VALIDITY_INTERVAL' | translate }} <span class="text-red-500">*</span>
+        <label for="quoteWarranyInterval" class="form-label">
+          {{ 'VENDOR.WARRANTY_INTERVAL' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
-          id="quoteValidityInterval"
+          id="quoteWarranyInterval"
           type="number"
-          formControlName="quoteValidityInterval"
+          formControlName="quoteWarranyInterval"
           class="form-input"
-          [class.border-red-500]="isFieldInvalid('quoteValidityInterval')"
+          [class.border-red-500]="isFieldInvalid('quoteWarranyInterval')"
           placeholder="Enter number..."
           min="1"
         />
-        <div *ngIf="isFieldInvalid('quoteValidityInterval')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['required']">
-            {{ 'VENDOR.VALIDITY_INTERVAL_REQUIRED' | translate }}
+        <div *ngIf="isFieldInvalid('quoteWarranyInterval')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('quoteWarranyInterval')?.errors?.['required']">
+            {{ 'VENDOR.WARRANTY_INTERVAL_REQUIRED' | translate }}
           </span>
-          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['min']">
-            {{ 'VENDOR.VALIDITY_INTERVAL_MIN' | translate }}
+          <span *ngIf="quoteForm.get('quoteWarranyInterval')?.errors?.['min']">
+            {{ 'VENDOR.WARRANTY_INTERVAL_MIN' | translate }}
           </span>
+        </div>
+      </div>
+
+      <!-- Warrany Validity Interval Type -->
+      <div>
+        <label for="quoteValidityIntervalType" class="form-label">
+          {{ 'VENDOR.WARRANTY_TYPE' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <select 
+          id="quoteValidityIntervalType" 
+          formControlName="quoteValidityIntervalType" 
+          class="form-select"
+          [class.border-red-500]="isFieldInvalid('quoteValidityIntervalType')"
+        >
+          <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_WARRANTY_TYPE' | translate }}</option>
+          <option 
+            *ngFor="let option of validityTypeOptions" 
+            [ngValue]="option.id"
+          >
+            {{ option.name }}
+          </option>
+        </select>
+        <div *ngIf="isFieldInvalid('quoteValidityIntervalType')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('quoteValidityIntervalType')?.errors?.['required']">
+            {{ 'VENDOR.WARRANTY_TYPE_REQUIRED' | translate }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Quote Timeline Row -->
+      <div class="md:col-span-2 grid grid-cols-3 gap-4">
+        
+        <!-- Minimum Interval -->
+        <div>
+          <label for="quoteTimelineMinimumInterval" class="form-label">
+            {{ 'VENDOR.TIMELINE_MIN' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="quoteTimelineMinimumInterval"
+            type="number"
+            formControlName="quoteTimelineMinimumInterval"
+            class="form-input"
+            [class.border-red-500]="isFieldInvalid('quoteTimelineMinimumInterval')"
+            placeholder="Enter min..."
+            min="0"
+          />
+          <div *ngIf="isFieldInvalid('quoteTimelineMinimumInterval')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('quoteTimelineMinimumInterval')?.errors?.['required']">
+              {{ 'VENDOR.TIMELINE_MIN_REQUIRED' | translate }}
+            </span>
+            <span *ngIf="quoteForm.get('quoteTimelineMinimumInterval')?.errors?.['min']">
+              {{ 'VENDOR.TIMELINE_MIN_ZERO' | translate }}
+            </span>
+            <span *ngIf="quoteForm.get('quoteTimelineMinimumInterval')?.errors?.['minGreater']">
+              {{ 'VENDOR.MIN_GREATER_THAN_MAX' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Maximum Interval -->
+        <div>
+          <label for="quoteTimelineMaximumInterval" class="form-label">
+            {{ 'VENDOR.TIMELINE_MAX' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="quoteTimelineMaximumInterval"
+            type="number"
+            formControlName="quoteTimelineMaximumInterval"
+            class="form-input"
+            [class.border-red-500]="isFieldInvalid('quoteTimelineMaximumInterval')"
+            placeholder="Enter max..."
+            min="0"
+          />
+          <div *ngIf="isFieldInvalid('quoteTimelineMaximumInterval')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('quoteTimelineMaximumInterval')?.errors?.['required']">
+              {{ 'VENDOR.TIMELINE_MAX_REQUIRED' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Quote Timeline Interval Type -->
+        <div>
+          <label for="quoteTimelineIntervalType" class="form-label">
+            {{ 'VENDOR.TIMELINE_TYPE' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="quoteTimelineIntervalType"
+            formControlName="quoteTimelineIntervalType"
+            class="form-select"
+            [class.border-red-500]="isFieldInvalid('quoteTimelineIntervalType')"
+          >
+            <option [ngValue]="null" disabled>
+              {{ 'VENDOR.SELECT_TIMELINE_TYPE' | translate }}
+            </option>
+            <option 
+              *ngFor="let option of validityTypeOptions" 
+              [ngValue]="option.id"
+            >
+              {{ option.name }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('quoteTimelineIntervalType')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('quoteTimelineIntervalType')?.errors?.['required']">
+              {{ 'VENDOR.TIMELINE_TYPE_REQUIRED' | translate }}
+            </span>
+          </div>
         </div>
       </div>
 

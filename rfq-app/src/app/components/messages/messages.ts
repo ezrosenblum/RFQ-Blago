@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { Activity, Conversation, Message } from '../../models/messages.model';
+import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry } from '../../models/messages.model';
 import { MessagesService } from '../../services/messages';
-import { map, Observable, startWith, take } from 'rxjs';
+import { map, Observable, of, startWith, take } from 'rxjs';
 import {
   MatDialog,
 } from '@angular/material/dialog';
@@ -11,8 +11,11 @@ import { FilePondComponent } from 'ngx-filepond';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Auth } from '../../services/auth';
 import { FormControl } from '@angular/forms';
-import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, User, userChat } from '../../models/user.model';
+import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, MessageConversationMessagesRequest, User, userChat } from '../../models/user.model';
 import { ActivatedRoute } from '@angular/router';
+import { TableResponse } from '../../models/rfq.model';
+import { Gallery, GalleryItem, ImageItem } from 'ng-gallery';
+import { Lightbox } from 'ng-gallery/lightbox';
 
 @Component({
   standalone: false,
@@ -52,15 +55,22 @@ export class MessagesComponent implements OnInit {
   selectedChatIndex: number = 0;
   pageSize: number = 10;
   pageNumber: number = 1;
+  messagesPageSize: number = 10;
+  messagesPageNumber: number = 1;
 
   // Autocomplete controls - Left sidenav
   vendorSearchControl = new FormControl();
-  vendorItems: userChat[] = [{name: 'Mary', email: 'marry@email.com', id: 12}, {name: 'Shelley', email: 'shelley@email.com', id: 13}, {name: 'Igor', email: 'igor@email.com', id: 14}];
-  filteredVendorOptions!: Observable<userChat[]>;
+  vendorItems: ConversationUserEntry[] = [];
+  filteredVendorOptions!: Observable<ConversationUserEntry[]>;
 
   customerSearchControl = new FormControl();
-  customerItems: userChat[] = [{name: 'Mary', email: 'marry@email.com', id: 12}, {name: 'Shelley', email: 'shelley@email.com', id: 13}, {name: 'Igor', email: 'igor@email.com', id: 14}];
-  filteredCustomerOptions!: Observable<userChat[]>;
+  customerItems: ConversationUserEntry[] = [];
+  filteredCustomerOptions!: Observable<ConversationUserEntry[]>;
+  usersCalledByDefault: boolean = false;
+
+  customerIdQuery: number | null = null;
+  vendorIdQuery: number | null = null;
+  rfqIdQuery: number | null = null;
 
   // Search conversations - Left sidenav
   searchTerm: string = '';
@@ -68,7 +78,10 @@ export class MessagesComponent implements OnInit {
   // Main chat properties
   newMessage: string = '';
   loadingChatMessages: boolean = false;
-  currentMessages: Message[] = [];
+  currentMessages: MessageEntry[] = [];
+   mediaImages = [
+
+  ]
 
   // File upload properties - Main chat
   showUploadFilesPanel: boolean = false;
@@ -77,7 +90,7 @@ export class MessagesComponent implements OnInit {
       maxFiles: 5,
       labelIdle: 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
   };
-  pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
+  pondFiles: File[] = [];
   @ViewChild('myPond') myPond!: FilePondComponent;
   uploadedFilesCount = 0;
 
@@ -108,12 +121,13 @@ export class MessagesComponent implements OnInit {
       bgColor: 'bg-orange-500',
     },
   ];
-  
 
   constructor(
     private _messageService: MessagesService,
     private _authService: Auth,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public gallery: Gallery,
+    public lightbox: Lightbox
   ){
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -128,20 +142,16 @@ export class MessagesComponent implements OnInit {
         if (user) {
           this.currentUser = user;
           this.isAdmin = user.type === 'Administrator';
-          if (this.isAdmin) {
-            this.loadAdminConversations();
-          } else {
-            this.loadConversations();
+          if (!this.usersCalledByDefault) {
+            this.getQueryParams();
+            this.usersCalledByDefault = true;
           }
-
-          this.getQueryParams();
         }
       },
       error: (error) => {
         this.handleError(error);
       }
     });
-    this.loadUsersListsAndSubscribeChanges();
   }
 
   ngAfterViewChecked() {
@@ -153,63 +163,40 @@ export class MessagesComponent implements OnInit {
   getQueryParams(): void {
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
       if (Object.keys(params).length > 0) {
-        switch(this.currentUser?.type) { 
-          case 'Vendor': { 
-              if (params['customerId']) {
-                let request: MessageConevrsationRequest;
-                request = {
-                  vendorId: null,
-                  submissionUserId: params['customerId'],
-                  paging: {
-                    pageNumber: this.pageNumber,
-                    pageSize: this.pageSize
-                  },
-                  sorting: {
-                    field: 1,
-                    sortOrder: 1
-                  }
-                };
-              }
-              break; 
-          } 
-          case 'Customer': { 
-              if (params['vendorId']) {
-                let request: MessageConevrsationRequest;
-                request = {
-                  vendorId: params['vendorId'],
-                  submissionUserId: null,
-                  paging: {
-                    pageNumber: this.pageNumber,
-                    pageSize: this.pageSize
-                  },
-                  sorting: {
-                    field: 1,
-                    sortOrder: 1
-                  }
-                };
-              }
-              break; 
-          } 
-          case 'Administrator': { 
-               if (params['customerId']) {
-                
-              }
-              break; 
-          } 
-        } 
+        if (params['customerId']) {
+          this.customerIdQuery = Number(params['customerId']);
+        }
+        if (params['vendorId']) {
+          this.vendorIdQuery = Number(params['vendorId']);
+        }
+        if (params['rfqId']) {
+          this.rfqIdQuery = Number(params['rfqId']);
+        }
       }
+      switch(this.currentUser?.type) { 
+        case 'Vendor': { 
+            this.loadConversations();
+            break; 
+        } 
+        case 'Customer': { 
+            this.loadConversations();
+            break; 
+        } 
+        case 'Administrator': { 
+            this.loadUsersListsAndSubscribeChanges();
+            this.loadAdminConversations();
+            break; 
+        } 
+      } 
     });
   }
 
   // API Data Fetching & Sending
   private loadUsersListsAndSubscribeChanges(): void {
-    this._messageService.getAllVendorsWithConversations().pipe(take(1)).subscribe({
-      next: (data: userChat[]) => {
-        this.vendorItems = data.map(conv => ({
-          name: conv.name,
-          email: conv.email,
-          id: conv.id
-        }));
+    this._messageService.getAllConversationUsersByRole('Vendor').pipe(take(1)).subscribe({
+      next: (data: ConversationUserEntry[]) => {
+        this.vendorItems = data;
+        this.filteredVendorOptions = of(this.vendorItems.slice());
       },
 
       error: (error) => {
@@ -217,13 +204,10 @@ export class MessagesComponent implements OnInit {
       },
     });
 
-    this._messageService.getAllCustomersWithConversations().pipe(take(1)).subscribe({
-      next: (data: userChat[]) => {
-        this.customerItems = data.map(conv => ({
-          name: conv.name,
-          email: conv.email,
-          id: conv.id
-        }));
+    this._messageService.getAllConversationUsersByRole('Customer').pipe(take(1)).subscribe({
+      next: (data: ConversationUserEntry[]) => {
+        this.customerItems = data;
+        this.filteredCustomerOptions = of(this.customerItems.slice());
       },
 
       error: (error) => {
@@ -246,21 +230,14 @@ export class MessagesComponent implements OnInit {
         return name ? this._filterCustomers(name as string) : this.customerItems.slice();
       }),
     );
-
-    this.vendorSearchControl.valueChanges.subscribe(data => {
-      this.loadAdminConversations();
-    });
-
-    this.customerSearchControl.valueChanges.subscribe(data => {
-      this.loadConversations();
-    });
   }
 
   private loadAdminConversations(): void {
     let request: MessageConevrsationRequest;
     request = {
-      vendorId: this.vendorSearchControl?.value?.id || 0,
-      submissionUserId: this.customerSearchControl?.value?.id || 0,
+      vendorId: this.vendorIdQuery ? this.vendorIdQuery : this.vendorSearchControl?.value?.id ? this.vendorSearchControl?.value?.id : this.currentUser?.type == 'Vendor' ? this.currentUser?.id : null,
+      submissionUserId: this.customerIdQuery ? this.customerIdQuery : this.customerSearchControl?.value?.id || null,
+      hasConversations: true,
       paging: {
         pageNumber: 1,
         pageSize: 10
@@ -270,13 +247,17 @@ export class MessagesComponent implements OnInit {
         sortOrder: 1
       }
     };
-    
+
+    this.customerIdQuery = null;
+    this.vendorIdQuery = null;
     this._messageService.getAdminMessageConversations(request).pipe(take(1)).subscribe({
       next: (data: MessageAdminConversationList) => {
         this.adminConversations = data.items;
         this.filteredAdminConversations = this.adminConversations;
         this.loadingConversations = false;
-        this.selectChat(0);
+        if (this.adminConversations.length > 0) {
+          this.selectChat(this.adminConversations[0], 0);
+        }
       },
       error: (error) => {
         this.loadingConversations = false;
@@ -287,11 +268,12 @@ export class MessagesComponent implements OnInit {
   private loadConversations(): void {
     let request: MessageConevrsationRequest;
     request = {
-      vendorId: this.vendorSearchControl?.value?.id || 0,
-      submissionUserId: this.currentUser?.id || 0,
+      vendorId: this.vendorIdQuery ? this.vendorIdQuery : this.vendorSearchControl?.value?.id ? this.vendorSearchControl?.value?.id : this.currentUser?.type == 'Vendor' ? this.currentUser?.id : null,
+      submissionUserId: this.customerIdQuery ? this.customerIdQuery : this.customerSearchControl?.value?.id || null,
+      hasConversations: true,
       paging: {
         pageNumber: 1,
-        pageSize: 10
+        pageSize: 100
       },
       sorting: {
         field: 1,
@@ -299,12 +281,16 @@ export class MessagesComponent implements OnInit {
       }
     };
 
+    this.customerIdQuery = null;
+    this.vendorIdQuery = null;
     this._messageService.getMessageConversations(request).pipe(take(1)).subscribe({
       next: (data: MessageAdminConversationList) => {
         this.conversations = data.items;
         this.filteredConversations = this.conversations;
         this.loadingConversations = false;
-        this.selectChat(0);
+        if (this.conversations.length > 0) {
+          this.selectChat(this.conversations[0], 0);
+        }
       },
       error: (error) => {
         this.loadingConversations = false;
@@ -312,35 +298,23 @@ export class MessagesComponent implements OnInit {
     });
   }
 
-  private loadMessagesForConversation(index: number): void {
-    // Dummy test data
-    let url;
-    switch(index) { 
-      case 0: { 
-          url = 'https://api.npoint.io/7b44e477a68e814b29c5';
-          break; 
-      } 
-      case 1: { 
-          url = 'https://api.npoint.io/592d1831918d41b892d1';
-          break; 
-      } 
-      case 2: { 
-          url = 'https://api.npoint.io/f26e5eeda168713955f6'; 
-          break; 
+  private loadMessagesForConversation(quoteId: number): void {
+    let request: MessageConversationMessagesRequest;
+    request = {
+      submissionQuoteId: quoteId,
+      paging: {
+        pageNumber: this.messagesPageNumber,
+        pageSize: this.messagesPageSize
+      },
+      sorting: {
+        field: 1,
+        sortOrder: 1
       }
-      case 3: { 
-          url = 'https://api.npoint.io/1046ff931f6f34f482ec'; 
-          break; 
-      }
-      default: { 
-          url = 'https://api.npoint.io/7b44e477a68e814b29c5';
-          break; 
-      } 
-    }
+    };
 
-    this._messageService.getChatMessages(index, url).pipe(take(1)).subscribe({
-      next: (data: Message[]) => {
-      this.currentMessages = data;
+    this._messageService.getChatMessageHistory(request).pipe(take(1)).subscribe({
+      next: (data: TableResponse<MessageEntry>) => {
+      this.currentMessages = Array.isArray(data.items) ? data.items : [];
       this.loadingChatMessages = false;
       },
       error: (error) => {
@@ -350,23 +324,56 @@ export class MessagesComponent implements OnInit {
   }
 
   sendMessage(): void {
-    if (this.newMessage.trim()) {
-      const message: Message = {
-        sender: 'You',
-        content: this.newMessage,
-        time: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        isUser: true,
-        initials: 'YU',
-        bgColor: 'bg-gray-500',
-      };
+    if (this.newMessage.trim() || this.pondFiles.length > 0) {
+      const formData = new FormData();
 
-      this._messageService.sendMessage(message).pipe(take(1)).subscribe({
+      formData.append('SubmissionQuoteId', String(this.selectedConversation?.id || 12)); // REMOVE 12
+      formData.append('Content', this.newMessage);
+
+      this.pondFiles.forEach(file => {
+        formData.append('Files', file, file.name);
+      });
+
+      const addMessage: MessageEntry = {
+        id: 0,
+        content: this.newMessage,
+        submissionQuoteId: this.selectedConversation?.id || null,
+        senderId: this.currentUser?.id || 0,
+        created: new Date().toISOString(),
+        quoteMessageStatus: {
+          id: 1,
+          name: 'Sent'
+        },
+        media: {
+          items: this.pondFiles.length > 0 ? this.pondFiles.map((file, index) => ({
+            id: `file-${index}`,
+            name: typeof file === 'string' ? file : (file as File).name,
+            isMain: index === 0,
+            sortOrder: index,
+            size: typeof file === 'string' ? 0 : (file as File).size,
+            url: typeof file === 'string' ? file : URL.createObjectURL(file as File),
+            type: 1, 
+            extension: typeof file === 'string' ? '' : (file as File).name.split('.').pop() || '' 
+          })) : []
+        },
+        sender: {
+          id: this.currentUser?.id || 0,
+          firstName: this.currentUser?.firstName || '',
+          lastName: this.currentUser?.lastName || '',
+          email: this.currentUser?.email || '',
+          picture: null,
+          receiveEmailNotifications: false,
+          receivePushNotifications: false
+        }
+      }
+
+      this._messageService.sendMessage(formData).pipe(take(1)).subscribe({
          next: (data) => {
-          this.currentMessages.push(message);
+          this.currentMessages.push(addMessage);
           this.newMessage = '';
+          this.pondFiles = [];
+          this.uploadedFilesCount = 0;
+          this.showUploadFilesPanel = false;
 
           // this.conversations[
           //   this.selectedChatIndex
@@ -390,7 +397,7 @@ export class MessagesComponent implements OnInit {
             }
 
             if (!this.isAdmin) {
-              this.loadMessagesForConversation(1);
+              this.loadMessagesForConversation(this.selectedConversation?.id || 0);
             }            
           },
           error: (error) => {
@@ -402,33 +409,69 @@ export class MessagesComponent implements OnInit {
   }
 
   // Filtering and Selection functions
-  displayFn(user: userChat): string {
-    return user && user.name ? user.name : '';
+
+  getImageGalleryItems(images: any) {
+    let items: GalleryItem[] = [];
+    items = images.map(
+      (item: any) => new ImageItem({ src: item.url, thumb: item.url })
+    );
+    return items;
   }
 
-  private _filterVendors(name: string): userChat[] {
-    const filterValue = name.toLowerCase();
-
-    return this.vendorItems.filter(option => option.name.toLowerCase().includes(filterValue));
+  displayFn(user: ConversationUserEntry): string {
+    return user && user.firstName ? `${user.firstName} ${user.lastName}` : '';
   }
 
-  private _filterCustomers(name: string): userChat[] {
+  private _filterVendors(name: string): ConversationUserEntry[] {
     const filterValue = name.toLowerCase();
 
-    return this.customerItems.filter(option => option.name.toLowerCase().includes(filterValue));
+    return this.vendorItems.filter(option => option.firstName.toLowerCase().includes(filterValue) ||
+      option.lastName.toLowerCase().includes(filterValue))
+  }
+
+  private _filterCustomers(name: string): ConversationUserEntry[] {
+    const filterValue = name.toLowerCase();
+
+    return this.customerItems.filter(option => option.firstName.toLowerCase().includes(filterValue) ||
+      option.lastName.toLowerCase().includes(filterValue))
   }
 
   onSearchChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input?.value || '';
     this.searchTerm = value.toLowerCase();
-    this.filteredConversations = this.conversations.filter(
-      (conv) =>
-        conv.title.toLowerCase().includes(this.searchTerm) ||
-        conv.vendor.firstName.toLowerCase().includes(this.searchTerm) ||
-        conv.vendor.lastName.toLowerCase().includes(this.searchTerm) ||
-        conv.submission.title.toLowerCase().includes(this.searchTerm)
-    );
+    if (!this.isAdmin) {
+      if (this.searchTerm) {
+        this.filteredConversations = this.conversations.filter(
+          (conv) =>
+            conv.title.toLowerCase().includes(this.searchTerm) ||
+            conv.vendor.firstName.toLowerCase().includes(this.searchTerm) ||
+            conv.vendor.lastName.toLowerCase().includes(this.searchTerm) ||
+            conv.submission.user.firstName.toLowerCase().includes(this.searchTerm) ||
+            conv.submission.user.lastName.toLowerCase().includes(this.searchTerm) ||
+            conv.submission.title.toLowerCase().includes(this.searchTerm)
+        );
+      } else {
+        this.filteredConversations = this.conversations
+      }
+    } 
+    else {
+      if (this.searchTerm) {
+        this.filteredAdminConversations = this.adminConversations.filter(
+          (conv) =>
+            conv.title.toLowerCase().includes(this.searchTerm) ||
+            conv.vendor.firstName.toLowerCase().includes(this.searchTerm) ||
+            conv.vendor.lastName.toLowerCase().includes(this.searchTerm) ||
+            conv.submission.title.toLowerCase().includes(this.searchTerm) ||
+            conv.submission.user.firstName.toLowerCase().includes(this.searchTerm) ||
+            conv.submission.user.lastName.toLowerCase().includes(this.searchTerm)
+        );
+      } else {
+          this.filteredAdminConversations = this.adminConversations;
+      }
+
+    }
+
   }
 
   get selectedConversation(): MessageAdminConversationEntry | null {
@@ -442,9 +485,17 @@ export class MessagesComponent implements OnInit {
     }
   }
 
-  selectChat(index: number): void {
+  selectChat(conv: MessageAdminConversationEntry, index: number): void {
     this.selectedChatIndex = index;
-    this.loadMessagesForConversation(index);
+    this.loadMessagesForConversation(conv.id);
+  }
+
+  onVendorSelected(event: any): void {
+    this.loadAdminConversations();
+  }
+
+  onCustomerSelected(event: any): void {
+    this.loadAdminConversations();
   }
 
 
@@ -457,31 +508,17 @@ export class MessagesComponent implements OnInit {
   }
 
   pondHandleAddFile(event: any) {
-    this.uploadedFilesCount++;
+    if (event?.file?.file) {
+      this.pondFiles.push(event.file.file as File);
+    }
   }
 
   onFileRemoved(event: any) {
-    this.uploadedFilesCount = Math.max(0, this.uploadedFilesCount - 1);
+  if (event?.file?.file) {
+      const removedFile = event.file.file as File;
+      this.pondFiles = this.pondFiles.filter(f => f !== removedFile);
+    }
   }
-
-  pondHandleActivateFile(event: any) {
-  }
-
-  onFilesUpdated(files: (string| FilePondInitialFile | Blob | ActualFileObject)[]): void {
-    this.pondFiles = files;
-
-    const rawFiles: File[] = files
-    .map(file => {
-      if (typeof file === 'string') return null;
-      if ('file' in file) return file.file as File;
-      if (file instanceof Blob) return file as File;
-      return null;
-    })
-    .filter((f): f is File => f !== null);
-
-    console.log('raw files', rawFiles)
-  }
-
 
   // Other formatting and error handling methods
   triggerMessagesMobile() {
@@ -504,6 +541,60 @@ export class MessagesComponent implements OnInit {
     }
   }
 
+  mapLetterToElementById(userId: number): any | undefined {
+    let findUser;
+    if (this.currentUser?.type === 'Administrator') {
+      findUser = this.adminConversations.find(item => item.submission.id === userId || item.vendor.id === userId);
+    } else {
+      findUser = this.conversations.find(item => item.submission.id === userId || item.vendor.id === userId);
+    }
+
+    if (findUser) {
+      return this.mapLetterToElement(findUser.submission.user.firstName);
+    } else
+    {
+      if (this.currentUser?.id === userId) {
+        return this.mapLetterToElement(this.currentUser.firstName!);
+      }
+    }
+  }
+
+  getUserFirstNameById(userId: number): string {
+    let findUser;
+    if (this.currentUser?.type === 'Administrator') {
+      findUser = this.adminConversations.find(item => item.submission.id === userId || item.vendor.id === userId);
+    } else {
+      findUser = this.conversations.find(item => item.submission.id === userId || item.vendor.id === userId);
+    }
+
+    if (findUser) {
+      return findUser.submission.user.firstName;
+    } else {
+      if (this.currentUser?.id === userId) {
+        return this.currentUser.firstName || '';
+      }
+    }
+    return '';
+  }
+
+  getUserLastNameById(userId: number): string {
+    let findUser;
+    if (this.currentUser?.type === 'Administrator') {
+      findUser = this.adminConversations.find(item => item.submission.id === userId || item.vendor.id === userId);
+    } else {
+      findUser = this.conversations.find(item => item.submission.id === userId || item.vendor.id === userId);
+    }
+
+    if (findUser) {
+      return findUser.submission.user.lastName;
+    } else {
+      if (this.currentUser?.id === userId) {
+        return this.currentUser.lastName || '';
+      }
+    }
+    return '';
+  }
+
   mapLetterToElement(name: string): any | undefined {
     if (!name) return this.colorPalette[0];
 
@@ -514,8 +605,34 @@ export class MessagesComponent implements OnInit {
       const index = (asciiCode - 65) % this.colorPalette.length;
       return this.colorPalette[index];
     }
-
     return this.colorPalette[0];
+  }
+
+  getRelativeTime(date: Date | string): string {
+    const now = new Date();
+    const d = new Date(date);
+    const diffMs = now.getTime() - d.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) return 'Just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return this.formatDate(date);
+  }
+
+  formatDate(date: Date | string): string {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   handleError(error: any): void {
