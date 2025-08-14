@@ -4,18 +4,18 @@ import { RequestQuote } from './request-quote/request-quote';
 import { VendorRfqs } from './vendor-rfqs/vendor-rfqs';
 import { RfqDetails } from './rfq-details/rfq-details';
 import { AuthGuard } from '../../guards/auth-guard';
+import { MyQuotesComponent } from './my-quotes/my-quotes';
 
 const routes: Routes = [
   { path: '', redirectTo: 'request-quote', pathMatch: 'full' },
   { path: 'request-quote', component: RequestQuote },
   { path: 'vendor-rfqs', component: VendorRfqs, canActivate: [AuthGuard] },
   { path: 'vendor-rfqs/:id', component: RfqDetails, canActivate: [AuthGuard] },
+  { path: 'my-quotes', component: MyQuotesComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class RfqRoutingModule { }
-
-
+export class RfqRoutingModule {}

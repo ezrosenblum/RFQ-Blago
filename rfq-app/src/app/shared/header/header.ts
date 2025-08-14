@@ -1,24 +1,32 @@
 // src/app/shared/header/header.component.ts
-import { Component, OnInit, OnDestroy, Signal, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Signal,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { User, UserRole } from '../../models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationData } from '../../services/notification-data';
-import { NotificationItem} from '../../models/notifications.model';
+import { NotificationItem } from '../../models/notifications.model';
 
 @Component({
   selector: 'app-header',
   standalone: false,
   templateUrl: './header.html',
-  styleUrls: ['./header.scss']
+  styleUrls: ['./header.scss'],
 })
 export class Header implements OnInit, OnDestroy {
   currentUser: User | null = null;
   isAuthenticated = false;
   isDarkMode = false;
   isMenuOpen = false;
+  imageLoadError = false;
   notificationCount: number = 0;
   notifications: NotificationItem[] = [];
   showNotificationsDropdown = false;
@@ -45,13 +53,13 @@ export class Header implements OnInit, OnDestroy {
     // Subscribe to authentication state
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
+      .subscribe((user) => {
         this.currentUser = user;
       });
 
     this.authService.isAuthenticated$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(isAuth => {
+      .subscribe((isAuth) => {
         this.isAuthenticated = isAuth;
       });
 
@@ -72,7 +80,9 @@ export class Header implements OnInit, OnDestroy {
       this.isDarkMode = savedTheme === 'dark';
     } else {
       // Check system preference
-      this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.isDarkMode = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      ).matches;
     }
     this.applyTheme();
   }
@@ -119,7 +129,12 @@ export class Header implements OnInit, OnDestroy {
     this.router.navigate(['/vendor-rfqs']);
   }
 
-   navigateToMessages(): void {
+  navigateToMyQuotes(): void {
+    this.closeMenu();
+    this.router.navigate(['/my-quotes']);
+  }
+
+  navigateToMessages(): void {
     this.closeMenu();
     this.router.navigate(['/messages']);
   }
@@ -133,12 +148,13 @@ export class Header implements OnInit, OnDestroy {
     this.authService.logout();
   }
 
-
   getUserDisplayName(): string {
     if (!this.currentUser) return '';
 
     if (this.currentUser.firstName || this.currentUser.lastName) {
-      return `${this.currentUser.firstName || ''} ${this.currentUser.lastName || ''}`.trim();
+      return `${this.currentUser.firstName || ''} ${
+        this.currentUser.lastName || ''
+      }`.trim();
     }
 
     return this.currentUser.email;
@@ -175,9 +191,15 @@ export class Header implements OnInit, OnDestroy {
   }
 
   canAccessRequestQuote(): boolean {
-    return !this.currentUser || (this.isAuthenticated && this.currentUser?.type === UserRole.CLIENT)
+    return (
+      !this.currentUser ||
+      (this.isAuthenticated && this.currentUser?.type === UserRole.CLIENT)
+    );
   }
 
+  canAccessMyQuotes(): boolean {
+    return this.isAuthenticated && this.currentUser?.type === UserRole.VENDOR;
+  }
 
   isCurrentRoute(route: string): boolean {
     return this.router.url === route;
@@ -190,8 +212,8 @@ export class Header implements OnInit, OnDestroy {
         this.hasMoreNotifications = true;
         this.getNotifications(1);
       },
-      error: err => console.error('Failed to get notification count:', err)
-    })
+      error: (err) => console.error('Failed to get notification count:', err),
+    });
   }
 
   toggleNotificationsDropdown(): void {
@@ -214,12 +236,12 @@ export class Header implements OnInit, OnDestroy {
       query: '',
       paging: {
         pageNumber: page,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
       },
       sorting: {
         field: 1,
-        sortOrder: 1
-      }
+        sortOrder: 1,
+      },
     };
 
     this.notificationDataService.getNotificationsPaged(searchParams).subscribe({
@@ -238,7 +260,7 @@ export class Header implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Failed to get notifications:', err);
         this.isLoadingMore = false;
-      }
+      },
     });
   }
 
@@ -247,7 +269,7 @@ export class Header implements OnInit, OnDestroy {
       next: () => {
         this.getNotificationCount();
       },
-      error: (err) => console.error('Failed to mark all as read:', err)
+      error: (err) => console.error('Failed to mark all as read:', err),
     });
   }
 
@@ -257,30 +279,37 @@ export class Header implements OnInit, OnDestroy {
 
     this.loadingStatusChange[notification.id] = true;
 
-    this.notificationDataService.changeStatus(notification.id, newStatusId).subscribe({
-      next: () => {
-        const index = this.notifications.findIndex(n => n.id === notification.id);
-        if (index > -1) {
-          this.notifications[index].status.id = newStatusId;
-        }
-        this.getNotificationCount();
-      },
-      error: (err) => {
-        console.error('Failed to toggle notification status:', err);
-      },
-      complete: () => {
-        this.loadingStatusChange[notification.id] = false;
-      }
-    });
+    this.notificationDataService
+      .changeStatus(notification.id, newStatusId)
+      .subscribe({
+        next: () => {
+          const index = this.notifications.findIndex(
+            (n) => n.id === notification.id
+          );
+          if (index > -1) {
+            this.notifications[index].status.id = newStatusId;
+          }
+          this.getNotificationCount();
+        },
+        error: (err) => {
+          console.error('Failed to toggle notification status:', err);
+        },
+        complete: () => {
+          this.loadingStatusChange[notification.id] = false;
+        },
+      });
   }
 
   onScroll(event: Event): void {
     const element = event.target as HTMLElement;
-    const scrollBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
-
-    // If near bottom and has more notifications to load
+    const scrollBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight;
     if (scrollBottom < 50 && this.hasMoreNotifications && !this.isLoadingMore) {
       this.getNotifications(this.currentPage + 1);
     }
+  }
+
+  onImageError(): void {
+    this.imageLoadError = true;
   }
 }
