@@ -10,16 +10,10 @@ import { environment } from '../../environments/environment';
 export class QuoteService {
   constructor(private http: HttpClient) {}
 
-  getMyQuotes(request: MyQuotesRequest): Observable<MyQuotesList> {
-    return this.http
-      .post<MyQuotesList>(
-        `${environment.apiUrl}Submission/quote/search`,
-        request
-      )
-      .pipe(
-        map((response: MyQuotesList) => {
-          return response;
-        })
-      );
+   getMyQuotes(request: MyQuotesRequest): Observable<MyQuotesList> {
+    return this.http.post<MyQuotesList>(
+      `${environment.apiUrl}Submission/quote/search`,
+      request
+    );
   }
 }
