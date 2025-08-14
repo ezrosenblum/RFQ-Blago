@@ -71,6 +71,8 @@ export interface MessageMediaEntry {
   url: string;
   type: number;
   extension: string;
+  srcUrl: string;
+  previewUrl: string;
 }
 
 export interface ConversationUserEntry {

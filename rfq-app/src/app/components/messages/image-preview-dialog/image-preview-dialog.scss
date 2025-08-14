@@ -1,0 +1,22 @@
+::ng-deep {
+    .mat-mdc-dialog-container {
+        min-width: 100% !important;
+    }
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.ki-abstract-11 {
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    z-index: 100;
+}
+
+.h-100 {
+    height: 100%;
+}

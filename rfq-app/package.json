@@ -26,7 +26,6 @@
     "filepond": "^4.32.8",
     "filepond-plugin-file-validate-size": "^2.2.8",
     "filepond-plugin-file-validate-type": "^1.2.9",
-    "ng-gallery": "^12.0.0",
     "ngx-filepond": "^7.0.3",
     "ngx-intl-tel-input": "^17.0.0",
     "rxjs": "~7.8.0",

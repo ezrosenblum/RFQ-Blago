@@ -1,0 +1,48 @@
+::ng-deep {
+    .mat-mdc-dialog-container {
+        min-width: 100% !important;
+    }
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.ki-abstract-11 {
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    top: 10px;
+}
+
+h1 {
+    font-size: 22px !important;
+    padding: 0 24px;
+}
+
+mat-dialog-actions {
+    padding: 20px 50px !important;
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    max-width: 40px;
+    max-height: 40px;
+    min-width: 40px;
+    max-width: 40px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+::ng-deep .filepond--credits {
+    display: none;
+}
+
+.upload-files-panel {
+    position: relative;
+    left: 0;
+    width: 100%;
+}

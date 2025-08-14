@@ -12,12 +12,12 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AsyncPipe } from '@angular/common';
-import { GalleryModule } from 'ng-gallery';
-import { LightboxModule } from 'ng-gallery/lightbox';
+import { ImagePreviewDialog } from './image-preview-dialog/image-preview-dialog';
 
 @NgModule({
   declarations: [
     MessagesComponent,
+    ImagePreviewDialog,
   ],
   imports: [
     CommonModule,
@@ -33,8 +33,6 @@ import { LightboxModule } from 'ng-gallery/lightbox';
     MatFormFieldModule,
     MatInputModule,
     AsyncPipe,
-    GalleryModule,
-    LightboxModule
   ]
 })
 export class MessagesModule { }

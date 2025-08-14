@@ -127,7 +127,7 @@ export class RequestQuote implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
         this.currentUser = user;
-        if (this.currentUser?.type == 'Administrator') {
+        if (this.currentUser?.type == 'Administrator' || this.currentUser?.type == 'Vendor') {
           this.router.navigate(['/vendor-rfqs']);
         }
         if (this.currentUser?.type === UserRole.CLIENT) {

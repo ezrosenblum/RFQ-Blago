@@ -5,8 +5,6 @@ import { map, Observable, of, startWith, take } from 'rxjs';
 import {
   MatDialog,
 } from '@angular/material/dialog';
-import { ActualFileObject, FilePondInitialFile } from 'filepond';
-import { FileItem } from '../../models/form-validation';
 import { FilePondComponent } from 'ngx-filepond';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Auth } from '../../services/auth';
@@ -14,8 +12,7 @@ import { FormControl } from '@angular/forms';
 import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, MessageConversationMessagesRequest, User, userChat } from '../../models/user.model';
 import { ActivatedRoute } from '@angular/router';
 import { TableResponse } from '../../models/rfq.model';
-import { Gallery, GalleryItem, ImageItem } from 'ng-gallery';
-import { Lightbox } from 'ng-gallery/lightbox';
+import { ImagePreviewDialog } from './image-preview-dialog/image-preview-dialog';
 
 @Component({
   standalone: false,
@@ -53,9 +50,9 @@ export class MessagesComponent implements OnInit {
   filteredAdminConversations: MessageAdminConversationEntry[] = [];
   loadingConversations: boolean = true;
   selectedChatIndex: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 100;
   pageNumber: number = 1;
-  messagesPageSize: number = 10;
+  messagesPageSize: number = 100;
   messagesPageNumber: number = 1;
 
   // Autocomplete controls - Left sidenav
@@ -70,7 +67,7 @@ export class MessagesComponent implements OnInit {
 
   customerIdQuery: number | null = null;
   vendorIdQuery: number | null = null;
-  rfqIdQuery: number | null = null;
+  quoteIdQuery: number | null = null;
 
   // Search conversations - Left sidenav
   searchTerm: string = '';
@@ -79,9 +76,6 @@ export class MessagesComponent implements OnInit {
   newMessage: string = '';
   loadingChatMessages: boolean = false;
   currentMessages: MessageEntry[] = [];
-   mediaImages = [
-
-  ]
 
   // File upload properties - Main chat
   showUploadFilesPanel: boolean = false;
@@ -126,8 +120,7 @@ export class MessagesComponent implements OnInit {
     private _messageService: MessagesService,
     private _authService: Auth,
     private route: ActivatedRoute,
-    public gallery: Gallery,
-    public lightbox: Lightbox
+    private _dialog: MatDialog,
   ){
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -169,8 +162,8 @@ export class MessagesComponent implements OnInit {
         if (params['vendorId']) {
           this.vendorIdQuery = Number(params['vendorId']);
         }
-        if (params['rfqId']) {
-          this.rfqIdQuery = Number(params['rfqId']);
+        if (params['quoteId']) {
+          this.quoteIdQuery = Number(params['quoteId']);
         }
       }
       switch(this.currentUser?.type) { 
@@ -255,9 +248,16 @@ export class MessagesComponent implements OnInit {
         this.adminConversations = data.items;
         this.filteredAdminConversations = this.adminConversations;
         this.loadingConversations = false;
-        if (this.adminConversations.length > 0) {
-          this.selectChat(this.adminConversations[0], 0);
+        if (this.quoteIdQuery) {
+          let findChatIndex = this.adminConversations.findIndex(el => el.id == this.quoteIdQuery)
+          if (findChatIndex > -1) {
+            this.selectChat(this.adminConversations[findChatIndex], findChatIndex);
+          }
+          this.quoteIdQuery = null;
+        } else {
+            this.selectChat(this.adminConversations[0], 0);
         }
+
       },
       error: (error) => {
         this.loadingConversations = false;
@@ -288,8 +288,17 @@ export class MessagesComponent implements OnInit {
         this.conversations = data.items;
         this.filteredConversations = this.conversations;
         this.loadingConversations = false;
+
         if (this.conversations.length > 0) {
-          this.selectChat(this.conversations[0], 0);
+          if (this.quoteIdQuery) {
+            let findChatIndex = this.conversations.findIndex(el => el.id == this.quoteIdQuery)
+            if (findChatIndex > -1) {
+              this.selectChat(this.conversations[findChatIndex], findChatIndex);
+            }
+            this.quoteIdQuery = null;
+          } else {
+             this.selectChat(this.conversations[0], 0);
+          }
         }
       },
       error: (error) => {
@@ -315,7 +324,25 @@ export class MessagesComponent implements OnInit {
     this._messageService.getChatMessageHistory(request).pipe(take(1)).subscribe({
       next: (data: TableResponse<MessageEntry>) => {
       this.currentMessages = Array.isArray(data.items) ? data.items : [];
+      this.currentMessages.forEach(el => {
+        if (el.media && el.media.items && el.media.items.length > 0) {
+          el.media.items.forEach(img => {
+            img.srcUrl = img.url;
+            img.previewUrl = img.url;
+          })
+        }
+      })
       this.loadingChatMessages = false;
+
+      setTimeout(() => {
+        const container = document.getElementById('chat-scrollable');
+        if (container) {
+           container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 500);
       },
       error: (error) => {
         this.loadingChatMessages = false;
@@ -327,7 +354,7 @@ export class MessagesComponent implements OnInit {
     if (this.newMessage.trim() || this.pondFiles.length > 0) {
       const formData = new FormData();
 
-      formData.append('SubmissionQuoteId', String(this.selectedConversation?.id || 12)); // REMOVE 12
+      formData.append('SubmissionQuoteId', String(this.selectedConversation?.id || null));
       formData.append('Content', this.newMessage);
 
       this.pondFiles.forEach(file => {
@@ -353,7 +380,9 @@ export class MessagesComponent implements OnInit {
             size: typeof file === 'string' ? 0 : (file as File).size,
             url: typeof file === 'string' ? file : URL.createObjectURL(file as File),
             type: 1, 
-            extension: typeof file === 'string' ? '' : (file as File).name.split('.').pop() || '' 
+            extension: typeof file === 'string' ? '' : (file as File).name.split('.').pop() || '' ,
+            srcUrl: typeof file === 'string' ? file : URL.createObjectURL(file as File),
+            previewUrl: typeof file === 'string' ? file : URL.createObjectURL(file as File)
           })) : []
         },
         sender: {
@@ -374,11 +403,15 @@ export class MessagesComponent implements OnInit {
           this.pondFiles = [];
           this.uploadedFilesCount = 0;
           this.showUploadFilesPanel = false;
-
-          // this.conversations[
-          //   this.selectedChatIndex
-          // ].lastMessage = `You: ${message.content}`;
-          // this.conversations[this.selectedChatIndex].time = message.time;
+          setTimeout(() => {
+            const container = document.getElementById('chat-scrollable');
+            if (container) {
+               container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+              });
+            }
+          }, 500);
          },
          error: (error) => {},
       })
@@ -410,12 +443,23 @@ export class MessagesComponent implements OnInit {
 
   // Filtering and Selection functions
 
-  getImageGalleryItems(images: any) {
-    let items: GalleryItem[] = [];
-    items = images.map(
-      (item: any) => new ImageItem({ src: item.url, thumb: item.url })
-    );
-    return items;
+  previewImageInFullScreen(url: string){
+    const dialogRef = this._dialog.open(ImagePreviewDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      panelClass: 'preview-image-dialog',
+      autoFocus: false,
+      data: {
+        url: url,
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .subscribe((result: any) => {
+
+      });
   }
 
   displayFn(user: ConversationUserEntry): string {

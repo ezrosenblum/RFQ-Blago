@@ -336,7 +336,7 @@
     </div>
 
     <!-- Messages -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4 relative messages-section">
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 relative messages-section" id="chat-scrollable">
       <div class="spinner mr-2" *ngIf="loadingChatMessages"></div>
       <div
         *ngFor="let msg of currentMessages"
@@ -357,12 +357,12 @@
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10">
             <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
           </div>
-            <span class="text-xs text-gray-500 dark:text-gray-400 mr-10">{{getRelativeTime(msg.created)}}</span>
-          <div class="flex flex-wrap">
-            <!-- <div class="file" *ngFor="let file of mediaImages; let i = index">  
-                <div class="file-image" [style.background-image]="'url(' + file.url + ')'" gallerize (click)="lightbox.open(i, 'lightbox', {panelClass: 'fullscreen'})"></div>
-            </div> -->
+          <div class="flex flex-wrap" *ngIf="msg.media && msg.media.items">
+            <div class="file" *ngFor="let file of msg.media.items; let i = index">  
+              <div (click)="previewImageInFullScreen(file.url)" *ngIf="file.extension == '.png' || file.extension == '.jpg' || file.extension == '.jpeg' || file.extension == '.gif'" class="file-image" [style.background-image]="'url(' + file.url + ')'"></div>
+            </div>
           </div>
+          <span class="text-xs text-gray-500 dark:text-gray-400 mr-10">{{getRelativeTime(msg.created)}}</span>
         </div>
       </div>
     </div>

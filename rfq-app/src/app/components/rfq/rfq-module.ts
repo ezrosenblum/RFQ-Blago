@@ -13,14 +13,16 @@ import { MaterialCategoriesSelectionComponent } from '../profile/material-catego
 import { QuoteFormDialog } from './vendor-rfqs/quote-form-dialog/quote-form-dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MyQuotesComponent } from './my-quotes/my-quotes';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { QuoteSendMessageDialog } from './quote-send-message-dialog/quote-send-message-dialog';
 @NgModule({
   declarations: [
     RequestQuote,
     VendorRfqs,
     RfqDetails,
     QuoteFormDialog,
-    MyQuotesComponent
+    MyQuotesComponent,
+    QuoteSendMessageDialog
   ],
   imports: [
     CommonModule,
@@ -31,7 +33,8 @@ import { MyQuotesComponent } from './my-quotes/my-quotes';
     TranslateModule,
     FileViewComponent,
     MaterialCategoriesSelectionComponent,
-    MatDialogModule
+    MatDialogModule,
+    MatTooltipModule
   ]
 })
 

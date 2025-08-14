@@ -59,11 +59,11 @@ export class QuoteFormDialog implements OnInit {
       price: [0, [Validators.required, Validators.min(0)]],
       quoteValidityInterval: [0, [Validators.required, Validators.min(1)]],
       quoteValidityIntervalType: [null, [Validators.required]],
-      quoteWarranyInterval: [0, [Validators.required, Validators.min(1)]],
-      quoteWarranyIntervalType: [null, [Validators.required]],
-      quoteTimelineIntervalType: [null, [Validators.required]],
-      quoteTimelineMinimumInterval: [0, [Validators.required, Validators.min(0)]],
-      quoteTimelineMaximumInterval: [0, [Validators.required, Validators.min(0)]],
+      warantyDuration: [0, [Validators.required, Validators.min(1)]],
+      warantyIntervalType: [null, [Validators.required]],
+      timelineIntervalType: [null, [Validators.required]],
+      minimumTimelineDuration: [0, [Validators.required, Validators.min(0)]],
+      maximumTimelineDuration: [0, [Validators.required, Validators.min(0)]],
       vendorId: [],
       submissionId: []
     });
@@ -107,19 +107,19 @@ export class QuoteFormDialog implements OnInit {
 
   private timelineMinMaxValidator() {
   return (formGroup: FormGroup) => {
-    const min = formGroup.get('quoteTimelineMinimumInterval')?.value;
-    const max = formGroup.get('quoteTimelineMaximumInterval')?.value;
+    const min = formGroup.get('minimumTimelineDuration')?.value;
+    const max = formGroup.get('maximumTimelineDuration')?.value;
 
     if (min != null && max != null && min > max) {
-      formGroup.get('quoteTimelineMinimumInterval')?.setErrors({ minGreater: true });
+      formGroup.get('minimumTimelineDuration')?.setErrors({ minGreater: true });
     } else {
-      if (formGroup.get('quoteTimelineMinimumInterval')?.hasError('minGreater')) {
-        const errors = { ...formGroup.get('quoteTimelineMinimumInterval')?.errors };
+      if (formGroup.get('minimumTimelineDuration')?.hasError('minGreater')) {
+        const errors = { ...formGroup.get('minimumTimelineDuration')?.errors };
         delete errors['minGreater'];
         if (Object.keys(errors).length === 0) {
-          formGroup.get('quoteTimelineMinimumInterval')?.setErrors(null);
+          formGroup.get('minimumTimelineDuration')?.setErrors(null);
         } else {
-          formGroup.get('quoteTimelineMinimumInterval')?.setErrors(errors);
+          formGroup.get('minimumTimelineDuration')?.setErrors(errors);
         }
       }
     }
