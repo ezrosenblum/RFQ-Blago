@@ -66,6 +66,9 @@ export class QuoteFormDialog implements OnInit {
       maximumTimelineDuration: [0, [Validators.required, Validators.min(0)]],
       vendorId: [],
       submissionId: []
+    },
+    {
+      validators: this.timelineMinMaxValidator()
     });
   }
 

@@ -322,3 +322,8 @@ body {
  .mdc-list-item__primary-text {
     font-size: 12px !important;
 }
+
+.mat-mdc-dialog-panel {
+  border-radius: 10px !important;
+  overflow: hidden;
+}

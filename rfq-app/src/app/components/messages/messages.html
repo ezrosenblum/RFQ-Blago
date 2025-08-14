@@ -357,11 +357,31 @@
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10">
             <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
           </div>
-          <div class="flex flex-wrap" *ngIf="msg.media && msg.media.items">
-            <div class="file" *ngFor="let file of msg.media.items; let i = index">  
-              <div (click)="previewImageInFullScreen(file.url)" *ngIf="file.extension == '.png' || file.extension == '.jpg' || file.extension == '.jpeg' || file.extension == '.gif'" class="file-image" [style.background-image]="'url(' + file.url + ')'"></div>
+          <div class="file" *ngFor="let file of msg.media.items; let i = index">  
+
+              <!-- Images -->
+              <div
+                (click)="previewImageInFullScreen(file.url)"
+                *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)"
+                class="file-image"
+                [style.background-image]="'url(' + file.url + ')'"
+              ></div>
+
+              <!-- PDF -->
+              <div *ngIf="file.extension === '.pdf'" class="file-pdf">
+                <a [href]="file.url" target="_blank">
+                  📄 PDF <span class="file-name">{{file.name}}</span>
+                </a>
+              </div>
+
+              <!-- Text File -->
+              <div *ngIf="file.extension === '.txt'" class="file-text">
+                <a [href]="file.url" target="_blank">
+                  📄 Text File <span class="file-name">{{file.name}}</span>
+                </a>
+              </div>
+
             </div>
-          </div>
           <span class="text-xs text-gray-500 dark:text-gray-400 mr-10">{{getRelativeTime(msg.created)}}</span>
         </div>
       </div>
@@ -415,6 +435,7 @@
           ></textarea>
         </div>
         <button
+         *ngIf="!isMessageSending"
           [disabled]="currentUser?.type === 'Administrator' || !newMessage.trim() || !selectedConversation"
           (click)="sendMessage()"
           class="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mb-1"
@@ -423,6 +444,7 @@
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
           </svg>
         </button>
+        <div class="spinner btn-spinner p-2 mb-1" *ngIf="isMessageSending"></div>
       </div>
     </div>
   </div>
