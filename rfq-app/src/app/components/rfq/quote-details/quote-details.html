@@ -1,0 +1,162 @@
+<div class="bg-gray-50 dark:bg-gray-900 min-h-screen p-4 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Left Column - Main Content -->
+    <div class="lg:col-span-2">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-xl p-10 mb-4 text-white shadow-lg dark:shadow-xl">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full bg-white/20 dark:bg-white/30 text-white flex items-center justify-center font-bold text-base">
+              {{ getInitials(quote.vendor?.firstName, quote.vendor?.lastName) }}
+            </div>
+            <div>
+              <h1 class="text-xl font-bold flex items-center">
+                {{quote.vendor.companyDetails.name}}
+                <svg class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </h1>
+              <p class="text-blue-100 dark:text-blue-200 text-xs mt-1">📍 {{quote.vendor.companyDetails.streetAddress}}
+                <span
+                  [class]="quote.vendor.status.id === 1 ? 'ms-5 px-3 py-1.5 bg-green-500 dark:bg-green-600 text-white rounded-full text-xs font-semibold shadow-md' : 'ms-5 px-3 py-1.5 bg-gray-500 dark:bg-gray-600 text-white rounded-full text-xs font-semibold shadow-md'">
+                  {{ (quote.vendor.status.id === 1 ? 'VENDOR.AVAILABLE_NOW' : 'VENDOR.NOT_AVAILABLE') | translate }}
+                </span>
+              </p>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Proposal Details -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white border-l-4 border-blue-500 dark:border-blue-400 pl-3">{{'VENDOR.PROPOSAL_DETAILS' | translate}}</h2>
+
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-white">{{ quote.title }}</h3>
+          <div class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
+            {{ quote.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Quote Summary -->
+    <div class="space-y-4">
+      <!-- Combined Price and Project Details Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 overflow-hidden">
+        <!-- Price Section -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 text-white p-6 text-center">
+          <div class="text-3xl font-bold mb-1">${{quote.price}}</div>
+          <div class="text-green-100 dark:text-green-200 text-base font-medium">{{'VENDOR.PROPOSED_BID' | translate}}</div>
+        </div>
+
+        <!-- Project Details Section -->
+        <div class="p-4">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.TIMELINE' | translate}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">6 - 8 weeks</span>
+            </div>
+            <hr class="border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.START_DATE' | translate}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">ASAP</span>
+            </div>
+            <hr class="border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.WARRANTY' | translate}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">2 years</span>
+            </div>
+            <hr class="border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.PAYMENT_TERMS' | translate}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">30-60-10</span>
+            </div>
+            <hr class="border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.EARLY_PAY_DISCOUNT' | translate}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">10%</span>
+            </div>
+            <hr class="border-gray-100 dark:border-gray-700">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.SUBMITTED' | translate}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.created | date:'MMM dd, yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Card -->
+      <div *ngIf="currentUser?.type === 'Customer'" class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 p-4">
+        <div class="px-2 space-y-2.5">
+          <button class="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {{'VENDOR.ACCEPT_QUOTE' | translate}}
+          </button>
+          <button class="w-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {{'VENDOR.REJECT_QUOTE' | translate}}
+          </button>
+          <button class="w-full border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-md bg-white dark:bg-gray-800 text-sm" (click)="navigateToMessages()">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+            </svg>
+            {{'VENDOR.MESSAGE_VENDOR' | translate}}
+          </button>
+          <button class="w-full border-2 border-blue-500 dark:border-blue-400 text-blue-500 dark:text-blue-400 py-3 px-4 rounded-xl font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-600 dark:hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-md bg-white dark:bg-gray-800 text-sm">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {{'VENDOR.SCHEDULE_CALL' | translate}}
+          </button>
+        </div>
+      </div>
+
+      <!-- Vendor Information -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200">
+        <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">{{'VENDOR.VENDOR_INFORMATION' | translate}}</h3>
+        <div class="space-y-3">
+          <div>
+            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.COMPANY' | translate}}</div>
+            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.name}}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.CONTACT_PERSON' | translate}}</div>
+            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.contactPersonFirstName}} {{quote.vendor.companyDetails.contactPersonLastName}}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.EMAIL' | translate}}</div>
+            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.contactPersonEmail}}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.PHONE' | translate}}</div>
+            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.contactPersonPhone}}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.COMPANY_SIZE' | translate}}</div>
+            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.companySize.name}}</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.OPERATING_RADIUS' | translate}}</div>
+            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.operatingRadius}} km</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
