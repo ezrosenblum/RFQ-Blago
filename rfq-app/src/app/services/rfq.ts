@@ -111,9 +111,9 @@ export class RfqService {
   getStatusColor(status: LookupValue): string {
     const statusColors: { [key: string]: string } = {
       1: 'text-warning-600 bg-warning-100 dark:text-warning-400 dark:bg-warning-900/20',
-      2: 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/20',
-      3: 'text-success-600 bg-success-100 dark:text-success-400 dark:bg-success-900/20',
-      4: 'text-error-600 bg-error-100 dark:text-error-400 dark:bg-error-900/20'
+      2: 'text-success-600 bg-success-100 dark:text-success-400 dark:bg-success-900/20',
+      3: 'text-error-600 bg-error-100 dark:text-error-400 dark:bg-error-900/20',
+      4: 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/20',
     };
 
     return statusColors[status.id] || 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/20';
@@ -133,5 +133,14 @@ export class RfqService {
 
   getQuoteDetails(id: number): Observable<QuoteItem> {
     return this.http.get<QuoteItem>(`${this.API_URL}Submission/quote/${id}`);
+  }
+
+  rfqChangeStatus(id: number, status: number): Observable<boolean> {
+    return this.http.put<ApiResponse<Rfq>>(`${this.API_URL}Submission/status/${id}?status=${status}`, null)
+      .pipe(
+        map(response => {
+          return response && response.success === true;
+        })
+      );
   }
 }

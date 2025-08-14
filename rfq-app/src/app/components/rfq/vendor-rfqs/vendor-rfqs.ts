@@ -738,6 +738,29 @@ export class VendorRfqs implements OnInit, OnDestroy {
         }
       });
   }
+
+  canApprove(rfq: Rfq): boolean {
+    return this.currentUser?.type === UserRole.ADMIN;
+  }
+
+  approveRfq(rfqId: number){
+    const approveRfq = 2;
+    this.rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.loadRfqs();
+    })
+  }
+
+  canDecline(rfq: Rfq): boolean {
+    return this.currentUser?.type === UserRole.ADMIN;
+  }
+
+  declineRfq(rfqId: number){
+    const declineRfq = 3;
+    this.rfqService.rfqChangeStatus(rfqId, declineRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.loadRfqs();
+    })
+  }
+
   // Expose Math to template
   Math = Math;
 
