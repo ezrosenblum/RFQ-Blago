@@ -58,8 +58,8 @@
     "CONTACT_EMAIL_OPTIONAL": "Contact Email (Optional)",
     "ENTER_CONTACT_EMAIL": "Enter contact email",
     "DEFAULTS_TO_YOUR_EMAIL_IF_NOT_PROVIDED": "Defaults to your email if not provided",
-    "CONTACT_PHONE_OPTIONAL": "Contact Phone (Optional)",
-    "ENTER_CONTACT_PHONE": "Enter contact phone",
+    "CONTACT_PHONE_OPTIONAL": "Phone Number (Optional)",
+    "ENTER_CONTACT_PHONE": "Enter Phone number",
     "DEFAULTS_TO_YOUR_PHONE_IF_NOT_PROVIDED": "Defaults to your phone if not provided",
     "PHONE_NUMBER": "Phone Number",
     "ENTER_PHONE_NUMBER": "Enter phone number",
@@ -357,7 +357,7 @@
     "LAST_NAME_REQUIRED": "Last name is required",
     "EMAIL_ADDRESS": "Email Address",
     "ENTER_EMAIL": "Enter email address",
-    "CONTACT_PHONE": "Contact Phone",
+    "CONTACT_PHONE": "Phone Number",
     "INVALID_PHONE_FORMAT": "Invalid phone format",
     "PHONE_TOO_SHORT": "Phone number must be at least 8 digits",
     "COMPANY_NAME": "Company Name",
@@ -408,7 +408,7 @@
     "CONTACT_PERSON_FIRST_NAME_REQUIRED": "Contact first name is required",
     "CONTACT_PERSON_LAST_NAME_REQUIRED": "Contact last name is required",
     "CONTACT_PERSON_EMAIL_REQUIRED": "Contact email is required",
-    "CONTACT_PERSON_PHONE_REQUIRED": "Contact phone is required",
+    "CONTACT_PERSON_PHONE_REQUIRED": "Phone Number is required",
     "BUSINESS_DESCRIPTION_REQUIRED": "Business description is required",
     "ENTER_EMAIL_VALIDATION": "Please enter a valid email address",
     "FIELD_TOO_LONG": "{{field}} must not exceed {{max}} characters",
@@ -432,7 +432,8 @@
     "CONFIRM_PASSWORD_CHANGE": "Are you sure you want to change your password?",
     "UNIT_MI": "mi",
     "INVALID_US_PHONE_FORMAT": "Invalid US phone format",
-    "PHONE_FORMAT_HINT": "Example: (123) 456-7890"
+    "PHONE_FORMAT_HINT": "Example: (123) 456-7890",
+    "PHONE_NUMBER": "Phone Number"
   },
   "ALERTS": {
     "CONFIRM": "Confirm",

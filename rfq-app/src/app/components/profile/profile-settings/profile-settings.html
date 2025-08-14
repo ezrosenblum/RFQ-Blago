@@ -51,27 +51,25 @@
         </label>
         <div class="md:col-span-8 space-y-2">
           <!-- Upload Button Placeholder -->
-          <div
+          <label
             *ngIf="!previewImageUrl"
-            class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md flex items-center justify-center h-32 w-32"
+            for="avatar-upload"
+            class="cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md flex flex-col items-center justify-center h-32 w-32"
           >
-            <label
-              class="cursor-pointer flex flex-col items-center justify-center"
-            >
-              <input
-                type="file"
-                (change)="onFileSelected($event, 'avatar')"
-                class="hidden"
-                accept="image/*"
-              />
-              <mat-icon class="text-gray-500 dark:text-gray-400"
-                >image</mat-icon
-              >
-              <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {{ 'PROFILE.UPLOAD' | translate }}
-              </span>
-            </label>
-          </div>
+            <input
+              id="avatar-upload"
+              type="file"
+              (change)="onFileSelected($event, 'avatar')"
+              class="hidden"
+              accept="image/*"
+            />
+            <i
+              class="ki-outline ki-picture text-base text-gray-500 dark:text-gray-400"
+            ></i>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-3">
+              {{ 'PROFILE.UPLOAD' | translate }}
+            </span>
+          </label>
 
           <!-- Image Preview -->
           <div *ngIf="previewImageUrl" class="relative w-32">
@@ -175,11 +173,7 @@
         <label
           class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2"
         >
-          {{ 'PROFILE.CONTACT_PHONE' | translate }}
-          <i
-            class="ki-outline ki-information-5 text-gray-400 text-sm dark:text-gray-500"
-            title="{{ 'PROFILE.PHONE_VERIFIED' | translate }}"
-          ></i>
+          {{ 'PROFILE.PHONE_NUMBER' | translate }}
         </label>
         <div class="md:col-span-8 relative">
           <input
