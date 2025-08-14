@@ -199,7 +199,7 @@ namespace Api.Controllers.v1
         [HttpGet("quote/validity-type")]
         public IReadOnlyCollection<ListItemBaseResponse> GetQuoteValidityTypes()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>(_localizationService);
+            return EnumHelper.ToListItemBaseResponses<GlobalIntervalType>(_localizationService);
         }
         
         [HttpGet("quote/statuses")]
@@ -235,6 +235,14 @@ namespace Api.Controllers.v1
         public async Task<PaginatedList<QuoteMessageSearchable>> FullQuoteMessageSearch([FromBody] QuoteMessageFullSearchQuery request)
         {
             return await Mediator.Send(request);
+        }
+
+        [HttpPut("quote/message/{id:int}/seen")]
+        public async Task<IActionResult> MarkMessageAsSeen([FromRoute] int id)
+        {
+            await Mediator.Send(new QuoteMessageMarkAsSeenCommand(id));
+
+            return Ok();
         }
 
         [Authorize(Roles = "Administrator")]

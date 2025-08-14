@@ -1,4 +1,5 @@
-﻿using DTO.Medias;
+﻿using DTO.Enums.Submission.SubmissionQuote;
+using DTO.Medias;
 using DTO.Response;
 using DTO.User;
 
@@ -19,5 +20,9 @@ public record SubmissionQuoteBaseResponse
     public UserResponse Vendor { get; init; } = new();
     public DateTime Created { get; init; }
     public MediaResponse Media { get; init; } = new();
-
+    public ListItemBaseResponse? TimelineIntervalType { get; init; }
+    public int? MinimumTimelineDuration { get; init; }
+    public int? MaximumTimelineDuration { get; init; }
+    public ListItemBaseResponse? WarantyIntervalType { get; init; }
+    public int? WarantyDuration { get; init; }
 }

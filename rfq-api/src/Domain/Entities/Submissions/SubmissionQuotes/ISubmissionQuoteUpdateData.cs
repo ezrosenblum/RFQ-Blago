@@ -7,6 +7,12 @@ public interface ISubmissionQuoteUpdateData
     string Title { get; }
     string Description { get; }
     decimal Price { get; }
-    SubmissionQuoteValidityIntervalType QuoteValidityIntervalType { get; }
+    GlobalIntervalType QuoteValidityIntervalType { get; }
     int QuoteValidityInterval { get; }
+    GlobalIntervalType? TimelineIntervalType { get; }
+    int? MinimumTimelineDuration { get; }
+    int? MaximumTimelineDuration { get; }
+    GlobalIntervalType? WarantyIntervalType { get; }
+    int? WarantyDuration { get; }
+
 }

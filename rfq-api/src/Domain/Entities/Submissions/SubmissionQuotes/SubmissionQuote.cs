@@ -16,11 +16,16 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
     public string Title { get; private set; } = null!;
     public string Description { get; private set; } = null!;
     public decimal Price { get; private set; }
-    public SubmissionQuoteValidityIntervalType QuoteValidityIntervalType { get; private set; }
+    public GlobalIntervalType QuoteValidityIntervalType { get; private set; }
     public SubmissionQuoteStatus Status { get; private set; } = SubmissionQuoteStatus.Pending;
     public int QuoteValidityInterval { get; private set; }
     public int SubmissionId { get; private set; }
     public int VendorId { get; private set; }
+    public GlobalIntervalType? TimelineIntervalType { get; private set; }
+    public int? MinimumTimelineDuration { get; private set; }
+    public int? MaximumTimelineDuration { get; private set; }
+    public GlobalIntervalType? WarantyIntervalType { get; private set; }
+    public int? WarantyDuration { get; private set; }
 
     public Media Media { get; private set; }
 
@@ -40,6 +45,11 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         SubmissionId = data.SubmissionId;
         VendorId = data.VendorId;
         Media = new Media(MediaEntityType.SubmissionQuote);
+        TimelineIntervalType = data.TimelineIntervalType;
+        MinimumTimelineDuration = data.MinimumTimelineDuration;
+        MaximumTimelineDuration = data.MaximumTimelineDuration;
+        WarantyIntervalType = data.WarantyIntervalType;
+        WarantyDuration = data.WarantyDuration;
 
         AddDomainEvent(new SubmissionQuoteCreatedEvent(this));
     }
@@ -54,6 +64,11 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         Price = data.Price;
         QuoteValidityIntervalType = data.QuoteValidityIntervalType;
         QuoteValidityInterval = data.QuoteValidityInterval;
+        TimelineIntervalType = data.TimelineIntervalType;
+        MinimumTimelineDuration = data.MinimumTimelineDuration;
+        MaximumTimelineDuration = data.MaximumTimelineDuration;
+        WarantyIntervalType = data.WarantyIntervalType;
+        WarantyDuration = data.WarantyDuration;
 
         AddDomainEvent(new SubmissionQuoteUpdatedEvent(this));
     }
@@ -71,10 +86,10 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
 
         AddDomainEvent(new SubmissionQuoteUpdatedEvent(this));
     }
-    
+
     public void ChangeStatus(SubmissionQuoteStatus newStatus)
     {
-        if (Status == newStatus) 
+        if (Status == newStatus)
             return;
 
         Status = newStatus;

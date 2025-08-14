@@ -37,10 +37,10 @@ public sealed class SubmissionQuoteMapperProfile : Profile
     private static DateTime CalculateValidUntil(SubmissionQuote s) =>
     s.QuoteValidityIntervalType switch
     {
-        SubmissionQuoteValidityIntervalType.Day => s.Created.AddDays(s.QuoteValidityInterval),
-        SubmissionQuoteValidityIntervalType.Week => s.Created.AddDays(s.QuoteValidityInterval * 7),
-        SubmissionQuoteValidityIntervalType.Month => s.Created.AddMonths(s.QuoteValidityInterval),
-        SubmissionQuoteValidityIntervalType.Year => s.Created.AddYears(s.QuoteValidityInterval),
+        GlobalIntervalType.Day => s.Created.AddDays(s.QuoteValidityInterval),
+        GlobalIntervalType.Week => s.Created.AddDays(s.QuoteValidityInterval * 7),
+        GlobalIntervalType.Month => s.Created.AddMonths(s.QuoteValidityInterval),
+        GlobalIntervalType.Year => s.Created.AddYears(s.QuoteValidityInterval),
         _ => s.Created
     };
 
