@@ -50,7 +50,7 @@
               <!-- Avatar -->
               <div class="me-7 mb-4">
                 <div class="relative w-24 h-24 sm:w-40 sm:h-40">
-                 <ng-container
+                  <ng-container
                     *ngIf="currentUser?.profilePicture && !imageError; else initials"
                   >
                     <img
@@ -151,7 +151,7 @@
             </div>
 
             <!-- Tabs -->
-             <mat-tab-group
+            <mat-tab-group
               (selectedTabChange)="onTabChange($event)"
               class="w-full sm:w-[400px] md:w-[600px]"
               [selectedIndex]="selectedIndex"
@@ -163,6 +163,7 @@
                 label="{{ 'PROFILE.MATERIALS' | translate }}"
               ></mat-tab>
               <mat-tab
+                *ngIf="currentUser?.type === 'Vendor'"
                 label="{{ 'PROFILE.SERVICE_AREAS' | translate }}"
               ></mat-tab>
             </mat-tab-group>
@@ -183,10 +184,14 @@
     <ng-container
       *ngIf="selectedTab === 'Materials' && currentUser?.type === 'Vendor'"
     >
-      <app-material-categories-selection [user]="currentUser"></app-material-categories-selection>
+      <app-material-categories-selection
+        [user]="currentUser"
+      ></app-material-categories-selection>
     </ng-container>
 
-    <ng-container *ngIf="selectedTab === 'Service_Areas'">
+    <ng-container
+      *ngIf="selectedTab === 'Service_Areas' && currentUser?.type === 'Vendor'"
+    >
       <app-service-areas></app-service-areas>
     </ng-container>
   </div>
