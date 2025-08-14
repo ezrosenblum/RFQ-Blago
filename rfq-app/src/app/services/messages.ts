@@ -3,10 +3,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable} from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Rfq } from '../models/rfq.model';
+import { Rfq, TableResponse } from '../models/rfq.model';
 import { Auth } from './auth';
-import { Conversation, Message } from '../models/messages.model';
-import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, userChat } from '../models/user.model';
+import { Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry } from '../models/messages.model';
+import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, MessageConversationMessagesRequest, userChat } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -42,53 +42,38 @@ export class MessagesService {
       );
   }
 
-  getAllVendorsWithConversations(): Observable<userChat[]> {
+  getAllConversationUsersByRole(role: string): Observable<ConversationUserEntry[]> {
+    return this.http.get<ConversationUserEntry[]>(`${this.API_URL}User/by/role?role=${role}`)
+      .pipe(
+        map(response => {
+          return response;
+        })
+      );
+  }
+
+  getChatMessage(quouteId: number): Observable<MessageEntry[]> {
+    return this.http.get<MessageEntry[]>(`${this.API_URL}Submission/quote/message/${quouteId}`)
+      .pipe(
+        map(response => {
+          return response;
+        })
+      );
+  }
+
+  getChatMessageHistory(data: MessageConversationMessagesRequest): Observable<TableResponse<MessageEntry>> {
+    return this.http.post<TableResponse<MessageEntry>>(`${this.API_URL}Submission/quote/message/search`, data)
+      .pipe(
+        map(response => {
+          return response
+        })
+      );
+  }
+
+  sendMessage(data: FormData): Observable<boolean | null> {
     const headers = new HttpHeaders({
       'Skip-Content-Type': 'true',
     });
-    let url = this.DEMO_MODE
-      ? `https://api.npoint.io/99b3f35518b0a3b0800f`
-      : `${this.API_URL}admin/users`;
-    return this.http.get<userChat[]>(url, { headers })
-      .pipe(
-        map(response => {
-          return response;
-        })
-      );
-  }
-
-  getAllCustomersWithConversations(): Observable<userChat[]> {
-     const headers = new HttpHeaders({
-      'Skip-Content-Type': 'true',
-    });
-    let url = this.DEMO_MODE
-      ? `https://api.npoint.io/d3ea1ea4cf33b38b1952`
-      : `${this.API_URL}admin/users`;
-    return this.http.get<userChat[]>(url, { headers })
-      .pipe(
-        map(response => {
-          return response;
-        })
-      );
-  }
-
-  getChatMessages(conversationId: number, url: string): Observable<Message[]> {
-    const headers = new HttpHeaders({
-      'Skip-Content-Type': 'true',
-    });
-    url = this.DEMO_MODE
-      ? url
-      : `${this.API_URL}messages/thread/${conversationId}`;
-    return this.http.get<Message[]>(url, { headers })
-      .pipe(
-        map(response => {
-          return response;
-        })
-      );
-  }
-
-  sendMessage(data: Message): Observable<boolean | null> {
-    return this.http.post<boolean>(`${this.API_URL}messages`, data)
+    return this.http.post<boolean>(`${this.API_URL}Submission/quote/message`, data, { headers })
       .pipe(
         map(response => {
           return response

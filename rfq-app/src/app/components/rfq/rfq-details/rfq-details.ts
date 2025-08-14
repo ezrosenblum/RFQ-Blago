@@ -5,6 +5,8 @@ import { QuoteItem, QuoteSearchRequest, QuoteSearchResponse, Rfq } from '../../.
 import { ActivatedRoute, Router } from '@angular/router';
 import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
+import { MatDialog } from '@angular/material/dialog';
+import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 
 
 @Component({
@@ -38,7 +40,8 @@ export class RfqDetails implements OnInit, OnDestroy{
     private route: ActivatedRoute,
     private rfqService: RfqService,
     private router: Router,
-    private _authService: Auth
+    private _authService: Auth,
+    private _dialog: MatDialog,
   ) {
   }
 
@@ -120,8 +123,32 @@ export class RfqDetails implements OnInit, OnDestroy{
     ).toUpperCase();
   }
 
-  navigateToMessages(): void {
-    this.router.navigate(['/messages'], {queryParams: { rfqId: this.rfq.id, customerId: this.rfq?.user?.id }});
+  sendQuoteFirstMessage(quote: QuoteItem){
+    if (quote.lastMessage) {
+      this.router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
+    } 
+    else {
+      const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
+        width: '500px',
+        maxWidth: '500px',
+        height: 'auto',
+        panelClass: 'send-quote-message-dialog',
+        autoFocus: false,
+        data: {
+          quote: quote,
+        },
+      });
+
+      dialogRef
+        .afterClosed()
+        .subscribe((result: any) => {
+          if (result) {
+            setTimeout(() => {
+              this.router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
+            }, 1000)
+          }
+        });
+    }
   }
 
   loadQuotes(): void {

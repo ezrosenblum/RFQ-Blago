@@ -477,10 +477,6 @@
             <div  class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium border border-green-500 text-green-600 bg-transparent dark:text-green-400 dark:border-green-400" *ngIf="hasSentQuote(rfq)">
               {{ 'VENDOR.QUOTE_SENT' | translate }}
             </div>
-            <button
-              class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-gray-100 text-gray-600 border border-gray-300 dark:bg-secondary-700 dark:text-secondary-200" (click)="navigateToMessages(rfq)">
-              💬 {{ 'VENDOR.MESSAGE' | translate }}
-            </button>
 
             <button [routerLink]="['/vendor-rfqs', rfq.id]"
               class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-mediumcursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-blue-500 text-white hover:bg-blue-600">
