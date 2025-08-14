@@ -9,6 +9,8 @@ import { QuoteService } from '../../../services/my-quotes';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { LookupValue } from '../../../models/rfq.model';
+import { RfqService } from '../../../services/rfq';
 
 @Component({
   standalone: false,
@@ -22,6 +24,10 @@ export class MyQuotesComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
+  pendingCount = 0;
+  approvedCount = 0;
+  avgPrice = 0;
+  currencyCode = 'USD';
   loading = false;
 
   filtersForm: FormGroup;
@@ -36,7 +42,8 @@ export class MyQuotesComponent implements OnInit {
     private fb: FormBuilder,
     private quoteService: QuoteService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private rfqService: RfqService
   ) {
     this.filtersForm = this.fb.group({
       query: [''],
@@ -95,6 +102,7 @@ export class MyQuotesComponent implements OnInit {
           this.quotes = raw.map((q: any) => ({
             id: q.id ?? q.submission?.id,
             vendorName: q.submission.title,
+            vendorNumber: q.vendor.phoneNumber,
             title: q.title ?? '',
             description: q.description ?? q.submission?.description ?? '',
             price: q.price ?? 0,
@@ -105,7 +113,21 @@ export class MyQuotesComponent implements OnInit {
             successRate: q.successRate ?? 0,
             skills: q.skills ?? [],
             status: q.submission.status.name,
+            statusId: q.submission.status.id,
+            submissionDate: q.submission.submissionDate,
+            warantyDuration: q.submission.warantyDuration,
           }));
+          this.pendingCount = this.quotes.filter(
+            (q) => q.statusId === 1
+          ).length;
+          this.approvedCount = this.quotes.filter(
+            (q) => q.statusId === 2
+          ).length;
+          const avg = (arr: { price: number }[]) => {
+            const sum = arr.reduce((s, it) => s + (Number(it.price) || 0), 0);
+            return arr.length ? sum / arr.length : 0;
+          };
+          this.avgPrice = avg(this.quotes);
           const count =
             response.totalCount ??
             response.total ??
@@ -163,21 +185,16 @@ export class MyQuotesComponent implements OnInit {
     this.onSearch();
   }
 
-  getStatusClass(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'accepted':
-      case 'approved':
-        return 'bg-green-100 text-green-800';
-      case 'rejected':
-      case 'declined':
-        return 'bg-red-100 text-red-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  statusStyles: Record<number, string> = {
+    1: 'bg-yellow-100 text-yellow-800 border border-yellow-400',
+    2: 'bg-green-100 text-green-800 border border-green-500',
+    3: 'bg-red-100 text-red-800 border border-red-500',
+    4: 'bg-gray-100 text-gray-800 border border-gray-400',
+    5: 'bg-blue-100 text-blue-800 border border-blue-500',
+  };
+
+  getStatusClass(statusId: number): string {
+    return this.statusStyles[statusId] || 'bg-gray-100 text-gray-800';
   }
 
   private updateUrlParams() {
@@ -211,5 +228,53 @@ export class MyQuotesComponent implements OnInit {
       pages.push(i);
     }
     return pages;
+  }
+
+  formatDate(date: Date | string): string {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  getRelativeTime(date: Date | string): string {
+    const now = new Date();
+    const d = new Date(date);
+    const diffMs = now.getTime() - d.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) return 'Just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return this.formatDate(date);
+  }
+
+  getStatusColor(status: LookupValue): string {
+    return this.rfqService.getStatusColor(status);
+  }
+
+  formatCompactCurrency(value: number, currency = this.currencyCode): string {
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(value || 0);
+    } catch {
+      // Fallback if currency code is invalid
+      return new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(value || 0);
+    }
   }
 }

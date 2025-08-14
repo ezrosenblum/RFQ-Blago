@@ -16,6 +16,7 @@ export interface MyQuotesRequest {
 export interface Quote {
   id: number;
   vendorName: string;
+  vendorNumber: string;
   title: string;
   description: string;
   price: number;
@@ -28,6 +29,9 @@ export interface Quote {
   skills: string[];
   profileImage?: string;
   status: string;
+  statusId: number;
+  submissionDate?: Date;
+  warantyDuration?: number;
 }
 
 export interface MyQuotesList {
