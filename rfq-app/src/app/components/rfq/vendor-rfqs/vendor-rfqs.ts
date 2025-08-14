@@ -756,9 +756,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
       btn.textContent = this.translate.instant('VENDOR.SHOW_MORE');
     }
   }
-  get isTableView(): boolean {
-    return this.viewMode === 'table';
-  }
 
   navigateToMessages(rfq: Rfq): void {
     this.router.navigate(['/messages'], {queryParams: { quoteId: rfq.id, customerId: rfq?.user?.id }});
