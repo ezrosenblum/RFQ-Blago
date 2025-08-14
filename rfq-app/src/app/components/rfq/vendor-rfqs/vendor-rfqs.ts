@@ -466,10 +466,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.loadStatistics();
   }
 
-  navigateToRequestQuote(): void {
-    this.router.navigate(['/request-quote']);
-  }
-
   getStatusColor(status: LookupValue): string {
     return this.rfqService.getStatusColor(status);
   }
