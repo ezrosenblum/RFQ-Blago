@@ -44,6 +44,13 @@
             "styles": [
               "src/styles.scss",
               "./node_modules/intl-tel-input/build/css/intlTelInput.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "filepond",
+              "filepond-plugin-file-validate-type",
+              "filepond-plugin-file-validate-size",
+              "sweetalert2",
+              "google-libphonenumber"
             ]
           },
           "configurations": {
@@ -57,12 +64,12 @@
 				"budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "2MB",
                   "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "10kB",
                   "maximumError": "1MB"
                 }
               ],

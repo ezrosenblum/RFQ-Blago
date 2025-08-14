@@ -11,7 +11,7 @@
         {{ 'VENDOR.RFQ_DETAILS' | translate }}
       </div>
       <div class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide">
-        {{ quotes?.length || 0 }} {{ 'VENDOR.QUOTES_RECEIVED' | translate }}
+        {{ quotes.length || 0 }} {{ 'VENDOR.QUOTES_RECEIVED' | translate }}
       </div>
     </div>
 
@@ -26,10 +26,10 @@
         <div class="flex justify-between items-start mb-6 gap-6">
           <div>
             <h1 class="text-3xl font-bold mb-2 text-shadow">
-              {{ rfq?.title || 'Office Renovation Project' }}
+              {{ rfq.title || 'Office Renovation Project' }}
             </h1>
             <div class="text-base opacity-90 font-medium">
-              {{ 'VENDOR.RFQ_ID' | translate }}: #{{ rfq?.id }}
+              {{ 'VENDOR.RFQ_ID' | translate }}: #{{ rfq.id }}
             </div>
           </div>
         </div>
@@ -41,7 +41,7 @@
               {{ 'VENDOR.QUANTITY' | translate }}
             </div>
             <div class="text-lg font-semibold">
-              {{ rfq?.quantity | number:'1.0-2' }} {{ rfq?.unit?.name }}
+              {{ rfq.quantity | number:'1.0-2' }} {{ rfq.unit?.name }}
             </div>
           </div>
 
@@ -50,7 +50,7 @@
               {{ 'VENDOR.LOCATION' | translate }}
             </div>
             <div class="text-lg font-semibold">
-              {{ rfq?.jobLocation }}
+              {{ rfq.jobLocation }}
             </div>
           </div>
 
@@ -59,7 +59,7 @@
               {{ 'VENDOR.POSTED_DATE' | translate }}
             </div>
             <div class="text-lg font-semibold">
-              {{ rfq?.submissionDate | date:'MMM dd, yyyy' }}
+              {{ rfq.submissionDate | date:'MMM dd, yyyy' }}
             </div>
           </div>
 
@@ -82,7 +82,7 @@
             {{ 'VENDOR.PROJECT_DESCRIPTION' | translate }}
           </h2>
           <p class="text-base leading-relaxed text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border-l-4 border-blue-600 dark:border-blue-400">
-            {{ rfq?.description }}
+            {{ rfq.description }}
           </p>
         </div>
 
@@ -133,7 +133,7 @@
         <!-- Quote Statistics -->
         <div class="flex gap-6 items-center">
           <div class="text-center">
-            <span class="text-xl font-bold text-gray-900 dark:text-white block">{{ quotes?.length || 0 }}</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white block">{{ quotes.length || 0 }}</span>
             <span class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">{{ 'VENDOR.TOTAL_QUOTES' | translate }}</span>
           </div>
           <div class="text-center">
@@ -268,7 +268,7 @@
                 <span *ngIf="quote.submission.status"
                       class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide"
                       [ngClass]="getStatusColor(quote.submission.status)">
-                  {{ quote.submission.status?.name }}
+                  {{ quote.submission.status.name }}
                 </span>
               </div>
               <div class="flex gap-2 flex-wrap">
