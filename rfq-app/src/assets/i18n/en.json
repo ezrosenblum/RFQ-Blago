@@ -304,7 +304,8 @@
     "100K_150K": "$100K - $150K",
     "OVER_150K": "Over $150K",
     "PRICE_RANGE": "Price Range",
-    "NO_QUOTES_YET": "No quotes have been submitted yet."
+    "NO_QUOTES_YET": "No quotes have been submitted yet.",
+    "YEARS": "years"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
