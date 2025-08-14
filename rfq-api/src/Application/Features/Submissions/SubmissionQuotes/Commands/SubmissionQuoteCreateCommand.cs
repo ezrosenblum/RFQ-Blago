@@ -18,8 +18,13 @@ public sealed record SubmissionQuoteCreateCommand(
     string Title,
     string Description,
     decimal Price,
-    SubmissionQuoteValidityIntervalType QuoteValidityIntervalType,
+    GlobalIntervalType QuoteValidityIntervalType,
     int QuoteValidityInterval,
+    GlobalIntervalType? TimelineIntervalType,
+    int? MinimumTimelineDuration,
+    int? MaximumTimelineDuration,
+    GlobalIntervalType? WarantyIntervalType,
+    int? WarantyDuration,
     int SubmissionId,
     int VendorId) : ISubmissionQuoteInsertData, ICommand;
 
@@ -48,11 +53,11 @@ public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<Submis
 
     public async Task Handle(SubmissionQuoteCreateCommand command, CancellationToken cancellationToken)
     {
-        SubmissionQuote newSubmissionQuote = SubmissionQuote.Create(command with { VendorId = _currentUserService.UserId!.Value});
+        SubmissionQuote newSubmissionQuote = SubmissionQuote.Create(command with { VendorId = _currentUserService.UserId!.Value });
 
         var submission = await _dbContext.Submission.FirstAsync(s => s.Id == command.SubmissionId, cancellationToken);
 
-        if(!submission.StatusHistory.Any(s => s.VendorId == _currentUserService.UserId && s.Status == SubmissionStatusHistoryType.Quoted))
+        if (!submission.StatusHistory.Any(s => s.VendorId == _currentUserService.UserId && s.Status == SubmissionStatusHistoryType.Quoted))
         {
             submission.CreateStatusHistory((int)_currentUserService.UserId, SubmissionStatusHistoryType.Quoted, _dateTime, true);
             _dbContext.Submission.Update(submission);

@@ -199,7 +199,7 @@ namespace Api.Controllers.v1
         [HttpGet("quote/validity-type")]
         public IReadOnlyCollection<ListItemBaseResponse> GetQuoteValidityTypes()
         {
-            return EnumHelper.ToListItemBaseResponses<SubmissionQuoteValidityIntervalType>(_localizationService);
+            return EnumHelper.ToListItemBaseResponses<GlobalIntervalType>(_localizationService);
         }
         
         [HttpGet("quote/statuses")]
