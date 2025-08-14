@@ -237,6 +237,14 @@ namespace Api.Controllers.v1
             return await Mediator.Send(request);
         }
 
+        [HttpPut("quote/message/{id:int}/seen")]
+        public async Task<IActionResult> MarkMessageAsSeen([FromRoute] int id)
+        {
+            await Mediator.Send(new QuoteMessageMarkAsSeenCommand(id));
+
+            return Ok();
+        }
+
         [Authorize(Roles = "Administrator")]
         [HttpPut("quote/message/search/rebuild")]
         public async Task<IActionResult> RebuildQuoteMessageSearchIndex()

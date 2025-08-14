@@ -2,7 +2,9 @@
 using Domain.Entities.Medias;
 using Domain.Entities.User;
 using Domain.Events;
+using Domain.Events.Submissions.SubmissionQuotes;
 using Domain.Events.Submissions.SubmissionQuotes.QuoteMessages;
+using Domain.Interfaces;
 using DTO.Enums.Media;
 using DTO.Enums.Submission.SubmissionQuote.QuoteMessage;
 using Microsoft.AspNetCore.Http;
@@ -48,5 +50,12 @@ public class QuoteMessage : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         QuoteMessageStatus = QuoteMessageStatus.Seen;
         AddDomainEvent(new QuoteMessageUpdatedEvent(this));
         AddDomainEvent(new QuoteMessageSeenEvent(this));
+        AddDomainEvent(new SubmissionQuoteUpdatedEvent(this.SubmissionQuote));
     }
+
+    public async Task UploadFile(IMediaUpsertData data, IMediaStorage mediaStorage)
+    {
+        await Media.Save(data, Id, mediaStorage);
+    }
+
 }
