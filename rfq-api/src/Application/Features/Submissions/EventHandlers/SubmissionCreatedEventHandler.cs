@@ -1,36 +1,21 @@
-﻿using Application.Common.Caching;
-using Application.Common.MessageBroker;
-using Application.Features.Submissions.Commands;
+﻿using Application.Common.MessageBroker;
 using Domain.Events.Submissions;
 using DTO.MessageBroker.Messages.Submission;
 using MediatR;
 
 namespace Application.Features.Submissions.EventHandlers;
 
-public sealed class SubmissionCreatedEventHandler : INotificationHandler<SubmissionCreatedEvent>
+public sealed class SubmissionApprovedEventHandler : INotificationHandler<SubmissionApprovedEvent>
 {
-    private readonly IMediator _mediatr;
     private readonly IMessagePublisher _messagePublisher;
-    public SubmissionCreatedEventHandler(
-        IMediator mediatr,
+    public SubmissionApprovedEventHandler(
         IMessagePublisher messagePublisher)
     {
-        _mediatr = mediatr;
         _messagePublisher = messagePublisher;
     }
 
-    public async Task Handle(SubmissionCreatedEvent eventData, CancellationToken cancellationToken)
+    public async Task Handle(SubmissionApprovedEvent eventData, CancellationToken cancellationToken)
     {
-        if (eventData.Files != null)
-        {
-            foreach (var file in eventData.Files)
-            {
-                await _mediatr.Send(new SubmissionFileUploadCommand(eventData.Submission.Id, file));
-            }
-        }
-
-        await _mediatr.Send(new SubmissionRebuildSearchIndexCommand());
-
         await _messagePublisher.PublishAsync(new NewSubmissionMessage(eventData.Submission.Id), cancellationToken);
     }
 }

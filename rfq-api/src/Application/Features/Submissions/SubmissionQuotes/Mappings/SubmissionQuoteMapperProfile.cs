@@ -31,6 +31,7 @@ public sealed class SubmissionQuoteMapperProfile : Profile
         CreateMap<SubmissionQuoteResponse, SubmissionQuoteSearchable>();
 
         CreateMap<SubmissionQuote, NewSubmissionQuoteData>()
+            .ForMember(d => d.SubmissionId, opt => opt.MapFrom(src => src.Submission.Id))
             .ForMember(d => d.QuoteId, opt => opt.MapFrom(src => src.Id));
     }
 

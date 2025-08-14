@@ -112,6 +112,9 @@ namespace Domain.Entities.Submissions
 
             Status = newStatus;
 
+            if (newStatus == SubmissionStatus.Approved)
+                AddDomainEvent(new SubmissionApprovedEvent(this));
+
             AddDomainEvent(new SubmissionUpdatedEvent(this));
         }
 
