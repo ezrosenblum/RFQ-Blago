@@ -1,4 +1,5 @@
-﻿using Application.Features.Submissions.SubmissionQuotes.Search;
+﻿using Application.Features.Submissions.SubmissionQuotes.Commands;
+using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using Domain.Entities.Submissions.SubmissionQuotes;
 using DTO.Enums.Submission.SubmissionQuote;
@@ -33,6 +34,20 @@ public sealed class SubmissionQuoteMapperProfile : Profile
         CreateMap<SubmissionQuote, NewSubmissionQuoteData>()
             .ForMember(d => d.SubmissionId, opt => opt.MapFrom(src => src.Submission.Id))
             .ForMember(d => d.QuoteId, opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<SubmissionQuoteUpdateRequest, SubmissionQuoteUpdateCommand>()
+            .ConstructUsing(src => new SubmissionQuoteUpdateCommand(
+                default,
+                src.Title,
+                src.Description,
+                src.Price,
+                src.QuoteValidityIntervalType,
+                src.QuoteValidityInterval,
+                src.TimelineIntervalType,
+                src.MinimumTimelineDuration,
+                src.MaximumTimelineDuration,
+                src.WarantyIntervalType,
+                src.WarantyDuration));
     }
 
     private static DateTime CalculateValidUntil(SubmissionQuote s) =>

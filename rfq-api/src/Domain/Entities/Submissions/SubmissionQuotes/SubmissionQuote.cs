@@ -45,6 +45,7 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         SubmissionId = data.SubmissionId;
         VendorId = data.VendorId;
         Media = new Media(MediaEntityType.SubmissionQuote);
+        Status = SubmissionQuoteStatus.Pending;
         TimelineIntervalType = data.TimelineIntervalType;
         MinimumTimelineDuration = data.MinimumTimelineDuration;
         MaximumTimelineDuration = data.MaximumTimelineDuration;
