@@ -248,6 +248,7 @@ export interface QuoteItem {
   vendor: Vendor;
   created: string;
   media: Media;
+  status: LookupValue;
 }
 
 export interface QuoteSearchResponse {

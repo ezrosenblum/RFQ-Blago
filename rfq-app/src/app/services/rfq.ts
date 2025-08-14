@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Category, LookupValue, QuoteRequest, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, QuoteSearchRequest, QuoteSearchResponse } from '../models/rfq.model';
+import { Category, LookupValue, QuoteRequest, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, QuoteSearchRequest, QuoteSearchResponse, QuoteItem } from '../models/rfq.model';
 import { Auth } from './auth';
 import { ApiResponse } from '../models/api-response';
 
@@ -111,9 +111,9 @@ export class RfqService {
   getStatusColor(status: LookupValue): string {
     const statusColors: { [key: string]: string } = {
       1: 'text-warning-600 bg-warning-100 dark:text-warning-400 dark:bg-warning-900/20',
-      2: 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/20',
-      3: 'text-success-600 bg-success-100 dark:text-success-400 dark:bg-success-900/20',
-      4: 'text-error-600 bg-error-100 dark:text-error-400 dark:bg-error-900/20'
+      2: 'text-success-600 bg-success-100 dark:text-success-400 dark:bg-success-900/20',
+      3: 'text-error-600 bg-error-100 dark:text-error-400 dark:bg-error-900/20',
+      4: 'text-primary-600 bg-primary-100 dark:text-primary-400 dark:bg-primary-900/20',
     };
 
     return statusColors[status.id] || 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/20';
@@ -129,5 +129,18 @@ export class RfqService {
 
   getQuotes(request: QuoteSearchRequest): Observable<QuoteSearchResponse> {
     return this.http.post<QuoteSearchResponse>(`${this.API_URL}Submission/quote/search`, request);
+  }
+
+  getQuoteDetails(id: number): Observable<QuoteItem> {
+    return this.http.get<QuoteItem>(`${this.API_URL}Submission/quote/${id}`);
+  }
+
+  rfqChangeStatus(id: number, status: number): Observable<boolean> {
+    return this.http.put<ApiResponse<Rfq>>(`${this.API_URL}Submission/status/${id}?status=${status}`, null)
+      .pipe(
+        map(response => {
+          return response && response.success === true;
+        })
+      );
   }
 }

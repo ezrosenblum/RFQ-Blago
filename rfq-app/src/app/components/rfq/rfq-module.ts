@@ -15,6 +15,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MyQuotesComponent } from './my-quotes/my-quotes';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { QuoteSendMessageDialog } from './quote-send-message-dialog/quote-send-message-dialog';
+import { QuoteDetails } from './quote-details/quote-details';
 @NgModule({
   declarations: [
     RequestQuote,
@@ -22,7 +23,8 @@ import { QuoteSendMessageDialog } from './quote-send-message-dialog/quote-send-m
     RfqDetails,
     QuoteFormDialog,
     MyQuotesComponent,
-    QuoteSendMessageDialog
+    QuoteSendMessageDialog,
+    QuoteDetails
   ],
   imports: [
     CommonModule,
