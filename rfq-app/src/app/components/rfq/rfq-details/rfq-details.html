@@ -283,7 +283,7 @@
                 <button class="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5" (click)="sendQuoteFirstMessage(quote)">
                   💬 {{ 'VENDOR.MESSAGE' | translate }}
                 </button>
-                <button class="px-5 py-2.5 rounded-lg text-sm font-medium border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white hover:-translate-y-0.5">
+                <button class="px-5 py-2.5 rounded-lg text-sm font-medium border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white hover:-translate-y-0.5" [routerLink]="['/quote-details', quote.id]">
                   📄 {{ 'VENDOR.VIEW_DETAILS' | translate }}
                 </button>
               </div>
