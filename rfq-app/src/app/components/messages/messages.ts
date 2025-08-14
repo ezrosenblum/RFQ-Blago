@@ -87,6 +87,8 @@ export class MessagesComponent implements OnInit {
   pondFiles: File[] = [];
   @ViewChild('myPond') myPond!: FilePondComponent;
   uploadedFilesCount = 0;
+  
+  isMessageSending: boolean = false;
 
   // Right sidenav properties
   activities: Activity[] = [
@@ -360,50 +362,16 @@ export class MessagesComponent implements OnInit {
       this.pondFiles.forEach(file => {
         formData.append('Files', file, file.name);
       });
-
-      const addMessage: MessageEntry = {
-        id: 0,
-        content: this.newMessage,
-        submissionQuoteId: this.selectedConversation?.id || null,
-        senderId: this.currentUser?.id || 0,
-        created: new Date().toISOString(),
-        quoteMessageStatus: {
-          id: 1,
-          name: 'Sent'
-        },
-        media: {
-          items: this.pondFiles.length > 0 ? this.pondFiles.map((file, index) => ({
-            id: `file-${index}`,
-            name: typeof file === 'string' ? file : (file as File).name,
-            isMain: index === 0,
-            sortOrder: index,
-            size: typeof file === 'string' ? 0 : (file as File).size,
-            url: typeof file === 'string' ? file : URL.createObjectURL(file as File),
-            type: 1, 
-            extension: typeof file === 'string' ? '' : (file as File).name.split('.').pop() || '' ,
-            srcUrl: typeof file === 'string' ? file : URL.createObjectURL(file as File),
-            previewUrl: typeof file === 'string' ? file : URL.createObjectURL(file as File)
-          })) : []
-        },
-        sender: {
-          id: this.currentUser?.id || 0,
-          firstName: this.currentUser?.firstName || '',
-          lastName: this.currentUser?.lastName || '',
-          email: this.currentUser?.email || '',
-          picture: null,
-          receiveEmailNotifications: false,
-          receivePushNotifications: false
-        }
-      }
-
+      this.isMessageSending = true;
       this._messageService.sendMessage(formData).pipe(take(1)).subscribe({
          next: (data) => {
-          this.currentMessages.push(addMessage);
           this.newMessage = '';
           this.pondFiles = [];
           this.uploadedFilesCount = 0;
           this.showUploadFilesPanel = false;
+          this.loadMessagesForConversation(this.selectedConversation!.id)
           setTimeout(() => {
+            this.isMessageSending = false;
             const container = document.getElementById('chat-scrollable');
             if (container) {
                container.scrollTo({
@@ -413,7 +381,9 @@ export class MessagesComponent implements OnInit {
             }
           }, 500);
          },
-         error: (error) => {},
+         error: (error) => {
+          this.isMessageSending = false;
+         },
       })
     }
   }
