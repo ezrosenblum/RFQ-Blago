@@ -19,6 +19,8 @@ public sealed class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEv
     }
     public async Task Handle(UserUpdatedEvent notification, CancellationToken cancellationToken)
     {
+        await _mediatr.Send(new UserIndexCommand(notification.User.Id), cancellationToken);
+
         await _cacheService.RemoveAsync($"{CacheKeys.User}-me-{notification.User.Id}", cancellationToken);
         await _cacheService.RemoveAsync($"{CacheKeys.User}-{notification.User.Id}", cancellationToken);
     }

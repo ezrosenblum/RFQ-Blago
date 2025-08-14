@@ -2,6 +2,7 @@
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.SubmissionQuotes.Commands;
 using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Commands;
+using Application.Features.Users.Commands;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Persistence;
@@ -12,10 +13,25 @@ public static class SearchIndexInitializer
 {
     public static async Task InitializeIndexes(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
     {
+        await InitializeUserIndex(mediatr, logger);
         await InitializeSubmissionIndex(mediatr, logger);
         await InitializeSubmissionQuoteIndex(mediatr, logger);
         await InitializeNotificationIndex(mediatr, logger);
         await InitializeQuoteMessageIndex(mediatr, logger);
+    }
+
+    private static async Task InitializeUserIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
+    {
+        try
+        {
+            logger.LogDebug("STARTED BUILDING SEARCH INDEX FOR USER");
+            await mediatr.Send(new UserRebuildSearchIndexCommand());
+            logger.LogDebug("FINISHED BUILDING SEARCH INDEX FOR USER");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "ERROR WHILE BUILDING SEARCH INDEX FOR USER");
+        }
     }
 
     private static async Task InitializeSubmissionIndex(ISender mediatr, ILogger<ApplicationDbContextInitialiser> logger)
