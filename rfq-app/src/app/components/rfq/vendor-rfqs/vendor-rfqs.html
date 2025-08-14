@@ -361,9 +361,9 @@
 
                   <div
                     class="inline-flex items-center gap-[6px] px-3 py-[6px] rounded-[20px] text-xs font-medium uppercase tracking-[0.5px]"
-                    [ngClass]="statusStyles[rfq.status?.id ?? 0]?.container">
+                    [ngClass]="statusStyles[rfq.status?.id ?? 0].container">
 
-                    <span [ngClass]="statusStyles[rfq.status?.id ?? 0]?.dot">●</span>
+                    <span [ngClass]="statusStyles[rfq.status?.id ?? 0].dot">●</span>
                     {{ rfq.status?.name }}
                   </div>
 
