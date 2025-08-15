@@ -34,6 +34,7 @@ export interface Quote {
   warantyDuration?: number;
   customerId?: number;
   vendorId?: number;
+  quoteId?: number;
 }
 
 export interface MyQuotesList {
