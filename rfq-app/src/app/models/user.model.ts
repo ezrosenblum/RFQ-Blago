@@ -167,4 +167,21 @@ export interface MessageAdminConversationEntry {
   media: {
     items: any[];
   };
+  lastMessage: {
+    content: string;
+    created: string;
+    id: number;
+    quoteMessageStatus: {
+      id: number,
+      name: string,
+    };
+    senderId: number;
+    submissionQuoteId: number;
+    sender: {
+      firstName: string;
+      id: number,
+      lastName: string;
+      picture: string;
+    }
+  }
 }
