@@ -10,8 +10,7 @@ namespace Api.Controllers;
 
 public class MediaController : ApiControllerBase
 {
-
-
+    [AllowAnonymous]
     [HttpGet("{mediaEntityType}/{entityId}/{mediaItemId}/download")]
     public async Task<FileStreamResult> Download(MediaEntityType mediaEntityType, int entityId, Guid mediaItemId)
     {

@@ -3,6 +3,10 @@ using Application.Common.Interfaces.Repository.Base;
 using Application.Common.MediaStorage.Interfaces;
 using Domain.Entities.Base;
 using Domain.Entities.Medias;
+using Domain.Entities.Submissions;
+using Domain.Entities.Submissions.SubmissionQuotes;
+using Domain.Entities.Submissions.SubmissionQuotes.QuoteMessages;
+using Domain.Entities.Users.CompanyDetails;
 using DTO.Enums.Media;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +26,10 @@ public class MediaEntityResolver : IMediaEntityResolver
         IWithMedia? entity = entityType switch
         {
             MediaEntityType.User => await GetUserEntity(id),
+            MediaEntityType.QuoteMessage => await GetEntity<QuoteMessage>(id),
+            MediaEntityType.SubmissionQuote => await GetEntity<SubmissionQuote>(id),
+            MediaEntityType.Submission => await GetEntity<Submission>(id),
+            MediaEntityType.UserCompanyDetails => await GetEntity<UserCompanyDetails>(id),
             _ => throw new ArgumentOutOfRangeException()
         };
 
