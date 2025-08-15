@@ -53,8 +53,8 @@ export class QuoteDetails implements OnInit {
         next: (result) => {
           this.quote = result;
         },
-        error: (err) => {
-          console.error('Failed to load Quote details', err);
+        error: (error) => {
+          this.handleError(error);
         },
       });
   }
@@ -67,6 +67,38 @@ export class QuoteDetails implements OnInit {
 
   navigateToMessages(): void {
     this._router.navigate(['/messages']);
+  }
+
+  onChangeStatus(quote: QuoteItem, statusId: number) {
+    this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
+      next: () => {
+        this.getDetails(quote.id);
+      },
+      error: (error) => {
+        this.handleError(error);
+      }
+    })
+  }
+
+  getStatusColor(status?: { id: number; name: string }): string {
+    if (!status) {
+      return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
+    }
+
+    switch (status.id) {
+      case 1: // Pending Review
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-400';
+      case 2: // Approved
+        return 'bg-green-100 text-green-800 border border-green-500';
+      case 3: // Rejected
+        return 'bg-red-100 text-red-800 border border-red-500';
+      case 4: // Archived
+        return 'bg-gray-100 text-gray-800 border border-gray-400';
+      case 5: // Completed
+        return 'bg-blue-100 text-blue-800 border border-blue-500';
+      default:
+        return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
+    }
   }
 
   handleError(error: any): void {

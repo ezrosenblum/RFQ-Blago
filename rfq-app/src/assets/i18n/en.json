@@ -155,7 +155,7 @@
   },
 
   "VENDOR": {
-    "MESSAGE": "Messages", 
+    "MESSAGE": "Messages",
     "TIMELINE_TYPE_REQUIRED": "Timeline type is required",
     "TIMELINE_MIN_ZERO": "Timeline interval must be at least 1 day",
     "MIN_GREATER_THAN_MAX": "Timeline minimum value must be lower than timeline maximum value",
@@ -313,12 +313,9 @@
     "NOT_AVAILABLE": "Not Available",
     "PROPOSAL_DETAILS": "Proposal Details",
     "PROPOSED_BID": "Proposed Bid",
-    "PAYMENT_TERMS": "Payment Terms",
-    "EARLY_PAY_DISCOUNT": "Early Payment Discount",
     "ACCEPT_QUOTE": "Accept Quote",
     "REJECT_QUOTE": "Reject Quote",
     "MESSAGE_VENDOR": "Message Vendor",
-    "SCHEDULE_CALL": "Schedule Call",
     "VENDOR_INFORMATION": "Vendor Information",
     "COMPANY": "Company",
     "CONTACT_PERSON": "Contact Person",
@@ -327,8 +324,9 @@
     "COMPANY_SIZE": "Company Size",
     "ADDRESS": "Address",
     "OPERATING_RADIUS": "Operating Radius",
-    "TOTAL_PROJECT_COST": "Total Project Cost",
-    "VENDOR_PROPOSAL": "Vendor Proposal"
+    "VENDOR_PROPOSAL": "Vendor Proposal",
+    "MARK_AS_VALID": "Mark as Valid",
+    "MARK_AS_INVALID": "Mark as Invalid"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

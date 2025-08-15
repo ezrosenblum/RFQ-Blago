@@ -17,16 +17,13 @@
 
     <!-- Main Content Card -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-8 overflow-hidden">
-      <div class="bg-gradient-to-br from-blue-800 to-blue-600 dark:from-blue-900 dark:to-blue-700 text-white p-8 relative">
-        <!-- Decorative bottom edge -->
-        <div class="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-br from-blue-800 to-blue-600 dark:from-blue-900 dark:to-blue-700"
-             style="clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);"></div>
+      <div class="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 p-8 relative">
 
         <!-- Header with Quotes Count and Title -->
         <div class="flex justify-between items-start mb-6 gap-6">
           <div>
             <h1 class="text-3xl font-bold mb-2 text-shadow">
-              {{ rfq.title || 'Office Renovation Project' }}
+              {{ rfq.title }}
             </h1>
             <div class="text-base opacity-90 font-medium">
               {{ 'VENDOR.RFQ_ID' | translate }}: #{{ rfq.id }}
@@ -137,15 +134,15 @@
             <span class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">{{ 'VENDOR.TOTAL_QUOTES' | translate }}</span>
           </div>
           <div class="text-center">
-            <span class="text-xl font-bold text-gray-900 dark:text-white block">3</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white block">{{ pendingCount }}</span>
             <span class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">{{ 'VENDOR.PENDING' | translate }}</span>
           </div>
           <div class="text-center">
-            <span class="text-xl font-bold text-gray-900 dark:text-white block">1</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white block">{{ acceptedCount }}</span>
             <span class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">{{ 'VENDOR.ACCEPTED' | translate }}</span>
           </div>
           <div class="text-center">
-            <span class="text-xl font-bold text-gray-900 dark:text-white block">$125k</span>
+            <span class="text-xl font-bold text-gray-900 dark:text-white block">${{ rfq.quotesAveragePrice | number:'1.0-2' }}</span>
             <span class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide">Avg Price</span>
           </div>
         </div>
@@ -189,24 +186,23 @@
           {{ 'VENDOR.NO_QUOTES_YET' | translate }}
         </div>
         <div *ngFor="let quote of quotes"
-             class="border-2 border-gray-200 dark:border-gray-600 rounded-xl mb-5 overflow-hidden transition-all duration-200 bg-white dark:bg-gray-800 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg">
-          <div class="bg-gradient-to-r from-gray-700 to-gray-600 dark:from-gray-800 dark:to-gray-700 text-white p-5 relative">
-            <div class="flex justify-between items-start gap-5">
+          class="border-2 rounded-xl mb-5 overflow-hidden transition-all duration-200 bg-white dark:bg-gray-800 hover:shadow-lg"
+          [ngClass]="getQuoteCardClasses(quote.status).border">
+
+        <div class="bg-gradient-to-r p-5 relative"
+            [ngClass]="getQuoteCardClasses(quote.status).header">
+                  <div class="flex justify-between items-start gap-5">
               <div class="flex-1">
                 <h3 class="text-xl font-bold mb-2">
                   {{ quote.vendor.firstName + ' ' + quote.vendor.lastName || quote.submission.title }}
                 </h3>
-                <div class="text-sm opacity-90 leading-relaxed">
-                  <!-- <span *ngIf="quote.vendor.email">📧 {{ quote.vendor.email }}</span><br> -->
-                  <span *ngIf="quote.vendor.phoneNumber">📞 {{ quote.vendor.phoneNumber }}</span>
-                </div>
               </div>
               <div class="text-right">
                 <div class="text-3xl font-extrabold mb-1">
                   ${{ quote.price | number:'1.0-0' }}
                 </div>
                 <div class="text-xs opacity-80 uppercase">
-                  {{ 'VENDOR.TOTAL_PROJECT_COST' | translate }}
+                  {{ 'VENDOR.TOTAL_COST' | translate }}
                 </div>
               </div>
             </div>
@@ -220,7 +216,7 @@
                   {{ 'VENDOR.TIMELINE' | translate }}
                 </div>
                 <div class="text-base font-bold text-gray-900 dark:text-white">
-                  8-10 years
+                  {{quote.minimumTimelineDuration}} - {{quote.maximumTimelineDuration}} {{quote.timelineIntervalType?.name}}
                 </div>
               </div>
 
@@ -229,7 +225,7 @@
                   {{ 'VENDOR.WARRANTY' | translate }}
                 </div>
                 <div class="text-base font-bold text-gray-900 dark:text-white">
-                  2 years
+                  {{quote.warantyDuration}} {{quote.warantyIntervalType?.name}}
                 </div>
               </div>
 
@@ -265,26 +261,53 @@
             <!-- Actions -->
             <div class="flex justify-between items-center flex-wrap gap-3 pt-5 border-t border-gray-200 dark:border-gray-600">
               <div class="flex items-center gap-2">
-                <span *ngIf="quote.submission.status"
+                <span *ngIf="quote.status"
                       class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide"
-                      [ngClass]="getStatusColor(quote.submission.status)">
-                  {{ quote.submission.status.name }}
+                      [ngClass]="getStatusColor(quote.status)">
+                  {{ quote.status.name }}
                 </span>
               </div>
               <div class="flex gap-2 flex-wrap">
-                <button *ngIf="currentUser?.type === 'Customer' && quote.submission.status?.name !== 'Accepted' && quote.submission.status?.name !== 'Rejected'"
+                <button *ngIf="currentUser?.type === 'Administrator'" (click)="onChangeStatus(quote, quote.status?.name === 'Invalid' ? 1 : 4)"
+                  class="px-5 py-2.5 rounded-lg text-sm font-medium border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-yellow-500 hover:bg-yellow-600 text-white hover:-translate-y-0.5">
+                  <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 22 20 2 20 12 2" />
+                    <line x1="12" y1="8" x2="12" y2="14" />
+                    <circle cx="12" cy="17" r="1" />
+                  </svg>
+                  {{ quote.status?.name === 'Invalid' ? ('VENDOR.MARK_AS_VALID' | translate) : ('VENDOR.MARK_AS_INVALID' | translate) }}
+                </button>
+                <button *ngIf="currentUser?.type === 'Customer' && quote.status?.name !== 'Accepted' && quote.status?.name !== 'Invalid'" (click)="onChangeStatus(quote, 2)"
                         class="px-5 py-2.5 rounded-lg text-sm font-medium border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white hover:-translate-y-0.5">
-                  ✓ {{ 'VENDOR.ACCEPT' | translate }}
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd"></path>
+                        </svg>
+                   {{ 'VENDOR.ACCEPT' | translate }}
                 </button>
-                <button *ngIf="currentUser?.type === 'Customer' && quote.submission.status?.name !== 'Rejected' && quote.submission.status?.name !== 'Accepted'"
+                <button *ngIf="currentUser?.type === 'Customer' && quote.status?.name !== 'Rejected' && quote.status?.name !== 'Invalid'" (click)="onChangeStatus(quote, 3)"
                         class="px-5 py-2.5 rounded-lg text-sm font-medium border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-red-500 hover:bg-red-600 text-white hover:-translate-y-0.5">
-                  ✗ {{ 'VENDOR.REJECT' | translate }}
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd"></path>
+                        </svg>
+                   {{ 'VENDOR.REJECT' | translate }}
                 </button>
-                <button class="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5" (click)="sendQuoteFirstMessage(quote)">
-                  💬 {{ 'VENDOR.MESSAGE' | translate }}
+                <button *ngIf="currentUser?.type === 'Customer'" class="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5" (click)="sendQuoteFirstMessage(quote)">
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                  </svg>
+                   {{ 'VENDOR.MESSAGE' | translate }}
                 </button>
                 <button class="px-5 py-2.5 rounded-lg text-sm font-medium border-none cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white hover:-translate-y-0.5" [routerLink]="['/quote-details', quote.id]">
-                  📄 {{ 'VENDOR.VIEW_DETAILS' | translate }}
+                  <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                   {{ 'VENDOR.VIEW_DETAILS' | translate }}
                 </button>
               </div>
             </div>

@@ -3,10 +3,10 @@
     <!-- Left Column - Main Content -->
     <div class="lg:col-span-2">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-xl p-10 mb-4 text-white shadow-lg dark:shadow-xl">
+      <div class="bg-gradient-to-r from-blue-200 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-900 dark:text-blue-200 rounded-xl p-10 mb-4 shadow-lg dark:shadow-xl">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 rounded-full bg-white/20 dark:bg-white/30 text-white flex items-center justify-center font-bold text-base">
+            <div class="w-12 h-12 rounded-full bg-white/60 dark:bg-white/30 text-blue-900 dark:text-blue-200 flex items-center justify-center font-bold text-base">
               {{ getInitials(quote.vendor.firstName, quote.vendor.lastName) }}
             </div>
             <div>
@@ -18,16 +18,21 @@
                     clip-rule="evenodd"></path>
                 </svg>
               </h1>
-              <p class="text-blue-100 dark:text-blue-200 text-xs mt-1">📍 {{quote.vendor.companyDetails.streetAddress}}
+              <p class="text-blue-900 dark:text-blue-200 text-xs mt-1">📍 {{quote.vendor.companyDetails.streetAddress}}
                 <span
                   [class]="quote.vendor.status.id === 1 ? 'ms-5 px-3 py-1.5 bg-green-500 dark:bg-green-600 text-white rounded-full text-xs font-semibold shadow-md' : 'ms-5 px-3 py-1.5 bg-gray-500 dark:bg-gray-600 text-white rounded-full text-xs font-semibold shadow-md'">
                   {{ (quote.vendor.status.id === 1 ? 'VENDOR.AVAILABLE_NOW' : 'VENDOR.NOT_AVAILABLE') | translate }}
                 </span>
               </p>
-
             </div>
           </div>
-
+          <div class="flex items-center gap-2">
+            <span *ngIf="quote.status"
+                  class="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide"
+                  [ngClass]="getStatusColor(quote.status)">
+              {{ quote.status.name }}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -49,9 +54,9 @@
       <!-- Combined Price and Project Details Card -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 overflow-hidden">
         <!-- Price Section -->
-        <div class="bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 text-white p-6 text-center">
+        <div class="bg-gradient-to-r from-green-200 to-green-100 dark:from-green-900/30 dark:to-green-800/30 text-green-900 dark:text-green-200 p-6 text-center">
           <div class="text-3xl font-bold mb-1">${{quote.price}}</div>
-          <div class="text-green-100 dark:text-green-200 text-base font-medium">{{'VENDOR.PROPOSED_BID' | translate}}</div>
+          <div class="font-medium">{{'VENDOR.PROPOSED_BID' | translate}}</div>
         </div>
 
         <!-- Project Details Section -->
@@ -59,27 +64,17 @@
           <div class="space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.TIMELINE' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">6 - 8 weeks</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.minimumTimelineDuration}} - {{quote.maximumTimelineDuration}} {{quote.timelineIntervalType?.name}}</span>
             </div>
             <hr class="border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center">
               <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.START_DATE' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">ASAP</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.created | date:'MMM dd, yyyy' }}</span>
             </div>
             <hr class="border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center">
               <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.WARRANTY' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">2 years</span>
-            </div>
-            <hr class="border-gray-100 dark:border-gray-700">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.PAYMENT_TERMS' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">30-60-10</span>
-            </div>
-            <hr class="border-gray-100 dark:border-gray-700">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.EARLY_PAY_DISCOUNT' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">10%</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.warantyDuration}} {{quote.warantyIntervalType?.name}}</span>
             </div>
             <hr class="border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -91,9 +86,17 @@
       </div>
 
       <!-- Action Buttons Card -->
-      <div *ngIf="currentUser?.type === 'Customer'" class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 p-4">
         <div class="px-2 space-y-2.5">
-          <button class="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
+          <button *ngIf="currentUser?.type === 'Administrator'" (click)="onChangeStatus(quote, quote.status?.name === 'Invalid' ? 1 : 4)" class="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg text-sm mb-3">
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 22 20 2 20 12 2" />
+            <line x1="12" y1="8" x2="12" y2="14" />
+            <circle cx="12" cy="17" r="1" />
+          </svg>
+          {{ quote.status?.name === 'Invalid' ? ('VENDOR.MARK_AS_VALID' | translate) : ('VENDOR.MARK_AS_INVALID' | translate) }}
+        </button>
+          <button *ngIf="currentUser?.type === 'Customer' && quote.status?.name !== 'Accepted' && quote.status?.name !== 'Invalid'"(click)="onChangeStatus(quote, 2)"  class="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd"
                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -101,7 +104,7 @@
             </svg>
             {{'VENDOR.ACCEPT_QUOTE' | translate}}
           </button>
-          <button class="w-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
+          <button *ngIf="currentUser?.type === 'Customer' && quote.status?.name !== 'Rejected' && quote.status?.name !== 'Invalid'" (click)="onChangeStatus(quote, 3)" class="w-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -109,20 +112,12 @@
             </svg>
             {{'VENDOR.REJECT_QUOTE' | translate}}
           </button>
-          <button class="w-full border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-md bg-white dark:bg-gray-800 text-sm" (click)="navigateToMessages()">
+          <button *ngIf="currentUser?.type === 'Customer'" class="w-full border-2 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-md bg-white dark:bg-gray-800 text-sm" (click)="navigateToMessages()">
             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
             </svg>
             {{'VENDOR.MESSAGE_VENDOR' | translate}}
-          </button>
-          <button class="w-full border-2 border-blue-500 dark:border-blue-400 text-blue-500 dark:text-blue-400 py-3 px-4 rounded-xl font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-600 dark:hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300 flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-md bg-white dark:bg-gray-800 text-sm">
-            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd"
-                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                clip-rule="evenodd"></path>
-            </svg>
-            {{'VENDOR.SCHEDULE_CALL' | translate}}
           </button>
         </div>
       </div>

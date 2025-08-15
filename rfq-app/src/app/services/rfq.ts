@@ -143,4 +143,13 @@ export class RfqService {
         })
       );
   }
+
+  quoteChangeStatus(id: number, status: number): Observable<boolean> {
+    return this.http.put<ApiResponse<QuoteItem>>(`${this.API_URL}Submission/quote/status/${id}?status=${status}`, null)
+      .pipe(
+        map(response => {
+          return response && response.success === true;
+        })
+      );
+  }
 }

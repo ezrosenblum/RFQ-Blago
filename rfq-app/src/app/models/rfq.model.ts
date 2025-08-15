@@ -78,6 +78,25 @@ export interface Rfq {
   media: Media;
   quotes: QuoteRequest[];
   title?: string;
+  statusHistory: StatusHistory[];
+  vendorStatus: LookupValue;
+  statusHistoryCount: StatusHistoryCount[];
+  quotesAveragePrice: number;
+  isValid: boolean;
+  streetAddress: string;
+  latitudeAddress: number;
+  longitudeAddress: number
+}
+
+export interface StatusHistoryCount {
+  count: number;
+  status: LookupValue
+}
+
+export interface StatusHistory {
+  vendorId: number;
+  dateCreated: string;
+  status: LookupValue
 }
 
 export interface RfqStatistics {
@@ -249,6 +268,11 @@ export interface QuoteItem {
   created: string;
   media: Media;
   status: LookupValue;
+  timelineIntervalType?: LookupValue;
+  minimumTimelineDuration?: number;
+  maximumTimelineDuration?: number;
+  warantyIntervalType?: LookupValue;
+  warantyDuration?: number;
 }
 
 export interface QuoteSearchResponse {
