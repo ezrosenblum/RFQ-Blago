@@ -9,7 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { PhoneInputComponent } from './phone-input/phone-input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { MatMenuModule } from '@angular/material/menu';
 
 
 @NgModule({
@@ -27,6 +27,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatTooltipModule,
     TranslateModule,
     NgxIntlTelInputModule,
+    MatMenuModule,
   ],
   exports: [
     Header,

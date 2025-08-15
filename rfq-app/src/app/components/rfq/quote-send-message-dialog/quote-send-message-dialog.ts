@@ -78,6 +78,8 @@ export class QuoteSendMessageDialog implements OnInit {
             this.sendingMessage = false;
           },
       })
+    } else {
+      this.alertService.error('VENDOR.MESSAGE_MANDATORY');
     }
   }
 
