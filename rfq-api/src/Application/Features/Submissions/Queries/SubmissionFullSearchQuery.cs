@@ -117,6 +117,7 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
             {
                 Category = categories,
                 Subcategory = subcategories,
+                Status = (int)SubmissionStatus.Approved,
                 Paging = new PaginationOptions(1, 10000)
             });
 
@@ -137,7 +138,8 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
         return await _searchClient.SearchSubmissionsAsync(query with
         {
             Category = categories,
-            Subcategory = subcategories
+            Subcategory = subcategories,
+            Status = (int)SubmissionStatus.Approved
         });
     }
     private PaginatedList<SubmissionSearchable> SetVendorStatuses(PaginatedList<SubmissionSearchable> response)

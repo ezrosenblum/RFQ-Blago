@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>New Quote Received</title>
+    <title>New Message Available</title>
     <style>
         body {
             margin: 0;
@@ -59,13 +59,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>New Quote Submitted</h1>
+            <h1>New Message Received</h1>
         </div>
         <div class="content">
             <h4>Hello @firstName @lastName,</h4>
-            <p>A vendor has submitted a quote for your Request for Quotation (RFQ).</p>
-            <p>Click the button below to view the details and respond if needed:</p>
-            <a href="@clientAppUrl/rfq/quote/@id" target="_blank" class="button">View Quote</a>
+            <p>A new message was sent to you.</p>
+            <p>Click the button below to view more details about it:</p>
+            <a href="@clientAppUrl/messages?quoteId=@quoteId" target="_blank" class="button">View Message</a>
         </div>
         <div class="footer">
             © 2025 RFQSubmission. All rights reserved.
