@@ -245,8 +245,8 @@
             </div>
           </div>
           <!-- Enhanced User Avatar -->
-          <a
-            class="relative h-8 w-8 rounded-full overflow-hidden bg-primary-600 flex items-center justify-center text-white text-sm font-medium"
+          <a [matMenuTriggerFor]="menu"
+            class="relative pointer h-8 w-8 rounded-full overflow-hidden bg-primary-600 flex items-center justify-center text-white text-sm font-medium"
           >
             <!-- User Image -->
             <img
@@ -264,13 +264,19 @@
               {{ getUserInitials() }}
             </span>
           </a>
-          <a
-            [routerLink]="['/profile']"
-            matTooltip="{{'HEADER.MANAGE_PROFILE_INFORMATIONS' | translate }}"
-            class="px-3 text-base me-1 mr-2 transition-transform duration-200 ease-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-          >
-            <i class="ki-outline ki-setting-2"></i>
-          </a>
+
+
+          <mat-menu #menu="matMenu">
+            <div class="p-3" [ngClass]="isDarkMode ? 'bg-dark' : 'bg-light'">
+              <button mat-menu-item [routerLink]="['/profile']" class="p-0">
+                <div class="flex items-center hover:bg-gray-100 dark:hover:bg-primary-600 p-2.5 rounded">
+                  <i class="ki-outline ki-profile-circle fs-24 text-base me-1 mr-2"></i>
+                  <span class="text-sm">{{'HEADER.MY_PROFILE' | translate }}</span>
+                </div>
+              </button>
+            </div>
+          </mat-menu>  
+
           <button
             (click)="logout()"
             class="py-1 text-sm font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-error-500 focus:ring-offset-2"

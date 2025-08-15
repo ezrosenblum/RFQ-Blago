@@ -13,6 +13,7 @@ import { MessageAdminConversationEntry, MessageAdminConversationList, MessageCon
 import { ActivatedRoute } from '@angular/router';
 import { TableResponse } from '../../models/rfq.model';
 import { ImagePreviewDialog } from './image-preview-dialog/image-preview-dialog';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   standalone: false,
@@ -123,6 +124,7 @@ export class MessagesComponent implements OnInit {
     private _authService: Auth,
     private route: ActivatedRoute,
     private _dialog: MatDialog,
+    private alertService: AlertService
   ){
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -393,6 +395,8 @@ export class MessagesComponent implements OnInit {
           this.isMessageSending = false;
          },
       })
+    } else {
+      this.alertService.error('VENDOR.MESSAGE_MANDATORY');
     }
   }
 

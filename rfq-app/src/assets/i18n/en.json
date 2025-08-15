@@ -270,6 +270,7 @@
     "TRY_ADJUSTING_YOUR_SEARCH_CRITERIA": "Try adjusting your search criteria.",
     "SEND_MESSAGE": "Send a message",
     "MESSAGE_SENT": "Message is successfully sent",
+    "MESSAGE_MANDATORY": "Enter a message or upload a file",
     "POSTED": "Posted",
     "QUOTES_RECEIVED": "Quotes Received",
     "RFQ_ID": "RFQ ID",
@@ -353,7 +354,8 @@
     "NO_NOTIFICATIONS": "No notifications",
     "LOADING_MORE": "Loading more...",
     "MY_QUOTES": "My Quotes",
-    "MANAGE_PROFILE_INFORMATIONS": "Manage Profile Informations"
+    "MANAGE_PROFILE_INFORMATIONS": "Manage Profile Informations",
+    "MY_PROFILE": "My Profile"
   },
 
   "SERVICE_AREA": {
