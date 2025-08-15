@@ -116,6 +116,9 @@ export class MyQuotesComponent implements OnInit {
             statusId: q.submission.status.id,
             submissionDate: q.submission.submissionDate,
             warantyDuration: q.submission.warantyDuration,
+            customerId: q.submission.user?.id,
+            vendorId: q.vendor.id,
+            quoteId: q.id,
           }));
           this.pendingCount = this.quotes.filter(
             (q) => q.statusId === 1
@@ -270,11 +273,11 @@ export class MyQuotesComponent implements OnInit {
         maximumFractionDigits: 1,
       }).format(value || 0);
     } catch {
-      // Fallback if currency code is invalid
       return new Intl.NumberFormat('en-US', {
         notation: 'compact',
         maximumFractionDigits: 1,
       }).format(value || 0);
     }
   }
+
 }
