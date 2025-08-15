@@ -425,9 +425,9 @@
               <div class="flex items-center">
                 <span
                   class="inline-flex px-2 py-1 text-xs font-semibold rounded-full uppercase"
-                  [ngClass]="getStatusClass(quote.status.id || 0)"
+                  [ngClass]="getStatusClass(quote.submission.status.id || 0)"
                 >
-                  {{ quote.status.name }}
+                  {{ quote.submission.status.name }}
                 </span>
               </div>
 
@@ -610,9 +610,9 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
                     class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                    [ngClass]="getStatusClass(quote.status.id || 0)"
+                    [ngClass]="getStatusClass(quote.submission.status.id || 0)"
                   >
-                    {{ quote.status.name }}
+                    {{ quote.submission.status.name }}
                   </span>
                 </td>
 
