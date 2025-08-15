@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -18,18 +18,20 @@
   <div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <!-- Card Container -->
-      <div class="bg-white rounded-lg border border-gray-200 shadow shadow">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow shadow"
+      >
         <!-- Card Header -->
-        <div class="border-b border-gray-200 px-6 py-4">
+        <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
           <div
             class="flex flex-col sm:flex-row sm:items-center sm:justify-between"
           >
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
               {{ 'VENDOR.FILTERS_AND_SEARCH' | translate }}
             </h2>
             <button
               (click)="clearFilters()"
-              class="text-sm text-gray-600 hover:text-gray-900 mt-2 sm:mt-0"
+              class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mt-2 sm:mt-0"
             >
               {{ 'VENDOR.CLEAR_ALL_FILTERS' | translate }}
             </button>
@@ -45,7 +47,7 @@
               <div>
                 <label
                   for="search"
-                  class="block text-sm font-medium text-gray-700 mb-2"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >{{ 'VENDOR.SEARCH' | translate }}</label
                 >
                 <div class="relative">
@@ -55,13 +57,13 @@
                     formControlName="query"
                     (keyup.enter)="onSearch()"
                     placeholder="{{ 'VENDOR.SEARCH_BY_FILTERS' | translate }}"
-                    class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <div
                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                   >
                     <svg
-                      class="h-5 w-5 text-gray-400"
+                      class="h-5 w-5 text-gray-400 dark:text-gray-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -81,7 +83,7 @@
               <div>
                 <label
                   for="priceFrom"
-                  class="block text-sm font-medium text-gray-700 mb-2"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >{{ 'VENDOR.PRICE_FROM' | translate }}</label
                 >
                 <input
@@ -89,7 +91,7 @@
                   type="number"
                   formControlName="priceFrom"
                   placeholder="{{ 'VENDOR.MIN_PRICE' | translate }}"
-                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -97,7 +99,7 @@
               <div>
                 <label
                   for="priceTo"
-                  class="block text-sm font-medium text-gray-700 mb-2"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >{{ 'VENDOR.PRICE_TO' | translate }}</label
                 >
                 <input
@@ -105,7 +107,7 @@
                   type="number"
                   formControlName="priceTo"
                   placeholder="{{ 'VENDOR.MAX_PRICE' | translate }}"
-                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -113,18 +115,20 @@
 
           <!-- Bottom Controls -->
           <div
-            class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 pt-6 border-t border-gray-200"
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
           >
             <!-- View Mode Toggle -->
             <div class="flex items-center space-x-3">
-              <span class="text-sm font-medium text-gray-700"
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
                 >{{ 'VENDOR.VIEW' | translate }}</span
               >
-              <div class="flex rounded-md shadow-sm border border-gray-300">
+              <div
+                class="flex rounded-md shadow-sm border border-gray-300 dark:border-gray-600"
+              >
                 <button
                   type="button"
                   (click)="toggleView('list')"
-                  [class]="viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+                  [class]="viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
                   class="relative inline-flex items-center px-3 py-2 rounded-l-md text-sm font-medium hover:bg-blue-700 hover:text-white focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
                   <svg
@@ -145,7 +149,7 @@
                 <button
                   type="button"
                   (click)="toggleView('table')"
-                  [class]="viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+                  [class]="viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
                   class="relative inline-flex items-center px-3 py-2 rounded-r-md text-sm font-medium hover:bg-blue-700 hover:text-white focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 border-l-0"
                 >
                   <svg
@@ -199,14 +203,16 @@
       <div
         class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"
       ></div>
-      <span class="ml-2 text-gray-600">{{ 'VENDOR.LOADING' | translate }}</span>
+      <span class="ml-2 text-gray-600 dark:text-gray-400"
+        >{{ 'VENDOR.LOADING' | translate }}</span
+      >
     </div>
 
     <!-- Results -->
     <div *ngIf="!loading">
       <!-- Results Header -->
       <div class="flex justify-between items-center mb-6">
-        <div class="text-sm text-gray-600">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
           {{ totalCount }} {{ 'VENDOR.QUOTES_FOUND' | translate }}
         </div>
       </div>
@@ -244,7 +250,7 @@
           </div>
           <div class="text-center">
             <span class="text-xl font-bold text-gray-900 dark:text-white block"
-              >1</span
+              >{{ approvedCount }}</span
             >
             <span
               class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide"
@@ -263,32 +269,39 @@
         </div>
       </div>
       <!-- Quote Cards - List View -->
-      <div class="p-6" *ngIf="viewMode === 'list'">
+      <div
+        class="p-6 bg-gray-50 dark:bg-gray-900/50"
+        *ngIf="viewMode === 'list'"
+      >
         <div
           *ngFor="let quote of quotes"
-          class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mb-5"
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-5"
         >
           <!-- Header Section - Dark Blue/Slate Background -->
-          <div class="bg-slate-600 text-white px-6 py-4">
+          <div class="bg-slate-600 dark:bg-slate-700 text-white px-6 py-4">
             <div class="flex items-center justify-between">
               <div class="">
                 <div class="flex items-center space-x-2">
                   <h3 class="text-xl font-semibold">
-                    Vendor {{ quote.vendorName }}
+                    {{'VENDOR.VENDOR' | translate }} {{ quote.vendorName }}
                   </h3>
                 </div>
-                <div class="flex items-center space-x-2 text-pink-300">
+                <div
+                  class="flex items-center space-x-2 text-pink-600 dark:text-pink-200"
+                >
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"
                     />
                   </svg>
-                  <span class="text-sm">{{ quote.vendorNumber }}</span>
+                  <span class="text-sm text-white">{{ quote.vendorNumber }}</span>
                 </div>
               </div>
               <div class="text-right">
                 <div class="text-3xl font-bold">${{ quote.price }}</div>
-                <div class="text-sm text-slate-300 uppercase tracking-wide">
+                <div
+                  class="text-sm text-slate-300 dark:text-slate-200 uppercase tracking-wide"
+                >
                   {{ 'VENDOR.TOTAL_PROJECT_COST' | translate }}
                 </div>
               </div>
@@ -296,7 +309,7 @@
           </div>
 
           <!-- Info Grid Section -->
-          <div class="px-4 py-3">
+          <div class="px-4 py-3 bg-white dark:bg-gray-800">
             <div
               class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4"
             >
@@ -370,17 +383,19 @@
           </div>
 
           <!-- Content Section -->
-          <div class="p-6">
+          <div class="p-6 bg-white dark:bg-gray-800">
             <!-- Vendor Proposal -->
             <div
               class="bg-slate-50 dark:bg-gray-700/30 p-5 rounded-lg border-l-4 border-blue-600 dark:border-blue-400 mb-6"
             >
               <div class="flex items-start">
                 <div class="flex-1">
-                  <h4 class="font-medium text-gray-900 mb-2">
+                  <h4 class="font-medium text-gray-900 dark:text-white mb-2">
                     {{ 'VENDOR.VENDOR_PROPOSAL' | translate }}
                   </h4>
-                  <p class="text-sm text-gray-700 leading-relaxed">
+                  <p
+                    class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+                  >
                     {{ quote.description }}
                   </p>
                 </div>
@@ -403,7 +418,14 @@
               <!-- Action Buttons -->
               <div class="flex items-center space-x-3">
                 <button
-                  class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+                  class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                  [routerLink]="['/messages']"
+                  [queryParams]="{
+                  quoteId: quote.id,
+                  customerId: quote.customerId,
+                  vendorId: quote.vendorId
+                  }"
+                  [disabled]="!quote?.id || !quote?.customerId || !quote?.vendorId"
                 >
                   <svg
                     class="w-4 h-4 mr-2"
@@ -421,7 +443,10 @@
                   {{ 'VENDOR.MESSAGE' | translate }}
                 </button>
                 <button
+                  type="button"
                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                  [routerLink]="['/quote-details', quote.id]"
+                  [disabled]="!quote?.id"
                 >
                   <svg
                     class="w-4 h-4 mr-2"
@@ -453,45 +478,47 @@
       <!-- Table View -->
       <div
         *ngIf="viewMode === 'table'"
-        class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden p-6"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden p-6"
       >
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   {{ 'VENDOR.VENDOR' | translate }}
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   {{ 'VENDOR.QUOTE_ID' | translate }}
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   {{ 'VENDOR.PRICE' | translate }}
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   {{ 'VENDOR.STATUS' | translate }}
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   {{ 'VENDOR.DESCRIPTION' | translate }}
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   {{ 'VENDOR.LOCATION' | translate }}
                 </th>
@@ -502,12 +529,17 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let quote of quotes" class="hover:bg-gray-50">
+            <tbody
+              class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+            >
+              <tr
+                *ngFor="let quote of quotes"
+                class="hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div
-                      class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3"
+                      class="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3"
                     >
                       <img
                         *ngIf="quote.profileImage"
@@ -517,22 +549,26 @@
                       />
                       <span
                         *ngIf="!quote.profileImage"
-                        class="text-xs font-medium text-gray-700"
+                        class="text-xs font-medium text-gray-700 dark:text-gray-300"
                         >{{ quote.vendorName.charAt(0) }}</span
                       >
                     </div>
                     <div>
-                      <div class="text-sm font-medium text-gray-900">
+                      <div
+                        class="text-sm font-medium text-gray-900 dark:text-white"
+                      >
                         {{ quote.vendorName }}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">#{{ quote.id }}</div>
+                  <div class="text-sm text-gray-900 dark:text-white">
+                    #{{ quote.id }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-bold text-gray-900">
+                  <div class="text-sm font-bold text-gray-900 dark:text-white">
                     ${{ quote.price }}
                   </div>
                 </td>
@@ -545,7 +581,9 @@
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-sm text-gray-700 max-w-xs">
+                  <div
+                    class="text-sm text-gray-700 dark:text-gray-300 max-w-xs"
+                  >
                     <span [title]="quote.description || ''"
                       >{{ (quote.description || '') | slice:0:100 }}{{
                       (quote.description || '').length > 100 ? '...' : ''
@@ -554,7 +592,7 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-700">
+                  <div class="text-sm text-gray-700 dark:text-gray-300">
                     {{ quote.location || '-' }}
                   </div>
                 </td>
@@ -563,8 +601,15 @@
                 >
                   <div class="flex items-center space-x-2">
                     <button
-                      class="text-blue-600 hover:text-blue-900 p-1 rounded"
-                      title="Message"
+                      class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded"
+                      title="{{ 'VENDOR.MESSAGE' | translate }}"
+                      [routerLink]="['/messages']"
+                      [queryParams]="{
+                      quoteId: quote.id,
+                      customerId: quote.customerId,
+                      vendorId: quote.vendorId
+                    }"
+                      [disabled]="!quote?.id || !quote?.customerId || !quote?.vendorId"
                     >
                       <svg
                         class="w-4 h-4"
@@ -577,12 +622,15 @@
                           stroke-linejoin="round"
                           stroke-width="2"
                           d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                        ></path>
+                        />
                       </svg>
                     </button>
+
                     <button
-                      class="text-blue-600 hover:text-blue-900 p-1 rounded"
+                      class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1 rounded"
                       title="{{ 'VENDOR.VIEW_DETAILS' | translate }}"
+                      [routerLink]="['/quote-details', quote.id]"
+                      [disabled]="!quote?.id"
                     >
                       <svg
                         class="w-4 h-4"
@@ -615,9 +663,9 @@
       <!-- Pagination -->
       <div
         *ngIf="totalPages > 1"
-        class="flex items-center justify-between mt-8 py-6 px-3 border-t border-gray-200"
+        class="flex items-center justify-between mt-8 py-6 px-3 border-t border-gray-200 dark:border-gray-700"
       >
-        <div class="text-sm text-gray-700">
+        <div class="text-sm text-gray-700 dark:text-gray-300">
           {{ 'VENDOR.SHOWING' | translate }} {{ (currentPage - 1) * pageSize + 1
           }} {{ 'VENDOR.TO' | translate }} {{ getDisplayEnd() }} {{ 'VENDOR.OF'
           | translate }} {{ totalCount }} {{ 'VENDOR.RESULTS' | translate }}
@@ -627,7 +675,7 @@
           <button
             (click)="onPageChange(currentPage - 1)"
             [disabled]="currentPage === 1"
-            class="px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
+            class="px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
           >
             {{ 'VENDOR.PREVIOUS' | translate }}
           </button>
@@ -636,7 +684,7 @@
           <button
             *ngFor="let page of getPaginationPages()"
             (click)="onPageChange(page)"
-            [class]="page === currentPage ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'"
+            [class]="page === currentPage ? 'bg-blue-600 text-white' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700'"
             class="px-3 py-2 text-sm font-medium rounded-md transition-colors"
           >
             {{ page }}
@@ -646,7 +694,7 @@
           <button
             (click)="onPageChange(currentPage + 1)"
             [disabled]="currentPage === totalPages"
-            class="px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
+            class="px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
           >
             {{ 'VENDOR.NEXT' | translate }}
           </button>
@@ -656,7 +704,7 @@
       <!-- No Results -->
       <div *ngIf="quotes.length === 0 && !loading" class="text-center py-12">
         <svg
-          class="mx-auto h-12 w-12 text-gray-400"
+          class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -668,10 +716,10 @@
             d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.084-2.343"
           ></path>
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
           {{ 'VENDOR.NO_QUOTES_FOUND' | translate }}
         </h3>
-        <p class="mt-1 text-sm text-gray-500">
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
           {{ 'VENDOR.TRY_ADJUSTING_YOUR_SEARCH_CRITERIA' | translate }}
         </p>
       </div>

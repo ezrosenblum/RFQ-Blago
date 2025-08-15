@@ -326,7 +326,9 @@
     "PHONE": "Phone",
     "COMPANY_SIZE": "Company Size",
     "ADDRESS": "Address",
-    "OPERATING_RADIUS": "Operating Radius"
+    "OPERATING_RADIUS": "Operating Radius",
+    "TOTAL_PROJECT_COST": "Total Project Cost",
+    "VENDOR_PROPOSAL": "Vendor Proposal"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

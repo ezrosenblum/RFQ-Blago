@@ -32,6 +32,9 @@ export interface Quote {
   statusId: number;
   submissionDate?: Date;
   warantyDuration?: number;
+  customerId?: number;
+  vendorId?: number;
+  quoteId?: number;
 }
 
 export interface MyQuotesList {
