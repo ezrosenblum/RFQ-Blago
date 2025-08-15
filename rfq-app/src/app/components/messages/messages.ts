@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry } from '../../models/messages.model';
 import { MessagesService } from '../../services/messages';
-import { map, Observable, of, startWith, take } from 'rxjs';
+import { find, map, Observable, of, startWith, take } from 'rxjs';
 import {
   MatDialog,
 } from '@angular/material/dialog';
@@ -326,15 +326,21 @@ export class MessagesComponent implements OnInit {
     this._messageService.getChatMessageHistory(request).pipe(take(1)).subscribe({
       next: (data: TableResponse<MessageEntry>) => {
       this.currentMessages = Array.isArray(data.items) ? data.items : [];
-      this.currentMessages.forEach(el => {
-        if (el.media && el.media.items && el.media.items.length > 0) {
-          el.media.items.forEach(img => {
-            img.srcUrl = img.url;
-            img.previewUrl = img.url;
-          })
-        }
-      })
       this.loadingChatMessages = false;
+
+      // Mark as read
+      let findSelectedQuoteIndex;
+      if (this.isAdmin) {
+        findSelectedQuoteIndex = this.adminConversations.findIndex(el => el.id == quoteId);
+        if (findSelectedQuoteIndex > -1 && this.adminConversations[findSelectedQuoteIndex].lastMessage?.quoteMessageStatus?.name == 'Sent') {
+          this.markMessageAsRead(this.adminConversations[findSelectedQuoteIndex]);
+        }
+      } else {
+        findSelectedQuoteIndex = this.conversations.findIndex(el => el.id == quoteId);
+        if (findSelectedQuoteIndex > -1 && this.conversations[findSelectedQuoteIndex].lastMessage?.quoteMessageStatus?.name == 'Sent') {
+          this.markMessageAsRead(this.conversations[findSelectedQuoteIndex]);
+        }
+      }
 
       setTimeout(() => {
         const container = document.getElementById('chat-scrollable');
@@ -388,6 +394,24 @@ export class MessagesComponent implements OnInit {
          },
       })
     }
+  }
+
+  markMessageAsRead(conversation: MessageAdminConversationEntry) {
+    this._messageService.markMessageAsRead(conversation.id).pipe(take(1)).subscribe({
+      next: (data) => {
+        if (this.isAdmin) {
+          let findQuoteIndex = this.adminConversations.findIndex(el => el.id == conversation.id);
+          if (findQuoteIndex > -1) {
+            this.adminConversations[findQuoteIndex].lastMessage.quoteMessageStatus.name = 'Read';
+          }
+        } else {
+          let findQuoteIndex = this.conversations.findIndex(el => el.id == conversation.id);
+          if (findQuoteIndex > -1) {
+            this.conversations[findQuoteIndex].lastMessage.quoteMessageStatus.name = 'Read';
+          }
+        }
+      }
+    });
   }
 
   removeConversation(): void {

@@ -64,7 +64,6 @@ export class QuoteSendMessageDialog implements OnInit {
       this.pondFiles.forEach(file => {
         formData.append('Files', file, file.name);
       });
-
       this._messageService.sendMessage(formData).pipe(take(1)).subscribe({
           next: (data) => {
           this.newMessage = '';

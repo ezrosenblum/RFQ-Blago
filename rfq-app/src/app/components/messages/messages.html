@@ -142,7 +142,7 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <h3 class="font-medium text-gray-900 dark:text-white truncate" matTooltip="{{ conv.title }}" (click)="triggerMessagesMobile()">
-                {{ conv.title }}
+                <span [ngClass]="{'chat-unread': conv.lastMessage && conv.lastMessage.quoteMessageStatus.name == 'Sent'}">{{ conv.title }}</span>
               </h3>
               <div class="flex">
                 <svg
@@ -161,11 +161,11 @@
                 </svg>
                 <mat-menu #menu="matMenu">
                   <div class="p-3" [ngClass]="isDarkMode ? 'bg-dark' : 'bg-light'">
-                    <button mat-menu-item>
+                    <button mat-menu-item (click)="markMessageAsRead(conv)" [disabled]="!conv.lastMessage || !conv.lastMessage.quoteMessageStatus || conv.lastMessage.quoteMessageStatus.name != 'Sent'">
                       <i class="ki-outline ki-sms text-base me-1 mr-2"></i>
                       <span class="text-sm">{{'MESSAGES.MARK_AS_READ' | translate}}</span>
                     </button>
-                    <button mat-menu-item>
+                    <button mat-menu-item disabled>
                       <i class="ki-outline ki-archive-tick text-base me-1 mr-2"></i>
                       <span class="text-sm">{{'MESSAGES.ARCHIVE' | translate}}</span>
                     </button>
@@ -176,7 +176,7 @@
           </div>
           <div class="w-100 m-0" [ngClass]="{'pl-42': !isAdmin}">
             <p class="text-sm text-gray-600 dark:text-gray-300 mt-1" (click)="triggerMessagesMobile()">
-              {{ conv.submission.title }}
+              <span [ngClass]="{'chat-unread': conv.lastMessage && conv.lastMessage.quoteMessageStatus.name == 'Sent'}">{{ conv.submission.title }}</span>
             </p>
           </div>
         </div>
@@ -217,7 +217,7 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <h3 class="font-medium text-gray-900 dark:text-white truncate" [matTooltip]="conv.title" (click)="triggerMessagesMobile()">
-                {{ conv.title }}
+                <span [ngClass]="{'chat-unread': conv.lastMessage && conv.lastMessage.quoteMessageStatus.name == 'Sent'}">{{ conv.title }}</span>
               </h3>
               <div class="flex">
                 <!-- <div class="text-xs text-gray-500 dark:text-gray-400 min-width-50 align-right ml-2">
@@ -239,11 +239,11 @@
                 </svg>
                 <mat-menu #menu="matMenu">
                   <div class="p-3" [ngClass]="isDarkMode ? 'bg-dark' : 'bg-light'">
-                    <button mat-menu-item>
+                    <button mat-menu-item (click)="markMessageAsRead(conv)" [disabled]="!conv.lastMessage || !conv.lastMessage.quoteMessageStatus || conv.lastMessage.quoteMessageStatus.name != 'Sent'">
                       <i class="ki-outline ki-sms text-base me-1 mr-2"></i>
                       <span class="text-sm">{{'MESSAGES.MARK_AS_READ' | translate}}</span>
                     </button>
-                    <button mat-menu-item>
+                    <button mat-menu-item disabled>
                       <i class="ki-outline ki-archive-tick text-base me-1 mr-2"></i>
                       <span class="text-sm">{{'MESSAGES.ARCHIVE' | translate}}</span>
                     </button>
@@ -254,7 +254,7 @@
           </div>
           <div class="w-100 m-0" [ngClass]="{'pl-42': !isAdmin}">
             <p class="text-sm text-gray-600 dark:text-gray-300 mt-1" (click)="triggerMessagesMobile()">
-              {{ conv.submission.title }}
+              <span [ngClass]="{'chat-unread': conv.lastMessage && conv.lastMessage.quoteMessageStatus.name == 'Sent'}">{{ conv.submission.title }}</span>
             </p>
             <!-- <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate" (click)="triggerMessagesMobile()">
               {{ conv.title }}
@@ -436,7 +436,7 @@
         </div>
         <button
          *ngIf="!isMessageSending"
-          [disabled]="currentUser?.type === 'Administrator' || !newMessage.trim() || !selectedConversation"
+          [disabled]="currentUser?.type === 'Administrator' || !selectedConversation"
           (click)="sendMessage()"
           class="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mb-1"
         >

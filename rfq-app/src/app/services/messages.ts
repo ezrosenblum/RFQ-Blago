@@ -90,4 +90,13 @@ export class MessagesService {
       );
   }
 
+  markMessageAsRead(id: number): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}Submission/quote/${id}/seen`, null)
+      .pipe(
+        map(response => {
+          return response
+        })
+      );
+  }
+
 }
