@@ -116,6 +116,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
       dot: 'text-blue-500'
     }
   };
+  showFullDescription = false;
+  isOverflowing: Record<string, boolean> = {};
 
   constructor(
     private fb: FormBuilder,
@@ -158,6 +160,17 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
     // Watch for filter changes
     this.setupFilterWatchers();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.rfqs.forEach(rfq => {
+        const el = document.getElementById('desc-' + rfq.id);
+        if (el) {
+          this.isOverflowing['desc-' + rfq.id] = el.scrollHeight > el.clientHeight;
+        }
+      });
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -418,6 +431,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
       this.currentPage = page;
       this.applyFilters();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -736,7 +751,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   canApprove(rfq: Rfq): boolean {
-    return this.currentUser?.type === UserRole.ADMIN;
+    if ( rfq.status?.name === 'Pending Review' || rfq.status?.name === 'Rejected' || rfq.status?.name === 'Archived') {
+      return this.currentUser?.type === UserRole.ADMIN;
+    } else {
+      return false;
+    }
   }
 
   approveRfq(rfqId: number){
@@ -747,7 +766,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   canDecline(rfq: Rfq): boolean {
-    return this.currentUser?.type === UserRole.ADMIN;
+    if ( rfq.status?.name === 'Approved' || rfq.status?.name === 'Pending Review') {
+      return this.currentUser?.type === UserRole.ADMIN;
+    } else {
+      return false;
+    }
   }
 
   declineRfq(rfqId: number){

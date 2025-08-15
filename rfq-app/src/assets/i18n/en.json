@@ -188,7 +188,7 @@
     "SUBMITTED_BY": "Submitted By",
     "UPDATE_STATUS": "Update Status",
     "DESCRIPTION": "Description",
-    "QUANTITY_UNIT": "Quantity/Unit",
+    "QUANTITY_UNIT": "Quantity / Unit",
     "DATE": "Date",
     "ACTIONS": "Actions",
     "SHOWING": "Showing",
@@ -327,7 +327,8 @@
     "OPERATING_RADIUS": "Operating Radius",
     "VENDOR_PROPOSAL": "Vendor Proposal",
     "MARK_AS_VALID": "Mark as Valid",
-    "MARK_AS_INVALID": "Mark as Invalid"
+    "MARK_AS_INVALID": "Mark as Invalid",
+    "QUOTES": "Quotes"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
