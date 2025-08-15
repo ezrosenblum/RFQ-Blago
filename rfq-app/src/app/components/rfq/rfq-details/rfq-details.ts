@@ -35,18 +35,19 @@ export class RfqDetails implements OnInit, OnDestroy{
   totalPages = 0;
   currentUser: User | null = null;
   errorMessage = '';
+  loadingQuoteId: number | null = null;
 
   constructor(
-    private route: ActivatedRoute,
-    private rfqService: RfqService,
-    private router: Router,
+    private _route: ActivatedRoute,
+    private _rfqService: RfqService,
+    private _router: Router,
     private _authService: Auth,
     private _dialog: MatDialog,
   ) {
   }
 
   ngOnInit() {
-    this.route.paramMap
+    this._route.paramMap
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         const id = Number(params.get('id'));
@@ -69,13 +70,13 @@ export class RfqDetails implements OnInit, OnDestroy{
   }
 
   getDetails(id: number) {
-    this.rfqService.getRfqDetails(id).pipe(take(1)).subscribe({
+    this._rfqService.getRfqDetails(id).pipe(take(1)).subscribe({
       next: (result) => {
-        this.rfq = result
+        this.rfq = result;
         this.loadQuotes();
       },
-      error: (err) => {
-        console.error('Failed to load RFQ details', err);
+      error: (error) => {
+        this.handleError(error);
       }
     });
   }
@@ -125,8 +126,8 @@ export class RfqDetails implements OnInit, OnDestroy{
 
   sendQuoteFirstMessage(quote: QuoteItem){
     if (quote.lastMessage) {
-      this.router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
-    } 
+      this._router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
+    }
     else {
       const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
         width: '500px',
@@ -144,7 +145,7 @@ export class RfqDetails implements OnInit, OnDestroy{
         .subscribe((result: any) => {
           if (result) {
             setTimeout(() => {
-              this.router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
+              this._router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
             }, 1000)
           }
         });
@@ -152,19 +153,63 @@ export class RfqDetails implements OnInit, OnDestroy{
   }
 
   loadQuotes(): void {
-      this.rfqService.getQuotes(this.submissionListRequest)
+      this._rfqService.getQuotes(this.submissionListRequest)
         .pipe(take(1))
         .subscribe({
           next: (response: QuoteSearchResponse) => {
-          this.quotes = Array.isArray(response.items) ? response.items : response.items ? [response.items] : [];
+            this.quotes = Array.isArray(response.items) ? response.items : response.items ? [response.items] : [];
             this.totalItems = response.totalCount!;
             this.totalPages = response.totalPages!;
           },
           error: (error) => {
-
+            this.handleError(error);
           }
         });
     }
+
+  get pendingCount(): number {
+    return this.quotes.filter(q => q.status?.name === 'Pending').length;
+  }
+
+  get acceptedCount(): number {
+    return this.quotes.filter(q => q.status?.name === 'Approved').length
+  }
+
+  onChangeStatus(quote: QuoteItem, statusId: number) {
+    this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
+      next: () => {
+        this.loadQuotes();
+      },
+      error: (error) => {
+        this.handleError(error);
+      }
+    })
+  }
+
+  getQuoteCardClasses(status: any) {
+    if (!status) return { border: '', header: '' };
+
+    const colors: any = {
+      Accepted: {
+        border: 'border-green-200 dark:border-green-700',
+        header: 'from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/30 text-green-900 dark:text-green-200'
+      },
+      Rejected: {
+        border: 'border-red-200 dark:border-red-700',
+        header: 'from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/30 text-red-900 dark:text-red-200'
+      },
+      Pending: {
+        border: 'border-yellow-200 dark:border-yellow-700',
+        header: 'from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/30 text-yellow-900 dark:text-yellow-200'
+      },
+      Invalid: {
+        border: 'border-gray-400 dark:border-gray-600',
+        header: 'from-gray-300 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300'
+      }
+    };
+
+    return colors[status.name] || { border: '', header: '' };
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
