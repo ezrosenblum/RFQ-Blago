@@ -59,5 +59,8 @@
   "enum.submissionStatusHistoryType.engaged": "Engaged",
   "enum.submissionUnit.lf": "Linear Feet",
   "enum.submissionUnit.sf": "Square Feet",
-  "enum.submissionUnit.ea": "Each"
+  "enum.submissionUnit.ea": "Each",
+  "enum.notificationType.newQuote": "New Quote",
+  "enum.notificationType.newSubmission": "New Submission",
+  "enum.notificationType.newMessage": "New Message"
 }
