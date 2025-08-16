@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import {
   FilterOptions,
-  MyQuotesList,
   MyQuotesRequest,
   Quote,
+  QuotesResponse,
 } from '../../../models/my-quotes';
 import { QuoteService } from '../../../services/my-quotes';
 import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { LookupValue } from '../../../models/rfq.model';
 import { RfqService } from '../../../services/rfq';
@@ -29,7 +29,7 @@ export class MyQuotesComponent implements OnInit {
   avgPrice = 0;
   currencyCode = 'USD';
   loading = false;
-
+  imageError = false;
   filtersForm: FormGroup;
 
   sortField = 1;
@@ -71,19 +71,33 @@ export class MyQuotesComponent implements OnInit {
       priceFrom: params.priceFrom ? +params.priceFrom : null,
       priceTo: params.priceTo ? +params.priceTo : null,
       minRating: params.minRating ? +params.minRating : 0,
+      location: params.location || '',
     });
 
     this.currentPage = params.page ? +params.page : 1;
     this.pageSize = params.size ? +params.size : 10;
     this.sortField = params.sortField ? +params.sortField : 1;
     this.sortOrder = params.sortOrder ? +params.sortOrder : 1;
-    this.viewMode = params.view || 'list';
+    this.viewMode = (params.view as 'list' | 'grid' | 'table') || 'list';
+  }
+
+  private mapSort(): { sortBy: string; sortDirection: 'asc' | 'desc' } {
+    const sortByMap: Record<number, string> = {
+      1: 'created',
+      2: 'price',
+      3: 'validUntil',
+      4: 'title',
+    };
+    const sortBy = sortByMap[this.sortField] ?? 'created';
+    const sortDirection = this.sortOrder === 2 ? 'asc' : 'desc';
+    return { sortBy, sortDirection };
   }
 
   searchQuotes() {
     this.loading = true;
 
-    const formValues = this.filtersForm.value;
+    const formValues = this.filtersForm.value as Partial<FilterOptions>;
+    const { sortBy, sortDirection } = this.mapSort();
 
     const request: MyQuotesRequest = {
       query: formValues.query || undefined,
@@ -97,53 +111,27 @@ export class MyQuotesComponent implements OnInit {
       .getMyQuotes(request)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (response: any) => {
-          const raw = response?.quotes ?? response?.items ?? [];
-          this.quotes = raw.map((q: any) => ({
-            id: q.id ?? q.submission?.id,
-            vendorName: q.submission.title,
-            vendorNumber: q.vendor.phoneNumber,
-            title: q.title ?? '',
-            description: q.description ?? q.submission?.description ?? '',
-            price: q.price ?? 0,
-            currency: q.currency ?? 'USD',
-            location: q.location ?? q.streetAddress ?? q.jobLocation ?? '',
-            profileImage: q.profileImage ?? q.user?.picture ?? null,
-            rating: q.rating ?? 0,
-            successRate: q.successRate ?? 0,
-            skills: q.skills ?? [],
-            status: q.submission.status.name,
-            statusId: q.submission.status.id,
-            submissionDate: q.submission.submissionDate,
-            warantyDuration: q.submission.warantyDuration,
-            customerId: q.submission.user?.id,
-            vendorId: q.vendor.id,
-            quoteId: q.id,
-          }));
+        next: (response: QuotesResponse) => {
+          const raw = response.items ?? [];
+          this.quotes = raw;
+
+          const sum = this.quotes.reduce(
+            (acc, q) => acc + (Number(q.price) || 0),
+            0
+          );
+          this.avgPrice = this.quotes.length ? sum / this.quotes.length : 0;
+
           this.pendingCount = this.quotes.filter(
-            (q) => q.statusId === 1
+            (q) => q.status?.id === 1
           ).length;
           this.approvedCount = this.quotes.filter(
-            (q) => q.statusId === 2
+            (q) => q.status?.id === 2
           ).length;
-          const avg = (arr: { price: number }[]) => {
-            const sum = arr.reduce((s, it) => s + (Number(it.price) || 0), 0);
-            return arr.length ? sum / arr.length : 0;
-          };
-          this.avgPrice = avg(this.quotes);
-          const count =
-            response.totalCount ??
-            response.total ??
-            response.pagination?.totalCount ??
-            raw.length;
-          const pages =
-            response.totalPages ??
-            response.pagination?.totalPages ??
-            Math.ceil(count / this.pageSize);
-          this.totalCount = count;
-          this.totalPages = pages;
+          this.totalCount = response.totalCount ?? raw.length;
+          this.totalPages =
+            response.totalPages ?? Math.ceil(this.totalCount / this.pageSize);
         },
-        error: (err) => {
+        error: (err: unknown) => {
           console.error('Error fetching quotes:', err);
         },
       });
@@ -205,10 +193,12 @@ export class MyQuotesComponent implements OnInit {
     const formValues = this.filtersForm.value;
 
     if (formValues.query) queryParams.query = formValues.query;
-    if (formValues.priceFrom) queryParams.priceFrom = formValues.priceFrom;
-    if (formValues.priceTo) queryParams.priceTo = formValues.priceTo;
+    if (formValues.priceFrom != null)
+      queryParams.priceFrom = formValues.priceFrom;
+    if (formValues.priceTo != null) queryParams.priceTo = formValues.priceTo;
     if (formValues.location) queryParams.location = formValues.location;
     if (formValues.minRating) queryParams.minRating = formValues.minRating;
+
     if (this.currentPage > 1) queryParams.page = this.currentPage;
     if (this.pageSize !== 10) queryParams.size = this.pageSize;
     if (this.sortField !== 1) queryParams.sortField = this.sortField;
@@ -223,13 +213,10 @@ export class MyQuotesComponent implements OnInit {
   }
 
   getPaginationPages(): number[] {
-    const pages = [];
+    const pages: number[] = [];
     const start = Math.max(1, this.currentPage - 2);
     const end = Math.min(this.totalPages, this.currentPage + 2);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+    for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   }
 
@@ -280,4 +267,17 @@ export class MyQuotesComponent implements OnInit {
     }
   }
 
+  onImageError(): void {
+    this.imageError = true;
+  }
+
+  getVendorInitial(quote: Quote): string {
+    const name = (
+      quote.vendor?.companyDetails?.name ??
+      quote.vendor?.firstName ??
+      '?'
+    ).trim();
+
+    return name ? name.charAt(0).toUpperCase() : '?';
+  }
 }

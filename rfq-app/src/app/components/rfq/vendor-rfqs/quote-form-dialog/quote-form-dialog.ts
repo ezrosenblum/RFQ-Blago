@@ -22,7 +22,7 @@ export class QuoteFormDialog implements OnInit {
   validityTypeOptions: LookupValue[] = [];
 
   constructor(
-    private _dialogRef: MatDialogRef<QuoteFormDialog>, 
+    private _dialogRef: MatDialogRef<QuoteFormDialog>,
     @Inject(MAT_DIALOG_DATA) public _data: any,
     private formBuilder: FormBuilder,
     private rfqService: RfqService,
@@ -59,7 +59,7 @@ export class QuoteFormDialog implements OnInit {
       price: [0, [Validators.required, Validators.min(0)]],
       quoteValidityInterval: [0, [Validators.required, Validators.min(1)]],
       quoteValidityIntervalType: [null, [Validators.required]],
-      warantyDuration: [0, [Validators.required, Validators.min(1)]],
+      warrantyDuration: [0, [Validators.required, Validators.min(1)]],
       warantyIntervalType: [null, [Validators.required]],
       timelineIntervalType: [null, [Validators.required]],
       minimumTimelineDuration: [0, [Validators.required, Validators.min(0)]],

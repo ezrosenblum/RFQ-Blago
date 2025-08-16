@@ -14,7 +14,7 @@
 <mat-dialog-content class="p-relative bg-secondary-50 dark:bg-dark-900">
   <form [formGroup]="quoteForm" class="card-body">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      
+
       <!-- Title -->
       <div class="md:col-span-2">
         <label for="title" class="form-label">
@@ -90,15 +90,15 @@
         <label for="quoteValidityIntervalType" class="form-label">
           {{ 'VENDOR.VALIDITY_TYPE' | translate }} <span class="text-red-500">*</span>
         </label>
-        <select 
-          id="quoteValidityIntervalType" 
-          formControlName="quoteValidityIntervalType" 
+        <select
+          id="quoteValidityIntervalType"
+          formControlName="quoteValidityIntervalType"
           class="form-select"
           [class.border-red-500]="isFieldInvalid('quoteValidityIntervalType')"
         >
           <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_VALIDITY_TYPE' | translate }}</option>
-          <option 
-            *ngFor="let option of validityTypeOptions" 
+          <option
+            *ngFor="let option of validityTypeOptions"
             [ngValue]="option.id"
           >
             {{ option.name }}
@@ -113,23 +113,23 @@
 
       <!-- Warrany Validity Interval -->
       <div>
-        <label for="warantyDuration" class="form-label">
+        <label for="warrantyDuration" class="form-label">
           {{ 'VENDOR.WARRANTY_INTERVAL' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
-          id="warantyDuration"
+          id="warrantyDuration"
           type="number"
-          formControlName="warantyDuration"
+          formControlName="warrantyDuration"
           class="form-input"
-          [class.border-red-500]="isFieldInvalid('warantyDuration')"
+          [class.border-red-500]="isFieldInvalid('warrantyDuration')"
           placeholder="Enter number..."
           min="1"
         />
-        <div *ngIf="isFieldInvalid('warantyDuration')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('warantyDuration')?.errors?.['required']">
+        <div *ngIf="isFieldInvalid('warrantyDuration')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('warrantyDuration')?.errors?.['required']">
             {{ 'VENDOR.WARRANTY_INTERVAL_REQUIRED' | translate }}
           </span>
-          <span *ngIf="quoteForm.get('warantyDuration')?.errors?.['min']">
+          <span *ngIf="quoteForm.get('warrantyDuration')?.errors?.['min']">
             {{ 'VENDOR.WARRANTY_INTERVAL_MIN' | translate }}
           </span>
         </div>
@@ -140,15 +140,15 @@
         <label for="warantyIntervalType" class="form-label">
           {{ 'VENDOR.WARRANTY_TYPE' | translate }} <span class="text-red-500">*</span>
         </label>
-        <select 
-          id="warantyIntervalType" 
-          formControlName="warantyIntervalType" 
+        <select
+          id="warantyIntervalType"
+          formControlName="warantyIntervalType"
           class="form-select"
           [class.border-red-500]="isFieldInvalid('warantyIntervalType')"
         >
           <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_WARRANTY_TYPE' | translate }}</option>
-          <option 
-            *ngFor="let option of validityTypeOptions" 
+          <option
+            *ngFor="let option of validityTypeOptions"
             [ngValue]="option.id"
           >
             {{ option.name }}
@@ -163,7 +163,7 @@
 
       <!-- Quote Timeline Row -->
       <div class="md:col-span-2 grid grid-cols-3 gap-4">
-        
+
         <!-- Minimum Interval -->
         <div>
           <label for="minimumTimelineDuration" class="form-label">
@@ -226,8 +226,8 @@
             <option [ngValue]="null" disabled>
               {{ 'VENDOR.SELECT_TIMELINE_TYPE' | translate }}
             </option>
-            <option 
-              *ngFor="let option of validityTypeOptions" 
+            <option
+              *ngFor="let option of validityTypeOptions"
               [ngValue]="option.id"
             >
               {{ option.name }}

@@ -1,0 +1,14 @@
+.card {
+      &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+    .dark & {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    &::before {
+      left: 100%;
+    }
+  }
+}
