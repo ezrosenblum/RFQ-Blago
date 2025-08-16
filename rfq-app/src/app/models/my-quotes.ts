@@ -20,7 +20,7 @@ export interface Submission {
   status: SubmissionStatus;
   jobLocation: string;
   user: SubmissionUser;
-  submissionDate: Date; 
+  submissionDate: Date;
   isValid: boolean;
   streetAddress: string;
   latitudeAddress: number;
@@ -57,7 +57,7 @@ export interface Vendor {
   email: string;
   receiveEmailNotifications: boolean;
   receivePushNotifications: boolean;
-  dateCreated: Date; 
+  dateCreated: Date;
   status: VendorStatus;
   companyDetails: CompanyDetails;
 }
@@ -79,8 +79,8 @@ export interface MyQuotesRequest {
   submissionUserId?: number;
   priceFrom?: number | null;
   priceTo?: number | null;
-  validFrom?: string; 
-  validTo?: string; 
+  validFrom?: string;
+  validTo?: string;
   paging: Paging;
   sorting: Sorting;
 }
@@ -94,16 +94,16 @@ export interface Quote {
   status: LookupValue;
   quoteValidityIntervalType: LookupValue;
   quoteValidityInterval: number;
-  validUntil: string; 
+  validUntil: string;
   submissionId: number;
   vendorId: number;
   vendor: Vendor;
-  created: Date; 
+  created: Date;
   timelineIntervalType: LookupValue;
   minimumTimelineDuration: number;
   maximumTimelineDuration: number;
   warantyIntervalType: LookupValue;
-  warantyDuration: number;
+  warrantyDuration: number;
 }
 
 export interface QuotesResponse {
@@ -116,18 +116,18 @@ export interface QuotesResponse {
 }
 
 export interface MyQuotesList {
-  items: Quote[]; 
+  items: Quote[];
   totalCount: number;
   pageNumber: number;
   totalPages: number;
   hasPreviousPage: boolean;
   hasNextPage: boolean;
-  pageSize?: number; 
+  pageSize?: number;
 }
 export interface FilterOptions {
   query: string;
   priceFrom: number | null;
   priceTo: number | null;
-  location?: string; 
-  minRating?: number; 
+  location?: string;
+  minRating?: number;
 }

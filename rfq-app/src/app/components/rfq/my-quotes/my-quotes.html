@@ -355,8 +355,8 @@
                 <div
                   class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100"
                 >
-                  <ng-container *ngIf="quote.warantyDuration; else noWarranty">
-                    {{ quote.warantyDuration }} {{
+                  <ng-container *ngIf="quote.warrantyDuration; else noWarranty">
+                    {{ quote.warrantyDuration }} {{
                     quote.warantyIntervalType.name || ('VENDOR.YEARS' |
                     translate) }}
                   </ng-container>
