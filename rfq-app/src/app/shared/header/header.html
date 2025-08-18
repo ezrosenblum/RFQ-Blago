@@ -601,20 +601,7 @@
 
   <!-- Template for Navigation Links -->
   <ng-template #navLinks>
-    <button
-      *ngIf="canAccessRequestQuote()"
-      (click)="navigateToRequestQuote()"
-      [ngClass]="{
-          'text-primary-600 dark:text-primary-400': isCurrentRoute('/request-quote'),
-          'text-secondary-700 dark:text-secondary-200': !isCurrentRoute('/request-quote'),
-          'px-3 py-2 rounded-md text-sm font-medium hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200': true,
-          'block w-full text-left': true,
-          'md:inline-block md:w-auto md:text-center': true
-        }"
-      aria-label="Request a quote"
-    >
-      {{ 'REQUEST.REQUEST_QUOTE' | translate }}
-    </button>
+
     <button
       *ngIf="canAccessVendorRfqs()"
       (click)="navigateToVendorRfqs()"
@@ -628,6 +615,20 @@
       aria-label="View RFQs"
     >
       {{ 'HEADER.VIEW_RFQS' | translate }}
+    </button>
+    <button
+        *ngIf="canAccessRequestQuote()"
+        (click)="navigateToRequestQuote()"
+        [ngClass]="{
+            'text-primary-600 dark:text-primary-400': isCurrentRoute('/request-quote'),
+            'text-secondary-700 dark:text-secondary-200': !isCurrentRoute('/request-quote'),
+            'px-3 py-2 rounded-md text-sm font-medium hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors duration-200': true,
+            'block w-full text-left': true,
+            'md:inline-block md:w-auto md:text-center': true
+          }"
+        aria-label="Request a quote"
+      >
+        {{ 'REQUEST.REQUEST_QUOTE' | translate }}
     </button>
     <button
       *ngIf="canAccessMyQuotes()"
