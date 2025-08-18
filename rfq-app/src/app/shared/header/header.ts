@@ -240,7 +240,7 @@ export class Header implements OnInit, OnDestroy {
       },
       sorting: {
         field: 1,
-        sortOrder: 1,
+        sortOrder: 2,
       },
     };
 
@@ -258,7 +258,6 @@ export class Header implements OnInit, OnDestroy {
         this.isLoadingMore = false;
       },
       error: (err) => {
-        console.error('Failed to get notifications:', err);
         this.isLoadingMore = false;
       },
     });
