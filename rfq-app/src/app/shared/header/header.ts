@@ -14,6 +14,7 @@ import { User, UserRole } from '../../models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationData } from '../../services/notification-data';
 import { NotificationItem } from '../../models/notifications.model';
+import { SORT_ORDER } from '../shared.model';
 
 @Component({
   selector: 'app-header',
@@ -240,7 +241,7 @@ export class Header implements OnInit, OnDestroy {
       },
       sorting: {
         field: 1,
-        sortOrder: 2,
+        sortOrder: SORT_ORDER.DESCENDING,
       },
     };
 
