@@ -14,6 +14,7 @@ import { User, UserRole } from '../../models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationData } from '../../services/notification-data';
 import { NotificationItem } from '../../models/notifications.model';
+import { SORT_ORDER } from '../shared.model';
 
 @Component({
   selector: 'app-header',
@@ -242,7 +243,7 @@ export class Header implements OnInit, OnDestroy {
       },
       sorting: {
         field: 1,
-        sortOrder: 1,
+        sortOrder: SORT_ORDER.DESCENDING,
       },
     };
 
@@ -260,7 +261,6 @@ export class Header implements OnInit, OnDestroy {
         this.isLoadingMore = false;
       },
       error: (err) => {
-        console.error('Failed to get notifications:', err);
         this.isLoadingMore = false;
       },
     });
