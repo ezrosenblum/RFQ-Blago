@@ -152,4 +152,8 @@ export class RfqService {
         })
       );
   }
+
+  viewedRfq(id:number): Observable<string> {
+    return this.http.put<string>(`${this.API_URL}Submission/${id}/viewed`, null)
+  }
 }
