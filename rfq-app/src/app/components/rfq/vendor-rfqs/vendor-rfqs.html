@@ -1,6 +1,6 @@
 <!-- src/app/rfq/vendor-rfqs/vendor-rfqs.component.html -->
 <div class="min-h-screen bg-secondary-50 dark:bg-dark-900 py-8 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-[90%] mx-auto">
     <!-- Header Section -->
     <div class="mb-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -291,7 +291,7 @@
 
     <ng-container *ngIf="!isLoading && filteredRfqs.length > 0">
       <!-- RFQ List - Card View -->
-      <div *ngIf="viewMode === 'card'" class="container">
+      <div *ngIf="viewMode === 'card'" class="container max-w-full">
         <div *ngFor="let rfq of filteredRfqs; trackBy: trackByRfqId"
           class="bg-white dark:bg-dark-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 mb-5 overflow-hidden transition-all duration-200 ease-in-out relative">
 
@@ -341,17 +341,13 @@
               </div>
 
               <!-- Right section -->
-              <div class="flex flex-col items-end gap-2 shrink-0">
-                <div class="text-right">
-                  <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.QTY' |
-                    translate
-                    }}</div>
-                  <div class="text-[18px] font-bold text-gray-800 dark:text-gray-100 flex items-baseline gap-1">
-                    {{ rfq.quantity | number:'1.0-2' }} <span
-                      class="text-sm font-medium text-gray-500 dark:text-gray-400">{{
-                      rfq.unit?.name }}</span>
-                  </div>
-                </div>
+              <div class="mt-7 px-3 py-1.5 bg-green-50 text-green-800 border border-green-200 rounded-[16px] text-xs uppercase tracking-wide" *ngIf="rfq.quotes.length > 0">
+                <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  {{ rfq.quotes.length }}
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
+                  {{ 'VENDOR.QUOTES_RECEIVED' | translate }}
+                </span>
               </div>
             </div>
 
@@ -404,7 +400,7 @@
                     translate }}</span>
                   <div class="flex items-center gap-2">
                     <div
-                      class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
+                      class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
                       {{ getInitials(rfq.user?.firstName, rfq.user?.lastName) }}
                     </div>
                     <div class="flex flex-col">
@@ -414,12 +410,23 @@
                   </div>
                 </div>
 
-                <div class="flex flex-col gap-0.5">
+                <!-- <div class="flex flex-col gap-0.5">
                   <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.POSTED' |
                     translate }}</span>
                   <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{
                     getRelativeTime(rfq.submissionDate!)
                     }}</span>
+                </div> -->
+
+                <div class="flex flex-col items-end gap-2 shrink-0">
+                  <div class="text-center">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.QTY' |
+                      translate
+                      }}</div>
+                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {{ rfq.quantity | number:'1.0-2' }} {{ rfq.unit?.name }}
+                    </div>
+                  </div>
                 </div>
 
                 <!-- <div class="flex flex-col gap-0.5">
@@ -467,7 +474,7 @@
               <tr class="bg-secondary-50 dark:bg-dark-700">
                 <th class="px-6 py-3 text-left">
                   <button (click)="setSorting(4)"
-                    class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                    class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400 uppercase">
                     <span>{{ 'VENDOR.STATUS' | translate }}</span>
                     <svg *ngIf="sortBy === 4" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -475,10 +482,10 @@
                     </svg>
                   </button>
                 </th>
-                <th class="px-6 py-3 text-left">{{ 'VENDOR.DESCRIPTION' | translate }}</th>
+                <th class="px-6 py-3 text-left uppercase">{{ 'VENDOR.DESCRIPTION' | translate }}</th>
                 <th class="px-6 py-3 text-left">
                   <button (click)="setSorting(3)"
-                    class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
+                    class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400 uppercase">
                     <span>{{ 'VENDOR.QUANTITY_UNIT' | translate }}</span>
                     <svg *ngIf="sortBy === 3" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -486,25 +493,13 @@
                     </svg>
                   </button>
                 </th>
-                <th class="px-6 py-3 text-left">
+                <th class="px-6 py-3 text-left uppercase">
                   <span>{{ 'VENDOR.CATEGORIES' | translate }}</span>
                 </th>
-                <th class="px-6 py-3 text-left">
+                <th class="px-6 py-3 text-left uppercase">
                   <span>{{ 'VENDOR.SUBCATEGORIES' | translate }}</span>
                 </th>
-                <th class="px-6 py-3 text-left">{{ 'VENDOR.LOCATION' | translate }}</th>
-                <th class="px-6 py-3 text-left">{{ 'VENDOR.SUBMITTED_BY' | translate }}</th>
-                <th class="px-6 py-3 text-left">
-                  <button (click)="setSorting(1)"
-                    class="flex items-center space-x-1 hover:text-primary-600 dark:hover:text-primary-400">
-                    <span>{{ 'VENDOR.DATE' | translate }}</span>
-                    <svg *ngIf="sortBy === 1 || sortBy === 2" class="h-4 w-4" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                    </svg>
-                  </button>
-                </th>
+                <th class="px-6 py-3 text-left uppercase">{{ 'VENDOR.SUBMITTED_BY' | translate }} / {{ 'VENDOR.LOCATION' | translate }} / {{ 'VENDOR.DATE' | translate }}</th>
                 <th class="px-6 py-3 text-left" *ngIf="currentUser?.type === 'Administrator' || !userId">{{
                   'VENDOR.ACTIONS'
                   | translate }}</th>
@@ -521,8 +516,17 @@
                 </td>
                 <td class="px-6 py-4 w-80">
                   <div class="w-full">
-                    <p class="text-xs text-secondary-900 dark:text-secondary-100 truncate-text m-0"
-                      [title]="rfq.description">{{rfq.description}}</p>
+                    <p id="desc-{{rfq.id}}" class="description-collapsed text-xs text-secondary-900 dark:text-secondary-100 whitespace-normal break-words" [title]="rfq?.description || ''">
+                      {{ rfq?.description }}
+                    </p>
+
+                    <button 
+                      *ngIf="(rfq?.description?.length || 0) > 80"
+                      class="text-sm text-primary-600 dark:text-primary-400 underline mt-1"
+                      (click)="toggleDescription('desc-' + rfq.id, $event)"
+                      type="button">
+                      {{ 'VENDOR.SHOW_MORE' | translate }}
+                    </button>
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -574,30 +578,12 @@
 
                 <td class="px-6 py-4">
                   <div class="text-xs text-secondary-900 dark:text-secondary-100 max-w-xs">
-                    {{ truncateText(rfq.jobLocation!, 40) }}
+                    {{ rfq.user?.firstName }} <br>
+                    {{ truncateText(rfq.jobLocation!, 40) }} <br>
+                    {{ rfq.submissionDate! | date:'mediumDate' }}
                   </div>
                 </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-secondary-900 dark:text-secondary-100">
-                    <div class="flex flex-col items-center space-y-1">
-                      <div
-                        class="inline-flex items-center justify-center w-8 h-8 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full text-sm font-medium"
-                        [title]="rfq.user?.firstName + ' ' + rfq.user?.lastName">
-                        {{ getInitials(rfq.user?.firstName, rfq.user?.lastName) }}
-                      </div>
-                      <div class="text-xs text-secondary-500 dark:text-secondary-400 text-center">
-                        {{rfq.user?.email}}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-xs text-secondary-900 dark:text-secondary-100">
-                    <div>{{ formatDate(rfq.submissionDate!) | date:'mediumDate' }}</div>
-                    <div class="text-xs text-secondary-500 dark:text-secondary-400">{{ rfq.submissionDate! |
-                      date:'shortTime' }}</div>
-                  </div>
-                </td>
+
                 <td class="px-6 py-4" *ngIf="!userId">
                   <div class="flex items-center gap-2">
 
