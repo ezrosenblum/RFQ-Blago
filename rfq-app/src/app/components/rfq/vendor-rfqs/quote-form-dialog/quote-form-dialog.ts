@@ -229,9 +229,9 @@ export class QuoteFormDialog implements OnInit {
   }
 
   onFileRemoved(event: any) {
-  if (event?.file?.file) {
+    if (event?.file?.file) {
       const removedFile = event.file.file as File;
-      this.pondFiles = this.pondFiles.filter(f => f !== removedFile);
+      this.pondFiles = this.pondFiles.filter(f => f != removedFile);
     }
   }
 

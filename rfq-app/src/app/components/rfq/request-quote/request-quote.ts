@@ -26,6 +26,7 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import { MaterialCategoriesSelectionComponent } from '../../profile/material-categories-selection/material-categories-selection.component';
 import { TranslateService } from '@ngx-translate/core';
+import { FilePondComponent } from 'ngx-filepond';
 
 FilePond.registerPlugin(
   FilePondPluginFileValidateType,
@@ -68,7 +69,8 @@ export class RequestQuote implements OnInit, OnDestroy {
   };
 
   pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
-
+  @ViewChild('myPond') myPond!: FilePondComponent;
+  
   attachedFiles: FileItem[] = [
     {
       id: '1',
@@ -230,7 +232,6 @@ export class RequestQuote implements OnInit, OnDestroy {
         } else {
           return;
         }
-
         rfqFormData.append('files', file, (file as File).name);
       });
 
@@ -474,25 +475,17 @@ export class RequestQuote implements OnInit, OnDestroy {
     return unitOption?.name || '';
   }
 
-  onFilesUpdated(files: any): void {
-    if (!files || !Array.isArray(files)) {
-      this.pondFiles = [];
-      this.rfqForm.get('attachments')?.setValue([]);
-      return;
+  pondHandleAddFile(event: any) {
+    if (event?.file?.file) {
+      this.pondFiles.push(event.file.file as File);
     }
+  }
 
-    this.pondFiles = files;
-
-    const rawFiles = files
-      .map((f) => {
-        if (typeof f === 'string') return null;
-        if ('file' in f) return f.file as File;
-        if (f instanceof Blob) return f as File;
-        return null;
-      })
-      .filter((f): f is File => f !== null);
-
-    this.rfqForm.get('attachments')?.setValue(rawFiles);
+  onFileRemoved(event: any) {
+    if (event?.file?.file) {
+      const removedFile = event.file.file as File;
+      this.pondFiles = this.pondFiles.filter(f => f != removedFile);
+    }
   }
 
   private loadGoogleMapsAPI(): Promise<any> {
