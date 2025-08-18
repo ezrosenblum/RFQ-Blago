@@ -43,6 +43,8 @@ export class ProfileSettingsComponent implements OnInit {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
+  isDragOver: boolean = false;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -169,12 +171,14 @@ export class ProfileSettingsComponent implements OnInit {
 
   onFileSelected(event: Event, fileType: FileType = 'avatar'): void {
     const file = this.getSelectedFile(event);
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     if (fileType === 'avatar') {
       this.handleAvatarSelection(file);
     } else if (fileType === 'certificate') {
-      this.handleCertificateSelection(file);
+      this.handleCertificateFileSelection(file);
     }
     this.checkIfFormChanged();
   }
@@ -187,11 +191,6 @@ export class ProfileSettingsComponent implements OnInit {
   private handleAvatarSelection(file: File): void {
     this.selectedFile = file;
     this.generateImagePreview(file);
-  }
-
-  private handleCertificateSelection(file: File): void {
-    this.selectedCertificate = file;
-    this.selectedFileName = file.name;
   }
 
   private generateImagePreview(file: File): void {
@@ -213,6 +212,103 @@ export class ProfileSettingsComponent implements OnInit {
     this.previewImageUrl = null;
   }
 
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      this.handleCertificateFileSelection(file);
+    }
+  }
+
+  private handleCertificateFileSelection(file: File): void {
+    this.errorMessage = null;
+
+    if (!this.validateCertificateFile(file)) {
+      return;
+    }
+
+    this.selectedCertificate = file;
+    this.selectedFileName = file.name;
+    this.checkIfFormChanged();
+  }
+  private validateCertificateFile(file: File): boolean {
+    const maxSize = 5 * 1024 * 1024;
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+
+    if (file.size > maxSize) {
+      this.errorMessage = this.translate.instant('PROFILE.FILE_TOO_LARGE');
+      return false;
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+      this.errorMessage = this.translate.instant('PROFILE.INVALID_FILE_TYPE');
+      return false;
+    }
+
+    return true;
+  }
+  onRemoveCertificate(event: Event): void {
+    event.stopPropagation();
+
+    this.selectedCertificate = null;
+    this.selectedFileName = null;
+    this.errorMessage = null;
+
+    this.userForm.get('certificateUrl')?.setValue(null);
+
+    const fileInput = document.querySelector(
+      'input[type="file"][formControlName="certificateUrl"]'
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
+    this.checkIfFormChanged();
+  }
+
+  getFileType(filename: string): 'pdf' | 'doc' | 'image' {
+    const ext = filename.toLowerCase().split('.').pop();
+
+    if (ext === 'pdf') return 'pdf';
+    if (ext === 'doc' || ext === 'docx') return 'doc';
+    if (['jpg', 'jpeg', 'png'].includes(ext || '')) return 'image';
+
+    return 'doc';
+  }
+
+  getFileSize(file: File): string {
+    const bytes = file.size;
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
   onSubmit(): void {
     if (!this.isFormValid()) return;
 
@@ -324,6 +420,9 @@ export class ProfileSettingsComponent implements OnInit {
       { key: 'CompanyDetails.CompanySize', field: 'companySize' },
     ];
 
+    if (this.selectedCertificate) {
+      formData.append('CompanyDetails.Certificate', this.selectedCertificate);
+    }
     companyFields.forEach(({ key, field }) => {
       const value = this.userForm.get(field)?.value;
       if (value != null && value !== '') {
@@ -425,7 +524,6 @@ export class ProfileSettingsComponent implements OnInit {
       return this.translate.instant('PROFILE.INVALID_PHONE_FORMAT');
     }
 
-    // Handle US phone validation errors
     if (errors['usPhone']) {
       return this.translate.instant('PROFILE.INVALID_US_PHONE_FORMAT');
     }
