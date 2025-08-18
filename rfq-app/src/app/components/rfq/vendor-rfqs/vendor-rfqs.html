@@ -393,6 +393,8 @@
             <div
               class="px-6 py-5 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center gap-4 flex-wrap">
               <div class="flex items-center gap-6 flex-wrap">
+
+                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm"></div>
                 <div class="flex flex-col gap-0.5">
                   <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{
                     'VENDOR.SUBMITTED_BY'
@@ -410,14 +412,7 @@
                   </div>
                 </div>
 
-                <!-- <div class="flex flex-col gap-0.5">
-                  <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.POSTED' |
-                    translate }}</span>
-                  <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{
-                    getRelativeTime(rfq.submissionDate!)
-                    }}</span>
-                </div> -->
-
+                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.QTY' |
@@ -429,10 +424,29 @@
                   </div>
                 </div>
 
-                <!-- <div class="flex flex-col gap-0.5">
-                              <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.PROPOSALS' | translate }}</span>
-                              <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ rfq.proposals?.length || 0 }} received</span>
-                            </div> -->
+                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
+                <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
+                  <div class="text-center">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
+                      {{ 'VENDOR.VIEWS' | translate }}
+                    </div>
+                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {{ getStatusCount(rfq, 'Viewed') }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
+                <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
+                  <div class="text-center">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
+                      {{ 'VENDOR.ENGAGEMENTS' | translate }}
+                    </div>
+                    <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {{ getStatusCount(rfq, 'Engaged') }}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="flex gap-2">
@@ -456,7 +470,7 @@
                   {{ 'VENDOR.QUOTE_SENT' | translate }}
                 </div>
 
-                <button [routerLink]="['/vendor-rfqs', rfq.id]"
+                <button (click)="onViewDetails(rfq.id!)"
                   class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-blue-500 text-white hover:bg-blue-600">
                   👁 {{ 'VENDOR.VIEW_DETAILS' | translate }}
                 </button>
@@ -520,7 +534,7 @@
                       {{ rfq?.description }}
                     </p>
 
-                    <button 
+                    <button
                       *ngIf="(rfq?.description?.length || 0) > 80"
                       class="text-sm text-primary-600 dark:text-primary-400 underline mt-1"
                       (click)="toggleDescription('desc-' + rfq.id, $event)"
@@ -588,7 +602,7 @@
                   <div class="flex items-center gap-2">
 
                     <!-- View Details button -->
-                    <button [routerLink]="['/vendor-rfqs', rfq.id]"
+                    <button (click)="onViewDetails(rfq.id!)"
                       class="inline-flex items-center justify-center p-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 transition-transform bg-blue-500 text-white hover:bg-blue-600"
                       title="{{ 'VENDOR.VIEW_DETAILS' | translate }}">
                       <!-- Eye Icon -->

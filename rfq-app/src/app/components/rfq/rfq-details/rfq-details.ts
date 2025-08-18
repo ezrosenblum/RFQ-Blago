@@ -7,6 +7,7 @@ import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -43,6 +44,7 @@ export class RfqDetails implements OnInit, OnDestroy{
     private _router: Router,
     private _authService: Auth,
     private _dialog: MatDialog,
+    private _translate: TranslateService
   ) {
   }
 
@@ -209,6 +211,26 @@ export class RfqDetails implements OnInit, OnDestroy{
     };
 
     return colors[status.name] || { border: '', header: '' };
+  }
+
+  getStatusCount(rfq: Rfq, statusName: string): number {
+    if (!rfq?.statusHistoryCount) return 0;
+    const entry = rfq.statusHistoryCount.find((s: any) => s.status?.name === statusName);
+    return entry ? entry.count : 0;
+  }
+
+  getVendorStatus(rfq: Rfq): string | null {
+    if (!rfq?.statusHistory) return null;
+
+    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
+    const hasEngaged = rfq.statusHistory.some((s: any) => s.status?.id === 4);
+    const hasViewed = rfq.statusHistory.some((s: any) => s.status?.id === 2);
+
+    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
+    if (hasEngaged) return this._translate.instant('VENDOR.ENGAGED');
+    if (hasViewed) return this._translate.instant('VENDOR.VIEWED');
+
+    return null;
   }
 
   ngOnDestroy(): void {

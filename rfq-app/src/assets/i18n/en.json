@@ -328,7 +328,11 @@
     "VENDOR_PROPOSAL": "Vendor Proposal",
     "MARK_AS_VALID": "Mark as Valid",
     "MARK_AS_INVALID": "Mark as Invalid",
-    "QUOTES": "Quotes"
+    "QUOTES": "Quotes",
+    "VIEWS": "Views",
+    "ENGAGEMENTS": "Engagements",
+    "ENGAGED": "Engaged",
+    "VIEWED": "Viewed"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

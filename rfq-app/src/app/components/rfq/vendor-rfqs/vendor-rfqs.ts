@@ -2,7 +2,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, take } from 'rxjs';
 import {
   Category,
   LookupValue,
@@ -853,5 +853,21 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   getScrollState(id: string) {
     return this.carouselScrollStates[id] || { canScrollLeft: false, canScrollRight: false, needsScroll: false };
+  }
+
+  onViewDetails(id: number): void {
+    this.rfqService.viewedRfq(id).pipe(take(1)).subscribe({
+      next: () => this.router.navigate(['/vendor-rfqs', id]),
+      error: (err) => {
+        this.handleError(err);
+        this.router.navigate(['/vendor-rfqs', id]);
+      }
+    });
+  }
+
+  getStatusCount(rfq: Rfq, statusName: string): number {
+    if (!rfq?.statusHistoryCount) return 0;
+    const entry = rfq.statusHistoryCount.find((s: any) => s.status?.name === statusName);
+    return entry ? entry.count : 0;
   }
 }
