@@ -339,7 +339,6 @@
       <div
         *ngFor="let msg of currentMessages"
         class="flex items-start space-x-3"
-          [ngClass]="msg.senderId == currentUser?.id ? 'dir-rtl' : 'dir-ltr'"
       >
         <div
           [class]="
@@ -397,7 +396,6 @@
           #myPond 
           [options]="pondOptions" 
           [files]="pondFiles"
-          (oninit)="pondHandleInit()"
           (onaddfile)="pondHandleAddFile($event)"
           (onremovefile)="onFileRemoved($event)">
         </file-pond>

@@ -349,6 +349,7 @@
     "SIGN_OUT": "Sign Out",
     "VENDOR": "Vendor",
     "CLIENT": "Client",
+    "ADMIN": "Admin",
     "MESSAGES": "Messages",
     "NOTIFICATIONS": "Notifications",
     "MARK_ALL_AS_READ": "Mark all as read",

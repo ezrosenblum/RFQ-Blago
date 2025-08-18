@@ -181,6 +181,8 @@ export class Header implements OnInit, OnDestroy {
         return this.translate.instant('HEADER.VENDOR');
       case UserRole.CLIENT:
         return this.translate.instant('HEADER.CLIENT');
+      case UserRole.ADMIN:
+        return this.translate.instant('HEADER.ADMIN');
       default:
         return '';
     }

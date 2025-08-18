@@ -5,6 +5,8 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { QuoteItem } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
+import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-quote-details',
@@ -22,7 +24,8 @@ export class QuoteDetails implements OnInit {
     private _route: ActivatedRoute,
     private _rfqService: RfqService,
     private _router: Router,
-    private _authService: Auth
+    private _authService: Auth,
+    private _dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -68,6 +71,34 @@ export class QuoteDetails implements OnInit {
   navigateToMessages(): void {
     this._router.navigate(['/messages']);
   }
+
+    sendQuoteFirstMessage(){
+      if (this.quote.lastMessage) {
+        this._router.navigate(['/messages'], {queryParams: { quoteId: this.quote.id, customerId: this.quote?.submission?.user?.id, vendorId: this.quote?.vendorId }});
+      }
+      else {
+        const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
+          width: '500px',
+          maxWidth: '500px',
+          height: 'auto',
+          panelClass: 'send-quote-message-dialog',
+          autoFocus: false,
+          data: {
+            quote: this.quote,
+          },
+        });
+  
+        dialogRef
+          .afterClosed()
+          .subscribe((result: any) => {
+            if (result) {
+              setTimeout(() => {
+                this._router.navigate(['/messages'], {queryParams: { quoteId: this.quote.id, customerId: this.quote?.submission?.user?.id, vendorId: this.quote?.vendorId }});
+              }, 1000)
+            }
+          });
+      }
+    }
 
   onChangeStatus(quote: QuoteItem, statusId: number) {
     this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({

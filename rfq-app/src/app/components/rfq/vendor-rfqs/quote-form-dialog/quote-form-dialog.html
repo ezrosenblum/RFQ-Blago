@@ -113,23 +113,23 @@
 
       <!-- Warrany Validity Interval -->
       <div>
-        <label for="warrantyDuration" class="form-label">
+        <label for="warantyDuration" class="form-label">
           {{ 'VENDOR.WARRANTY_INTERVAL' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
-          id="warrantyDuration"
+          id="warantyDuration"
           type="number"
-          formControlName="warrantyDuration"
+          formControlName="warantyDuration"
           class="form-input"
-          [class.border-red-500]="isFieldInvalid('warrantyDuration')"
+          [class.border-red-500]="isFieldInvalid('warantyDuration')"
           placeholder="Enter number..."
           min="1"
         />
-        <div *ngIf="isFieldInvalid('warrantyDuration')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('warrantyDuration')?.errors?.['required']">
+        <div *ngIf="isFieldInvalid('warantyDuration')" class="mt-1 text-sm text-red-500">
+          <span *ngIf="quoteForm.get('warantyDuration')?.errors?.['required']">
             {{ 'VENDOR.WARRANTY_INTERVAL_REQUIRED' | translate }}
           </span>
-          <span *ngIf="quoteForm.get('warrantyDuration')?.errors?.['min']">
+          <span *ngIf="quoteForm.get('warantyDuration')?.errors?.['min']">
             {{ 'VENDOR.WARRANTY_INTERVAL_MIN' | translate }}
           </span>
         </div>
@@ -247,16 +247,17 @@
           {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
         </label>
         <div class="relative">
-          <input
-            id="price"
-            type="number"
-            formControlName="price"
-            class="form-input pl-8"
-            [class.border-red-500]="isFieldInvalid('price')"
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-          />
+        <input
+          #priceInput
+          id="price"
+          type="text"
+          formControlName="price"
+          class="form-input pl-8"
+          [class.border-red-500]="isFieldInvalid('price')"
+          placeholder="0.00"
+          (blur)="onBlurPrice()"
+          (focus)="onFocusPrice()"
+/>
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span class="text-secondary-500 text-sm">$</span>
           </div>
@@ -269,6 +270,17 @@
             {{ 'VENDOR.PRICE_MIN' | translate }}
           </span>
         </div>
+      </div>
+
+      <!-- Files -->
+      <div class="pt-28">
+        <file-pond 
+          #myPond 
+          [options]="pondOptions" 
+          [files]="pondFiles"
+          (onaddfile)="pondHandleAddFile($event)"
+          (onremovefile)="onFileRemoved($event)">
+        </file-pond>
       </div>
     </div>
   </form>

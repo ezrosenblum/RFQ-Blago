@@ -240,8 +240,8 @@ export class MessagesComponent implements OnInit {
         pageSize: 10
       },
       sorting: {
-        field: 1,
-        sortOrder: 1
+        field: 4,
+        sortOrder: 2
       }
     };
 
@@ -280,8 +280,8 @@ export class MessagesComponent implements OnInit {
         pageSize: 100
       },
       sorting: {
-        field: 1,
-        sortOrder: 1
+        field: 4,
+        sortOrder: 2
       }
     };
 
@@ -546,9 +546,6 @@ export class MessagesComponent implements OnInit {
   // Upload files 
   toggleFileUploadPanel(){
     this.showUploadFilesPanel = !this.showUploadFilesPanel;
-  }
-
-  pondHandleInit() {
   }
 
   pondHandleAddFile(event: any) {
