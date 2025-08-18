@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
   <div class="max-w-7xl mx-auto">
     <!-- Back Button -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 mb-6 shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 mb-6 shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4 justify-between">
       <button type="button"
               class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5"
               [routerLink]="['/vendor-rfqs']">
@@ -13,10 +13,20 @@
       <div class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide" *ngIf="this.currentUser?.type === 'Customer'">
         {{ quotes.length || 0 }} {{ 'VENDOR.QUOTES_RECEIVED' | translate }}
       </div>
-      <div
-        class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide"
-        *ngIf="this.currentUser?.type === 'Vendor' && getVendorStatus(rfq)">
-        {{ getVendorStatus(rfq) }}
+      <div *ngIf="this.currentUser?.type === 'Vendor'" class="flex items-center gap-4">
+        <!-- Status badge -->
+        <div
+          class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide"
+          *ngIf="getVendorStatus(rfq)">
+          {{ getVendorStatus(rfq) }}
+        </div>
+
+        <!-- Send Quote button (only if vendor hasn't quoted yet) -->
+        <button *ngIf="!hasQuoted(rfq)"
+                (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                class="mt-2 inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-green-500 text-white hover:bg-green-600">
+          {{ 'VENDOR.SEND_QUOTE' | translate }}
+        </button>
       </div>
     </div>
 

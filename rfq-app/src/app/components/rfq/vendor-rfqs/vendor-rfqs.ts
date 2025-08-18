@@ -120,11 +120,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
   isOverflowing: Record<string, boolean> = {};
 
   constructor(
-    private fb: FormBuilder,
-    private authService: Auth,
-    private rfqService: RfqService,
-    private router: Router,
-    private translate: TranslateService,
+    private _fb: FormBuilder,
+    private _authService: Auth,
+    private _rfqService: RfqService,
+    private _router: Router,
+    private _translate: TranslateService,
     private _dialog: MatDialog,
   ) {
     this.initializeFilterForm();
@@ -132,7 +132,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Check authentication and user role
-    this.authService.currentUser$
+    this._authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
         this.currentUser = user;
@@ -179,7 +179,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   loadStatuses(): void {
-    this.rfqService
+    this._rfqService
       .getRfqStatuses()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -187,13 +187,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.statusOptions = statuses;
         },
         error: () => {
-          this.errorMessage = this.translate.instant('VENDOR.LOAD_STATUSES');
+          this.errorMessage = this._translate.instant('VENDOR.LOAD_STATUSES');
         },
       });
   }
 
   loadCategories(): void {
-    this.rfqService
+    this._rfqService
       .getRfqSCategories()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -202,7 +202,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.updateSubcategoriesFromSelected();
         },
         error: () => {
-          this.errorMessage = this.translate.instant('VENDOR.LOAD_CATEGORIES');
+          this.errorMessage = this._translate.instant('VENDOR.LOAD_CATEGORIES');
         },
       });
   }
@@ -221,7 +221,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   private initializeFilterForm(): void {
-    this.filterForm = this.fb.group({
+    this.filterForm = this._fb.group({
       search: [''],
       status: [null],
       category: [[]],
@@ -290,7 +290,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   loadRfqs(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.rfqService
+    this._rfqService
       .getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -313,7 +313,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   loadStatistics(): void {
-    this.rfqService
+    this._rfqService
       .getRfqStatistics()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -321,7 +321,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.statistics = stats;
         },
         error: () => {
-          this.errorMessage = this.translate.instant('VENDOR.LOAD_STATISTICS');
+          this.errorMessage = this._translate.instant('VENDOR.LOAD_STATISTICS');
         },
       });
   }
@@ -343,7 +343,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
       this.filterForm.get('dateTo')?.value.trim() || undefined;
     this.submissionListRequest.paging.pageNumber = this.currentPage;
     this.submissionListRequest.paging.pageSize = this.pageSize;
-    this.rfqService
+    this._rfqService
       .getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -392,13 +392,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.isUpdating = true;
     this.errorMessage = '';
     this.successMessage = '';
-    this.rfqService
+    this._rfqService
       .updateRfqStatus(rfqId, newStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedRfq) => {
           this.isUpdating = false;
-          this.successMessage = this.translate.instant('VENDOR.STATUS_UPDATED');
+          this.successMessage = this._translate.instant('VENDOR.STATUS_UPDATED');
           this.loadStatistics();
           this.loadRfqs();
           setTimeout(() => {
@@ -414,15 +414,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   private handleError(error: any): void {
     if (error.status === 401) {
-      this.errorMessage = this.translate.instant('ERROR.SESSION_EXPIRED');
-      this.authService.logout();
+      this.errorMessage = this._translate.instant('ERROR.SESSION_EXPIRED');
+      this._authService.logout();
     } else if (error.status === 403) {
-      this.errorMessage = this.translate.instant('ERROR.NO_PERMISSION');
+      this.errorMessage = this._translate.instant('ERROR.NO_PERMISSION');
     } else if (error.status === 0) {
-      this.errorMessage = this.translate.instant('ERROR.NO_CONNECTION');
+      this.errorMessage = this._translate.instant('ERROR.NO_CONNECTION');
     } else {
       this.errorMessage =
-        error.error?.message || this.translate.instant('ERROR.LOAD_RFQS');
+        error.error?.message || this._translate.instant('ERROR.LOAD_RFQS');
     }
   }
 
@@ -482,7 +482,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   getStatusColor(status: LookupValue): string {
-    return this.rfqService.getStatusColor(status);
+    return this._rfqService.getStatusColor(status);
   }
 
   formatDate(date: Date | string): string {
@@ -601,7 +601,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
   toggleSubcategoryDropdown(): void {
     if (this.isSubcategoryDisabled) {
-      this.flashInfo(this.translate.instant('VENDOR.PLEASE_SELECT_CATEGORIES'));
+      this.flashInfo(this._translate.instant('VENDOR.PLEASE_SELECT_CATEGORIES'));
       return;
     }
     this.subcategoryDropdownOpen = !this.subcategoryDropdownOpen;
@@ -665,7 +665,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   getCategoryDisplayText(): string {
     const selectedIds = this.filterForm.value.category || [];
     if (selectedIds.length === 0) {
-      return this.translate.instant('VENDOR.SELECT_CATEGORIES');
+      return this._translate.instant('VENDOR.SELECT_CATEGORIES');
     }
 
     const selectedNames = this.categoryOptions
@@ -678,7 +678,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   getSubcategoryDisplayText(): string {
     const selectedIds = this.filterForm.value.subcategory || [];
     if (selectedIds.length === 0) {
-      return this.translate.instant('VENDOR.SELECT_SUBCATEGORIES');
+      return this._translate.instant('VENDOR.SELECT_SUBCATEGORIES');
     }
 
     const selectedNames = this.subcategoryOptions
@@ -760,7 +760,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   approveRfq(rfqId: number){
     const approveRfq = 2;
-    this.rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this._rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadRfqs();
     })
   }
@@ -775,7 +775,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   declineRfq(rfqId: number){
     const declineRfq = 3;
-    this.rfqService.rfqChangeStatus(rfqId, declineRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this._rfqService.rfqChangeStatus(rfqId, declineRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadRfqs();
     })
   }
@@ -791,16 +791,16 @@ export class VendorRfqs implements OnInit, OnDestroy {
     if (desc.classList.contains('description-collapsed')) {
       desc.classList.remove('description-collapsed');
       desc.classList.add('description-expanded');
-      btn.textContent = this.translate.instant('VENDOR.SHOW_LESS');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_LESS');
     } else {
       desc.classList.remove('description-expanded');
       desc.classList.add('description-collapsed');
-      btn.textContent = this.translate.instant('VENDOR.SHOW_MORE');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_MORE');
     }
   }
 
   navigateToMessages(rfq: Rfq): void {
-    this.router.navigate(['/messages'], {queryParams: { quoteId: rfq.id, customerId: rfq?.user?.id }});
+    this._router.navigate(['/messages'], {queryParams: { quoteId: rfq.id, customerId: rfq?.user?.id }});
   }
 
   initializeCarouselStates() {
@@ -856,11 +856,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   onViewDetails(id: number): void {
-    this.rfqService.viewedRfq(id).pipe(take(1)).subscribe({
-      next: () => this.router.navigate(['/vendor-rfqs', id]),
+    this._rfqService.viewedRfq(id).pipe(take(1)).subscribe({
+      next: () => this._router.navigate(['/vendor-rfqs', id]),
       error: (err) => {
         this.handleError(err);
-        this.router.navigate(['/vendor-rfqs', id]);
+        this._router.navigate(['/vendor-rfqs', id]);
       }
     });
   }
@@ -869,5 +869,19 @@ export class VendorRfqs implements OnInit, OnDestroy {
     if (!rfq?.statusHistoryCount) return 0;
     const entry = rfq.statusHistoryCount.find((s: any) => s.status?.name === statusName);
     return entry ? entry.count : 0;
+  }
+
+  getVendorStatus(rfq: Rfq): string | null {
+    if (!rfq?.statusHistory) return null;
+
+    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
+    const hasEngaged = rfq.statusHistory.some((s: any) => s.status?.id === 4);
+    const hasViewed = rfq.statusHistory.some((s: any) => s.status?.id === 2);
+
+    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
+    if (hasEngaged) return this._translate.instant('VENDOR.ENGAGED');
+    if (hasViewed) return this._translate.instant('VENDOR.VIEWED');
+
+    return null;
   }
 }
