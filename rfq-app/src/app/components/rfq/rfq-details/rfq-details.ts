@@ -8,6 +8,7 @@ import { User } from '../../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dialog';
 
 
 @Component({
@@ -232,6 +233,35 @@ export class RfqDetails implements OnInit, OnDestroy{
 
     return null;
   }
+
+  hasQuoted(rfq: Rfq): boolean {
+    if (!rfq?.statusHistory) return false;
+    return rfq.statusHistory.some((s: any) => s.status?.id === 3);
+  }
+
+   openQuoteFormDialog(id: number, customerId: number, edit: boolean){
+      const dialogRef = this._dialog.open(QuoteFormDialog, {
+        width: '60%',
+        maxWidth: '60%',
+        height: 'auto',
+        panelClass: 'add-quote-dialog',
+        autoFocus: false,
+        data: {
+          action: edit? 'Edit' : 'Add',
+          rfqId: id,
+          customerId: customerId,
+          vendorId: this.currentUser?.id,
+        },
+      });
+
+      dialogRef
+        .afterClosed()
+        .subscribe((result: any) => {
+          if (result) {
+            this.getDetails(id);
+          }
+        });
+    }
 
   ngOnDestroy(): void {
     this.destroy$.next();

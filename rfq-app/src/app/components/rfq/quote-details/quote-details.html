@@ -12,17 +12,8 @@
             <div>
               <h1 class="text-xl font-bold flex items-center">
                 {{quote.vendor.companyDetails.name}}
-                <svg class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clip-rule="evenodd"></path>
-                </svg>
               </h1>
               <p class="text-blue-900 dark:text-blue-200 text-xs mt-1">📍 {{quote.vendor.companyDetails.streetAddress}}
-                <span
-                  [class]="quote.vendor.status.id === 1 ? 'ms-5 px-3 py-1.5 bg-green-500 dark:bg-green-600 text-white rounded-full text-xs font-semibold shadow-md' : 'ms-5 px-3 py-1.5 bg-gray-500 dark:bg-gray-600 text-white rounded-full text-xs font-semibold shadow-md'">
-                  {{ (quote.vendor.status.id === 1 ? 'VENDOR.AVAILABLE_NOW' : 'VENDOR.NOT_AVAILABLE') | translate }}
-                </span>
               </p>
             </div>
           </div>
@@ -86,7 +77,7 @@
       </div>
 
       <!-- Action Buttons Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 p-4" *ngIf="currentUser?.type != 'Vendor'">
         <div class="px-2 space-y-2.5">
           <button *ngIf="currentUser?.type === 'Administrator'" (click)="onChangeStatus(quote, quote.status?.name === 'Invalid' ? 1 : 4)" class="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg text-sm mb-3">
           <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -133,14 +124,6 @@
           <div>
             <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.CONTACT_PERSON' | translate}}</div>
             <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.contactPersonFirstName}} {{quote.vendor.companyDetails.contactPersonLastName}}</div>
-          </div>
-          <div>
-            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.EMAIL' | translate}}</div>
-            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.contactPersonEmail}}</div>
-          </div>
-          <div>
-            <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.PHONE' | translate}}</div>
-            <div class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.vendor.companyDetails.contactPersonPhone}}</div>
           </div>
           <div>
             <div class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold mb-1">{{'VENDOR.COMPANY_SIZE' | translate}}</div>
