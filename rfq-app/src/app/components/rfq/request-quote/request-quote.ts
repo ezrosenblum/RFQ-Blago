@@ -166,7 +166,7 @@ export class RequestQuote implements OnInit, OnDestroy {
         [
           Validators.required,
           Validators.minLength(10),
-          Validators.maxLength(1000),
+          Validators.maxLength(5000),
           this.noOnlyWhitespaceValidator,
         ],
       ],
@@ -333,6 +333,11 @@ export class RequestQuote implements OnInit, OnDestroy {
       streetAddress: '',
     });
 
+    this.pondFiles = [];
+    this.clearData.next(true);
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.clearData.next(false);
     this.rfqForm.markAsUntouched();
     this.rfqForm.markAsPristine();
   }
@@ -406,7 +411,7 @@ export class RequestQuote implements OnInit, OnDestroy {
 
   getMaxLength(fieldName: string): number {
     const maxLengths: { [key: string]: number } = {
-      description: 1000,
+      description: 5000,
       jobLocation: 200,
       title: 100,
     };
@@ -427,6 +432,7 @@ export class RequestQuote implements OnInit, OnDestroy {
         'Are you sure you want to clear all fields? This action cannot be undone.'
       )
     ) {
+      this.pondFiles = [];
       this.clearData.next(true);
       this.resetForm();
       this.successMessage = '';
