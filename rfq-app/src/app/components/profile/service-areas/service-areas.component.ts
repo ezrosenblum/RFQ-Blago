@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, NgZone, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, NgZone, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 import { GoogleMapsApi } from '../../../models/rfq.model';
+import { User } from '../../../models/user.model';
+import { Auth } from '../../../services/auth';
 
 declare var google: GoogleMapsApi;
 @Component({
@@ -12,7 +14,7 @@ declare var google: GoogleMapsApi;
   templateUrl: './service-areas.component.html',
   styleUrl: './service-areas.component.scss'
 })
-export class ServiceAreasComponent {
+export class ServiceAreasComponent implements OnInit {
   @ViewChild('locationInput') locationInput!: ElementRef;
   @ViewChild('mapContainer') mapContainer!: ElementRef;
   @Output() serviceAreaChange = new EventEmitter<{
@@ -35,13 +37,24 @@ export class ServiceAreasComponent {
   LatitudeAddress: number = 0;
   LongitudeAddress: number = 0;
   OperatingRadius: number = 0;
+  currentUser: User | null = null;
 
-  constructor(private ngZone: NgZone) {}
+  constructor(
+    private ngZone: NgZone,
+    private _authService: Auth
+  ) {}
 
-
-  ngAfterViewInit() {
-   this.loadGoogleMaps();
+  ngOnInit(): void {
+    this._authService.currentUserSubject.subscribe({
+      next: (user) => {
+        if (user) {
+          this.currentUser = user;
+          this.loadGoogleMaps();
+        }
+      }
+    });
   }
+
 
   private loadGoogleMaps() {
     if (typeof google !== 'undefined') {
@@ -60,7 +73,7 @@ export class ServiceAreasComponent {
   }
 
   private initializeMap() {
-    const defaultLocation = { lat: 41.9981, lng: 21.4254 }; // Skopje, Macedonia
+    const defaultLocation = { lat: this.currentUser?.companyDetails?.latitudeAddress || 41.9981, lng: this.currentUser?.companyDetails?.longitudeAddress || 21.4254 }; // Skopje, Macedonia
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: defaultLocation,
