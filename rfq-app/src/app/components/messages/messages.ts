@@ -240,8 +240,8 @@ export class MessagesComponent implements OnInit {
         pageSize: 10
       },
       sorting: {
-        field: 1,
-        sortOrder: 1
+        field: 4,
+        sortOrder: 2
       }
     };
 
@@ -249,12 +249,8 @@ export class MessagesComponent implements OnInit {
     this.vendorIdQuery = null;
     this._messageService.getAdminMessageConversations(request).pipe(take(1)).subscribe({
       next: (data: MessageAdminConversationList) => {
-        const sortedItems = data.items.sort(
-          (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-        );
-
-        this.adminConversations = sortedItems;
-        this.filteredAdminConversations = sortedItems;
+        this.adminConversations = data.items;
+        this.filteredAdminConversations = this.adminConversations;
         this.loadingConversations = false;
         if (this.quoteIdQuery) {
           let findChatIndex = this.adminConversations.findIndex(el => el.id == this.quoteIdQuery)
@@ -284,8 +280,8 @@ export class MessagesComponent implements OnInit {
         pageSize: 100
       },
       sorting: {
-        field: 1,
-        sortOrder: 1
+        field: 4,
+        sortOrder: 2
       }
     };
 
@@ -293,12 +289,8 @@ export class MessagesComponent implements OnInit {
     this.vendorIdQuery = null;
     this._messageService.getMessageConversations(request).pipe(take(1)).subscribe({
       next: (data: MessageAdminConversationList) => {
-        const sortedItems = data.items.sort(
-          (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-        );
-
-        this.conversations = sortedItems;
-        this.filteredConversations = sortedItems;
+        this.conversations = data.items;
+        this.filteredConversations = this.conversations;
         this.loadingConversations = false;
 
         if (this.conversations.length > 0) {
@@ -554,9 +546,6 @@ export class MessagesComponent implements OnInit {
   // Upload files 
   toggleFileUploadPanel(){
     this.showUploadFilesPanel = !this.showUploadFilesPanel;
-  }
-
-  pondHandleInit() {
   }
 
   pondHandleAddFile(event: any) {

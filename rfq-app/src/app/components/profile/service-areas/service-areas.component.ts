@@ -38,6 +38,8 @@ export class ServiceAreasComponent implements OnInit {
   LongitudeAddress: number = 0;
   OperatingRadius: number = 0;
   currentUser: User | null = null;
+  isSubmitting: boolean = false;
+  coordinatesChanged: boolean = false;
 
   constructor(
     private ngZone: NgZone,
@@ -252,6 +254,7 @@ export class ServiceAreasComponent implements OnInit {
     this.LatitudeAddress = this.selectedPlaceDetails.geometry.location.lat();
     this.LongitudeAddress = this.selectedPlaceDetails.geometry.location.lng();
     this.OperatingRadius = this.rangeMiles;
+    this.coordinatesChanged = true;
 
     this.serviceAreaChange.emit({
       streetAddress: this.StreetAddress,

@@ -88,9 +88,6 @@ export class QuoteSendMessageDialog implements OnInit {
     this.showUploadFilesPanel = !this.showUploadFilesPanel;
   }
 
-  pondHandleInit() {
-  }
-
   pondHandleAddFile(event: any) {
     if (event?.file?.file) {
       this.pondFiles.push(event.file.file as File);

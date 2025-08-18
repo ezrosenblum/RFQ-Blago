@@ -88,8 +88,11 @@ export class RfqService {
       );
   }
 
-  saveQuote(request: QuoteRequest): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}Submission/quote`, request)
+  saveQuote(request: FormData): Observable<any> {
+    const headers = new HttpHeaders({
+      'Skip-Content-Type': 'true',
+    });
+    return this.http.post<any>(`${this.API_URL}Submission/quote`, request, { headers })
       .pipe(
         map((response: any) => {
           return response;
