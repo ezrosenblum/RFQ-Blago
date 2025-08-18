@@ -7,6 +7,7 @@ using Application.Features.Users.Search;
 using DTO.Notification.Search;
 using DTO.Pagination;
 using DTO.Sorting;
+using DTO.Submission.SubmissionQuote.Search;
 using DTO.User.Search;
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
@@ -121,7 +122,7 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
         var searchResponse = await _elasticClient.SearchAsync<SubmissionQuoteSearchable>(s => s
             .Index(_index)
             .Query(q => BuildSubmissionQuoteSearchQuery(q, criteria))
-            .Sort(so => BuildSort(so, criteria.Sorting!))
+            .Sort(so => BuildSubmissionQuoteSort(so, criteria.Sorting!))
             .From((criteria.Paging.PageNumber - 1) * criteria.Paging.PageSize)
         .Size(criteria.Paging.PageSize));
 
@@ -442,6 +443,44 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
                 var fieldName = sortOptions.Field.ToString();
 
                 var propertyInfo = FindProperty(typeof(NotificationSearchable), fieldName);
+
+                if (propertyInfo != null)
+                {
+                    var lowerFieldName = char.ToLower(fieldName[0]) + fieldName.Substring(1); // Assuming enum values directly correspond to field names
+
+                    // Check if the property is a string and append .keyword
+                    if (propertyInfo.PropertyType == typeof(string))
+                    {
+                        lowerFieldName += ".keyword";
+                    }
+
+                    return descriptor.Field(lowerFieldName, sortOrder);
+                }
+                else
+                {
+                    throw new ArgumentException($"Property {fieldName} not found in type {typeof(NotificationSearchable)} or its base types.");
+                }
+            }
+        }
+
+        return descriptor;
+    }
+
+    private SortDescriptor<SubmissionQuoteSearchable> BuildSubmissionQuoteSort(SortDescriptor<SubmissionQuoteSearchable> descriptor, SortOptions<SubmissionQuoteFullSearchSortField> sortOptions)
+    {
+        if (sortOptions != null)
+        {
+            var sortOrder = sortOptions.SortOrder == DTO.Sorting.SortOrder.Asc ? Nest.SortOrder.Ascending : Nest.SortOrder.Descending;
+
+            if (sortOptions.Field == SubmissionQuoteFullSearchSortField.LastMessageDate)
+            {
+                return descriptor.Field("lastMessage.created", sortOrder);
+            }
+            else
+            {
+                var fieldName = sortOptions.Field.ToString();
+
+                var propertyInfo = FindProperty(typeof(SubmissionQuoteSearchable), fieldName);
 
                 if (propertyInfo != null)
                 {

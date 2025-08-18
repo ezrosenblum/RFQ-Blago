@@ -4,5 +4,6 @@ public enum SubmissionQuoteFullSearchSortField
 {
     Created = 1,
     Title,
-    ValidUntil
+    ValidUntil,
+    LastMessageDate,
 }
