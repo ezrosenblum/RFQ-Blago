@@ -332,7 +332,8 @@
     "VIEWS": "Views",
     "ENGAGEMENTS": "Engagements",
     "ENGAGED": "Engaged",
-    "VIEWED": "Viewed"
+    "VIEWED": "Viewed",
+    "TOTAL_PROJECT_COST": "Total Project Cost" 
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
