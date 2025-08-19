@@ -10,6 +10,7 @@ import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-
 import { TranslateService } from '@ngx-translate/core';
 import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -210,9 +211,21 @@ export class RfqDetails implements OnInit, OnDestroy {
         this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
           next: () => {
             this.loadQuotes();
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
           },
           error: (error) => {
             this.handleError(error);
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATE_FAILED'),
+            });
           },
         });
       }

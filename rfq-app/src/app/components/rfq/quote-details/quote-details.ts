@@ -8,6 +8,8 @@ import { User } from '../../../models/user.model';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { AlertService } from '../../../services/alert.service';
+import Swal from 'sweetalert2';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-quote-details',
@@ -27,7 +29,8 @@ export class QuoteDetails implements OnInit {
     private _router: Router,
     private _authService: Auth,
     private _dialog: MatDialog,
-    private _alert: AlertService
+    private _alert: AlertService,
+    private _translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -126,15 +129,26 @@ export class QuoteDetails implements OnInit {
         this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
           next: () => {
             this.getDetails(quote.id);
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
           },
           error: (error) => {
             this.handleError(error);
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATE_FAILED'),
+            });
           },
         });
       }
     });
   }
-
   getStatusColor(status?: { id: number; name: string }): string {
     if (!status) {
       return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';

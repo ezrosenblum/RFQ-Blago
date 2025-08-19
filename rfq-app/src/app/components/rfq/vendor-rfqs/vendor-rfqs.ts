@@ -20,6 +20,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { QuoteFormDialog } from './quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -784,15 +785,29 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   approveRfq(rfqId: number) {
     const confirmKey = 'ALERTS.CONFIRM_APPROVE_RFQ';
+
     this._alert.confirm(confirmKey).then((result) => {
       if (result.isConfirmed) {
         const approveRfq = 2;
-        this._rfqService
-          .rfqChangeStatus(rfqId, approveRfq)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(() => {
+        this._rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
             this.loadRfqs();
-          });
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_APPROVED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: () => {
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_APPROVE_FAILED'),
+            });
+          },
+        });
       }
     });
   }
@@ -810,19 +825,32 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   declineRfq(rfqId: number) {
     const confirmKey = 'ALERTS.CONFIRM_REJECT_RFQ';
+
     this._alert.confirm(confirmKey).then((result) => {
       if (result.isConfirmed) {
         const declineRfq = 3;
-        this._rfqService
-          .rfqChangeStatus(rfqId, declineRfq)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(() => {
+        this._rfqService.rfqChangeStatus(rfqId, declineRfq).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
             this.loadRfqs();
-          });
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_DECLINED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: () => {
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_DECLINE_FAILED'),
+            });
+          },
+        });
       }
     });
   }
-
   // Expose Math to template
   Math = Math;
 
