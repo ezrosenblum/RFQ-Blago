@@ -61,6 +61,37 @@
         </div>
       </div>
 
+      <!-- Price -->
+       <div class="md:col-span-2 grid grid-cols-3 gap-4">
+        <div>
+          <label for="price" class="form-label">
+            {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+          <input
+            #priceInput
+            id="price"
+            type="text"
+            formControlName="price"
+            class="form-input"
+            [class.border-red-500]="isFieldInvalid('price')"
+            placeholder="0.00"
+            (blur)="onBlurPrice()"
+            (focus)="onFocusPrice()"
+  />
+          </div>
+          <div *ngIf="isFieldInvalid('price')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('price')?.errors?.['required']">
+              {{ 'VENDOR.PRICE_REQUIRED' | translate }}
+            </span>
+            <span *ngIf="quoteForm.get('price')?.errors?.['min']">
+              {{ 'VENDOR.PRICE_MIN' | translate }}
+            </span>
+          </div>
+        </div>
+       </div>
+
+
       <!-- Quote Validity Interval -->
       <div>
         <label for="quoteValidityInterval" class="form-label">
@@ -240,48 +271,17 @@
           </div>
         </div>
       </div>
-
-      <!-- Price -->
-      <div>
-        <label for="price" class="form-label">
-          {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <div class="relative">
-        <input
-          #priceInput
-          id="price"
-          type="text"
-          formControlName="price"
-          class="form-input pl-8"
-          [class.border-red-500]="isFieldInvalid('price')"
-          placeholder="0.00"
-          (blur)="onBlurPrice()"
-          (focus)="onFocusPrice()"
-/>
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-secondary-500 text-sm">$</span>
-          </div>
-        </div>
-        <div *ngIf="isFieldInvalid('price')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('price')?.errors?.['required']">
-            {{ 'VENDOR.PRICE_REQUIRED' | translate }}
-          </span>
-          <span *ngIf="quoteForm.get('price')?.errors?.['min']">
-            {{ 'VENDOR.PRICE_MIN' | translate }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Files -->
-      <div class="pt-28">
-        <file-pond 
-          #myPond 
-          [options]="pondOptions" 
-          [files]="pondFiles"
-          (onaddfile)="pondHandleAddFile($event)"
-          (onremovefile)="onFileRemoved($event)">
-        </file-pond>
-      </div>
+    </div>
+    
+    <!-- Files -->
+    <div class="pt-28 md:grid-cols-2">
+      <file-pond 
+        #myPond 
+        [options]="pondOptions" 
+        [files]="pondFiles"
+        (onaddfile)="pondHandleAddFile($event)"
+        (onremovefile)="onFileRemoved($event)">
+      </file-pond>
     </div>
   </form>
 </mat-dialog-content>

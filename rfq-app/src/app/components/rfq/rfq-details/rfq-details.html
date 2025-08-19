@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
   <div class="max-w-7xl mx-auto">
     <!-- Back Button -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 mb-6 shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4 justify-between">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 mb-6 shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4">
       <button type="button"
               class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5"
               [routerLink]="['/vendor-rfqs']">
@@ -10,23 +10,8 @@
       <div class="text-lg font-semibold text-gray-900 dark:text-white">
         {{ 'VENDOR.RFQ_DETAILS' | translate }}
       </div>
-      <div class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide" *ngIf="this.currentUser?.type === 'Customer'">
+      <div class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide">
         {{ quotes.length || 0 }} {{ 'VENDOR.QUOTES_RECEIVED' | translate }}
-      </div>
-      <div *ngIf="this.currentUser?.type === 'Vendor'" class="flex items-center gap-4">
-        <!-- Status badge -->
-        <div
-          class="ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide"
-          *ngIf="getVendorStatus(rfq)">
-          {{ getVendorStatus(rfq) }}
-        </div>
-
-        <!-- Send Quote button (only if vendor hasn't quoted yet) -->
-        <button *ngIf="!hasQuoted(rfq)"
-                (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
-                class="mt-2 inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-green-500 text-white hover:bg-green-600">
-          {{ 'VENDOR.SEND_QUOTE' | translate }}
-        </button>
       </div>
     </div>
 
@@ -40,33 +25,15 @@
             <h1 class="text-3xl font-bold mb-2 text-shadow">
               {{ rfq.title }}
             </h1>
-          </div>
-
-          <div class="flex items-center gap-4" *ngIf="this.currentUser?.type === 'Customer'">
-
-            <div class="bg-white/80 dark:bg-black/20 px-4 py-2 rounded-lg text-center">
-              <div class="text-xs uppercase tracking-wide opacity-80">
-                {{ 'VENDOR.VIEWS' | translate }}
-              </div>
-              <div class="text-lg font-semibold">
-                {{ getStatusCount(rfq, 'Viewed') }}
-              </div>
-            </div>
-
-            <div class="bg-white/80 dark:bg-black/20 px-4 py-2 rounded-lg text-center">
-              <div class="text-xs uppercase tracking-wide opacity-80">
-                {{ 'VENDOR.ENGAGEMENTS' | translate }}
-              </div>
-              <div class="text-lg font-semibold">
-                {{ getStatusCount(rfq, 'Engaged') }}
-              </div>
+            <div class="text-base opacity-90 font-medium">
+              {{ 'VENDOR.RFQ_ID' | translate }}: #{{ rfq.id }}
             </div>
           </div>
         </div>
 
         <!-- Project Details Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-          <div class="bg-white/80 dark:bg-black/20 backdrop-blur-sm p-5 rounded-xl border border-white/20">
+          <div class="bg-white/10 backdrop-blur-sm p-5 rounded-xl border border-white/20">
             <div class="text-xs uppercase tracking-wide opacity-80 mb-2">
               {{ 'VENDOR.QUANTITY' | translate }}
             </div>
@@ -75,7 +42,7 @@
             </div>
           </div>
 
-          <div class="bg-white/80 dark:bg-black/20 backdrop-blur-sm p-5 rounded-xl border border-white/20">
+          <div class="bg-white/10 backdrop-blur-sm p-5 rounded-xl border border-white/20">
             <div class="text-xs uppercase tracking-wide opacity-80 mb-2">
               {{ 'VENDOR.LOCATION' | translate }}
             </div>
@@ -84,7 +51,7 @@
             </div>
           </div>
 
-          <div class="bg-white/80 dark:bg-black/20 backdrop-blur-sm p-5 rounded-xl border border-white/20">
+          <div class="bg-white/10 backdrop-blur-sm p-5 rounded-xl border border-white/20">
             <div class="text-xs uppercase tracking-wide opacity-80 mb-2">
               {{ 'VENDOR.POSTED_DATE' | translate }}
             </div>

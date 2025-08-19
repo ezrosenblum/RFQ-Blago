@@ -299,6 +299,33 @@ export class MessagesComponent implements OnInit {
 
     this._messageService.getChatMessageHistory(request).pipe(take(1)).subscribe({
       next: (data: TableResponse<MessageEntry>) => {
+        let quotetMessage: MessageEntry = {
+          id: 1,
+          content: this.selectedConversation!.description,
+          created: this.selectedConversation!.created,
+          media: this.selectedConversation!.media,
+          submissionQuoteId: this.selectedConversation!.id,
+          senderId: this.selectedConversation!.vendor.id,
+          quoteMessageStatus: {
+            id: 0,
+            name: '',
+          },
+          sender: {
+            id: this.selectedConversation!.vendor.id,
+            firstName: this.selectedConversation!.vendor.firstName,
+            lastName: this.selectedConversation!.vendor.lastName,
+            email: '',
+            picture: this.selectedConversation!.vendor.picture,
+            receiveEmailNotifications: false,
+            receivePushNotifications: false,
+          }
+        };
+        
+        if (Array.isArray(data?.items)) {
+          data.items.unshift(quotetMessage);
+        }
+
+
       this.currentMessages = Array.isArray(data.items) ? data.items : [];
       this.loadingChatMessages = false;
 
