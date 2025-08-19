@@ -337,7 +337,7 @@ export class Signup implements OnInit {
     this.signupForm.patchValue({ certificate: file });
     this.clearErrorMessages();
 
-    console.log('Certificate processed:', file.name);
+    // Certificate processed: file.name
   }
 
   // Keep backward compatibility with old file input method
