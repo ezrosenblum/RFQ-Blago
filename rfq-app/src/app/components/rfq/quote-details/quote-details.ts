@@ -7,6 +7,9 @@ import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { AlertService } from '../../../services/alert.service';
+import Swal from 'sweetalert2';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-quote-details',
@@ -26,6 +29,8 @@ export class QuoteDetails implements OnInit {
     private _router: Router,
     private _authService: Auth,
     private _dialog: MatDialog,
+    private _alert: AlertService,
+    private _translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -72,45 +77,78 @@ export class QuoteDetails implements OnInit {
     this._router.navigate(['/messages']);
   }
 
-    sendQuoteFirstMessage(){
-      if (this.quote.lastMessage) {
-        this._router.navigate(['/messages'], {queryParams: { quoteId: this.quote.id, customerId: this.quote?.submission?.user?.id, vendorId: this.quote?.vendorId }});
-      }
-      else {
-        const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
-          width: '500px',
-          maxWidth: '500px',
-          height: 'auto',
-          panelClass: 'send-quote-message-dialog',
-          autoFocus: false,
-          data: {
-            quote: this.quote,
-          },
-        });
-  
-        dialogRef
-          .afterClosed()
-          .subscribe((result: any) => {
-            if (result) {
-              setTimeout(() => {
-                this._router.navigate(['/messages'], {queryParams: { quoteId: this.quote.id, customerId: this.quote?.submission?.user?.id, vendorId: this.quote?.vendorId }});
-              }, 1000)
-            }
-          });
-      }
-    }
+  sendQuoteFirstMessage() {
+    if (this.quote.lastMessage) {
+      this._router.navigate(['/messages'], {
+        queryParams: {
+          quoteId: this.quote.id,
+          customerId: this.quote?.submission?.user?.id,
+          vendorId: this.quote?.vendorId,
+        },
+      });
+    } else {
+      const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
+        width: '500px',
+        maxWidth: '500px',
+        height: 'auto',
+        panelClass: 'send-quote-message-dialog',
+        autoFocus: false,
+        data: {
+          quote: this.quote,
+        },
+      });
 
-  onChangeStatus(quote: QuoteItem, statusId: number) {
-    this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
-      next: () => {
-        this.getDetails(quote.id);
-      },
-      error: (error) => {
-        this.handleError(error);
-      }
-    })
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result) {
+          setTimeout(() => {
+            this._router.navigate(['/messages'], {
+              queryParams: {
+                quoteId: this.quote.id,
+                customerId: this.quote?.submission?.user?.id,
+                vendorId: this.quote?.vendorId,
+              },
+            });
+          }, 1000);
+        }
+      });
+    }
   }
 
+  onChangeStatus(quote: QuoteItem, statusId: number) {
+    const statusConfirmKeyMap: { [key: number]: string } = {
+      1: 'ALERTS.CONFIRM_VALID',
+      2: 'ALERTS.CONFIRM_APPROVE',
+      3: 'ALERTS.CONFIRM_REJECT',
+      4: 'ALERTS.CONFIRM_INVALID',
+    };
+
+    const confirmKey = statusConfirmKeyMap[statusId] || 'ALERTS.CONFIRM_ACTION';
+
+    this._alert.confirm(confirmKey).then((result) => {
+      if (result.isConfirmed) {
+        this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
+          next: () => {
+            this.getDetails(quote.id);
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: (error) => {
+            this.handleError(error);
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATE_FAILED'),
+            });
+          },
+        });
+      }
+    });
+  }
   getStatusColor(status?: { id: number; name: string }): string {
     if (!status) {
       return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
@@ -139,9 +177,11 @@ export class QuoteDetails implements OnInit {
     } else if (error.status === 403) {
       this.errorMessage = 'You do not have permission to view this content.';
     } else if (error.status === 0) {
-      this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      this.errorMessage =
+        'Unable to connect to server. Please check your internet connection.';
     } else {
-      this.errorMessage = error.error?.message || 'An error occurred while loading RFQs.';
+      this.errorMessage =
+        error.error?.message || 'An error occurred while loading RFQs.';
     }
   }
 }

@@ -499,7 +499,22 @@
     "DELETE_FAILED": "Failed to delete the record",
     "MANDATORY_FIELDS_REQUIRED": "Mandatory fields must be filled in!",
     "INVALID_STATUS": "Invalid status",
-    "PROFILE_UPDATED": "Profile updated successfully"
+    "PROFILE_UPDATED": "Profile updated successfully",
+    "CONFIRM_APPROVE": "Do you want to accept this quote?",
+    "CONFIRM_REJECT": "Do you want to reject this quote?",
+    "CONFIRM_INVALID": "Do you want to mark this quote as invalid?",
+    "CONFIRM_ACTION": "Do you want to continue?",
+    "CONFIRM_VALID":  "Do you want to mark this quote as valid?",
+    "CONFIRM_APPROVE_RFQ": "Do you want to approve this RFQ?",
+    "CONFIRM_REJECT_RFQ": "Do you want to reject this RFQ?",
+    "SUCCESS_TITLE": "Success",
+    "ERROR_TITLE": "Error",
+    "STATUS_UPDATED": "Status has been updated successfully.",
+    "STATUS_UPDATE_FAILED": "Failed to update the status. Please try again.",
+    "RFQ_APPROVED": "RFQ has been approved successfully.",
+    "RFQ_APPROVE_FAILED": "Failed to approve RFQ. Please try again.",
+    "RFQ_DECLINED": "RFQ has been declined successfully.",
+    "RFQ_DECLINE_FAILED": "Failed to decline RFQ. Please try again."
   },
   "MESSAGES": {
     "NO_CONVERSATIONS_FOUND": "No conversations found",
