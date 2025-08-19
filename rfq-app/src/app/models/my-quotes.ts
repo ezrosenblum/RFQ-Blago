@@ -103,7 +103,7 @@ export interface Quote {
   minimumTimelineDuration: number;
   maximumTimelineDuration: number;
   warantyIntervalType: LookupValue;
-  warrantyDuration: number;
+  warantyDuration: number;
   lastMessage: string | null;
 }
 

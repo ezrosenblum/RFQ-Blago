@@ -46,7 +46,7 @@ export class MyQuotesComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private rfqService: RfqService,
-    private dialog: MatDialog,
+    private dialog: MatDialog
   ) {
     this.filtersForm = this.fb.group({
       query: [''],
@@ -284,31 +284,40 @@ export class MyQuotesComponent implements OnInit {
     return name ? name.charAt(0).toUpperCase() : '?';
   }
 
-    sendQuoteFirstMessage(quote: Quote){
-      if (quote.lastMessage) {
-        this.router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: quote?.submission?.user?.id, vendorId: quote?.vendorId }});
-      }
-      else {
-        const dialogRef = this.dialog.open(QuoteSendMessageDialog, {
-          width: '500px',
-          maxWidth: '500px',
-          height: 'auto',
-          panelClass: 'send-quote-message-dialog',
-          autoFocus: false,
-          data: {
-            quote: quote,
-          },
-        });
-  
-        dialogRef
-          .afterClosed()
-          .subscribe((result: any) => {
-            if (result) {
-              setTimeout(() => {
-                this.router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: quote?.submission?.user?.id, vendorId: quote?.vendorId }});
-              }, 1000)
-            }
-          });
-      }
+  sendQuoteFirstMessage(quote: Quote) {
+    if (quote.lastMessage) {
+      this.router.navigate(['/messages'], {
+        queryParams: {
+          quoteId: quote.id,
+          customerId: quote?.submission?.user?.id,
+          vendorId: quote?.vendorId,
+        },
+      });
+    } else {
+      const dialogRef = this.dialog.open(QuoteSendMessageDialog, {
+        width: '500px',
+        maxWidth: '500px',
+        height: 'auto',
+        panelClass: 'send-quote-message-dialog',
+        autoFocus: false,
+        data: {
+          quote: quote,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result) {
+          setTimeout(() => {
+            this.router.navigate(['/messages'], {
+              queryParams: {
+                quoteId: quote.id,
+                customerId: quote?.submission?.user?.id,
+                vendorId: quote?.vendorId,
+              },
+            });
+          }, 1000);
+        }
+      });
     }
+  }
 }
