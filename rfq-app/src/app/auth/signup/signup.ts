@@ -280,7 +280,6 @@ export class Signup implements OnInit {
     this.selectedFileName = '';
     this.signupForm.patchValue({ certificate: null });
     this.clearErrorMessages();
-    console.log('Certificate removed');
   }
 
   onFilePondError(event: Event): void {
