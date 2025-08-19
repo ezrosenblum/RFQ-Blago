@@ -123,14 +123,14 @@ export class QuoteFormDialog implements OnInit {
   onSubmit(): void {
   if (this.quoteForm.valid) {
     this.isSubmitting = true;
+
+    const quoteEntry = this.quoteForm.value;
+    quoteEntry.vendorId = this.vendorId;
+    quoteEntry.submissionId = this.rfqId;
     
     // Create FormData object
     const formData = new FormData();
-    
-    // Get form values
     const formValues = this.quoteForm.value;
-    
-    // Append form fields to FormData
     formData.append('title', formValues.title || '');
     formData.append('description', formValues.description || '');
     formData.append('price', String(formValues.price || 0));
@@ -144,7 +144,6 @@ export class QuoteFormDialog implements OnInit {
     formData.append('vendorId', String(this.vendorId || ''));
     formData.append('submissionId', String(this.rfqId || ''));
     
-    // Append files to FormData
     this.pondFiles.forEach(file => {
       formData.append('Files', file, file.name);
     });
@@ -162,7 +161,7 @@ export class QuoteFormDialog implements OnInit {
         this.pondFiles = [];
         this.uploadedFilesCount = 0;
         setTimeout(() => {
-          this._dialogRef.close(response);
+          this._dialogRef.close(quoteEntry);
         }, 500);
       },
       error: (error) => {
@@ -208,7 +207,7 @@ export class QuoteFormDialog implements OnInit {
       this.quoteForm.get('price')?.setValue(numericValue);
 
       this.priceInput.nativeElement.value =
-        this.currencyPipe.transform(numericValue, 'USD', 'symbol', '1.2-2') ?? '';
+        this.currencyPipe.transform(numericValue, 'USD', 'symbol', '1.0-2') ?? '';
     } else {
       this.priceInput.nativeElement.value = '';
     }

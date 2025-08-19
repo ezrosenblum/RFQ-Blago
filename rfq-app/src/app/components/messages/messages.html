@@ -344,7 +344,7 @@
     <div class="flex-1 overflow-y-auto p-4 space-y-4 relative messages-section" id="chat-scrollable">
       <div class="spinner mr-2" *ngIf="loadingChatMessages"></div>
       <div
-        *ngFor="let msg of currentMessages"
+        *ngFor="let msg of currentMessages; let j = index"
         class="flex items-start space-x-3"
       >
         <div *ngIf="!msg.sender.picture"
@@ -357,14 +357,13 @@
         </div>
         <div class="user-avatar bg-round" *ngIf="msg.sender.picture" [style.background-image]="'url(' + msg.sender.picture + ')'"></div>
 
-        <div class="flex-1">
+        <div class="flex-1" [ngClass]="{'quoted-msg' : j == 0}">
           <span class="font-medium text-gray-900 dark:text-white mr-10"
             >{{ msg.sender.firstName }} {{ msg.sender.lastName }}</span>
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10" *ngIf="msg.content">
             <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
           </div>
-          <div class="file" *ngFor="let file of msg.media.items; let i = index">  
-
+            <div class="file mt-3" *ngFor="let file of msg.media.items; let i = index">  
               <!-- Images -->
               <div
                 (click)="previewImageInFullScreen(file.url)"
@@ -386,7 +385,6 @@
                   📄 Text File <span class="file-name">{{file.name}}</span>
                 </a>
               </div>
-
             </div>
           <span class="text-xs text-gray-500 dark:text-gray-400 mr-10">{{getRelativeTime(msg.created)}}</span>
         </div>
@@ -429,7 +427,6 @@
             [disabled]="currentUser?.type === 'Administrator' || !selectedConversation"
             placeholder="Send a message..."
             [(ngModel)]="newMessage"
-            (keyup.enter)="sendMessage()"
             rows="1"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none overflow-hidden min-h-[40px]"
             style="height: auto"
@@ -495,7 +492,7 @@
       <div class="file-sidebar border-b border-gray-200 dark:border-gray-700" *ngFor="let file of selectedConversation?.media?.items; let i = index">  
 
         <!-- IMAGE -->
-        <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" class="file-pdf">
+        <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" class="file-img">
           <a (click)="previewImageInFullScreen(file.url)" class="pointer">
             🖼️ Image <span class="file-name">{{file.name}}</span>
           </a>

@@ -137,10 +137,10 @@
     padding-left: 35px;
 }
 
-.file {
-    width: 100px;
-    height: 80px;
-    padding: 10px 5px 0 5px;
+.quoted-msg {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.048);
 }
 
 .file-sidebar {
@@ -157,6 +157,9 @@
     background-size: cover !important;
     border-radius: 5px;
     cursor: pointer;
+    width: 100px;
+    height: 80px;
+    margin: 10px 5px 0 5px;
 }
 
 .right-sidenav-img {
@@ -174,6 +177,10 @@
     background-position: center !important;
     background-size: cover !important;
     border-radius: 50%;
+}
+
+.file-pdf, .file-text {
+    min-width: 300px;
 }
 
 .btn-spinner {
