@@ -120,23 +120,23 @@
         "
       >
         <div class="flex flex-wrap items-start space-x-3">
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.submission.user.firstName }} {{ conv.submission.user.lastName }}" *ngIf="currentUser?.type == 'Vendor'"
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.submission.user.firstName }} {{ conv.submission.user.lastName }}" *ngIf="currentUser?.type == 'Vendor' && !conv.submission.user.picture"
             [class]="
               'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
               mapLetterToElement(conv.submission.user.firstName)
             ">
             {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
           </div>
-          <!-- <div class="user-avatar" *ngIf="currentUser?.type == 'Vendor' && !conv.submission.user.picture" [style.background-image]="'url(' + conv.submission.user.picture + ')'"></div> -->
+          <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Vendor' && conv.submission.user.picture" [style.background-image]="'url(' + conv.submission.user.picture + ')'"></div>
 
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}" *ngIf="currentUser?.type == 'Customer'"
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}" *ngIf="currentUser?.type == 'Customer' && !conv.vendor.picture"
             [class]="
               'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
               mapLetterToElement(conv.vendor.firstName)
             ">
             {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
           </div>
-          <!-- <div class="user-avatar" *ngIf="currentUser?.type == 'Customer' && !conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div> -->
+          <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Customer' && conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div>
 
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
@@ -194,23 +194,23 @@
         "
       >
         <div class="flex flex-wrap items-start space-x-3">
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}"
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" *ngIf="!conv.vendor.picture" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}"
             [class]="
               'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
               mapLetterToElement(conv.vendor.firstName)
             ">
             {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
           </div>
-          <!-- <div class="user-avatar" *ngIf="isAdmin && conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div> -->
+          <div class="user-avatar bg-round" *ngIf="conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div>
 
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.submission.user.firstName }} {{ conv.submission.user.lastName }}"
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" *ngIf="isAdmin && !conv.submission.user.picture"  matTooltip="{{ conv.submission.user.firstName }} {{ conv.submission.user.lastName }}"
             [class]="
               'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
               mapLetterToElement(conv.submission.user.firstName)
             ">
             {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
           </div>
-          <!-- <div class="user-avatar" *ngIf="isAdmin && conv.submission.user.picture" [style.background-image]="'url(' + conv.submission.user.picture + ')'"></div> -->
+          <div class="user-avatar bg-round" *ngIf="isAdmin && conv.submission.user.picture" [style.background-image]="'url(' + conv.submission.user.picture + ')'"></div>
 
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
@@ -281,7 +281,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div *ngIf="selectedConversation && !isAdmin">
-            <div *ngIf="currentUser?.type == 'Customer'" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" 
+            <div *ngIf="currentUser?.type == 'Customer' && !selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" 
               [class]="
                 'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
                 mapLetterToElement(selectedConversation.vendor.firstName)
@@ -289,8 +289,9 @@
             >
               {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
             </div>
+            <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Customer' && selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
-            <div *ngIf="currentUser?.type == 'Vendor'" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}" 
+            <div *ngIf="currentUser?.type == 'Vendor' && !selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}" 
               [class]="
                 'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
                 mapLetterToElement(selectedConversation.submission.user.firstName)
@@ -298,10 +299,12 @@
             >
               {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
             </div>
+            <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Vendor' && selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+
           </div>
 
           <div class="flex" *ngIf="selectedConversation && isAdmin">
-            <div matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
+            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
               [class]="
                 'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
                 mapLetterToElement(selectedConversation.vendor.firstName)
@@ -309,7 +312,9 @@
             >
               {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
             </div>
-            <div  matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
+            <div class="user-avatar bg-round" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+
+            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
               [class]="
                 'w-10 h-10 ml-2 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
                 mapLetterToElement(selectedConversation.submission.user.firstName)
@@ -317,6 +322,8 @@
             >
               {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
             </div>
+            <div class="user-avatar bg-round" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+
           </div>
           <div *ngIf="selectedConversation">
             <h2 class="font-semibold text-gray-900 dark:text-white">
@@ -337,11 +344,10 @@
     <div class="flex-1 overflow-y-auto p-4 space-y-4 relative messages-section" id="chat-scrollable">
       <div class="spinner mr-2" *ngIf="loadingChatMessages"></div>
       <div
-        *ngFor="let msg of currentMessages"
+        *ngFor="let msg of currentMessages; let j = index"
         class="flex items-start space-x-3"
-          [ngClass]="msg.senderId == currentUser?.id ? 'dir-rtl' : 'dir-ltr'"
       >
-        <div
+        <div *ngIf="!msg.sender.picture"
           [class]="
             'w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0 ' +
             mapLetterToElement(msg.sender.firstName)
@@ -349,14 +355,15 @@
         >
           {{ transform(msg.sender.firstName) }} {{ transform(msg.sender.lastName) }}
         </div>
-        <div class="flex-1">
+        <div class="user-avatar bg-round" *ngIf="msg.sender.picture" [style.background-image]="'url(' + msg.sender.picture + ')'"></div>
+
+        <div class="flex-1" [ngClass]="{'quoted-msg' : j == 0}">
           <span class="font-medium text-gray-900 dark:text-white mr-10"
             >{{ msg.sender.firstName }} {{ msg.sender.lastName }}</span>
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10" *ngIf="msg.content">
             <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
           </div>
-          <div class="file" *ngFor="let file of msg.media.items; let i = index">  
-
+            <div class="file mt-3" *ngFor="let file of msg.media.items; let i = index">  
               <!-- Images -->
               <div
                 (click)="previewImageInFullScreen(file.url)"
@@ -378,7 +385,6 @@
                   📄 Text File <span class="file-name">{{file.name}}</span>
                 </a>
               </div>
-
             </div>
           <span class="text-xs text-gray-500 dark:text-gray-400 mr-10">{{getRelativeTime(msg.created)}}</span>
         </div>
@@ -397,7 +403,6 @@
           #myPond 
           [options]="pondOptions" 
           [files]="pondFiles"
-          (oninit)="pondHandleInit()"
           (onaddfile)="pondHandleAddFile($event)"
           (onremovefile)="onFileRemoved($event)">
         </file-pond>
@@ -422,7 +427,6 @@
             [disabled]="currentUser?.type === 'Administrator' || !selectedConversation"
             placeholder="Send a message..."
             [(ngModel)]="newMessage"
-            (keyup.enter)="sendMessage()"
             rows="1"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none overflow-hidden min-h-[40px]"
             style="height: auto"
@@ -450,11 +454,11 @@
   <div class="w-80 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 company-panel"
   >
     <!-- Profile Section -->
-    <div
+    <div *ngIf="selectedConversation"
       class="p-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
     >
-      <div class="text-center" *ngIf="selectedConversation">
-        <div
+      <div class="text-center">
+        <div *ngIf="!selectedConversation.submission.user.picture"
           [class]="
             'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium ' +
             mapLetterToElement(selectedConversation.vendor.firstName)
@@ -462,12 +466,52 @@
         >
           {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
         </div>
+        <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium bg-round right-sidenav-img" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+
         <h3 class="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
-          {{ selectedConversation.submission.title }}
+          {{ selectedConversation.title }}
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-          {{ selectedConversation.title }}
+          {{ selectedConversation.submission.title }}
         </p>
+
+        <button [routerLink]="['/quote-details', selectedConversation.id]" class="mt-5 px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5">
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+            {{ 'VENDOR.VIEW_DETAILS' | translate }}
+        </button>
+      </div>
+    </div>
+    <div *ngIf="selectedConversation?.media?.items?.[0]" class="p-10">
+      <p class="text-medium text-gray-600 dark:text-gray-300 mt-1 mb-5">
+        {{'VENDOR.DOCUMENTS' | translate}}
+      </p>
+
+      <div class="file-sidebar border-b border-gray-200 dark:border-gray-700" *ngFor="let file of selectedConversation?.media?.items; let i = index">  
+
+        <!-- IMAGE -->
+        <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" class="file-img">
+          <a (click)="previewImageInFullScreen(file.url)" class="pointer">
+            🖼️ Image <span class="file-name">{{file.name}}</span>
+          </a>
+        </div>
+
+        <!-- PDF -->
+        <div *ngIf="file.extension === '.pdf'" class="file-pdf">
+          <a [href]="file.url" target="_blank">
+            📄 PDF <span class="file-name">{{file.name}}</span>
+          </a>
+        </div>
+
+        <!-- Text File -->
+        <div *ngIf="file.extension === '.txt'" class="file-text">
+          <a [href]="file.url" target="_blank">
+            📋 Text File <span class="file-name">{{file.name}}</span>
+          </a>
+        </div>
+
       </div>
     </div>
   </div>

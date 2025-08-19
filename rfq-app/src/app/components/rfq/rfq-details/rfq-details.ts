@@ -8,29 +8,31 @@ import { User } from '../../../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dialog';
+import { AlertService } from '../../../services/alert.service';
+import Swal from 'sweetalert2';
 
 
 @Component({
   selector: 'app-rfq-details',
   standalone: false,
   templateUrl: './rfq-details.html',
-  styleUrl: './rfq-details.scss'
+  styleUrl: './rfq-details.scss',
 })
-export class RfqDetails implements OnInit, OnDestroy{
-
-  loading: boolean = false
+export class RfqDetails implements OnInit, OnDestroy {
+  loading: boolean = false;
   rfq!: Rfq;
   private destroy$ = new Subject<void>();
   submissionListRequest: QuoteSearchRequest = {
-      paging: {
-        pageNumber: 1,
-        pageSize: 10
-      },
-      sorting: {
-        field: 1,
-        sortOrder: 2
-      }
-    };
+    paging: {
+      pageNumber: 1,
+      pageSize: 10,
+    },
+    sorting: {
+      field: 1,
+      sortOrder: 2,
+    },
+  };
   quotes: QuoteItem[] = [];
   totalItems = 0;
   totalPages = 0;
@@ -44,43 +46,44 @@ export class RfqDetails implements OnInit, OnDestroy{
     private _router: Router,
     private _authService: Auth,
     private _dialog: MatDialog,
-    private _translate: TranslateService
-  ) {
-  }
+    private _translate: TranslateService,
+    private _alert: AlertService
+  ) {}
 
   ngOnInit() {
-    this._route.paramMap
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        const id = Number(params.get('id'));
-        if (id) {
-          this.getDetails(id);
-          this.submissionListRequest.submissionId = id
-        }
-      });
+    this._route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      const id = Number(params.get('id'));
+      if (id) {
+        this.getDetails(id);
+        this.submissionListRequest.submissionId = id;
+      }
+    });
 
-      this._authService.currentUserSubject.subscribe({
-        next: (user) => {
-          if (user) {
-            this.currentUser = user;
-          }
-        },
-        error: (error) => {
-          this.handleError(error);
+    this._authService.currentUserSubject.subscribe({
+      next: (user) => {
+        if (user) {
+          this.currentUser = user;
         }
-      });
-  }
-
-  getDetails(id: number) {
-    this._rfqService.getRfqDetails(id).pipe(take(1)).subscribe({
-      next: (result) => {
-        this.rfq = result;
-        this.loadQuotes();
       },
       error: (error) => {
         this.handleError(error);
-      }
+      },
     });
+  }
+
+  getDetails(id: number) {
+    this._rfqService
+      .getRfqDetails(id)
+      .pipe(take(1))
+      .subscribe({
+        next: (result) => {
+          this.rfq = result;
+          this.loadQuotes();
+        },
+        error: (error) => {
+          this.handleError(error);
+        },
+      });
   }
 
   // Status badge color based on status name/id
@@ -115,22 +118,29 @@ export class RfqDetails implements OnInit, OnDestroy{
       kg: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300',
       m: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     };
-    return map[unit.toLowerCase()] || 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
+    return (
+      map[unit.toLowerCase()] ||
+      'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300'
+    );
   }
 
   // User initials
   getInitials(firstName?: string, lastName?: string): string {
     return (
-      (firstName?.charAt(0) || '') +
-      (lastName?.charAt(0) || '')
+      (firstName?.charAt(0) || '') + (lastName?.charAt(0) || '')
     ).toUpperCase();
   }
 
-  sendQuoteFirstMessage(quote: QuoteItem){
+  sendQuoteFirstMessage(quote: QuoteItem) {
     if (quote.lastMessage) {
-      this._router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
-    }
-    else {
+      this._router.navigate(['/messages'], {
+        queryParams: {
+          quoteId: quote.id,
+          customerId: this.rfq?.user?.id,
+          vendorId: quote?.vendorId,
+        },
+      });
+    } else {
       const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
         width: '500px',
         maxWidth: '500px',
@@ -142,50 +152,84 @@ export class RfqDetails implements OnInit, OnDestroy{
         },
       });
 
-      dialogRef
-        .afterClosed()
-        .subscribe((result: any) => {
-          if (result) {
-            setTimeout(() => {
-              this._router.navigate(['/messages'], {queryParams: { quoteId: quote.id, customerId: this.rfq?.user?.id, vendorId: quote?.vendorId }});
-            }, 1000)
-          }
-        });
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result) {
+          setTimeout(() => {
+            this._router.navigate(['/messages'], {
+              queryParams: {
+                quoteId: quote.id,
+                customerId: this.rfq?.user?.id,
+                vendorId: quote?.vendorId,
+              },
+            });
+          }, 1000);
+        }
+      });
     }
   }
 
   loadQuotes(): void {
-      this._rfqService.getQuotes(this.submissionListRequest)
-        .pipe(take(1))
-        .subscribe({
-          next: (response: QuoteSearchResponse) => {
-            this.quotes = Array.isArray(response.items) ? response.items : response.items ? [response.items] : [];
-            this.totalItems = response.totalCount!;
-            this.totalPages = response.totalPages!;
-          },
-          error: (error) => {
-            this.handleError(error);
-          }
-        });
-    }
+    this._rfqService
+      .getQuotes(this.submissionListRequest)
+      .pipe(take(1))
+      .subscribe({
+        next: (response: QuoteSearchResponse) => {
+          this.quotes = Array.isArray(response.items)
+            ? response.items
+            : response.items
+            ? [response.items]
+            : [];
+          this.totalItems = response.totalCount!;
+          this.totalPages = response.totalPages!;
+        },
+        error: (error) => {
+          this.handleError(error);
+        },
+      });
+  }
 
   get pendingCount(): number {
-    return this.quotes.filter(q => q.status?.name === 'Pending').length;
+    return this.quotes.filter((q) => q.status?.name === 'Pending').length;
   }
 
   get acceptedCount(): number {
-    return this.quotes.filter(q => q.status?.name === 'Approved').length
+    return this.quotes.filter((q) => q.status?.name === 'Approved').length;
   }
 
   onChangeStatus(quote: QuoteItem, statusId: number) {
-    this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
-      next: () => {
-        this.loadQuotes();
-      },
-      error: (error) => {
-        this.handleError(error);
+    const statusConfirmKeyMap: { [key: number]: string } = {
+      1: 'ALERTS.CONFIRM_VALID',
+      2: 'ALERTS.CONFIRM_APPROVE',
+      3: 'ALERTS.CONFIRM_REJECT',
+      4: 'ALERTS.CONFIRM_INVALID',
+    };
+
+    const confirmKey = statusConfirmKeyMap[statusId] || 'ALERTS.CONFIRM_ACTION';
+
+    this._alert.confirm(confirmKey).then((result) => {
+      if (result.isConfirmed) {
+        this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
+          next: () => {
+            this.loadQuotes();
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: (error) => {
+            this.handleError(error);
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.STATUS_UPDATE_FAILED'),
+            });
+          },
+        });
       }
-    })
+    });
   }
 
   getQuoteCardClasses(status: any) {
@@ -194,20 +238,24 @@ export class RfqDetails implements OnInit, OnDestroy{
     const colors: any = {
       Accepted: {
         border: 'border-green-200 dark:border-green-700',
-        header: 'from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/30 text-green-900 dark:text-green-200'
+        header:
+          'from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/30 text-green-900 dark:text-green-200',
       },
       Rejected: {
         border: 'border-red-200 dark:border-red-700',
-        header: 'from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/30 text-red-900 dark:text-red-200'
+        header:
+          'from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-800/30 text-red-900 dark:text-red-200',
       },
       Pending: {
         border: 'border-yellow-200 dark:border-yellow-700',
-        header: 'from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/30 text-yellow-900 dark:text-yellow-200'
+        header:
+          'from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-800/30 text-yellow-900 dark:text-yellow-200',
       },
       Invalid: {
         border: 'border-gray-400 dark:border-gray-600',
-        header: 'from-gray-300 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300'
-      }
+        header:
+          'from-gray-300 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300',
+      },
     };
 
     return colors[status.name] || { border: '', header: '' };
@@ -215,7 +263,9 @@ export class RfqDetails implements OnInit, OnDestroy{
 
   getStatusCount(rfq: Rfq, statusName: string): number {
     if (!rfq?.statusHistoryCount) return 0;
-    const entry = rfq.statusHistoryCount.find((s: any) => s.status?.name === statusName);
+    const entry = rfq.statusHistoryCount.find(
+      (s: any) => s.status?.name === statusName
+    );
     return entry ? entry.count : 0;
   }
 
@@ -233,6 +283,33 @@ export class RfqDetails implements OnInit, OnDestroy{
     return null;
   }
 
+  hasQuoted(rfq: Rfq): boolean {
+    if (!rfq?.statusHistory) return false;
+    return rfq.statusHistory.some((s: any) => s.status?.id === 3);
+  }
+
+  openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
+    const dialogRef = this._dialog.open(QuoteFormDialog, {
+      width: '60%',
+      maxWidth: '60%',
+      height: 'auto',
+      panelClass: 'add-quote-dialog',
+      autoFocus: false,
+      data: {
+        action: edit ? 'Edit' : 'Add',
+        rfqId: id,
+        customerId: customerId,
+        vendorId: this.currentUser?.id,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.getDetails(id);
+      }
+    });
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -245,9 +322,11 @@ export class RfqDetails implements OnInit, OnDestroy{
     } else if (error.status === 403) {
       this.errorMessage = 'You do not have permission to view this content.';
     } else if (error.status === 0) {
-      this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      this.errorMessage =
+        'Unable to connect to server. Please check your internet connection.';
     } else {
-      this.errorMessage = error.error?.message || 'An error occurred while loading RFQs.';
+      this.errorMessage =
+        error.error?.message || 'An error occurred while loading RFQs.';
     }
   }
 }

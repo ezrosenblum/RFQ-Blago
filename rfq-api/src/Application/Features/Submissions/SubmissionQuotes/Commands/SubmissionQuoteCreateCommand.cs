@@ -10,6 +10,7 @@ using Domain.Interfaces;
 using DTO.Enums.Submission;
 using DTO.Enums.Submission.SubmissionQuote;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Submissions.SubmissionQuotes.Commands;
@@ -26,7 +27,8 @@ public sealed record SubmissionQuoteCreateCommand(
     GlobalIntervalType? WarantyIntervalType,
     int? WarantyDuration,
     int SubmissionId,
-    int VendorId) : ISubmissionQuoteInsertData, ICommand;
+    int VendorId,
+    IReadOnlyCollection<IFormFile> Files) : ISubmissionQuoteInsertData, ICommand;
 
 public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<SubmissionQuoteCreateCommand>
 {
@@ -53,7 +55,7 @@ public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<Submis
 
     public async Task Handle(SubmissionQuoteCreateCommand command, CancellationToken cancellationToken)
     {
-        SubmissionQuote newSubmissionQuote = SubmissionQuote.Create(command with { VendorId = _currentUserService.UserId!.Value });
+        SubmissionQuote newSubmissionQuote = SubmissionQuote.Create(command with { VendorId = _currentUserService.UserId!.Value }, command.Files);
 
         var submission = await _dbContext.Submission.FirstAsync(s => s.Id == command.SubmissionId, cancellationToken);
 

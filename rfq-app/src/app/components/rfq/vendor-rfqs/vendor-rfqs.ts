@@ -19,6 +19,8 @@ import { RfqService } from '../../../services/rfq';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { QuoteFormDialog } from './quote-form-dialog/quote-form-dialog';
+import { AlertService } from '../../../services/alert.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -85,7 +87,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
   showAllCategories = false;
   showAllSubcategories = false;
 
-  carouselScrollStates: { [key: string]: { canScrollLeft: boolean; canScrollRight: boolean; needsScroll: boolean } } = {};
+  carouselScrollStates: {
+    [key: string]: {
+      canScrollLeft: boolean;
+      canScrollRight: boolean;
+      needsScroll: boolean;
+    };
+  } = {};
 
   sortOptions = [
     { value: 1, label: 'Submission Date' },
@@ -95,44 +103,50 @@ export class VendorRfqs implements OnInit, OnDestroy {
   ];
 
   statusStyles: Record<number, { container: string; dot: string }> = {
-    1: { // Pending Review
+    1: {
+      // Pending Review
       container: 'bg-yellow-100 text-yellow-800 border border-yellow-400',
-      dot: 'text-yellow-500'
+      dot: 'text-yellow-500',
     },
-    2: { // Approved
+    2: {
+      // Approved
       container: 'bg-green-100 text-green-800 border border-green-500',
-      dot: 'text-green-500'
+      dot: 'text-green-500',
     },
-    3: { // Rejected
+    3: {
+      // Rejected
       container: 'bg-red-100 text-red-800 border border-red-500',
-      dot: 'text-red-500'
+      dot: 'text-red-500',
     },
-    4: { // Archived
+    4: {
+      // Archived
       container: 'bg-gray-100 text-gray-800 border border-gray-400',
-      dot: 'text-gray-500'
+      dot: 'text-gray-500',
     },
-    5: { // Completed
+    5: {
+      // Completed
       container: 'bg-blue-100 text-blue-800 border border-blue-500',
-      dot: 'text-blue-500'
-    }
+      dot: 'text-blue-500',
+    },
   };
   showFullDescription = false;
   isOverflowing: Record<string, boolean> = {};
 
   constructor(
-    private fb: FormBuilder,
-    private authService: Auth,
-    private rfqService: RfqService,
-    private router: Router,
-    private translate: TranslateService,
+    private _fb: FormBuilder,
+    private _authService: Auth,
+    private _rfqService: RfqService,
+    private _router: Router,
+    private _translate: TranslateService,
     private _dialog: MatDialog,
+    private _alert: AlertService
   ) {
     this.initializeFilterForm();
   }
 
   ngOnInit(): void {
     // Check authentication and user role
-    this.authService.currentUser$
+    this._authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
         this.currentUser = user;
@@ -164,10 +178,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.rfqs.forEach(rfq => {
+      this.rfqs.forEach((rfq) => {
         const el = document.getElementById('desc-' + rfq.id);
         if (el) {
-          this.isOverflowing['desc-' + rfq.id] = el.scrollHeight > el.clientHeight;
+          this.isOverflowing['desc-' + rfq.id] =
+            el.scrollHeight > el.clientHeight;
         }
       });
     }, 100);
@@ -179,7 +194,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   loadStatuses(): void {
-    this.rfqService
+    this._rfqService
       .getRfqStatuses()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -187,13 +202,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.statusOptions = statuses;
         },
         error: () => {
-          this.errorMessage = this.translate.instant('VENDOR.LOAD_STATUSES');
+          this.errorMessage = this._translate.instant('VENDOR.LOAD_STATUSES');
         },
       });
   }
 
   loadCategories(): void {
-    this.rfqService
+    this._rfqService
       .getRfqSCategories()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -202,7 +217,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.updateSubcategoriesFromSelected();
         },
         error: () => {
-          this.errorMessage = this.translate.instant('VENDOR.LOAD_CATEGORIES');
+          this.errorMessage = this._translate.instant('VENDOR.LOAD_CATEGORIES');
         },
       });
   }
@@ -221,7 +236,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   private initializeFilterForm(): void {
-    this.filterForm = this.fb.group({
+    this.filterForm = this._fb.group({
       search: [''],
       status: [null],
       category: [[]],
@@ -290,7 +305,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   loadRfqs(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.rfqService
+    this._rfqService
       .getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -313,7 +328,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   loadStatistics(): void {
-    this.rfqService
+    this._rfqService
       .getRfqStatistics()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -321,7 +336,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.statistics = stats;
         },
         error: () => {
-          this.errorMessage = this.translate.instant('VENDOR.LOAD_STATISTICS');
+          this.errorMessage = this._translate.instant('VENDOR.LOAD_STATISTICS');
         },
       });
   }
@@ -343,7 +358,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
       this.filterForm.get('dateTo')?.value.trim() || undefined;
     this.submissionListRequest.paging.pageNumber = this.currentPage;
     this.submissionListRequest.paging.pageSize = this.pageSize;
-    this.rfqService
+    this._rfqService
       .getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -392,13 +407,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.isUpdating = true;
     this.errorMessage = '';
     this.successMessage = '';
-    this.rfqService
+    this._rfqService
       .updateRfqStatus(rfqId, newStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedRfq) => {
           this.isUpdating = false;
-          this.successMessage = this.translate.instant('VENDOR.STATUS_UPDATED');
+          this.successMessage = this._translate.instant(
+            'VENDOR.STATUS_UPDATED'
+          );
           this.loadStatistics();
           this.loadRfqs();
           setTimeout(() => {
@@ -414,15 +431,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   private handleError(error: any): void {
     if (error.status === 401) {
-      this.errorMessage = this.translate.instant('ERROR.SESSION_EXPIRED');
-      this.authService.logout();
+      this.errorMessage = this._translate.instant('ERROR.SESSION_EXPIRED');
+      this._authService.logout();
     } else if (error.status === 403) {
-      this.errorMessage = this.translate.instant('ERROR.NO_PERMISSION');
+      this.errorMessage = this._translate.instant('ERROR.NO_PERMISSION');
     } else if (error.status === 0) {
-      this.errorMessage = this.translate.instant('ERROR.NO_CONNECTION');
+      this.errorMessage = this._translate.instant('ERROR.NO_CONNECTION');
     } else {
       this.errorMessage =
-        error.error?.message || this.translate.instant('ERROR.LOAD_RFQS');
+        error.error?.message || this._translate.instant('ERROR.LOAD_RFQS');
     }
   }
 
@@ -482,7 +499,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   getStatusColor(status: LookupValue): string {
-    return this.rfqService.getStatusColor(status);
+    return this._rfqService.getStatusColor(status);
   }
 
   formatDate(date: Date | string): string {
@@ -601,7 +618,9 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
   toggleSubcategoryDropdown(): void {
     if (this.isSubcategoryDisabled) {
-      this.flashInfo(this.translate.instant('VENDOR.PLEASE_SELECT_CATEGORIES'));
+      this.flashInfo(
+        this._translate.instant('VENDOR.PLEASE_SELECT_CATEGORIES')
+      );
       return;
     }
     this.subcategoryDropdownOpen = !this.subcategoryDropdownOpen;
@@ -665,7 +684,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   getCategoryDisplayText(): string {
     const selectedIds = this.filterForm.value.category || [];
     if (selectedIds.length === 0) {
-      return this.translate.instant('VENDOR.SELECT_CATEGORIES');
+      return this._translate.instant('VENDOR.SELECT_CATEGORIES');
     }
 
     const selectedNames = this.categoryOptions
@@ -678,7 +697,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   getSubcategoryDisplayText(): string {
     const selectedIds = this.filterForm.value.subcategory || [];
     if (selectedIds.length === 0) {
-      return this.translate.instant('VENDOR.SELECT_SUBCATEGORIES');
+      return this._translate.instant('VENDOR.SELECT_SUBCATEGORIES');
     }
 
     const selectedNames = this.subcategoryOptions
@@ -707,10 +726,14 @@ export class VendorRfqs implements OnInit, OnDestroy {
       return false;
     }
     const firstQuote = rfq.quotes[0];
-    return firstQuote.vendorId !== undefined && firstQuote.vendorId !== null && firstQuote.vendorId === this.currentUser.id;
+    return (
+      firstQuote.vendorId !== undefined &&
+      firstQuote.vendorId !== null &&
+      firstQuote.vendorId === this.currentUser.id
+    );
   }
 
-  openQuoteFormDialog(id: number, customerId: number, edit: boolean){
+  openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
     const dialogRef = this._dialog.open(QuoteFormDialog, {
       width: '60%',
       maxWidth: '60%',
@@ -718,68 +741,116 @@ export class VendorRfqs implements OnInit, OnDestroy {
       panelClass: 'add-quote-dialog',
       autoFocus: false,
       data: {
-        action: edit? 'Edit' : 'Add',
+        action: edit ? 'Edit' : 'Add',
         rfqId: id,
         customerId: customerId,
         vendorId: this.currentUser?.id,
       },
     });
 
-    dialogRef
-      .afterClosed()
-      .subscribe((result: any) => {
-        if (result) {
-          this.loadStatistics();
-          setTimeout(() => {
-            let findRfqIndex = this.filteredRfqs.findIndex(rfq => rfq.id === id);
-            if (findRfqIndex > -1) {
-              this.filteredRfqs[findRfqIndex].quotes.push(
-                {
-                  title: result.title,
-                  description: result.description,
-                  price: result.price,
-                  quoteValidityIntervalType: result.quoteValidityIntervalType,
-                  quoteValidityInterval: result.quoteValidityInterval,
-                  vendorId: this.currentUser?.id!,
-                  submissionId: id
-                }
-              )
-            }
-          })
-        }
-      });
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.loadStatistics();
+        setTimeout(() => {
+          let findRfqIndex = this.filteredRfqs.findIndex(
+            (rfq) => rfq.id === id
+          );
+          if (findRfqIndex > -1) {
+            this.filteredRfqs[findRfqIndex].quotes.push({
+              title: result.title,
+              description: result.description,
+              price: result.price,
+              quoteValidityIntervalType: result.quoteValidityIntervalType,
+              quoteValidityInterval: result.quoteValidityInterval,
+              vendorId: this.currentUser?.id!,
+              submissionId: id,
+            });
+          }
+        });
+      }
+    });
   }
 
   canApprove(rfq: Rfq): boolean {
-    if ( rfq.status?.name === 'Pending Review' || rfq.status?.name === 'Rejected' || rfq.status?.name === 'Archived') {
+    if (
+      rfq.status?.name === 'Pending Review' ||
+      rfq.status?.name === 'Rejected' ||
+      rfq.status?.name === 'Archived'
+    ) {
       return this.currentUser?.type === UserRole.ADMIN;
     } else {
       return false;
     }
   }
 
-  approveRfq(rfqId: number){
-    const approveRfq = 2;
-    this.rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.loadRfqs();
-    })
+  approveRfq(rfqId: number) {
+    const confirmKey = 'ALERTS.CONFIRM_APPROVE_RFQ';
+
+    this._alert.confirm(confirmKey).then((result) => {
+      if (result.isConfirmed) {
+        const approveRfq = 2;
+        this._rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.loadRfqs();
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_APPROVED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: () => {
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_APPROVE_FAILED'),
+            });
+          },
+        });
+      }
+    });
   }
 
   canDecline(rfq: Rfq): boolean {
-    if ( rfq.status?.name === 'Approved' || rfq.status?.name === 'Pending Review') {
+    if (
+      rfq.status?.name === 'Approved' ||
+      rfq.status?.name === 'Pending Review'
+    ) {
       return this.currentUser?.type === UserRole.ADMIN;
     } else {
       return false;
     }
   }
 
-  declineRfq(rfqId: number){
-    const declineRfq = 3;
-    this.rfqService.rfqChangeStatus(rfqId, declineRfq).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.loadRfqs();
-    })
-  }
+  declineRfq(rfqId: number) {
+    const confirmKey = 'ALERTS.CONFIRM_REJECT_RFQ';
 
+    this._alert.confirm(confirmKey).then((result) => {
+      if (result.isConfirmed) {
+        const declineRfq = 3;
+        this._rfqService.rfqChangeStatus(rfqId, declineRfq).pipe(takeUntil(this.destroy$)).subscribe({
+          next: () => {
+            this.loadRfqs();
+            Swal.fire({
+              icon: 'success',
+              title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_DECLINED'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          },
+          error: () => {
+            Swal.fire({
+              icon: 'error',
+              title: this._translate.instant('ALERTS.ERROR_TITLE'),
+              text: this._translate.instant('ALERTS.RFQ_DECLINE_FAILED'),
+            });
+          },
+        });
+      }
+    });
+  }
   // Expose Math to template
   Math = Math;
 
@@ -791,23 +862,25 @@ export class VendorRfqs implements OnInit, OnDestroy {
     if (desc.classList.contains('description-collapsed')) {
       desc.classList.remove('description-collapsed');
       desc.classList.add('description-expanded');
-      btn.textContent = this.translate.instant('VENDOR.SHOW_LESS');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_LESS');
     } else {
       desc.classList.remove('description-expanded');
       desc.classList.add('description-collapsed');
-      btn.textContent = this.translate.instant('VENDOR.SHOW_MORE');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_MORE');
     }
   }
 
   navigateToMessages(rfq: Rfq): void {
-    this.router.navigate(['/messages'], {queryParams: { quoteId: rfq.id, customerId: rfq?.user?.id }});
+    this._router.navigate(['/messages'], {
+      queryParams: { quoteId: rfq.id, customerId: rfq?.user?.id },
+    });
   }
 
   initializeCarouselStates() {
     if (this.filteredRfqs) {
-        this.filteredRfqs.forEach(rfq => {
-          this.updateScrollState('carousel' + rfq.id);
-        });
+      this.filteredRfqs.forEach((rfq) => {
+        this.updateScrollState('carousel' + rfq.id);
+      });
     }
   }
 
@@ -838,12 +911,12 @@ export class VendorRfqs implements OnInit, OnDestroy {
     const needsScroll = scrollWidth > clientWidth;
 
     const canScrollLeft = scrollLeft > 0;
-    const canScrollRight = scrollLeft < (scrollWidth - clientWidth - 1);
+    const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
 
     this.carouselScrollStates[id] = {
       canScrollLeft: canScrollLeft && needsScroll,
       canScrollRight: canScrollRight && needsScroll,
-      needsScroll
+      needsScroll,
     };
   }
 
@@ -852,22 +925,47 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   getScrollState(id: string) {
-    return this.carouselScrollStates[id] || { canScrollLeft: false, canScrollRight: false, needsScroll: false };
+    return (
+      this.carouselScrollStates[id] || {
+        canScrollLeft: false,
+        canScrollRight: false,
+        needsScroll: false,
+      }
+    );
   }
 
   onViewDetails(id: number): void {
-    this.rfqService.viewedRfq(id).pipe(take(1)).subscribe({
-      next: () => this.router.navigate(['/vendor-rfqs', id]),
-      error: (err) => {
-        this.handleError(err);
-        this.router.navigate(['/vendor-rfqs', id]);
-      }
-    });
+    this._rfqService
+      .viewedRfq(id)
+      .pipe(take(1))
+      .subscribe({
+        next: () => this._router.navigate(['/vendor-rfqs', id]),
+        error: (err) => {
+          this.handleError(err);
+          this._router.navigate(['/vendor-rfqs', id]);
+        },
+      });
   }
 
   getStatusCount(rfq: Rfq, statusName: string): number {
     if (!rfq?.statusHistoryCount) return 0;
-    const entry = rfq.statusHistoryCount.find((s: any) => s.status?.name === statusName);
+    const entry = rfq.statusHistoryCount.find(
+      (s: any) => s.status?.name === statusName
+    );
     return entry ? entry.count : 0;
+  }
+
+  getVendorStatus(rfq: Rfq): string | null {
+    if (!rfq?.statusHistory) return null;
+
+    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
+    const hasEngaged = rfq.statusHistory.some((s: any) => s.status?.id === 4);
+    const hasViewed = rfq.statusHistory.some((s: any) => s.status?.id === 2);
+
+    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
+    if (hasEngaged) return this._translate.instant('VENDOR.ENGAGED');
+    if (hasViewed) return this._translate.instant('VENDOR.VIEWED');
+
+    return null;
   }
 }

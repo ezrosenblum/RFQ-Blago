@@ -318,11 +318,9 @@
                   </div>
 
                   <div
-                    class="inline-flex items-center gap-[6px] px-3 py-[6px] rounded-[20px] text-xs font-medium uppercase tracking-[0.5px]"
-                    [ngClass]="statusStyles[rfq.status?.id ?? 0].container">
-
-                    <span [ngClass]="statusStyles[rfq.status?.id ?? 0].dot">●</span>
-                    {{ rfq.status?.name }}
+                    class="inline-flex items-center gap-[6px] py-[6px] rounded-[20px] tracking-[0.5px] px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide"
+                    *ngIf="this.currentUser?.type === 'Vendor' && getVendorStatus(rfq)">
+                    {{ getVendorStatus(rfq) }}
                   </div>
 
                 </div>
@@ -394,7 +392,7 @@
               class="px-6 py-5 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center gap-4 flex-wrap">
               <div class="flex items-center gap-6 flex-wrap">
 
-                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm"></div>
+                <div class="w-0.5 h-10 bg-gray-300 rounded-sm"></div>
                 <div class="flex flex-col gap-0.5">
                   <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{
                     'VENDOR.SUBMITTED_BY'
@@ -412,7 +410,7 @@
                   </div>
                 </div>
 
-                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm"></div>
+                <div class="w-0.5 h-10 bg-gray-300 rounded-sm"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.QTY' |
@@ -424,7 +422,7 @@
                   </div>
                 </div>
 
-                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
+                <div class="w-0.5 h-10 bg-gray-300 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
@@ -436,7 +434,7 @@
                   </div>
                 </div>
 
-                <div class="w-1 h-10 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
+                <div class="w-0.5 h-10 bg-gray-300 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
@@ -612,6 +610,20 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478
                                          0 8.268 2.943 9.542 7-1.274 4.057-5.064
                                          7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+
+                    <!-- Send Quote button (Envelope Icon) -->
+                    <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                      class="inline-flex items-center justify-center p-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 transition-transform bg-green-500 text-white hover:bg-green-600"
+                      title="{{ 'VENDOR.SEND_QUOTE' | translate }}">
+                      <!-- Envelope Icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2
+                            2 0 002-2V7a2 2 0 00-2-2H5a2 2 0
+                            00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </button>
 

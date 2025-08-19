@@ -1,8 +1,10 @@
-﻿using Application.Common.Interfaces.Repository.Base;
+﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repository.Base;
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
 using AutoMapper;
 using Domain.Entities.Users.CompanyDetails;
+using Domain.Interfaces;
 using DTO.Enums.Company;
 using DTO.User.CompanyDetails;
 using FluentValidation;
@@ -28,21 +30,30 @@ public sealed record UserCompanyDetailsUpdateCommand(
 public sealed class UserCompanyDetailsUpdateCommandHandler : ICommandHandler<UserCompanyDetailsUpdateCommand, UserCompanyDetailsResponse>
 {
     private readonly IRepository<UserCompanyDetails> _repository;
+    private readonly IMediaStorage _mediaStorage;
     private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UserCompanyDetailsUpdateCommandHandler(
         IRepository<UserCompanyDetails> repository,
-        IMapper mapper)
+        IMediaStorage mediaStorage,
+        IMapper mapper,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _mediaStorage = mediaStorage;
         _mapper = mapper;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<UserCompanyDetailsResponse> Handle(UserCompanyDetailsUpdateCommand command, CancellationToken cancellationToken)
     {
         var companyDetails = await _repository.GetSafeAsync(command.Id, cancellationToken);
 
-        companyDetails.Update(command);
+        await companyDetails.Update(command, _mediaStorage);
+
+        _repository.Update(companyDetails);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map<UserCompanyDetailsResponse>(companyDetails);
     }

@@ -4,7 +4,7 @@ namespace DTO.Enums.Notification;
 
 public enum NotificationType
 {
-    [LocalizationKey("enum.notificationType.newRfq")]
+    [LocalizationKey("enum.notificationType.newSubmission")]
     NewRFQ = 1,
     [LocalizationKey("enum.notificationType.newQuote")]
     NewQuote = 2,

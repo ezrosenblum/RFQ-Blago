@@ -182,6 +182,8 @@ export class Header implements OnInit, OnDestroy {
         return this.translate.instant('HEADER.VENDOR');
       case UserRole.CLIENT:
         return this.translate.instant('HEADER.CLIENT');
+      case UserRole.ADMIN:
+        return this.translate.instant('HEADER.ADMIN');
       default:
         return '';
     }
@@ -312,4 +314,61 @@ export class Header implements OnInit, OnDestroy {
   onImageError(): void {
     this.imageLoadError = true;
   }
+
+  navigateFromNotification(notif: NotificationItem): void {
+    try {
+      const data = JSON.parse(notif.data);
+
+      if (notif.status.id === 2) {
+        this.loadingStatusChange[notif.id] = true;
+        this.notificationDataService
+          .changeStatus(notif.id, 1)
+          .subscribe({
+            next: () => {
+              const index = this.notifications.findIndex(n => n.id === notif.id);
+              if (index > -1) {
+                this.notifications[index].status.id = 1;
+              }
+              this.getNotificationCount();
+
+              this.performNavigation(notif, data);
+            },
+            error: (err) => {
+              console.error('Failed to mark notification as read:', err);
+              this.performNavigation(notif, data);
+            },
+            complete: () => {
+              this.loadingStatusChange[notif.id] = false;
+            }
+          });
+      } else {
+        this.performNavigation(notif, data);
+      }
+
+    } catch (error) {
+      console.error('Error parsing notification data:', error);
+    }
+  }
+
+  private performNavigation(notif: NotificationItem, data: any): void {
+    this.showNotificationsDropdown = false;
+
+    if (notif.type.id === 1) {
+      const submissionId = data.SubmissionId;
+      if (submissionId) {
+        this.router.navigate(['/vendor-rfqs', submissionId]);
+      }
+    } else if (notif.type.id === 2) {
+      const quoteId = data.QuoteId;
+      if (quoteId) {
+        this.router.navigate(['/quote-details', quoteId]);
+      }
+    } else if (notif.type.id === 3) {
+      const submissionQuoteId = data.SubmissionQuoteId;
+      if (submissionQuoteId) {
+        this.router.navigate(['/messages'], { queryParams: { quoteId: submissionQuoteId } });
+      }
+    }
+  }
+
 }

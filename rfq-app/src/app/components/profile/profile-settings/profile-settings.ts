@@ -670,3 +670,4 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
     return '';
   }
 }
+

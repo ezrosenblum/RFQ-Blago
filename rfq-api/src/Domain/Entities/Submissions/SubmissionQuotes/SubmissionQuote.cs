@@ -8,6 +8,7 @@ using Domain.Events.Submissions.SubmissionQuotes;
 using Domain.Interfaces;
 using DTO.Enums.Media;
 using DTO.Enums.Submission.SubmissionQuote;
+using Microsoft.AspNetCore.Http;
 
 namespace Domain.Entities.Submissions.SubmissionQuotes;
 
@@ -35,7 +36,7 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
     public virtual ICollection<QuoteMessage> QuoteMessages { get; set; } = new List<QuoteMessage>();
 
     private SubmissionQuote() { }
-    private SubmissionQuote(ISubmissionQuoteInsertData data)
+    private SubmissionQuote(ISubmissionQuoteInsertData data, IReadOnlyCollection<IFormFile> files)
     {
         Title = data.Title;
         Description = data.Description;
@@ -52,11 +53,11 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         WarantyIntervalType = data.WarantyIntervalType;
         WarantyDuration = data.WarantyDuration;
 
-        AddDomainEvent(new SubmissionQuoteCreatedEvent(this));
+        AddDomainEvent(new SubmissionQuoteCreatedEvent(this, files));
     }
-    public static SubmissionQuote Create(ISubmissionQuoteInsertData data)
+    public static SubmissionQuote Create(ISubmissionQuoteInsertData data, IReadOnlyCollection<IFormFile> files)
     {
-        return new SubmissionQuote(data);
+        return new SubmissionQuote(data, files);
     }
     public void Update(ISubmissionQuoteUpdateData data)
     {

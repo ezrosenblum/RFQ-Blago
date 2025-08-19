@@ -141,7 +141,7 @@ namespace Api.Controllers.v1
 
         [Authorize(Policy = AuthorizationPolicies.Vendor)]
         [HttpPost("quote")]
-        public async Task<IActionResult> QuoteCreate([FromBody] SubmissionQuoteCreateCommand request)
+        public async Task<IActionResult> QuoteCreate([FromForm] SubmissionQuoteCreateCommand request)
         {
             await Mediator.Send(request);
 

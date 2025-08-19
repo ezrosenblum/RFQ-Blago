@@ -220,6 +220,7 @@
     "LOAD_UNITS": "Failed to load unit options. Please try again later.",
     "SUBMIT_SUCCESS": "Your quote request has been submitted successfully! We will review it and get back to you soon.",
     "LABEL_IDLE": "Drag & Drop your files or <span class=\"filepond--label-action\">Browse</span>",
+    "DOCUMENTS": "Documents",
     "SEND_QUOTE": "Send a Quote",
     "QUOTE_SENT": "Quote sent",
     "EDIT_QUOTE": "Edit Quote",
@@ -334,7 +335,8 @@
     "VIEWS": "Views",
     "ENGAGEMENTS": "Engagements",
     "ENGAGED": "Engaged",
-    "VIEWED": "Viewed"
+    "VIEWED": "Viewed",
+    "TOTAL_PROJECT_COST": "Total Project Cost"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
@@ -351,6 +353,7 @@
     "SIGN_OUT": "Sign Out",
     "VENDOR": "Vendor",
     "CLIENT": "Client",
+    "ADMIN": "Admin",
     "MESSAGES": "Messages",
     "NOTIFICATIONS": "Notifications",
     "MARK_ALL_AS_READ": "Mark all as read",
@@ -488,7 +491,12 @@
     "CONFIRM_DELETE_IMAGE": "Are you sure you want to delete this image?",
     "IMAGE_REMOVED": "Profile photo removed.",
     "CONFIRM_DELETE_CERTIFICATE": "Are you sure you want to delete this certificate?",
-    "CERTIFICATE_REMOVED": "Business certificate removed."
+    "CERTIFICATE_REMOVED": "Business certificate removed.",
+    "CLICK_TO_UPLOAD": "Click to upload",
+    "OR_DRAG_AND_DROP": "or drag and drop",
+    "REMOVE_FILE": "Remove File",
+    "FILE_TOO_LARGE": "File size must be less than 5MB",
+    "INVALID_FILE_TYPE": "Please upload a valid file format (PDF, JPG, PNG, DOC, DOCX)"
   },
   "ALERTS": {
     "CONFIRM": "Confirm",
@@ -506,7 +514,22 @@
     "DELETE_FAILED": "Failed to delete the record",
     "MANDATORY_FIELDS_REQUIRED": "Mandatory fields must be filled in!",
     "INVALID_STATUS": "Invalid status",
-    "PROFILE_UPDATED": "Profile updated successfully"
+    "PROFILE_UPDATED": "Profile updated successfully",
+    "CONFIRM_APPROVE": "Do you want to accept this quote?",
+    "CONFIRM_REJECT": "Do you want to reject this quote?",
+    "CONFIRM_INVALID": "Do you want to mark this quote as invalid?",
+    "CONFIRM_ACTION": "Do you want to continue?",
+    "CONFIRM_VALID":  "Do you want to mark this quote as valid?",
+    "CONFIRM_APPROVE_RFQ": "Do you want to approve this RFQ?",
+    "CONFIRM_REJECT_RFQ": "Do you want to reject this RFQ?",
+    "SUCCESS_TITLE": "Success",
+    "ERROR_TITLE": "Error",
+    "STATUS_UPDATED": "Status has been updated successfully.",
+    "STATUS_UPDATE_FAILED": "Failed to update the status. Please try again.",
+    "RFQ_APPROVED": "RFQ has been approved successfully.",
+    "RFQ_APPROVE_FAILED": "Failed to approve RFQ. Please try again.",
+    "RFQ_DECLINED": "RFQ has been declined successfully.",
+    "RFQ_DECLINE_FAILED": "Failed to decline RFQ. Please try again."
   },
   "MESSAGES": {
     "NO_CONVERSATIONS_FOUND": "No conversations found",

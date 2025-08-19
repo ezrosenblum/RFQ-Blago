@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 
 import { RfqRoutingModule } from './rfq-routing-module';
 import { RequestQuote } from './request-quote/request-quote';
@@ -37,6 +37,9 @@ import { QuoteDetails } from './quote-details/quote-details';
     MaterialCategoriesSelectionComponent,
     MatDialogModule,
     MatTooltipModule
+  ],
+  providers: [
+    CurrencyPipe 
   ]
 })
 

@@ -23,3 +23,11 @@ h1 {
 mat-dialog-actions {
     padding: 20px 50px !important;
 }
+
+.pt-28 {
+    padding-top: 28px;
+}
+
+::ng-deep .filepond--credits {
+    display: none;
+}

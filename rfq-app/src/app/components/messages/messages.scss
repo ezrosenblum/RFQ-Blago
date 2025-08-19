@@ -137,10 +137,16 @@
     padding-left: 35px;
 }
 
-.file {
-    width: 100px;
-    height: 80px;
-    padding: 10px 5px 0 5px;
+.quoted-msg {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.048);
+}
+
+.file-sidebar {
+    width: 100%;
+    height: 50px;
+    padding: 10px 0 0px 0;
 }
 
 .file-image {
@@ -151,14 +157,30 @@
     background-size: cover !important;
     border-radius: 5px;
     cursor: pointer;
+    width: 100px;
+    height: 80px;
+    margin: 10px 5px 0 5px;
+}
+
+.right-sidenav-img {
+    width: 64px;
+    height: 64px;
 }
 
 .user-avatar {
     width: 32px;
     height: 32px;
+}
+
+.bg-round {
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: cover !important;
+    border-radius: 50%;
+}
+
+.file-pdf, .file-text {
+    min-width: 300px;
 }
 
 .btn-spinner {
@@ -174,6 +196,14 @@
 
 .chat-unread {
     font-weight: bold;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.p-0 {
+    padding: 0;
 }
 
 @media (max-width: 900px) {

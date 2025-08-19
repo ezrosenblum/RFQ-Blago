@@ -84,8 +84,8 @@ export interface MessageConevrsationRequest {
     pageSize: number
   },
   sorting: {
-    field: 1,
-    sortOrder: 1
+    field: number,
+    sortOrder: number
   }
 }
 

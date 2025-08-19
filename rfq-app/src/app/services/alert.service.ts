@@ -9,7 +9,7 @@ export class AlertService {
   private snackBar = inject(MatSnackBar);
 
   confirmButtonColor: string = '#1b84ff';
-  cancelButtonColor: string = '#f0f0f0';
+  cancelButtonColor: string = '#9ca3af';
 
   confirm(
     textKey: string,

@@ -88,9 +88,6 @@ export class QuoteSendMessageDialog implements OnInit {
     this.showUploadFilesPanel = !this.showUploadFilesPanel;
   }
 
-  pondHandleInit() {
-  }
-
   pondHandleAddFile(event: any) {
     if (event?.file?.file) {
       this.pondFiles.push(event.file.file as File);
@@ -100,7 +97,7 @@ export class QuoteSendMessageDialog implements OnInit {
   onFileRemoved(event: any) {
   if (event?.file?.file) {
       const removedFile = event.file.file as File;
-      this.pondFiles = this.pondFiles.filter(f => f !== removedFile);
+      this.pondFiles = this.pondFiles.filter(f => f != removedFile);
     }
   }
 

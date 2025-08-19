@@ -91,34 +91,6 @@ export class MessagesComponent implements OnInit {
   
   isMessageSending: boolean = false;
 
-  // Right sidenav properties
-  activities: Activity[] = [
-    {
-      icon: 'check',
-      title: 'Project proposal accepted',
-      date: 'July 29',
-      bgColor: 'bg-green-500',
-    },
-    {
-      icon: 'settings',
-      title: 'Development contract signed',
-      subtitle: 'E-commerce platform redesign project',
-      bgColor: 'bg-blue-500',
-    },
-    {
-      icon: 'play',
-      title: 'Sprint 1 commenced',
-      subtitle: 'Analytics dashboard development',
-      bgColor: 'bg-purple-500',
-    },
-    {
-      icon: 'check',
-      title: 'Milestone 1 delivery',
-      subtitle: 'Scheduled for August 5',
-      bgColor: 'bg-orange-500',
-    },
-  ];
-
   constructor(
     private _messageService: MessagesService,
     private _authService: Auth,
@@ -240,8 +212,8 @@ export class MessagesComponent implements OnInit {
         pageSize: 10
       },
       sorting: {
-        field: 1,
-        sortOrder: 1
+        field: 4,
+        sortOrder: 2
       }
     };
 
@@ -280,8 +252,8 @@ export class MessagesComponent implements OnInit {
         pageSize: 100
       },
       sorting: {
-        field: 1,
-        sortOrder: 1
+        field: 4,
+        sortOrder: 2
       }
     };
 
@@ -327,6 +299,33 @@ export class MessagesComponent implements OnInit {
 
     this._messageService.getChatMessageHistory(request).pipe(take(1)).subscribe({
       next: (data: TableResponse<MessageEntry>) => {
+        let quotetMessage: MessageEntry = {
+          id: 1,
+          content: this.selectedConversation!.description,
+          created: this.selectedConversation!.created,
+          media: this.selectedConversation!.media,
+          submissionQuoteId: this.selectedConversation!.id,
+          senderId: this.selectedConversation!.vendor.id,
+          quoteMessageStatus: {
+            id: 0,
+            name: '',
+          },
+          sender: {
+            id: this.selectedConversation!.vendor.id,
+            firstName: this.selectedConversation!.vendor.firstName,
+            lastName: this.selectedConversation!.vendor.lastName,
+            email: '',
+            picture: this.selectedConversation!.vendor.picture,
+            receiveEmailNotifications: false,
+            receivePushNotifications: false,
+          }
+        };
+        
+        if (Array.isArray(data?.items)) {
+          data.items.unshift(quotetMessage);
+        }
+
+
       this.currentMessages = Array.isArray(data.items) ? data.items : [];
       this.loadingChatMessages = false;
 
@@ -548,9 +547,6 @@ export class MessagesComponent implements OnInit {
     this.showUploadFilesPanel = !this.showUploadFilesPanel;
   }
 
-  pondHandleInit() {
-  }
-
   pondHandleAddFile(event: any) {
     if (event?.file?.file) {
       this.pondFiles.push(event.file.file as File);
@@ -558,9 +554,9 @@ export class MessagesComponent implements OnInit {
   }
 
   onFileRemoved(event: any) {
-  if (event?.file?.file) {
+    if (event?.file?.file) {
       const removedFile = event.file.file as File;
-      this.pondFiles = this.pondFiles.filter(f => f !== removedFile);
+      this.pondFiles = this.pondFiles.filter(f => f != removedFile);
     }
   }
 
