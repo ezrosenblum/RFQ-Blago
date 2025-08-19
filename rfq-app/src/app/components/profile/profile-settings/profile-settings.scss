@@ -1,3 +1,10 @@
 .ki-picture{
   font-size: 40px;
 }
+
+::ng-deep {
+
+    .filepond--credits {
+        display: none !important;
+    }
+}

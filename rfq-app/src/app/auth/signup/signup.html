@@ -436,7 +436,8 @@
                   placeholder="{{ 'AUTH.ENTER_CONTACT_PHONE' | translate }}"
                 />
                 <p class="mt-1 text-xs text-secondary-500">
-                  {{ 'AUTH.DEFAULTS_TO_YOUR_PHONE_IF_NOT_PROVIDED' | translate }}
+                  {{ 'AUTH.DEFAULTS_TO_YOUR_PHONE_IF_NOT_PROVIDED' | translate
+                  }}
                 </p>
               </div>
             </div>
@@ -470,7 +471,10 @@
                 [class.border-error-500]="isFieldInvalid('businessDescription')"
                 placeholder="{{ 'AUTH.DESCRIBE_YOUR_BUSINESS_AND_SPECIALTIES' | translate }}"
               ></textarea>
-              <div *ngIf="isFieldInvalid('businessDescription')" class="form-error">
+              <div
+                *ngIf="isFieldInvalid('businessDescription')"
+                class="form-error"
+              >
                 {{ getFieldError('businessDescription') }}
               </div>
             </div>
@@ -495,18 +499,24 @@
               <label for="businessLicense" class="form-label">
                 {{ 'AUTH.BUSINESS_LICENSE_CERTIFICATION_OPTIONAL' | translate }}
               </label>
-              <input
-                formControlName="businessLicense"
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                (change)="onFileSelected($event)"
-                class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-              />
+              <file-pond
+                #pond
+                [options]="pondOptions"
+                [files]="pondFiles"
+                (onaddfile)="onFilePondAddFile($event)"
+                (onremovefile)="onFilePondRemoveFile($event)"
+                (onerror)="onFilePondError($event)"
+                class="certificate-upload"
+              >
+              </file-pond>
               <p class="mt-1 text-xs text-secondary-500">
-                {{ 'AUTH.ACCEPTED_FORMATS' | translate }}: PDF, JPG, PNG, DOC, DOCX
-                (Max 5MB)
+                {{ 'AUTH.ACCEPTED_FORMATS' | translate }}: PDF, JPG, PNG, DOC,
+                DOCX (Max 5MB)
               </p>
-              <div *ngIf="selectedFileName" class="mt-2 text-sm text-secondary-600">
+              <div
+                *ngIf="selectedFileName"
+                class="mt-2 text-sm text-secondary-600"
+              >
                 {{ 'AUTH.SELECTED' | translate }}: {{ selectedFileName }}
               </div>
             </div>
@@ -514,7 +524,9 @@
 
           <!-- Right side -->
           <div class="space-y-6">
-            <app-service-areas (serviceAreaChange)="handleServiceAreaChange($event)"></app-service-areas>
+            <app-service-areas
+              (serviceAreaChange)="handleServiceAreaChange($event)"
+            ></app-service-areas>
           </div>
         </div>
       </div>
