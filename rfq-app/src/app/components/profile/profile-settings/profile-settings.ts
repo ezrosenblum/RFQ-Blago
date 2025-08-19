@@ -259,7 +259,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
   private initializeUserData(data: User): void {
     this.user = data;
     this.populateForm(data);
-    this.previewImageUrl = data.picture || data.picture || null;
+    this.previewImageUrl = data.picture || data.profilePicture || null;
     this.accountExistingAvatar = this.previewImageUrl;
     this.initializeFilePondWithExistingFile();
   }
