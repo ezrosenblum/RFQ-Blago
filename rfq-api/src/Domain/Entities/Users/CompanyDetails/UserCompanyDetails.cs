@@ -59,7 +59,9 @@ public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMe
         return userCompanyDetails;
     }
 
-    public void Update(IUserCompanyDetailsUpdateData data)
+    public async Task Update(
+        IUserCompanyDetailsUpdateData data,
+        IMediaStorage mediaStorage)
     {
         Name = data.Name;
         ContactPersonFirstName = data.ContactPersonFirstName;
@@ -72,6 +74,14 @@ public class UserCompanyDetails : BaseAuditableEntity, IHasDomainEvents, IWithMe
         LongitudeAddress = data.LongitudeAddress;
         LatitudeAddress = data.LatitudeAddress;
         OperatingRadius = data.OperatingRadius;
+
+        if (data.Certificate != null)
+        {
+            if (Media.Items.Count > 0)
+                await Media.Delete(Media.Items.Select(s => s.Id), Id, mediaStorage);
+
+            await UploadFile(new MediaCreateData(data.Certificate, true, 1), mediaStorage);
+        }
 
         AddDomainEvent(new UserCompanyDetailsUpdatedEvent(this));
     }

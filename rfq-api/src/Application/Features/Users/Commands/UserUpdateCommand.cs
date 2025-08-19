@@ -68,9 +68,19 @@ public sealed class UserUpdateCommandHandler : ICommandHandler<UserUpdateCommand
 
         UserCompanyDetailsUpdateCommand? companyCommand = null;
 
+        _dbContext.User.Update(user);
+
         if (command.CompanyDetails is not null)
         {
             var details = command.CompanyDetails;
+
+            if (user.CompanyDetails == null)
+            {
+                var createCompanyCommand = _mapper.Map<UserCompanyDetailsCreateCommand>(details);
+
+                await _mediatr.Send(createCompanyCommand with { UserId = user.Id }, cancellationToken);
+            }
+
 
             companyCommand = new UserCompanyDetailsUpdateCommand(
                 Id: user.CompanyDetails!.Id,
@@ -92,13 +102,17 @@ public sealed class UserUpdateCommandHandler : ICommandHandler<UserUpdateCommand
 
         }
 
-        await _userManager.UpdateAsync(user);
-        await _unitOfWork.SaveChangesAsync();
+        else 
+            await _unitOfWork.SaveChangesAsync();
+
+        user = await _dbContext.User
+                .Include(u => u.CompanyDetails)
+                .FirstAsync(s => s.Id == user.Id, cancellationToken);
 
         var userResponse = _mapper.Map<UserResponse>(user);
 
         if (companyCommand is not null)
-            userResponse.CompanyDetails = _mapper.Map<UserCompanyDetailsResponse>(companyCommand);
+            userResponse.CompanyDetails = _mapper.Map<UserCompanyDetailsResponse>(user.CompanyDetails);
 
         return userResponse;
     }

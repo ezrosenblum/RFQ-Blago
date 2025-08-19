@@ -1,4 +1,5 @@
-﻿using DTO.Response;
+﻿using DTO.Medias;
+using DTO.Response;
 
 namespace DTO.User.CompanyDetails;
 
@@ -16,5 +17,5 @@ public sealed record UserCompanyDetailsResponse
     public double? LongitudeAddress { get; init; }
     public double? OperatingRadius { get; init; }
     public ListItemBaseResponse CompanySize { get; init; } = new();
-    public string? CertificateUrl { get; init; }
+    public MediaItemResponse? Certificate { get; init; }
 }
