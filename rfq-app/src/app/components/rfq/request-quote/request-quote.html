@@ -270,11 +270,13 @@
 
         <!-- FilePond drag and drop input -->
         <file-pond
+          #myPond 
           class="mt-5"
           name="file"
           [options]="pondOptions"
           [files]="pondFiles"
-          (onupdatefiles)="onFilesUpdated($event)">
+          (onaddfile)="pondHandleAddFile($event)"
+          (onremovefile)="onFileRemoved($event)">
         </file-pond>
         <!-- Form Actions -->
         <div class="flex flex-col sm:flex-row justify-between pt-6 border-t border-secondary-200 dark:border-secondary-700">

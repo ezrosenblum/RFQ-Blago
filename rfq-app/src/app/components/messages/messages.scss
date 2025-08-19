@@ -143,6 +143,12 @@
     padding: 10px 5px 0 5px;
 }
 
+.file-sidebar {
+    width: 100%;
+    height: 50px;
+    padding: 10px 0 0px 0;
+}
+
 .file-image {
     width: 100%;
     height: 100%;
@@ -153,12 +159,21 @@
     cursor: pointer;
 }
 
+.right-sidenav-img {
+    width: 64px;
+    height: 64px;
+}
+
 .user-avatar {
     width: 32px;
     height: 32px;
+}
+
+.bg-round {
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: cover !important;
+    border-radius: 50%;
 }
 
 .btn-spinner {
@@ -174,6 +189,14 @@
 
 .chat-unread {
     font-weight: bold;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.p-0 {
+    padding: 0;
 }
 
 @media (max-width: 900px) {

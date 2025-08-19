@@ -91,34 +91,6 @@ export class MessagesComponent implements OnInit {
   
   isMessageSending: boolean = false;
 
-  // Right sidenav properties
-  activities: Activity[] = [
-    {
-      icon: 'check',
-      title: 'Project proposal accepted',
-      date: 'July 29',
-      bgColor: 'bg-green-500',
-    },
-    {
-      icon: 'settings',
-      title: 'Development contract signed',
-      subtitle: 'E-commerce platform redesign project',
-      bgColor: 'bg-blue-500',
-    },
-    {
-      icon: 'play',
-      title: 'Sprint 1 commenced',
-      subtitle: 'Analytics dashboard development',
-      bgColor: 'bg-purple-500',
-    },
-    {
-      icon: 'check',
-      title: 'Milestone 1 delivery',
-      subtitle: 'Scheduled for August 5',
-      bgColor: 'bg-orange-500',
-    },
-  ];
-
   constructor(
     private _messageService: MessagesService,
     private _authService: Auth,
@@ -555,9 +527,9 @@ export class MessagesComponent implements OnInit {
   }
 
   onFileRemoved(event: any) {
-  if (event?.file?.file) {
+    if (event?.file?.file) {
       const removedFile = event.file.file as File;
-      this.pondFiles = this.pondFiles.filter(f => f !== removedFile);
+      this.pondFiles = this.pondFiles.filter(f => f != removedFile);
     }
   }
 

@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AsyncPipe } from '@angular/common';
 import { ImagePreviewDialog } from './image-preview-dialog/image-preview-dialog';
+import { RouterModule } from '@angular/router';
+import { FileViewComponent } from '../../shared/file-view/file-view.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,8 @@ import { ImagePreviewDialog } from './image-preview-dialog/image-preview-dialog'
     MatFormFieldModule,
     MatInputModule,
     AsyncPipe,
+    RouterModule,
+    FileViewComponent
   ]
 })
 export class MessagesModule { }

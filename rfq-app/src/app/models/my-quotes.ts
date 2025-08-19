@@ -104,6 +104,7 @@ export interface Quote {
   maximumTimelineDuration: number;
   warantyIntervalType: LookupValue;
   warrantyDuration: number;
+  lastMessage: string | null;
 }
 
 export interface QuotesResponse {
