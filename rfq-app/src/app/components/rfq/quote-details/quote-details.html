@@ -7,12 +7,15 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div class="w-12 h-12 rounded-full bg-white/60 dark:bg-white/30 text-blue-900 dark:text-blue-200 flex items-center justify-center font-bold text-base">
-              {{ getInitials(quote.vendor.firstName, quote.vendor.lastName) }}
+              {{ getInitials(quote.vendor.companyDetails.contactPersonFirstName, quote.vendor.companyDetails.contactPersonLastName) }}
             </div>
             <div>
               <h1 class="text-xl font-bold flex items-center">
                 {{quote.vendor.companyDetails.name}}
               </h1>
+              <h3 class="text-blue-900 dark:text-blue-200 text-sm">
+                {{quote.vendor.companyDetails.contactPersonFirstName}} {{quote.vendor.companyDetails.contactPersonLastName}}
+              </h3>
               <p class="text-blue-900 dark:text-blue-200 text-xs mt-1">📍 {{quote.vendor.companyDetails.streetAddress}}
               </p>
             </div>
@@ -79,15 +82,15 @@
       <!-- Action Buttons Card -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 p-4" *ngIf="currentUser?.type != 'Vendor'">
         <div class="px-2 space-y-2.5">
-          <button *ngIf="currentUser?.type === 'Administrator'" (click)="onChangeStatus(quote, quote.status?.name === 'Invalid' ? 1 : 4)" class="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg text-sm mb-3">
+          <button *ngIf="currentUser?.type === 'Administrator'" (click)="onChangeStatus(quote, quote.status.name === 'Invalid' ? 1 : 4)" class="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg text-sm mb-3">
           <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="12 2 22 20 2 20 12 2" />
             <line x1="12" y1="8" x2="12" y2="14" />
             <circle cx="12" cy="17" r="1" />
           </svg>
-          {{ quote.status?.name === 'Invalid' ? ('VENDOR.MARK_AS_VALID' | translate) : ('VENDOR.MARK_AS_INVALID' | translate) }}
+          {{ quote.status.name === 'Invalid' ? ('VENDOR.MARK_AS_VALID' | translate) : ('VENDOR.MARK_AS_INVALID' | translate) }}
         </button>
-          <button *ngIf="currentUser?.type === 'Customer' && quote.status?.name !== 'Accepted' && quote.status?.name !== 'Invalid'"(click)="onChangeStatus(quote, 2)"  class="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
+          <button *ngIf="currentUser?.type === 'Customer' && quote.status.name !== 'Accepted' && quote.status.name !== 'Invalid'"(click)="onChangeStatus(quote, 2)"  class="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd"
                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -95,7 +98,7 @@
             </svg>
             {{'VENDOR.ACCEPT_QUOTE' | translate}}
           </button>
-          <button *ngIf="currentUser?.type === 'Customer' && quote.status?.name !== 'Rejected' && quote.status?.name !== 'Invalid'" (click)="onChangeStatus(quote, 3)" class="w-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
+          <button *ngIf="currentUser?.type === 'Customer' && quote.status.name !== 'Rejected' && quote.status.name !== 'Invalid'" (click)="onChangeStatus(quote, 3)" class="w-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg text-sm">
             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"

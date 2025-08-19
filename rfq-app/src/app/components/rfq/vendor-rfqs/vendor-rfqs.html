@@ -392,7 +392,6 @@
               class="px-6 py-5 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center gap-4 flex-wrap">
               <div class="flex items-center gap-6 flex-wrap">
 
-                <div class="w-0.5 h-10 bg-gray-300 rounded-sm"></div>
                 <div class="flex flex-col gap-0.5">
                   <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{
                     'VENDOR.SUBMITTED_BY'
@@ -410,7 +409,7 @@
                   </div>
                 </div>
 
-                <div class="w-0.5 h-10 bg-gray-300 rounded-sm"></div>
+                <div class="w-0.5 h-10 bg-gray-200 rounded-sm"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.QTY' |
@@ -422,7 +421,7 @@
                   </div>
                 </div>
 
-                <div class="w-0.5 h-10 bg-gray-300 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
+                <div class="w-0.5 h-10 bg-gray-200 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
@@ -434,7 +433,7 @@
                   </div>
                 </div>
 
-                <div class="w-0.5 h-10 bg-gray-300 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
+                <div class="w-0.5 h-10 bg-gray-200 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
                 <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
                   <div class="text-center">
                     <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">

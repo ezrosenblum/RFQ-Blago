@@ -272,12 +272,12 @@ export class RfqDetails implements OnInit, OnDestroy {
   getVendorStatus(rfq: Rfq): string | null {
     if (!rfq?.statusHistory) return null;
 
-    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
     const hasEngaged = rfq.statusHistory.some((s: any) => s.status?.id === 4);
+    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
     const hasViewed = rfq.statusHistory.some((s: any) => s.status?.id === 2);
 
-    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
     if (hasEngaged) return this._translate.instant('VENDOR.ENGAGED');
+    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
     if (hasViewed) return this._translate.instant('VENDOR.VIEWED');
 
     return null;
