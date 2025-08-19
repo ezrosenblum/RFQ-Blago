@@ -1,10 +1,10 @@
-.ki-picture{
+.ki-picture {
   font-size: 40px;
 }
 
-::ng-deep {
-
-    .filepond--credits {
-        display: none !important;
-    }
+::ng-deep .filepond--file-wrapper {
+  cursor: pointer !important;
+}
+::ng-deep .filepond--drop-label {
+  cursor: pointer !important;
 }
