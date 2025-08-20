@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
+import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
 
 @Component({
   selector: 'app-quote-details',
@@ -168,6 +169,19 @@ export class QuoteDetails implements OnInit {
       default:
         return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
     }
+  }
+
+  previewImageInFullScreen(url: string){
+    const dialogRef = this._dialog.open(ImagePreviewDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      panelClass: 'preview-image-dialog',
+      autoFocus: false,
+      data: {
+        url: url,
+      },
+    });
   }
 
   handleError(error: any): void {

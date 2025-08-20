@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
+import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
 
 
 @Component({
@@ -307,6 +308,19 @@ export class RfqDetails implements OnInit, OnDestroy {
       if (result) {
         this.getDetails(id);
       }
+    });
+  }
+
+  previewImageInFullScreen(url: string){
+    const dialogRef = this._dialog.open(ImagePreviewDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      panelClass: 'preview-image-dialog',
+      autoFocus: false,
+      data: {
+        url: url,
+      },
     });
   }
 
