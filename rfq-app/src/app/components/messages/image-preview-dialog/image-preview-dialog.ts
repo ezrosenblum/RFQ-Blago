@@ -27,7 +27,10 @@ export class ImagePreviewDialog implements OnInit {
     if (this.format === '.txt') {
       fetch(this.imageUrl)
         .then(res => res.text())
-        .then(text => this.textContent = text);
+        .then(text => this.textContent = text)
+        .catch(error => {
+          this.textContent = 'Failed to load file.';
+        });
       }
   }
 

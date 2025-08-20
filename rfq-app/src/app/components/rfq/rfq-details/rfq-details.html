@@ -124,24 +124,18 @@
           <div class="border-b border-gray-200 dark:border-gray-700" *ngFor="let file of rfq?.media?.items">
 
             <!-- IMAGE -->
-            <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)">
-              <a (click)="previewImageInFullScreen(file.url)" class="pointer">
-                🖼️ Image <span>{{file.name}}</span>
-              </a>
+            <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" (click)="previewImageInFullScreen(file.url, 'img')" class="pointer">
+              🖼️ Image <span>{{file.name}}</span>
             </div>
 
             <!-- PDF -->
-            <div *ngIf="file.extension === '.pdf'">
-              <a [href]="file.url" target="_blank">
-                📄 PDF <span>{{file.name}}</span>
-              </a>
+            <div *ngIf="file.extension === '.pdf'" class="pointer" (click)="downloadFile(file, 'pdf')">
+              📄 PDF <span>{{file.name}}</span>
             </div>
 
             <!-- Text File -->
-            <div *ngIf="file.extension === '.txt'">
-              <a [href]="file.url" target="_blank">
-                📋 Text File <span>{{file.name}}</span>
-              </a>
+            <div *ngIf="file.extension === '.txt'" class="pointer" (click)="downloadFile(file, 'txt')">
+              📋 Text File <span>{{file.name}}</span>
             </div>
 
           </div>

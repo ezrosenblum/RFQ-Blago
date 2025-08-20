@@ -3,11 +3,11 @@
         <i class="ki-outline ki-abstract-11 text-base me-1 mr-2 text-secondary-900 dark:text-secondary-100" (click)="closeDialog()"></i>
     </div>
 
-    @if (format == 'img') {
+    @if (format === 'img') {
         <img [src]="imageUrl">
     }
 
-    @if (format == 'pdf') {
+    @if (format === 'pdf') {
         <iframe
             [src]="transform(imageUrl)"
             width="100%"
@@ -16,7 +16,7 @@
         ></iframe>
     }
 
-    @if (format == 'txt') {
+    @if (format === 'txt') {
         <pre class="file-content">{{ textContent }}</pre>
     }
 </div>

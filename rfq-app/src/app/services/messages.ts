@@ -100,7 +100,7 @@ export class MessagesService {
   }
 
   downloadFile(mediaEntityType: number, entityId: number, mediaItemId: string): Observable<Blob> {
-    return this.http.get(`${this.API_URL}Media/${entityId}/${mediaEntityType}/${mediaItemId}/download`, {
+    return this.http.get(`${this.API_URL}Media/${mediaEntityType}/${entityId}/${mediaItemId}/download`, {
       responseType: 'blob'
     });
   }

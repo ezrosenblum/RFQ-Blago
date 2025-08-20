@@ -361,8 +361,8 @@
           <span class="font-medium text-gray-900 dark:text-white mr-10"
             >{{ msg.sender.firstName }} {{ msg.sender.lastName }}</span>
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10" *ngIf="msg.content">
-            <p class="text-gray-800 dark:text-gray-200" *ngIf="j != 0">{{ msg.content }}</p>
-            <div [innerHTML]="msg.content" class="quill-content" *ngIf="j == 0"></div>
+            <p class="text-gray-800 dark:text-gray-200" *ngIf="j !== 0">{{ msg.content }}</p>
+            <div [innerHTML]="msg.content" class="quill-content" *ngIf="j === 0"></div>
           </div>
             <div class="file mt-3" *ngFor="let file of msg.media.items; let i = index">  
               <!-- Images -->
@@ -374,12 +374,12 @@
               ></div>
 
               <!-- PDF -->
-              <div *ngIf="file.extension === '.pdf'" class="file-pdf pointer" (click)="downloadFile(file, 'pdf', selectedConversation!.lastMessage!.id)">
+              <div *ngIf="file.extension === '.pdf'" class="file-pdf pointer" (click)="downloadFile(file, 'pdf')">
                 📄 PDF <span class="file-name">{{file.name}}</span>
               </div>
 
               <!-- Text File -->
-              <div *ngIf="file.extension === '.txt'" class="file-text pointer" (click)="downloadFile(file, 'txt', selectedConversation!.lastMessage!.id)">
+              <div *ngIf="file.extension === '.txt'" class="file-text pointer" (click)="downloadFile(file, 'txt')">
                 📄 Text File <span class="file-name">{{file.name}}</span>
               </div>
             </div>
@@ -494,12 +494,12 @@
         </div>
 
         <!-- PDF -->
-        <div *ngIf="file.extension === '.pdf'" class="file-pdf pointer" (click)="downloadFile(file, 'pdf', selectedConversation!.id)">
+        <div *ngIf="file.extension === '.pdf'" class="file-pdf pointer" (click)="downloadFile(file, 'pdf')">
           📄 PDF <span class="file-name">{{file.name}}</span>
         </div>
 
         <!-- Text File -->
-        <div *ngIf="file.extension === '.txt'" class="file-text pointer" (click)="downloadFile(file, 'txt', selectedConversation!.id)">
+        <div *ngIf="file.extension === '.txt'" class="file-text pointer" (click)="downloadFile(file, 'txt')">
           📋 Text File <span class="file-name">{{file.name}}</span>
         </div>
 

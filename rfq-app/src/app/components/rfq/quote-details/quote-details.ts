@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RfqService } from '../../../services/rfq';
 import { Subject, take, takeUntil } from 'rxjs';
-import { QuoteItem } from '../../../models/rfq.model';
+import { MediaItem, QuoteItem } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
@@ -11,6 +11,8 @@ import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
 import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
+import { MessagesService } from '../../../services/messages';
+import { MessageMediaEntry } from '../../../models/messages.model';
 
 @Component({
   selector: 'app-quote-details',
@@ -31,7 +33,8 @@ export class QuoteDetails implements OnInit {
     private _authService: Auth,
     private _dialog: MatDialog,
     private _alert: AlertService,
-    private _translate: TranslateService
+    private _translate: TranslateService,
+    private _messageService: MessagesService
   ) {}
 
   ngOnInit() {
@@ -171,7 +174,7 @@ export class QuoteDetails implements OnInit {
     }
   }
 
-  previewImageInFullScreen(url: string){
+  previewImageInFullScreen(url: string, format: string){
     const dialogRef = this._dialog.open(ImagePreviewDialog, {
       width: '100%',
       maxWidth: '100%',
@@ -180,8 +183,55 @@ export class QuoteDetails implements OnInit {
       autoFocus: false,
       data: {
         url: url,
+        format: format,
       },
     });
+  }
+
+  downloadFile(file: MediaItem, format: string) {
+    const result = this.extractIdsFromUrl(file.url);
+    if (result && result.entityId && result.typeId ) {
+      this._messageService.downloadFile(result.typeId, result.entityId, file.id)
+        .pipe(take(1))
+        .subscribe({
+          next: (blob: Blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            this.previewImageInFullScreen(url, format);
+            if (format !== 'pdf') {
+              link.download = file.name || `download_${file.id}`;
+              
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              window.URL.revokeObjectURL(url);
+            }
+          },
+          error: (error) => {
+            this._alert.error('VENDOR.FILE_PREVIEW_ERROR');
+          },
+        });
+    } else {
+      this._alert.error('VENDOR.FILE_PREVIEW_ERROR');
+    }
+  }
+
+  extractIdsFromUrl(url: string): { typeId: number, entityId: number } | null {
+    try {
+      const parts = url.split('/documents/')[1]?.split('/');
+      if (!parts || parts.length < 2) return null;
+
+      const typeId = Number(parts[0]);
+      const entityId = Number(parts[1]);
+
+      if (isNaN(typeId) || isNaN(entityId)) return null;
+
+      return { typeId, entityId };
+    } catch {
+      return null;
+    }
   }
 
   handleError(error: any): void {

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RfqService } from '../../../services/rfq';
 import { Subject, take, takeUntil } from 'rxjs';
-import { QuoteItem, QuoteSearchRequest, QuoteSearchResponse, Rfq } from '../../../models/rfq.model';
+import { MediaItem, QuoteItem, QuoteSearchRequest, QuoteSearchResponse, Rfq } from '../../../models/rfq.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
@@ -12,6 +12,8 @@ import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dia
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
 import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
+import { MessageMediaEntry } from '../../../models/messages.model';
+import { MessagesService } from '../../../services/messages';
 
 
 @Component({
@@ -48,7 +50,8 @@ export class RfqDetails implements OnInit, OnDestroy {
     private _authService: Auth,
     private _dialog: MatDialog,
     private _translate: TranslateService,
-    private _alert: AlertService
+    private _alert: AlertService,
+    private _messageService: MessagesService
   ) {}
 
   ngOnInit() {
@@ -311,7 +314,7 @@ export class RfqDetails implements OnInit, OnDestroy {
     });
   }
 
-  previewImageInFullScreen(url: string){
+  previewImageInFullScreen(url: string, format: string){
     const dialogRef = this._dialog.open(ImagePreviewDialog, {
       width: '100%',
       maxWidth: '100%',
@@ -320,8 +323,55 @@ export class RfqDetails implements OnInit, OnDestroy {
       autoFocus: false,
       data: {
         url: url,
+        format: format
       },
     });
+  }
+
+  downloadFile(file: MediaItem, format: string) {
+    const result = this.extractIdsFromUrl(file.url);
+    if (result && result.entityId && result.typeId ) {
+      this._messageService.downloadFile(result.typeId, result.entityId, file.id)
+        .pipe(take(1))
+        .subscribe({
+          next: (blob: Blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            this.previewImageInFullScreen(url, format);
+            if (format !== 'pdf') {
+              link.download = file.name || `download_${file.id}`;
+              
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              window.URL.revokeObjectURL(url);
+            }
+          },
+          error: (error) => {
+            this._alert.error('VENDOR.FILE_PREVIEW_ERROR');
+          },
+        });
+    } else {
+      this._alert.error('VENDOR.FILE_PREVIEW_ERROR');
+    }
+  }
+
+  extractIdsFromUrl(url: string): { typeId: number, entityId: number } | null {
+    try {
+      const parts = url.split('/documents/')[1]?.split('/');
+      if (!parts || parts.length < 2) return null;
+
+      const typeId = Number(parts[0]);
+      const entityId = Number(parts[1]);
+
+      if (isNaN(typeId) || isNaN(entityId)) return null;
+
+      return { typeId, entityId };
+    } catch {
+      return null;
+    }
   }
 
   ngOnDestroy(): void {
