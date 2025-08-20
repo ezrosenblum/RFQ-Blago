@@ -117,6 +117,36 @@
             </div>
           </div>
         </div>
+        <div *ngIf="rfq?.media?.items?.[0]">
+          <p class="text-medium text-gray-600 dark:text-gray-300 mt-1 mb-5">
+            {{'VENDOR.DOCUMENTS' | translate}}
+          </p>
+
+          <div class="border-b border-gray-200 dark:border-gray-700" *ngFor="let file of rfq?.media?.items">
+
+            <!-- IMAGE -->
+            <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)">
+              <a (click)="previewImageInFullScreen(file.url)" class="pointer">
+                🖼️ Image <span>{{file.name}}</span>
+              </a>
+            </div>
+
+            <!-- PDF -->
+            <div *ngIf="file.extension === '.pdf'">
+              <a [href]="file.url" target="_blank">
+                📄 PDF <span>{{file.name}}</span>
+              </a>
+            </div>
+
+            <!-- Text File -->
+            <div *ngIf="file.extension === '.txt'">
+              <a [href]="file.url" target="_blank">
+                📋 Text File <span>{{file.name}}</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
 
