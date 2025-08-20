@@ -136,7 +136,7 @@
         </div>
 
         <form [formGroup]="filterForm" class="card-body">
-          <div
+           <div
             class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 mb-8 dark:border-secondary-700">
             <!-- View Mode Toggle -->
             <div class="flex items-center space-x-3">
@@ -147,7 +147,7 @@
                   [class.text-white]="viewMode === 'card'" [class.bg-white]="viewMode !== 'card'"
                   [class.text-secondary-700]="viewMode !== 'card'" [class.dark:bg-primary-600]="viewMode === 'card'"
                   [class.dark:bg-dark-800]="viewMode !== 'card'" [class.dark:text-secondary-200]="viewMode !== 'card'"
-                  class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                  class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-blue-700 hover:text-white focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" />
@@ -158,7 +158,7 @@
                   [class.text-white]="viewMode === 'table'" [class.bg-white]="viewMode !== 'table'"
                   [class.text-secondary-700]="viewMode !== 'table'" [class.dark:bg-primary-600]="viewMode === 'table'"
                   [class.dark:bg-dark-800]="viewMode !== 'table'" [class.dark:text-secondary-200]="viewMode !== 'table'"
-                  class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-l-0 border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                  class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-l-0 border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-blue-700 hover:text-white focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -167,33 +167,7 @@
                 </button>
               </div>
             </div>
-
-            <!-- Sort Controls -->
-            <!-- <div class="flex items-center space-x-3 mt-4 sm:mt-0">
-              <span class="text-sm font-medium text-secondary-700 dark:text-secondary-300">Sort by:</span>
-              <select
-                (change)="setSorting($any($event.target).value)"
-                class="form-select text-sm"
-              >
-                <option *ngFor="let option of sortOptions" [value]="option.value" [selected]="sortBy === option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-              <button
-                type="button"
-                (click)="setSorting(sortBy)"
-                class="btn btn-ghost p-2"
-                [title]="sortDirection === 'asc' ? 'Sort Descending' : 'Sort Ascending'"
-              >
-                <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
-                </svg>
-                <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
-                </svg>
-              </button>
-            </div> -->
-          </div>
+           </div>
           <div class="grid grid-cols-1">
             <!-- Search -->
             <div class="mb-3">

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   FilterOptions,
   MyQuotesRequest,
@@ -7,7 +7,7 @@ import {
 } from '../../../models/my-quotes';
 import { QuoteService } from '../../../services/my-quotes';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { LookupValue, QuoteItem } from '../../../models/rfq.model';
 import { RfqService } from '../../../services/rfq';
@@ -20,7 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './my-quotes.html',
   styleUrl: './my-quotes.scss',
 })
-export class MyQuotesComponent implements OnInit {
+export class MyQuotesComponent implements OnInit, OnDestroy {
   quotes: Quote[] = [];
   totalCount = 0;
   currentPage = 1;
@@ -39,6 +39,9 @@ export class MyQuotesComponent implements OnInit {
 
   viewMode: 'list' | 'grid' | 'table' = 'list';
   showFilters = false;
+
+  private destroy$ = new Subject<void>();
+  isQueryParamsChecked: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -59,9 +62,33 @@ export class MyQuotesComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      this.loadFiltersFromParams(params);
-      this.searchQuotes();
+      if (!this.isQueryParamsChecked) {
+        this.loadFiltersFromParams(params);
+        this.searchQuotes();
+        this.isQueryParamsChecked = true;
+      }
     });
+
+    this.setupAutoFiltering();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupAutoFiltering() {
+    this.filtersForm.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.updateUrlParams();
+        this.searchQuotes();
+      });
   }
 
   getDisplayEnd(): number {
@@ -75,7 +102,7 @@ export class MyQuotesComponent implements OnInit {
       priceTo: params.priceTo ? +params.priceTo : null,
       minRating: params.minRating ? +params.minRating : 0,
       location: params.location || '',
-    });
+    }, { emitEvent: false }); 
 
     this.currentPage = params.page ? +params.page : 1;
     this.pageSize = params.size ? +params.size : 10;
@@ -176,7 +203,6 @@ export class MyQuotesComponent implements OnInit {
       location: '',
       minRating: 0,
     });
-    this.onSearch();
   }
 
   statusStyles: Record<number, string> = {

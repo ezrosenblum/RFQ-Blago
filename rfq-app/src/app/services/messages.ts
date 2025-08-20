@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable} from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Rfq, TableResponse } from '../models/rfq.model';
+import { MediaItem, Rfq, TableResponse } from '../models/rfq.model';
 import { Auth } from './auth';
-import { Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry } from '../models/messages.model';
+import { Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry, MessageMediaEntry } from '../models/messages.model';
 import { MessageAdminConversationEntry, MessageAdminConversationList, MessageConevrsationRequest, MessageConversationMessagesRequest, userChat } from '../models/user.model';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class MessagesService {
 
   constructor(
     private http: HttpClient,
-    private authService: Auth
+    private alertService: AlertService
   ) {}
 
   getMessageConversations(request: MessageConevrsationRequest): Observable<MessageAdminConversationList> {
@@ -99,10 +100,55 @@ export class MessagesService {
       );
   }
 
-  downloadFile(mediaEntityType: number, entityId: number, mediaItemId: string): Observable<Blob> {
+  downloadFileLink(mediaEntityType: number, entityId: number, mediaItemId: string): Observable<Blob> {
     return this.http.get(`${this.API_URL}Media/${mediaEntityType}/${entityId}/${mediaItemId}/download`, {
       responseType: 'blob'
     });
+  }
+
+  downloadFile(file: MessageMediaEntry | MediaItem, format: string, previewImageInFullScreen: (url: string, format: string) => void) {
+    const result = this.extractIdsFromUrl(file.url);
+    if (result && result.entityId && result.typeId) {
+      this.downloadFileLink(result.typeId, result.entityId, file.id)
+        .pipe(take(1))
+        .subscribe({
+          next: (blob: Blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            if (format !== 'pdf') {
+              link.download = file.name || `download_${file.id}`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
+            } else {
+              previewImageInFullScreen(url, format);
+            }
+          },
+          error: () => {
+            this.alertService.error('VENDOR.FILE_PREVIEW_ERROR');
+          },
+        });
+    } else {
+      this.alertService.error('VENDOR.FILE_PREVIEW_ERROR');
+    }
+  }
+
+  private extractIdsFromUrl(url: string): { typeId: number; entityId: number } | null {
+    try {
+      const parts = url.split('/documents/')[1]?.split('/');
+      if (!parts || parts.length < 2) return null;
+
+      const typeId = Number(parts[0]);
+      const entityId = Number(parts[1]);
+
+      if (isNaN(typeId) || isNaN(entityId)) return null;
+
+      return { typeId, entityId };
+    } catch {
+      return null;
+    }
   }
 
 }
