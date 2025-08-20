@@ -5,3 +5,10 @@
 .pointer {
   cursor: pointer;
 }
+
+.quill-content {
+  white-space: normal;   
+  word-wrap: break-word;      
+  overflow-wrap: anywhere;     
+  line-height: 1.5;           
+}

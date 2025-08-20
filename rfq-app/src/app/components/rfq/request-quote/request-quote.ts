@@ -28,6 +28,7 @@ import { MaterialCategoriesSelectionComponent } from '../../profile/material-cat
 import { TranslateService } from '@ngx-translate/core';
 import { FilePondComponent } from 'ngx-filepond';
 import { AlertService } from '../../../services/alert.service';
+import { ContentChange, QuillEditorComponent } from 'ngx-quill';
 
 FilePond.registerPlugin(
   FilePondPluginFileValidateType,
@@ -58,6 +59,15 @@ export class RequestQuote implements OnInit, OnDestroy {
   options: any;
   @ViewChild(MaterialCategoriesSelectionComponent)
   categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
+  @ViewChild('messageInput') messageInput!: QuillEditorComponent;
+  toolbarOptions = [
+  [{ 'header': [1, 2, 3, false] }], 
+  ['bold', 'italic', 'underline'] 
+  ];
+
+  modules = {
+    toolbar: this.toolbarOptions
+  };
 
   private destroy$ = new Subject<void>();
 

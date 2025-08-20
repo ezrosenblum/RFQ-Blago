@@ -206,6 +206,13 @@
     padding: 0;
 }
 
+.quill-content {
+  white-space: normal;   
+  word-wrap: break-word;      
+  overflow-wrap: anywhere;     
+  line-height: 1.5;           
+}
+
 @media (max-width: 900px) {
     .messages-panel {
         position: absolute;

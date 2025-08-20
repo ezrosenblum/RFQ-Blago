@@ -493,12 +493,12 @@
   transition: max-height 0.3s ease;
 }
 
-.description-collapsed {
+.description-collapsed, .table-description-collapsed {
   max-height: 4.5em;
   position: relative;
 }
 
-.description-collapsed::after {
+.description-collapsed::after, .table-description-collapsed::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -539,6 +539,18 @@
   overflow: hidden;
 }
 
+.table-description-collapsed {
+  max-height: 3.5rem;
+  overflow: hidden;
+}
+
 .description-expanded {
   max-height: none;
+}
+
+.quill-content {
+  white-space: normal;   
+  word-wrap: break-word;      
+  overflow-wrap: anywhere;     
+  line-height: 1.5;           
 }

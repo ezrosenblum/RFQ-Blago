@@ -78,9 +78,8 @@
             <div class="w-1 h-6 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm"></div>
             {{ 'VENDOR.PROJECT_DESCRIPTION' | translate }}
           </h2>
-          <p class="text-base leading-relaxed text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border-l-4 border-blue-600 dark:border-blue-400">
-            {{ rfq.description }}
-          </p>
+          <div [innerHTML]="rfq.description" class="quill-content text-base leading-relaxed text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border-l-4 border-blue-600 dark:border-blue-400">
+          </div>
         </div>
 
         <!-- Required Categories & Specializations -->
@@ -125,24 +124,18 @@
           <div class="border-b border-gray-200 dark:border-gray-700" *ngFor="let file of rfq?.media?.items">
 
             <!-- IMAGE -->
-            <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)">
-              <a (click)="previewImageInFullScreen(file.url)" class="pointer">
-                🖼️ Image <span>{{file.name}}</span>
-              </a>
+            <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" (click)="previewImageInFullScreen(file.url, 'img')" class="pointer">
+              🖼️ Image <span>{{file.name}}</span>
             </div>
 
             <!-- PDF -->
-            <div *ngIf="file.extension === '.pdf'">
-              <a [href]="file.url" target="_blank">
-                📄 PDF <span>{{file.name}}</span>
-              </a>
+            <div *ngIf="file.extension === '.pdf'" class="pointer" (click)="downloadFile(file, 'pdf')">
+              📄 PDF <span>{{file.name}}</span>
             </div>
 
             <!-- Text File -->
-            <div *ngIf="file.extension === '.txt'">
-              <a [href]="file.url" target="_blank">
-                📋 Text File <span>{{file.name}}</span>
-              </a>
+            <div *ngIf="file.extension === '.txt'" class="pointer" (click)="downloadFile(file, 'txt')">
+              📋 Text File <span>{{file.name}}</span>
             </div>
 
           </div>
@@ -283,9 +276,8 @@
               <div class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
                 {{ 'VENDOR.VENDOR_PROPOSAL' | translate }}
               </div>
-              <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                {{ quote.description }}
-              </p>
+              <div [innerHTML]="quote.description" class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed quill-content">
+              </div>
             </div>
 
             <!-- Actions -->

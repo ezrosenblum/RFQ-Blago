@@ -361,29 +361,26 @@
           <span class="font-medium text-gray-900 dark:text-white mr-10"
             >{{ msg.sender.firstName }} {{ msg.sender.lastName }}</span>
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10" *ngIf="msg.content">
-            <p class="text-gray-800 dark:text-gray-200">{{ msg.content }}</p>
+            <p class="text-gray-800 dark:text-gray-200" *ngIf="j !== 0">{{ msg.content }}</p>
+            <div [innerHTML]="msg.content" class="quill-content" *ngIf="j === 0"></div>
           </div>
             <div class="file mt-3" *ngFor="let file of msg.media.items; let i = index">  
               <!-- Images -->
               <div
-                (click)="previewImageInFullScreen(file.url)"
+                (click)="previewImageInFullScreen(file.url, 'img')"
                 *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)"
                 class="file-image"
                 [style.background-image]="'url(' + file.url + ')'"
               ></div>
 
               <!-- PDF -->
-              <div *ngIf="file.extension === '.pdf'" class="file-pdf">
-                <a [href]="file.url" target="_blank">
-                  📄 PDF <span class="file-name">{{file.name}}</span>
-                </a>
+              <div *ngIf="file.extension === '.pdf'" class="file-pdf pointer" (click)="downloadFile(file, 'pdf')">
+                📄 PDF <span class="file-name">{{file.name}}</span>
               </div>
 
               <!-- Text File -->
-              <div *ngIf="file.extension === '.txt'" class="file-text">
-                <a [href]="file.url" target="_blank">
-                  📄 Text File <span class="file-name">{{file.name}}</span>
-                </a>
+              <div *ngIf="file.extension === '.txt'" class="file-text pointer" (click)="downloadFile(file, 'txt')">
+                📄 Text File <span class="file-name">{{file.name}}</span>
               </div>
             </div>
           <span class="text-xs text-gray-500 dark:text-gray-400 mr-10">{{getRelativeTime(msg.created)}}</span>
@@ -492,24 +489,18 @@
       <div class="file-sidebar border-b border-gray-200 dark:border-gray-700" *ngFor="let file of selectedConversation?.media?.items; let i = index">  
 
         <!-- IMAGE -->
-        <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" class="file-img">
-          <a (click)="previewImageInFullScreen(file.url)" class="pointer">
-            🖼️ Image <span class="file-name">{{file.name}}</span>
-          </a>
+        <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" class="file-img pointer" (click)="previewImageInFullScreen(file.url, 'img')">
+          🖼️ Image <span class="file-name">{{file.name}}</span>
         </div>
 
         <!-- PDF -->
-        <div *ngIf="file.extension === '.pdf'" class="file-pdf">
-          <a [href]="file.url" target="_blank">
-            📄 PDF <span class="file-name">{{file.name}}</span>
-          </a>
+        <div *ngIf="file.extension === '.pdf'" class="file-pdf pointer" (click)="downloadFile(file, 'pdf')">
+          📄 PDF <span class="file-name">{{file.name}}</span>
         </div>
 
         <!-- Text File -->
-        <div *ngIf="file.extension === '.txt'" class="file-text">
-          <a [href]="file.url" target="_blank">
-            📋 Text File <span class="file-name">{{file.name}}</span>
-          </a>
+        <div *ngIf="file.extension === '.txt'" class="file-text pointer" (click)="downloadFile(file, 'txt')">
+          📋 Text File <span class="file-name">{{file.name}}</span>
         </div>
 
       </div>
