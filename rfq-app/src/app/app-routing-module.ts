@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth-guard';
 import { MessagesComponent } from './components/messages/messages';
+import { ChartDemoComponent } from './components/chart-demo/chart-demo';
 
 const routes: Routes = [
   {
@@ -23,6 +24,10 @@ const routes: Routes = [
     path: 'messages',
     component: MessagesComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'chart-demo',
+    component: ChartDemoComponent
   },
   {
     path: '**',
