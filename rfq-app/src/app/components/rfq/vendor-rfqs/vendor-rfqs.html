@@ -93,6 +93,44 @@
       </div>
     </div>
 
+    <!-- Charts Section (Admin Only) -->
+    <div *ngIf="currentUser?.type === 'Administrator'" class="mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Status Distribution Pie Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 flex items-center">
+              <i class="ki ki-chart-pie-simple ki-outline mr-2"></i>
+              {{ 'ADMIN.STATUS_DISTRIBUTION' | translate }}
+            </h3>
+          </div>
+          <div class="card-body">
+            <app-pie-chart 
+              [data]="pieChartData"
+              [title]="'Status Distribution'"
+              [colors]="statusColors">
+            </app-pie-chart>
+          </div>
+        </div>
+
+        <!-- Submissions Timeline Line Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 flex items-center">
+              <i class="ki ki-chart-line ki-outline mr-2"></i>
+              {{ 'ADMIN.SUBMISSIONS_TIMELINE' | translate }}
+            </h3>
+          </div>
+          <div class="card-body">
+            <app-line-chart 
+              [data]="lineChartData"
+              [title]="'RFQ Submissions Over Time'">
+            </app-line-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Error Message -->
     <div *ngIf="errorMessage" class="alert alert-error mb-6 fade-in" role="alert">
       <div class="flex">
