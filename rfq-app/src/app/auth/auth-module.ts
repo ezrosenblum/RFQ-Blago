@@ -11,6 +11,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { VerifyComponent } from './verify/verify.component';
 import { TranslateModule  } from '@ngx-translate/core';
 import { ServiceAreasComponent } from "../components/profile/service-areas/service-areas.component";
+import { FilePondModule } from 'ngx-filepond';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { ServiceAreasComponent } from "../components/profile/service-areas/servi
     FormsModule,
     AuthRoutingModule,
     TranslateModule,
-    ServiceAreasComponent
+    ServiceAreasComponent,
+    FilePondModule
 ]
 })
 export class AuthModule { }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FileType, LookupValue, User } from '../../../models/user.model';
 import {
   FormBuilder,
@@ -14,37 +14,66 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { usPhoneValidator } from '../../../shared/validators/phone.validators';
 import { PhoneNumberFormatter } from '../../../shared/utils/phone-formatter.util';
+import { DocumentService } from '../../../services/document';
+import { FilePondFile } from 'filepond';
 @Component({
   standalone: false,
   selector: 'app-profile-settings',
   templateUrl: './profile-settings.html',
   styleUrl: './profile-settings.scss',
 })
-export class ProfileSettingsComponent implements OnInit {
+export class ProfileSettingsComponent implements OnInit, OnDestroy {
   @Input() user: User | null = null;
 
   userForm: FormGroup;
   errors: ValidationErrors | null = null;
-
   isSubmitting: boolean = false;
   isFormChanged: boolean = false;
 
   selectedFile: File | null = null;
-  selectedCertificate: File | null = null;
-
   accountExistingAvatar: string | null = null;
+  previewImageUrl: string | null = null;
+
+  selectedCertificate: File | null = null;
+  existingCertificate: any = null;
+  isDownloadingCertificate = false;
   selectedFileName: string | null = null;
+  isDragOver: boolean = false;
+  isUploadingCertificate: boolean = false;
+  uploadProgress: number = 0;
 
   initialValues: any;
-
   companySizes: LookupValue[] = [];
 
-  previewImageUrl: string | null = null;
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  isDragOver: boolean = false;
-
+  pondOptions = {
+    allowMultiple: false,
+    maxFiles: 1,
+    labelIdle: `
+    `,
+    acceptedFileTypes: [
+      'application/pdf',
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
+    maxFileSize: '5MB',
+    allowFileTypeValidation: true,
+    allowFileSizeValidation: true,
+    fileValidateTypeLabelExpectedTypes: 'Expects PDF, JPG, PNG, DOC, or DOCX',
+    server: null,
+    allowRevert: true,
+    allowReorder: false,
+    allowProcess: false,
+    instantUpload: false,
+    credits: false,
+    className: 'certificate-filepond',
+  };
+  pondFiles: any[] = [];
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -52,7 +81,9 @@ export class ProfileSettingsComponent implements OnInit {
     private userService: Auth,
     private translate: TranslateService,
     private alertService: AlertService,
-    private errorHandler: ErrorHandlerService
+    private errorHandler: ErrorHandlerService,
+    private documentService: DocumentService,
+    private auth: Auth
   ) {
     this.userForm = this.createUserForm();
   }
@@ -63,6 +94,20 @@ export class ProfileSettingsComponent implements OnInit {
     this.userForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.checkIfFormChanged();
     });
+
+    this.pondOptions = {
+      ...this.pondOptions,
+      labelIdle: `
+      ${this.translate.instant('PROFILE.DRAG_DROP_CERTIFICATE')}
+      <span class="filepond--label-action">
+        ${this.translate.instant('PROFILE.BROWSE')}
+      </span>
+      <br>
+      <small style="color:#666;">
+        ${this.translate.instant('PROFILE.CLICK_EXISTING_TO_VIEW')}
+      </small>
+    `,
+    };
   }
 
   ngOnDestroy(): void {
@@ -76,7 +121,7 @@ export class ProfileSettingsComponent implements OnInit {
       lastName: ['', Validators.required],
       email: [{ value: '', disabled: true }],
       phoneNumber: ['', [usPhoneValidator()]],
-      profilePicture: [''],
+      picture: [''],
       companyName: [''],
       contactPersonFirstName: [''],
       contactPersonLastName: [''],
@@ -88,20 +133,17 @@ export class ProfileSettingsComponent implements OnInit {
       longitudeAddress: [null],
       operatingRadius: [null],
       companySize: [null],
-      certificateUrl: [null],
+      certificate: [null],
     });
   }
 
   onPhoneInput(event: Event, fieldName: string): void {
     const input = event.target as HTMLInputElement;
     const formattedValue = PhoneNumberFormatter.formatUsPhone(input.value);
-
-    // Update the form control
     this.userForm
       .get(fieldName)
       ?.setValue(formattedValue, { emitEvent: false });
 
-    // Update the input display
     input.value = formattedValue;
   }
 
@@ -114,22 +156,16 @@ export class ProfileSettingsComponent implements OnInit {
         }
       });
   }
-
-  private initializeUserData(data: User): void {
-    this.user = data;
-    this.populateForm(data);
-    this.previewImageUrl = data.picture || data.profilePicture || null;
-  }
-
   private populateForm(user: User): void {
     const companyDetails = user.companyDetails;
+    this.existingCertificate = companyDetails?.certificate || null;
 
     this.userForm.patchValue({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       phoneNumber: user.phoneNumber,
-      profilePicture: user.profilePicture,
+      picture: user.picture,
       companyName: companyDetails?.name,
       contactPersonFirstName: companyDetails?.contactPersonFirstName,
       contactPersonLastName: companyDetails?.contactPersonLastName,
@@ -141,8 +177,9 @@ export class ProfileSettingsComponent implements OnInit {
       longitudeAddress: companyDetails?.longitudeAddress,
       operatingRadius: companyDetails?.operatingRadius,
       companySize: companyDetails?.companySize?.id || null,
-      certificateUrl: companyDetails?.certificateUrl || null,
+      certificate: companyDetails?.certificate?.id || null,
     });
+
     this.initialValues = this.userForm.getRawValue();
   }
 
@@ -159,27 +196,130 @@ export class ProfileSettingsComponent implements OnInit {
   checkIfFormChanged(): void {
     const currentValues = this.userForm.getRawValue();
     const formChanged = !this.isEqual(this.initialValues, currentValues);
-
     const avatarChanged = !!this.selectedFile;
     const certificateChanged = !!this.selectedCertificate;
 
     this.isFormChanged = formChanged || avatarChanged || certificateChanged;
   }
+
   isEqual(obj1: any, obj2: any): boolean {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
 
-  onFileSelected(event: Event, fileType: FileType = 'avatar'): void {
-    const file = this.getSelectedFile(event);
-    if (!file) {
+  onPondActivateFile(event: Event): void {
+    if (this.selectedCertificate) {
+      this.documentService.openLocalFile(this.selectedCertificate);
       return;
     }
+
+    const url = this.existingCertificate?.url;
+    if (!url) {
+      this.handleSubmissionError(
+        this.translate.instant('PROFILE.DOCUMENT_NOT_AVAILABLE')
+      );
+      return;
+    }
+
+    this.isDownloadingCertificate = true;
+
+    this.documentService
+      .openRemote(url, {
+        fileName: this.getCertificateName() ?? 'Document',
+        token: this.auth.getToken() ?? undefined,
+        withCredentials: false,
+      })
+      .pipe(finalize(() => (this.isDownloadingCertificate = false)))
+      .subscribe({
+        error: () =>
+          this.handleSubmissionError(
+            this.translate.instant('PROFILE.DOCUMENT_NOT_AVAILABLE')
+          ),
+      });
+  }
+
+  private initializeFilePondWithExistingFile(): void {
+    if (this.existingCertificate?.url) {
+      this.pondFiles = [
+        {
+          source: this.existingCertificate.url,
+          options: {
+            type: 'remote',
+            file: {
+              name: this.existingCertificate.name,
+              size: this.existingCertificate.size ?? 0,
+              type: this.getMimeType(this.existingCertificate.name),
+            },
+          },
+        },
+      ];
+    } else {
+      this.pondFiles = [];
+    }
+  }
+  private initializeUserData(data: User): void {
+    this.user = data;
+    this.populateForm(data);
+    this.previewImageUrl = data.picture || data.profilePicture || null;
+    this.accountExistingAvatar = this.previewImageUrl;
+    this.initializeFilePondWithExistingFile();
+  }
+
+  private getMimeType(filename: string): string {
+    const extension = filename
+      .toLowerCase()
+      .substring(filename.lastIndexOf('.'));
+    const mimeTypes: { [key: string]: string } = {
+      '.pdf': 'application/pdf',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.doc': 'application/msword',
+      '.docx':
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    };
+    return mimeTypes[extension] || 'application/octet-stream';
+  }
+
+  onFilePondAddFile({ file }: { file: FilePondFile }): void {
+    if (file.file instanceof File) {
+      this.processCertificateFile(file.file);
+    }
+  }
+
+  onFilePondRemoveFile(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.alertService
+      .confirm('PROFILE.CONFIRM_DELETE_CERTIFICATE', 'warning')
+      .then(({ isConfirmed }) => {
+        if (!isConfirmed) return;
+        this.selectedCertificate = null;
+        this.selectedFileName = null;
+        this.checkIfFormChanged();
+        this.translate.get('PROFILE.CERTIFICATE_REMOVED').subscribe((msg) => {
+          this.successMessage = msg;
+          setTimeout(() => {
+            this.successMessage = null;
+          }, 3000);
+        });
+      });
+  }
+
+  onFilePondError(event: Event): void {
+    this.handleSubmissionError(
+      this.translate.instant('PROFILE.FILE_UPLOAD_ERROR')
+    );
+  }
+  onFileSelected(event: Event, fileType: FileType = 'avatar'): void {
+    const file = this.getSelectedFile(event);
+    if (!file) return;
 
     if (fileType === 'avatar') {
       this.handleAvatarSelection(file);
     } else if (fileType === 'certificate') {
-      this.handleCertificateFileSelection(file);
+      this.processCertificateFile(file);
     }
+
     this.checkIfFormChanged();
   }
 
@@ -193,62 +333,8 @@ export class ProfileSettingsComponent implements OnInit {
     this.generateImagePreview(file);
   }
 
-  private generateImagePreview(file: File): void {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.previewImageUrl = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  onDeleteImage(): void {
-    this.previewImageUrl = null;
-    this.selectedFile = null;
-    this.userForm.patchValue({ profilePicture: null });
-    this.checkIfFormChanged();
-  }
-
-  onImageLoadError(): void {
-    this.previewImageUrl = null;
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      this.handleCertificateFileSelection(file);
-    }
-  }
-
-  private handleCertificateFileSelection(file: File): void {
+  private processCertificateFile(file: File): void {
     this.errorMessage = null;
-
-    if (!this.validateCertificateFile(file)) {
-      return;
-    }
-
-    this.selectedCertificate = file;
-    this.selectedFileName = file.name;
-    this.checkIfFormChanged();
-  }
-  private validateCertificateFile(file: File): boolean {
-    const maxSize = 5 * 1024 * 1024;
     const allowedTypes = [
       'application/pdf',
       'image/jpeg',
@@ -257,58 +343,120 @@ export class ProfileSettingsComponent implements OnInit {
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ];
+    const allowedExtensions = [
+      '.pdf',
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.doc',
+      '.docx',
+    ];
 
+    const fileExtension = file.name
+      .toLowerCase()
+      .substring(file.name.lastIndexOf('.'));
+
+    if (
+      !allowedTypes.includes(file.type) &&
+      !allowedExtensions.includes(fileExtension)
+    ) {
+      this.handleSubmissionError(
+        this.translate.instant('PROFILE.INVALID_FILE_TYPE')
+      );
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      this.errorMessage = this.translate.instant('PROFILE.FILE_TOO_LARGE');
-      return false;
+      this.handleSubmissionError(
+        this.translate.instant('PROFILE.FILE_TOO_LARGE')
+      );
+      return;
     }
 
-    if (!allowedTypes.includes(file.type)) {
-      this.errorMessage = this.translate.instant('PROFILE.INVALID_FILE_TYPE');
-      return false;
-    }
-
-    return true;
-  }
-  onRemoveCertificate(event: Event): void {
-    event.stopPropagation();
-
-    this.selectedCertificate = null;
-    this.selectedFileName = null;
-    this.errorMessage = null;
-
-    this.userForm.get('certificateUrl')?.setValue(null);
-
-    const fileInput = document.querySelector(
-      'input[type="file"][formControlName="certificateUrl"]'
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-
+    this.existingCertificate = null;
+    this.selectedCertificate = file;
+    this.selectedFileName = file.name;
     this.checkIfFormChanged();
   }
 
-  getFileType(filename: string): 'pdf' | 'doc' | 'image' {
-    const ext = filename.toLowerCase().split('.').pop();
+  removeCertificate(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-    if (ext === 'pdf') return 'pdf';
-    if (ext === 'doc' || ext === 'docx') return 'doc';
-    if (['jpg', 'jpeg', 'png'].includes(ext || '')) return 'image';
-
-    return 'doc';
+    this.selectedCertificate = null;
+    this.existingCertificate = null;
+    this.selectedFileName = null;
+    this.errorMessage = null;
+    this.pondFiles = [];
+    this.userForm.patchValue({ certificate: null });
+    this.checkIfFormChanged();
   }
 
-  getFileSize(file: File): string {
-    const bytes = file.size;
-    if (bytes === 0) return '0 Bytes';
-
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  getCertificateName(): string {
+    if (this.selectedCertificate) {
+      return this.selectedCertificate.name;
+    }
+    if (this.existingCertificate) {
+      return this.existingCertificate.name;
+    }
+    return '';
   }
+
+  getFileType(): string {
+    let fileName: string;
+
+    if (this.selectedCertificate) {
+      fileName = this.selectedCertificate.name;
+    } else if (this.existingCertificate) {
+      fileName = this.existingCertificate.name;
+    } else {
+      return 'document';
+    }
+
+    const extension = fileName
+      .toLowerCase()
+      .substring(fileName.lastIndexOf('.'));
+
+    if (extension === '.pdf') {
+      return 'pdf';
+    } else if (['.jpg', '.jpeg', '.png'].includes(extension)) {
+      return 'image';
+    } else {
+      return 'document';
+    }
+  }
+  private generateImagePreview(file: File): void {
+    const url = URL.createObjectURL(file);
+    this.previewImageUrl = url;
+    const reader = new FileReader();
+    reader.onload = () => URL.revokeObjectURL(url);
+    reader.readAsArrayBuffer(file);
+  }
+
+  onDeleteImage(): void {
+    this.alertService
+      .confirm('PROFILE.CONFIRM_DELETE_IMAGE', 'warning')
+      .then(({ isConfirmed }) => {
+        if (!isConfirmed) return;
+
+        this.previewImageUrl = null;
+        this.selectedFile = null;
+        this.userForm.patchValue({ picture: null });
+        this.checkIfFormChanged();
+        this.translate.get('PROFILE.IMAGE_REMOVED').subscribe((msg) => {
+          this.successMessage = msg;
+          setTimeout(() => {
+            this.successMessage = null;
+          }, 3000);
+        });
+      });
+  }
+
+  onImageLoadError(): void {
+    this.previewImageUrl = null;
+  }
+
   onSubmit(): void {
     if (!this.isFormValid()) return;
 
@@ -323,14 +471,12 @@ export class ProfileSettingsComponent implements OnInit {
     if (this.userForm.valid) {
       return true;
     }
-
     this.userForm.markAllAsTouched();
     return false;
   }
 
   private processFormSubmission(): void {
     this.isSubmitting = true;
-
     if (this.selectedFile) {
       this.uploadProfilePictureAndSubmit();
     } else {
@@ -353,7 +499,6 @@ export class ProfileSettingsComponent implements OnInit {
 
   private submitProfile(): void {
     const formData = this.buildFormData();
-
     this.userService
       .updateUserProfile(formData)
       .pipe(
@@ -372,6 +517,7 @@ export class ProfileSettingsComponent implements OnInit {
     this.appendFormField(formData, 'LastName', 'lastName');
     this.appendFormField(formData, 'Email', 'email');
     this.appendPhoneNumber(formData);
+
     if (this.isVendorUser()) {
       this.appendCompanyFields(formData);
     }
@@ -420,9 +566,6 @@ export class ProfileSettingsComponent implements OnInit {
       { key: 'CompanyDetails.CompanySize', field: 'companySize' },
     ];
 
-    if (this.selectedCertificate) {
-      formData.append('CompanyDetails.Certificate', this.selectedCertificate);
-    }
     companyFields.forEach(({ key, field }) => {
       const value = this.userForm.get(field)?.value;
       if (value != null && value !== '') {
@@ -437,7 +580,6 @@ export class ProfileSettingsComponent implements OnInit {
 
   private handleSubmissionSuccess(): void {
     this.userForm.markAsPristine();
-    this.resetFileSelections();
 
     window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -445,47 +587,46 @@ export class ProfileSettingsComponent implements OnInit {
 
     this.translate.get('ALERTS.PROFILE_UPDATED').subscribe((msg) => {
       this.successMessage = msg;
-
       setTimeout(() => {
         this.successMessage = null;
       }, 3000);
     });
   }
-  private handleSubmissionError(error: HttpErrorResponse): void {
+
+  private handleSubmissionError(error: HttpErrorResponse | string): void {
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     const message = this.errorHandler.handleError(error);
     this.errorMessage = message;
-
     setTimeout(() => {
       this.errorMessage = null;
     }, 5000);
-  }
-
-  private resetFileSelections(): void {
-    this.selectedFile = null;
-    this.selectedCertificate = null;
-    this.selectedFileName = null;
   }
 
   discardChanges(): void {
     this.userForm.reset(this.initialValues);
     this.previewImageUrl = this.accountExistingAvatar;
     this.selectedFile = null;
+    this.selectedCertificate = null;
+    this.selectedFileName = null;
+    this.errorMessage = null;
 
-    const fileInputElement = document.querySelector(
-      'input[type="file"]'
-    ) as HTMLInputElement;
-    if (fileInputElement) {
-      fileInputElement.value = '';
-    }
+    this.userForm.patchValue({
+      certificate: this.user?.companyDetails?.certificate?.id ?? null,
+    });
+
+    this.existingCertificate = this.user?.companyDetails?.certificate || null;
+    this.pondFiles = [];
+    setTimeout(() => {
+      if (this.user) {
+        this.initializeUserData(this.user);
+      }
+    }, 100);
 
     this.checkIfFormChanged();
   }
-
-  // Validation helpers
   isFieldInvalid(fieldName: string): boolean {
     const field = this.userForm.get(fieldName);
     return !!(field?.invalid && field?.touched);
@@ -493,7 +634,6 @@ export class ProfileSettingsComponent implements OnInit {
 
   getFieldError(fieldName: string): string {
     const field = this.userForm.get(fieldName);
-
     if (!field?.errors || !field.touched) {
       return '';
     }
@@ -523,7 +663,6 @@ export class ProfileSettingsComponent implements OnInit {
     if (errors['pattern']) {
       return this.translate.instant('PROFILE.INVALID_PHONE_FORMAT');
     }
-
     if (errors['usPhone']) {
       return this.translate.instant('PROFILE.INVALID_US_PHONE_FORMAT');
     }
@@ -531,3 +670,4 @@ export class ProfileSettingsComponent implements OnInit {
     return '';
   }
 }
+

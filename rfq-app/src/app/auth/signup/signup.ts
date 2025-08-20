@@ -30,8 +30,38 @@ export class Signup implements OnInit {
   isVendorDetailsStep: boolean = false;
   selectedFile: File | null = null;
 
+  // FilePond specific properties
+  selectedCertificate: File | null = null;
+  isUploadingCertificate: boolean = false;
+
   companySizes: LookupValue[] = [];
   userRoles: LookupValue[] = [];
+
+  pondOptions = {
+    allowMultiple: false,
+    maxFiles: 1,
+    labelIdle: ``,
+    acceptedFileTypes: [
+      'application/pdf',
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
+    maxFileSize: '5MB',
+    allowFileTypeValidation: true,
+    allowFileSizeValidation: true,
+    fileValidateTypeLabelExpectedTypes: 'Expects PDF, JPG, PNG, DOC, or DOCX',
+    server: null,
+    allowRevert: true,
+    allowReorder: false,
+    allowProcess: false,
+    instantUpload: false,
+    credits: false,
+  };
+
+  pondFiles: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +73,20 @@ export class Signup implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookupData();
+    this.updatePondLabels();
+  }
+
+  private updatePondLabels(): void {
+    this.pondOptions = {
+      ...this.pondOptions,
+      labelIdle: `
+        ${this.translate.instant('AUTH.DRAG_DROP_CERTIFICATE')}
+        <span class="filepond--label-action">
+          ${this.translate.instant('AUTH.BROWSE')}
+        </span>
+        <br>
+      `,
+    };
   }
 
   private loadLookupData(): void {
@@ -101,10 +145,11 @@ export class Signup implements OnInit {
         contactPhone: [''],
         businessDescription: [''],
         companySize: [''],
-        businessLicense: [''],
+        certificate: [null],
       },
       { validators: this.passwordMatchValidator }
     );
+
     this.signupForm.get('role')?.valueChanges.subscribe((roleName) => {
       const isVendor = this.isVendorRole(roleName);
       this.updateVendorFieldValidation(isVendor);
@@ -223,36 +268,106 @@ export class Signup implements OnInit {
     return 'strong';
   }
 
+  // FilePond event handlers following ProfileSettings pattern
+  onFilePondAddFile({ file }: { file: any }): void {
+    if (file.file instanceof File) {
+      this.processCertificateFile(file.file);
+    }
+  }
+
+  onFilePondRemoveFile(event: Event): void {
+    this.selectedCertificate = null;
+    this.selectedFileName = '';
+    this.signupForm.patchValue({ certificate: null });
+    this.clearErrorMessages();
+  }
+
+  onFilePondError(event: Event): void {
+    this.translate.get('AUTH.FILE_UPLOAD_ERROR').subscribe((translation) => {
+      this.errorMessage = translation;
+    });
+  }
+
+  private processCertificateFile(file: File): void {
+    this.errorMessage = '';
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+    const allowedExtensions = [
+      '.pdf',
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.doc',
+      '.docx',
+    ];
+
+    const fileExtension = file.name
+      .toLowerCase()
+      .substring(file.name.lastIndexOf('.'));
+
+    // Validate file type
+    if (
+      !allowedTypes.includes(file.type) &&
+      !allowedExtensions.includes(fileExtension)
+    ) {
+      this.translate.get('AUTH.INVALID_FILE_TYPE').subscribe((translation) => {
+        this.errorMessage = translation;
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      this.translate.get('AUTH.FILE_TOO_LARGE').subscribe((translation) => {
+        this.errorMessage = translation;
+      });
+      return;
+    }
+
+    // File is valid
+    this.selectedCertificate = file;
+    this.selectedFileName = file.name;
+    this.signupForm.patchValue({ certificate: file });
+    this.clearErrorMessages();
+
+    // Certificate processed: file.name
+  }
+
+  // Keep backward compatibility with old file input method
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        this.translate.get('AUTH.FILE_TOO_LARGE').subscribe((translation) => {
-          this.errorMessage = translation;
-        });
-        return;
-      }
-      const allowedTypes = [
-        'application/pdf',
-        'image/jpeg',
-        'image/jpg',
-        'image/png',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      ];
+      this.processCertificateFile(file);
+      // Update FilePond to show the selected file
+      this.pondFiles = [file];
+    }
+  }
 
-      if (!allowedTypes.includes(file.type)) {
-        this.translate
-          .get('AUTH.INVALID_FILE_TYPE')
-          .subscribe((translation) => {
-            this.errorMessage = translation;
-          });
-        return;
-      }
+  getCertificateName(): string {
+    return this.selectedCertificate?.name || this.selectedFileName || '';
+  }
 
-      this.selectedFile = file;
-      this.selectedFileName = file.name;
-      this.clearErrorMessages();
+  getFileType(): string {
+    const fileName = this.getCertificateName();
+    if (!fileName) return 'document';
+
+    const extension = fileName
+      .toLowerCase()
+      .substring(fileName.lastIndexOf('.'));
+
+    if (extension === '.pdf') {
+      return 'pdf';
+    } else if (['.jpg', '.jpeg', '.png'].includes(extension)) {
+      return 'image';
+    } else {
+      return 'document';
     }
   }
 
@@ -303,7 +418,9 @@ export class Signup implements OnInit {
         );
       }
       if (!strength.minLength) {
-        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH'));
+        requirements.push(
+          this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH')
+        );
       }
 
       return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
@@ -463,19 +580,18 @@ export class Signup implements OnInit {
       'ContactPersonLastName',
       formValue.contactPersonLastName || ''
     );
-    formData.append(
-      'ContactPersonEmail',
-      formValue.contactEmail || ''
-    );
-    formData.append(
-      'ContactPersonPhone',
-      formValue.contactPhone || ''
-    );
+    formData.append('ContactPersonEmail', formValue.contactEmail || '');
+    formData.append('ContactPersonPhone', formValue.contactPhone || '');
     formData.append('Description', formValue.businessDescription || '');
     formData.append('CompanySize', formValue.companySize?.toString() || '1');
 
-    if (this.selectedFile) {
-      formData.append('Certificate', this.selectedFile, this.selectedFile.name);
+    // Use selectedCertificate (from FilePond) instead of selectedFile
+    if (this.selectedCertificate) {
+      formData.append(
+        'Certificate',
+        this.selectedCertificate,
+        this.selectedCertificate.name
+      );
     } else {
       formData.append('Certificate', '');
     }
@@ -552,6 +668,6 @@ export class Signup implements OnInit {
       latitude: data.latitude,
       longitude: data.longitude,
       operatingRadius: data.radius,
-    })
+    });
   }
 }
