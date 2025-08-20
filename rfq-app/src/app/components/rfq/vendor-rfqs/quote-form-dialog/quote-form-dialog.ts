@@ -6,6 +6,7 @@ import { LookupValue } from '../../../../models/user.model';
 import { AlertService } from '../../../../services/alert.service';
 import { CurrencyPipe } from '@angular/common';
 import { FilePondComponent } from 'ngx-filepond';
+import { QuillEditorComponent } from 'ngx-quill';
 
 @Component({
   selector: 'app-quote-form-dialog',
@@ -31,6 +32,14 @@ export class QuoteFormDialog implements OnInit {
   };
   @ViewChild('myPond') myPond!: FilePondComponent;
   uploadedFilesCount = 0;
+  @ViewChild('messageInput') messageInput!: QuillEditorComponent;
+  toolbarOptions = [
+    [{ 'header': [1, 2, 3, false] }], 
+    ['bold', 'italic', 'underline'] 
+  ];
+  modules = {
+    toolbar: this.toolbarOptions
+  };
   
   constructor(
     private _dialogRef: MatDialogRef<QuoteFormDialog>,
@@ -67,7 +76,7 @@ export class QuoteFormDialog implements OnInit {
   private initializeForm(): FormGroup {
     return this.formBuilder.group({
       title: ['', [Validators.required, Validators.maxLength(200)]],
-      description: ['', [Validators.required, Validators.maxLength(1000)]],
+      description: ['', [Validators.required, Validators.maxLength(5000)]],
       price: [0, [Validators.required, Validators.min(0)]],
       quoteValidityInterval: [0, [Validators.required, Validators.min(1)]],
       quoteValidityIntervalType: [null, [Validators.required]],
@@ -88,37 +97,6 @@ export class QuoteFormDialog implements OnInit {
     const field = this.quoteForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
-
-  // onSubmit(): void {
-  //   if (this.quoteForm.valid) {
-  //     this.isSubmitting = true;
-  //     const formData = this.quoteForm.value;
-  //     formData.vendorId = this.vendorId;
-  //     formData.submissionId = this.rfqId;
-  //     this.rfqService.saveQuote(formData).subscribe({
-  //       next: (response) => {
-  //         if (this.action === 'Add') {
-  //           this.alertService.success('VENDOR.QUOTE_SUBMITTED_SUCCESS');
-  //         } else {
-  //           this.alertService.success('VENDOR.QUOTE_UPDATED_SUCCESS');
-  //         }
-
-  //         this.isSubmitting = false;
-  //         setTimeout(() => {
-  //           this._dialogRef.close(formData);
-  //         }, 500);
-  //       },
-  //       error: (error) => {
-  //         this.alertService.error(error.error.detail || 'VENDOR.QUOTE_SUBMISSION_FAILED');
-  //         this.isSubmitting = false;
-  //       }
-  //     });
-  //   } else {
-  //     Object.keys(this.quoteForm.controls).forEach(key => {
-  //       this.quoteForm.get(key)?.markAsTouched();
-  //     });
-  //   }
-  // }
 
   onSubmit(): void {
   if (this.quoteForm.valid) {

@@ -336,7 +336,8 @@
     "ENGAGEMENTS": "Engagements",
     "ENGAGED": "Engaged",
     "VIEWED": "Viewed",
-    "TOTAL_PROJECT_COST": "Total Project Cost"
+    "TOTAL_PROJECT_COST": "Total Project Cost",
+    "FILE_PREVIEW_ERROR": "'Download failed"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
@@ -494,9 +495,7 @@
     "CERTIFICATE_REMOVED": "Business certificate removed.",
     "CLICK_TO_UPLOAD": "Click to upload",
     "OR_DRAG_AND_DROP": "or drag and drop",
-    "REMOVE_FILE": "Remove File",
-    "FILE_TOO_LARGE": "File size must be less than 5MB",
-    "INVALID_FILE_TYPE": "Please upload a valid file format (PDF, JPG, PNG, DOC, DOCX)"
+    "REMOVE_FILE": "Remove File"
   },
   "ALERTS": {
     "CONFIRM": "Confirm",

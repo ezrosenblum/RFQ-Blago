@@ -36,8 +36,7 @@
 
         <div class="mb-4">
           <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-white">{{ quote.title }}</h3>
-          <div class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
-            {{ quote.description }}
+          <div class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm quill-content" [innerHTML]="quote.description">
           </div>
         </div>
         <div *ngIf="quote?.media?.items?.[0]">

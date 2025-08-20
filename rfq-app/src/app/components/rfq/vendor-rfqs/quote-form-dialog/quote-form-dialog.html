@@ -43,14 +43,24 @@
         <label for="description" class="form-label">
           {{ 'VENDOR.DESCRIPTION' | translate }} <span class="text-red-500">*</span>
         </label>
-        <textarea
+        <!-- <textarea
           id="description"
           formControlName="description"
           rows="4"
           class="form-input resize-none"
-          [class.border-red-500]="isFieldInvalid('description')"
+
           placeholder="Enter detailed description..."
-        ></textarea>
+        ></textarea> -->
+        <quill-editor
+          #messageInput
+          formControlName="description"
+          [modules]="modules"
+          placeholder="Enter detailed description..."
+          [class.border-red-500]="isFieldInvalid('description')"
+          class="m-0 w-100 bg-transparent"
+        >
+        </quill-editor>
+
         <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-500">
           <span *ngIf="quoteForm.get('description')?.errors?.['required']">
             {{ 'VENDOR.DESCRIPTION_REQUIRED' | translate }}

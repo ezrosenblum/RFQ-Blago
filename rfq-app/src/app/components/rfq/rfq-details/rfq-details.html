@@ -78,9 +78,8 @@
             <div class="w-1 h-6 bg-gradient-to-b from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 rounded-sm"></div>
             {{ 'VENDOR.PROJECT_DESCRIPTION' | translate }}
           </h2>
-          <p class="text-base leading-relaxed text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border-l-4 border-blue-600 dark:border-blue-400">
-            {{ rfq.description }}
-          </p>
+          <div [innerHTML]="rfq.description" class="quill-content text-base leading-relaxed text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl border-l-4 border-blue-600 dark:border-blue-400">
+          </div>
         </div>
 
         <!-- Required Categories & Specializations -->
@@ -283,9 +282,8 @@
               <div class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
                 {{ 'VENDOR.VENDOR_PROPOSAL' | translate }}
               </div>
-              <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                {{ quote.description }}
-              </p>
+              <div [innerHTML]="quote.description" class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed quill-content">
+              </div>
             </div>
 
             <!-- Actions -->

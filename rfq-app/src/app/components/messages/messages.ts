@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry } from '../../models/messages.model';
+import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry, MessageMediaEntry } from '../../models/messages.model';
 import { MessagesService } from '../../services/messages';
 import { find, map, Observable, of, startWith, take } from 'rxjs';
 import {
@@ -442,7 +442,7 @@ export class MessagesComponent implements OnInit {
 
   // Filtering and Selection functions
 
-  previewImageInFullScreen(url: string){
+  previewImageInFullScreen(url: string, format: string){
     const dialogRef = this._dialog.open(ImagePreviewDialog, {
       width: '100%',
       maxWidth: '100%',
@@ -451,6 +451,7 @@ export class MessagesComponent implements OnInit {
       autoFocus: false,
       data: {
         url: url,
+        format: format
       },
     });
 
@@ -460,6 +461,53 @@ export class MessagesComponent implements OnInit {
 
       });
   }
+
+downloadFile(file: MessageMediaEntry, format: string, entityId: number) {
+  const result = this.extractIdsFromUrl(file.url);
+  if (result && result.entityId && result.typeId ) {
+    this._messageService.downloadFile(entityId, file.type, file.id)
+      .pipe(take(1))
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          this.previewImageInFullScreen(url, format);
+          if (format != 'pdf') {
+            link.download = file.name || `download_${file.id}`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            window.URL.revokeObjectURL(url);
+          }
+        },
+        error: (error) => {
+          this.isMessageSending = false;
+          this.alertService.error('VENDOR.FILE_PREVIEW_ERROR');
+        },
+      });
+  } else {
+    this.alertService.error('VENDOR.FILE_PREVIEW_ERROR');
+  }
+}
+
+extractIdsFromUrl(url: string): { typeId: number, entityId: number } | null {
+  try {
+    const parts = url.split('/documents/')[1]?.split('/');
+    if (!parts || parts.length < 2) return null;
+
+    const typeId = Number(parts[0]);
+    const entityId = Number(parts[1]);
+
+    if (isNaN(typeId) || isNaN(entityId)) return null;
+
+    return { typeId, entityId };
+  } catch {
+    return null;
+  }
+}
 
   displayFn(user: ConversationUserEntry): string {
     return user && user.firstName ? `${user.firstName} ${user.lastName}` : '';
