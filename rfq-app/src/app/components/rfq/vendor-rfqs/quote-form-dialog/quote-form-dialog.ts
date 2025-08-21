@@ -99,7 +99,7 @@ export class QuoteFormDialog implements OnInit {
   }
 
   onSubmit(): void {
-  if (this.quoteForm.valid) {
+  if (this.quoteForm.valid && (this.pondFiles && this.pondFiles.length > 0)) {
     this.isSubmitting = true;
 
     const quoteEntry = this.quoteForm.value;

@@ -260,6 +260,7 @@
           </div>
 
           <!-- Quote Cards - List View -->
+          <ng-container *ngIf="viewMode === 'list'">
             <div
               *ngFor="let quote of quotes"
               class="rounded-lg overflow-hidden mb-5 transition-all duration-200 mb-7 shadow-md border border-gray-200 dark:border-gray-700"
@@ -295,78 +296,48 @@
 
               <!-- Info Grid Section -->
               <div class="px-4 py-3 bg-white dark:bg-gray-800">
-                <div
-                  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4"
-                >
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                  
                   <!-- TIMELINE -->
-                  <div
-                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600"
-                  >
-                    <div
-                      class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase"
-                    >
+                  <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
+                    <div class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">
                       {{ 'VENDOR.TIMELINE' | translate }}
                     </div>
-                    <div
-                      class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100"
-                    >
-                      {{quote.minimumTimelineDuration}} -
-                      {{quote.maximumTimelineDuration}}
-                      {{quote.timelineIntervalType.name}}
+                    <div class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100">
+                      {{quote.minimumTimelineDuration}} - {{quote.maximumTimelineDuration}} {{quote.timelineIntervalType.name}}
                     </div>
                   </div>
 
                   <!-- WARRANTY -->
-                  <div
-                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600"
-                  >
-                    <div
-                      class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase"
-                    >
+                  <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
+                    <div class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">
                       {{ 'VENDOR.WARRANTY' | translate }}
                     </div>
-                    <div
-                      class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100"
-                    >
-                      <div
-                        class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100"
-                      >
-                        {{quote.warantyDuration}} {{quote.warantyIntervalType.name}}
-                      </div>
+                    <div class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100">
+                      {{quote.warantyDuration}} {{quote.warantyIntervalType.name}}
                     </div>
                   </div>
 
                   <!-- START DATE -->
-                  <div
-                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600"
-                  >
-                    <div
-                      class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase"
-                    >
+                  <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
+                    <div class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">
                       {{ 'VENDOR.START_DATE' | translate }}
                     </div>
-                    <div
-                      class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100"
-                    >
-                      {{quote.created | date:'MMM dd, yyyy' }}
+                    <div class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100">
+                      {{quote.created | date:'MMM dd, yyyy'}}
                     </div>
                   </div>
 
                   <!-- SUBMITTED -->
-                  <div
-                    class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600"
-                  >
-                    <div
-                      class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase"
-                    >
+                  <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
+                    <div class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">
                       {{ 'VENDOR.SUBMITTED' | translate }}
                     </div>
-                    <div
-                      class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100"
-                    >
-                      {{quote.created | date:'MMM dd, yyyy' }}
+                    <div class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100">
+                      {{quote.created | date:'MMM dd, yyyy'}}
                     </div>
                   </div>
+
                 </div>
               </div>
 
@@ -455,6 +426,7 @@
                 </div>
               </div>
             </div>
+          </ng-container>
 
           <!-- Table View -->
           <div
@@ -582,14 +554,18 @@
 
                     <!-- Description -->
                     <td class="px-6 py-4">
-                      <div
-                        class="text-sm text-gray-700 dark:text-gray-300 max-w-xs"
-                      >
-                        <span [title]="quote.description || ''">
-                          {{ (quote.description || '') | slice:0:100 }}{{
-                          (quote.description || '').length > 100 ? '...' : '' }}
-                        </span>
-                      </div>
+                      <div id="desc-{{quote.id}}"
+                        class="text-sm text-gray-700 dark:text-gray-300 max-w-xs quill-content table-description-collapsed"
+                        [innerHTML]="(quote.description || '') | slice:0:100"
+                      ></div>
+
+                      <button
+                        *ngIf="(quote?.description?.length || 0) > 350"
+                        class="text-sm text-primary-600 dark:text-primary-400 underline mt-1"
+                        (click)="toggleDescription('desc-' + quote.id, $event)"
+                        type="button">
+                        {{ 'VENDOR.SHOW_MORE' | translate }}
+                      </button>
                     </td>
 
                     <!-- Location -->

@@ -144,8 +144,8 @@
     </div>
 
     <!-- Vendor Quotes Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div class="bg-gray-50 dark:bg-gray-700/50 p-6 border-b-2 border-gray-200 dark:border-gray-600 flex justify-between items-center flex-wrap gap-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border-0 shadow-none sm:border sm:border-gray-200 sm:shadow-sm overflow-hidden">
+      <div class="bg-white shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-4 sm:mb-0 sm:shadow-none sm:border-0 flex justify-between items-center flex-wrap gap-4">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
           {{ 'VENDOR.VENDOR_QUOTES' | translate }}
         </h2>
@@ -204,7 +204,7 @@
         </div>
       </div> -->
 
-      <div class="p-6">
+      <div class="p-0 sm:p-6 sm:mb-4">
         <div *ngIf="!quotes || quotes.length === 0" class="text-center text-gray-600 dark:text-gray-400 py-10 text-lg font-medium">
           {{ 'VENDOR.NO_QUOTES_YET' | translate }}
         </div>
@@ -233,7 +233,7 @@
 
           <!-- Quote Details Grid -->
           <div class="p-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
               <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
                 <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
                   {{ 'VENDOR.TIMELINE' | translate }}
@@ -317,8 +317,8 @@
                         </svg>
                    {{ 'VENDOR.REJECT' | translate }}
                 </button>
-                <button *ngIf="currentUser?.type === 'Customer'" class="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5" (click)="sendQuoteFirstMessage(quote)">
-                  <svg class="w-full sm:w-auto px-5 justify-center w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <button *ngIf="currentUser?.type === 'Customer'" class="w-full sm:w-auto px-5 justify-center px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-200 inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5" (click)="sendQuoteFirstMessage(quote)">
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
                   </svg>

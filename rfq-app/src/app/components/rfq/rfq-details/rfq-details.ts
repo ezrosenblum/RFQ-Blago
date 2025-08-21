@@ -12,9 +12,8 @@ import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dia
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
 import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
-import { MessageMediaEntry } from '../../../models/messages.model';
 import { MessagesService } from '../../../services/messages';
-
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-rfq-details',
@@ -51,7 +50,8 @@ export class RfqDetails implements OnInit, OnDestroy {
     private _dialog: MatDialog,
     private _translate: TranslateService,
     private _alert: AlertService,
-    private _messageService: MessagesService
+    private _messageService: MessagesService,
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {
@@ -147,7 +147,7 @@ export class RfqDetails implements OnInit, OnDestroy {
     } else {
       const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
         width: '500px',
-        maxWidth: '500px',
+        maxWidth: '90%',
         height: 'auto',
         panelClass: 'send-quote-message-dialog',
         autoFocus: false,
@@ -293,9 +293,15 @@ export class RfqDetails implements OnInit, OnDestroy {
   }
 
   openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
+    let width = '60%';
+
+    if (this.breakpointObserver.isMatched(Breakpoints.Handset)) {
+      width = '90%';
+    }
+
     const dialogRef = this._dialog.open(QuoteFormDialog, {
-      width: '60%',
-      maxWidth: '60%',
+      width,
+      maxWidth: '90%',
       height: 'auto',
       panelClass: 'add-quote-dialog',
       autoFocus: false,

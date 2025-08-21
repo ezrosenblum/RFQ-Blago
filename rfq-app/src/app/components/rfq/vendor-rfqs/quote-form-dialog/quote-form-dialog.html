@@ -12,7 +12,7 @@
 </div>
 
 <mat-dialog-content class="p-relative bg-secondary-50 dark:bg-dark-900">
-  <form [formGroup]="quoteForm" class="card-body">
+  <form [formGroup]="quoteForm" class="card-body p-0 sm:p-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
       <!-- Title -->
@@ -73,7 +73,7 @@
 
       <!-- Price -->
        <div class="md:col-span-2 grid grid-cols-3 gap-4">
-        <div>
+        <div class="col-span-3 md:col-span-1">
           <label for="price" class="form-label">
             {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
           </label>
@@ -206,7 +206,7 @@
       <div class="md:col-span-2 grid grid-cols-3 gap-4">
 
         <!-- Minimum Interval -->
-        <div>
+        <div  class="col-span-3 md:col-span-1">
           <label for="minimumTimelineDuration" class="form-label">
             {{ 'VENDOR.TIMELINE_MIN' | translate }} <span class="text-red-500">*</span>
           </label>
@@ -233,7 +233,7 @@
         </div>
 
         <!-- Maximum Interval -->
-        <div>
+        <div  class="col-span-3 md:col-span-1">
           <label for="maximumTimelineDuration" class="form-label">
             {{ 'VENDOR.TIMELINE_MAX' | translate }} <span class="text-red-500">*</span>
           </label>
@@ -254,7 +254,7 @@
         </div>
 
         <!-- Quote Timeline Interval Type -->
-        <div>
+        <div  class="col-span-3 md:col-span-1">
           <label for="timelineIntervalType" class="form-label">
             {{ 'VENDOR.TIMELINE_TYPE' | translate }} <span class="text-red-500">*</span>
           </label>
@@ -285,6 +285,9 @@
     
     <!-- Files -->
     <div class="pt-28 md:grid-cols-2">
+      <label for="timelineIntervalType" class="form-label">
+        {{ 'VENDOR.ADD_FILE' | translate }} <span class="text-red-500">*</span>
+      </label>
       <file-pond 
         #myPond 
         [options]="pondOptions" 
@@ -303,7 +306,7 @@
     </button>
 
 
-    <button (click)="onSubmit()"
+    <button (click)="onSubmit()" [disabled]="!quoteForm.valid || !pondFiles || pondFiles.length < 1"
         class="btn btn-success ml-5"
     >
       <span *ngIf="!isSubmitting">{{ 'AUTH.SUBMIT' | translate }}</span>
