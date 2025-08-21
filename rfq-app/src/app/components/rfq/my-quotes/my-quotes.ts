@@ -13,6 +13,7 @@ import { LookupValue, QuoteItem } from '../../../models/rfq.model';
 import { RfqService } from '../../../services/rfq';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: false,
@@ -49,7 +50,8 @@ export class MyQuotesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private rfqService: RfqService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private _translate: TranslateService,
   ) {
     this.filtersForm = this.fb.group({
       query: [''],
@@ -346,4 +348,21 @@ export class MyQuotesComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  toggleDescription(id: string, event: Event) {
+    const desc = document.getElementById(id);
+    const btn = event.target as HTMLButtonElement;
+    if (!desc) return;
+
+    if (desc.classList.contains('description-collapsed')) {
+      desc.classList.remove('description-collapsed');
+      desc.classList.add('description-expanded');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_LESS');
+    } else {
+      desc.classList.remove('description-expanded');
+      desc.classList.add('description-collapsed');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_MORE');
+    }
+  }
+
 }

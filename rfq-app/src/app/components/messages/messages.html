@@ -279,8 +279,14 @@
       class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
     >
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div *ngIf="selectedConversation && !isAdmin">
+        <div class="flex space-x-3">
+          <div *ngIf="selectedConversation && !isAdmin" class="flex flex-col justify-between">
+              <div (click)="sidenavTrigger = 'out'" class="sm:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"/>
+                  <polyline points="12 19 5 12 12 5"/>
+                </svg>
+              </div>
             <div *ngIf="currentUser?.type == 'Customer' && !selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" 
               [class]="
                 'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
@@ -333,9 +339,6 @@
               {{ selectedConversation.submission.title }}
             </p>
           </div>
-        </div>
-        <div class="flex items-start space-x-2">
-          <i class="ki-outline ki-abstract-11 cursor-pointer text-base me-1 mr-2" (click)="sidenavTrigger = 'out'"></i>
         </div>
       </div>
     </div>

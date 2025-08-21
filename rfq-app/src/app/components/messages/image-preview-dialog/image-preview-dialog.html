@@ -4,7 +4,7 @@
     </div>
 
     @if (format === 'img') {
-        <img [src]="imageUrl">
+        <img class="w-full max-w-lg h-auto object-contain" [src]="imageUrl">
     }
 
     @if (format === 'pdf') {

@@ -58,7 +58,7 @@
       </div>
 
       <!-- Step 1: Basic User Information -->
-      <div *ngIf="!isVendorDetailsStep" class="max-w-md">
+      <div *ngIf="!isVendorDetailsStep" class="w-full sm:w-auto max-w-md">
         <!-- Name Fields -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- First Name -->
@@ -80,7 +80,7 @@
           </div>
 
           <!-- Last Name -->
-          <div>
+          <div class="mb-4 sm:mb-0">
             <label for="lastName" class="form-label"
               >{{ 'AUTH.LAST_NAME' | translate }}
             </label>
@@ -99,7 +99,7 @@
         </div>
 
         <!-- Email Field -->
-        <div>
+        <div class="mb-4 sm:mb-0">
           <label for="email" class="form-label"
             >{{'AUTH.EMAIL' | translate}}</label
           >
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Role Selection -->
-        <div>
+        <div class="mb-4 sm:mb-0">
           <label for="role" class="form-label"
             >{{ 'AUTH.ACCOUNT_TYPE' | translate }} *</label
           >
@@ -170,7 +170,7 @@
         </div>
 
         <!-- Password Field -->
-        <div>
+        <div class="mb-4 sm:mb-0">
           <label for="password" class="form-label"
             >{{ 'AUTH.PASSWORD' | translate }} *</label
           >
@@ -260,7 +260,7 @@
         </div>
 
         <!-- Confirm Password Field -->
-        <div>
+        <div class="mb-4 sm:mb-0">
           <label for="confirmPassword" class="form-label">
             {{ 'AUTH.CONFIRM_PASSWORD' | translate }} *
           </label>
@@ -387,7 +387,7 @@
             </div>
 
             <!-- Contact Person Last Name -->
-            <div>
+            <div class="mb-4 sm:mb-0">
               <label for="contactPersonLastName" class="form-label">
                 {{ 'AUTH.CONTACT_PERSON_LAST_NAME' | translate }} *
               </label>
@@ -409,7 +409,7 @@
             <!-- Contact Details -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <!-- Contact Email -->
-              <div>
+              <div class="mb-4 sm:mb-0">
                 <label for="contactEmail" class="form-label">
                   {{ 'AUTH.CONTACT_EMAIL_OPTIONAL' | translate }}
                 </label>
@@ -425,7 +425,7 @@
               </div>
 
               <!-- Contact Phone -->
-              <div>
+              <div class="mb-4 sm:mb-0">
                 <label for="contactPhone" class="form-label">
                   {{ 'AUTH.CONTACT_PHONE_OPTIONAL' | translate }}
                 </label>
@@ -443,7 +443,7 @@
             </div>
 
             <!-- Phone Number -->
-            <div>
+            <div class="mb-4 sm:mb-0">
               <label for="phoneNumber" class="form-label">
                 {{ 'AUTH.PHONE_NUMBER' | translate }} *
               </label>
@@ -460,7 +460,7 @@
             </div>
 
             <!-- Business Description -->
-            <div>
+            <div class="mb-4 sm:mb-0">
               <label for="businessDescription" class="form-label">
                 {{ 'AUTH.BUSINESS_DESCRIPTION_SPECIALTIES' | translate }} *
               </label>
