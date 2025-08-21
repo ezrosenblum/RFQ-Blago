@@ -17,7 +17,7 @@
 
     <div class="lg:flex lg:gap-6">
       <!-- Filters & Search Section -->
-      <div class="lg:w-1/4 lg:sticky lg:top-20 lg:self-start">
+      <div class="lg:w-1/4 lg:sticky lg:top-20 lg:self-start mb-6 md:mb-0">
         <!-- Card Container -->
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow">
           <!-- Card Header -->
@@ -402,9 +402,9 @@
                   </div>
 
                   <!-- Action Buttons -->
-                  <div class="flex items-center space-x-3">
+                  <div class="flex items-center lg:space-x-3 w-full flex-wrap">
                     <button
-                      class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                      class="mb-4 md:mb-0 w-full sm:w-auto justify-center inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                       (click)="sendQuoteFirstMessage(quote)"
                       [disabled]="!quote?.id || !quote?.submission?.user?.id || !quote?.vendorId"
                     >
@@ -426,7 +426,7 @@
 
                     <button
                       type="button"
-                      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                      class="w-full sm:w-auto justify-center inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                       [routerLink]="['/quote-details', quote.id]"
                       [disabled]="!quote?.id"
                     >

@@ -417,7 +417,7 @@
           class="pt-4 border-t border-secondary-200 dark:border-secondary-700"
         >
           <!-- User Info -->
-          <div *ngIf="isAuthenticated" class="px-3 py-2">
+          <div *ngIf="isAuthenticated" class="px-3 py-2" (click)="closeMenu()" [routerLink]="['/profile']">
             <div class="flex items-center space-x-3">
               <div
                 class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center text-white text-base font-medium"
