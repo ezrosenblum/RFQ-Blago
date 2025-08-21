@@ -21,6 +21,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { QuoteFormDialog } from './quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -139,7 +140,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     private _router: Router,
     private _translate: TranslateService,
     private _dialog: MatDialog,
-    private _alert: AlertService
+    private _alert: AlertService,
+    private breakpointObserver: BreakpointObserver
   ) {
     this.initializeFilterForm();
   }
@@ -722,9 +724,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
+    let width = '60%';
+
+    if (this.breakpointObserver.isMatched(Breakpoints.Handset)) {
+      width = '90%';
+    }
+
     const dialogRef = this._dialog.open(QuoteFormDialog, {
-      width: '60%',
-      maxWidth: '60%',
+      width,
+      maxWidth: '90%',
       height: 'auto',
       panelClass: 'add-quote-dialog',
       autoFocus: false,

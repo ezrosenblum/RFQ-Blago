@@ -93,7 +93,7 @@ export class QuoteDetails implements OnInit {
     } else {
       const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
         width: '500px',
-        maxWidth: '500px',
+        maxWidth: '90%',
         height: 'auto',
         panelClass: 'send-quote-message-dialog',
         autoFocus: false,

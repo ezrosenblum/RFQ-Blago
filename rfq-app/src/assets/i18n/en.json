@@ -337,7 +337,8 @@
     "ENGAGED": "Engaged",
     "VIEWED": "Viewed",
     "TOTAL_PROJECT_COST": "Total Project Cost",
-    "FILE_PREVIEW_ERROR": "Download failed"
+    "FILE_PREVIEW_ERROR": "Download failed",
+    "ADD_FILE": "Attach file(s)"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

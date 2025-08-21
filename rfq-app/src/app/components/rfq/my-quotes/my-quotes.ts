@@ -322,7 +322,7 @@ export class MyQuotesComponent implements OnInit, OnDestroy {
     } else {
       const dialogRef = this.dialog.open(QuoteSendMessageDialog, {
         width: '500px',
-        maxWidth: '500px',
+        maxWidth: '90%',
         height: 'auto',
         panelClass: 'send-quote-message-dialog',
         autoFocus: false,
