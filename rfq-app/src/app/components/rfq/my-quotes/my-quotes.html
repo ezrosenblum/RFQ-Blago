@@ -17,7 +17,7 @@
 
     <div class="lg:flex lg:gap-6">
       <!-- Filters & Search Section -->
-      <div class="lg:w-1/4 lg:sticky lg:top-20 lg:self-start">
+      <div class="lg:w-1/4 lg:sticky lg:top-20 lg:self-start mb-6 md:mb-0">
         <!-- Card Container -->
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow">
           <!-- Card Header -->
@@ -39,7 +39,8 @@
 
           <!-- Card Body -->
           <div class="px-6 py-6">
-            <form [formGroup]="filtersForm" (ngSubmit)="onSearch()">
+            <!-- Filter Form - Remove the (ngSubmit) as we're using auto-filtering -->
+            <form [formGroup]="filtersForm">
               <!-- Filter Grid -->
               <div class="grid grid-cols-1">
                 <!-- View Mode Toggle -->
@@ -110,7 +111,6 @@
                       id="search"
                       type="text"
                       formControlName="query"
-                      (keyup.enter)="onSearch()"
                       placeholder="{{ 'VENDOR.SEARCH_BY_FILTERS' | translate }}"
                       class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -129,6 +129,32 @@
                           stroke-width="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
+                      </svg>
+                    </div>
+                    <!-- Loading indicator for search field -->
+                    <div
+                      *ngIf="loading"
+                      class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
+                    >
+                      <svg
+                        class="animate-spin h-4 w-4 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                     </div>
                   </div>
@@ -169,32 +195,6 @@
                 </div>
               </div>
             </form>
-
-            <!-- Bottom Controls -->
-            <div
-              class="flex flex-col sm:flex-row sm:items-center sm:justify-end mt-6 dark:border-gray-700"
-            >
-              <!-- Search Button -->
-              <button
-                (click)="onSearch()"
-                class="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <svg
-                  class="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                {{ 'VENDOR.SEARCH' | translate }}
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -402,9 +402,9 @@
                   </div>
 
                   <!-- Action Buttons -->
-                  <div class="flex items-center space-x-3">
+                  <div class="flex items-center lg:space-x-3 w-full flex-wrap">
                     <button
-                      class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                      class="mb-4 md:mb-0 w-full sm:w-auto justify-center inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                       (click)="sendQuoteFirstMessage(quote)"
                       [disabled]="!quote?.id || !quote?.submission?.user?.id || !quote?.vendorId"
                     >
@@ -426,7 +426,7 @@
 
                     <button
                       type="button"
-                      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+                      class="w-full sm:w-auto justify-center inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                       [routerLink]="['/quote-details', quote.id]"
                       [disabled]="!quote?.id"
                     >

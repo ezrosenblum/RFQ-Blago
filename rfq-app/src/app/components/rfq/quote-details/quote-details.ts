@@ -189,49 +189,7 @@ export class QuoteDetails implements OnInit {
   }
 
   downloadFile(file: MediaItem, format: string) {
-    const result = this.extractIdsFromUrl(file.url);
-    if (result && result.entityId && result.typeId ) {
-      this._messageService.downloadFile(result.typeId, result.entityId, file.id)
-        .pipe(take(1))
-        .subscribe({
-          next: (blob: Blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            this.previewImageInFullScreen(url, format);
-            if (format !== 'pdf') {
-              link.download = file.name || `download_${file.id}`;
-              
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              window.URL.revokeObjectURL(url);
-            }
-          },
-          error: (error) => {
-            this._alert.error('VENDOR.FILE_PREVIEW_ERROR');
-          },
-        });
-    } else {
-      this._alert.error('VENDOR.FILE_PREVIEW_ERROR');
-    }
-  }
-
-  extractIdsFromUrl(url: string): { typeId: number, entityId: number } | null {
-    try {
-      const parts = url.split('/documents/')[1]?.split('/');
-      if (!parts || parts.length < 2) return null;
-
-      const typeId = Number(parts[0]);
-      const entityId = Number(parts[1]);
-
-      if (isNaN(typeId) || isNaN(entityId)) return null;
-
-      return { typeId, entityId };
-    } catch {
-      return null;
-    }
+    this._messageService.downloadFile(file, format, this.previewImageInFullScreen.bind(this));
   }
 
   handleError(error: any): void {

@@ -554,3 +554,10 @@
   overflow-wrap: anywhere;     
   line-height: 1.5;           
 }
+
+@media (max-width: 1024px) {
+  .sm-flex-dir-col {
+    flex-direction: column;
+    padding-top: 30px;
+  }
+}

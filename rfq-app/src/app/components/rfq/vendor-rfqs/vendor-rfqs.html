@@ -136,7 +136,7 @@
         </div>
 
         <form [formGroup]="filterForm" class="card-body">
-          <div
+           <div
             class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 mb-8 dark:border-secondary-700">
             <!-- View Mode Toggle -->
             <div class="flex items-center space-x-3">
@@ -147,7 +147,7 @@
                   [class.text-white]="viewMode === 'card'" [class.bg-white]="viewMode !== 'card'"
                   [class.text-secondary-700]="viewMode !== 'card'" [class.dark:bg-primary-600]="viewMode === 'card'"
                   [class.dark:bg-dark-800]="viewMode !== 'card'" [class.dark:text-secondary-200]="viewMode !== 'card'"
-                  class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                  class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-blue-700 hover:text-white focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" />
@@ -158,7 +158,7 @@
                   [class.text-white]="viewMode === 'table'" [class.bg-white]="viewMode !== 'table'"
                   [class.text-secondary-700]="viewMode !== 'table'" [class.dark:bg-primary-600]="viewMode === 'table'"
                   [class.dark:bg-dark-800]="viewMode !== 'table'" [class.dark:text-secondary-200]="viewMode !== 'table'"
-                  class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-l-0 border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                  class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-l-0 border-secondary-300 dark:border-secondary-600 text-sm font-medium hover:bg-blue-700 hover:text-white focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -167,33 +167,7 @@
                 </button>
               </div>
             </div>
-
-            <!-- Sort Controls -->
-            <!-- <div class="flex items-center space-x-3 mt-4 sm:mt-0">
-              <span class="text-sm font-medium text-secondary-700 dark:text-secondary-300">Sort by:</span>
-              <select
-                (change)="setSorting($any($event.target).value)"
-                class="form-select text-sm"
-              >
-                <option *ngFor="let option of sortOptions" [value]="option.value" [selected]="sortBy === option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-              <button
-                type="button"
-                (click)="setSorting(sortBy)"
-                class="btn btn-ghost p-2"
-                [title]="sortDirection === 'asc' ? 'Sort Descending' : 'Sort Ascending'"
-              >
-                <svg *ngIf="sortDirection === 'asc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
-                </svg>
-                <svg *ngIf="sortDirection === 'desc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
-                </svg>
-              </button>
-            </div> -->
-          </div>
+           </div>
           <div class="grid grid-cols-1">
             <!-- Search -->
             <div class="mb-3">
@@ -309,7 +283,7 @@
 
               <!-- Card header -->
               <div class="px-6 pt-6 pb-5 border-b border-gray-100 dark:border-gray-700">
-                <div class="flex justify-between items-start mb-4 gap-4">
+                <div class="flex justify-between items-start mb-4 gap-4 sm-flex-dir-col">
 
                   <!-- Left section -->
                   <div class="flex-1 min-w-0">
@@ -344,7 +318,7 @@
                   </div>
 
                   <!-- Right section -->
-                  <div class="mt-7 px-3 py-1.5 bg-green-50 text-green-800 border border-green-200 rounded-[16px] text-xs uppercase tracking-wide" *ngIf="rfq.quotes.length > 0">
+                  <div class="lg:mt-7 px-3 py-1.5 bg-green-50 text-green-800 border border-green-200 rounded-[16px] text-xs uppercase tracking-wide" *ngIf="rfq.quotes.length > 0">
                     <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">
                       {{ rfq.quotes.length }}
                     </span>
@@ -394,89 +368,103 @@
 
                 <!-- Footer -->
                 <div
-                  class="px-6 py-5 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center gap-4 flex-wrap">
-                  <div class="flex items-center gap-6 flex-wrap">
+                  class="lg:px-6 lg:py-5 lg:bg-gray-50 dark:bg-gray-900 lg:border-t border-gray-100 dark:border-gray-700 
+                        flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
 
-                    <div class="w-0.5 h-10 bg-gray-300 rounded-sm"></div>
-                    <div class="flex flex-col gap-0.5">
-                      <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{
-                        'VENDOR.SUBMITTED_BY'
-                        |
-                        translate }}</span>
+                  <!-- Left section -->
+                  <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6 flex-wrap w-full lg:w-auto">
+                    <!-- Submitted by -->
+                    <div class="flex flex-col gap-0.5 w-full sm:w-auto">
+                      <span
+                        class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.SUBMITTED_BY' | translate }}</span>
                       <div class="flex items-center gap-2">
                         <div
                           class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
                           {{ getInitials(rfq.user?.firstName, rfq.user?.lastName) }}
                         </div>
                         <div class="flex flex-col">
-                          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ rfq.user?.firstName }} {{
-                            rfq.user?.lastName }}</span>
+                          <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {{ rfq.user?.firstName }} {{ rfq.user?.lastName }}
+                          </span>
                         </div>
                       </div>
                     </div>
 
-                    <div class="w-0.5 h-10 bg-gray-300 rounded-sm"></div>
-                    <div class="flex flex-col items-end gap-2 shrink-0">
-                      <div class="text-center">
-                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.QTY' |
-                          translate
-                          }}</div>
+                    <!-- Divider hidden on mobile -->
+                    <div class="hidden lg:block w-0.5 h-10 bg-gray-300 rounded-sm"></div>
+
+                    <!-- Qty -->
+                    <div class="flex flex-col items-start lg:items-end gap-2 shrink-0 w-full sm:w-auto">
+                      <div class="lg:text-center">
+                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
+                          {{ 'VENDOR.QTY' | translate }}
+                        </div>
                         <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
                           {{ rfq.quantity | number:'1.0-2' }} {{ rfq.unit?.name }}
                         </div>
                       </div>
                     </div>
 
-                    <div class="w-0.5 h-10 bg-gray-300 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
-                    <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
-                      <div class="text-center">
-                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
-                          {{ 'VENDOR.VIEWS' | translate }}
-                        </div>
-                        <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                          {{ getStatusCount(rfq, 'Viewed') }}
-                        </div>
-                      </div>
-                    </div>
+                    <!-- Customer-only blocks -->
+                    <ng-container *ngIf="this.currentUser?.type === 'Customer'">
+                      <div class="hidden lg:block w-0.5 h-10 bg-gray-300 rounded-sm"></div>
 
-                    <div class="w-0.5 h-10 bg-gray-300 rounded-sm" *ngIf="this.currentUser?.type === 'Customer'"></div>
-                    <div class="flex flex-col items-end gap-2 shrink-0" *ngIf="this.currentUser?.type === 'Customer'">
-                      <div class="text-center">
-                        <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
-                          {{ 'VENDOR.ENGAGEMENTS' | translate }}
-                        </div>
-                        <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                          {{ getStatusCount(rfq, 'Engaged') }}
+                      <!-- Views -->
+                      <div class="flex flex-col items-start lg:items-end gap-2 shrink-0 w-full sm:w-auto">
+                        <div class="lg:text-center">
+                          <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
+                            {{ 'VENDOR.VIEWS' | translate }}
+                          </div>
+                          <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {{ getStatusCount(rfq, 'Viewed') }}
+                          </div>
                         </div>
                       </div>
-                    </div>
+
+                      <div class="hidden lg:block w-0.5 h-10 bg-gray-300 rounded-sm"></div>
+
+                      <!-- Engagements -->
+                      <div class="flex flex-col items-start lg:items-end gap-2 shrink-0 w-full sm:w-auto">
+                        <div class="lg:text-center">
+                          <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">
+                            {{ 'VENDOR.ENGAGEMENTS' | translate }}
+                          </div>
+                          <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {{ getStatusCount(rfq, 'Engaged') }}
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
                   </div>
 
-                  <div class="flex gap-2">
-                    <div *ngIf="rfq.status?.name !== 'Rejected'" class="flex gap-2">
+                  <!-- Right section (buttons) -->
+                  <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                    <ng-container *ngIf="rfq.status?.name !== 'Rejected'">
                       <button *ngIf="canApprove(rfq)" (click)="approveRfq(rfq.id!)"
-                        class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-green-500 text-white hover:bg-green-600">
+                        class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-green-500 text-white hover:bg-green-600 w-full sm:w-auto">
                         {{ 'VENDOR.APPROVE' | translate }}
                       </button>
+
                       <button *ngIf="canDecline(rfq)" (click)="declineRfq(rfq.id!)"
-                        class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-red-500 text-white hover:bg-red-600">
+                        class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-red-500 text-white hover:bg-red-600 w-full sm:w-auto">
                         {{ 'VENDOR.REJECT' | translate }}
                       </button>
-                    </div>
-                    <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
-                      class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-green-500 text-white hover:bg-green-600">
-                      {{ 'VENDOR.SEND_QUOTE' | translate }}
-                    </button>
-                    <div
-                      class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium border border-green-500 text-green-600 bg-transparent dark:text-green-400 dark:border-green-400"
-                      *ngIf="hasSentQuote(rfq)">
-                      {{ 'VENDOR.QUOTE_SENT' | translate }}
-                    </div>
 
-                    <button (click)="onViewDetails(rfq.id!)"
-                      class="inline-flex items-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out no-underline hover:-translate-y-1 transition-transform duration-150 bg-blue-500 text-white hover:bg-blue-600">
-                      👁 {{ 'VENDOR.VIEW_DETAILS' | translate }}
-                    </button>
+                      <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                        class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-green-500 text-white hover:bg-green-600 w-full sm:w-auto">
+                        {{ 'VENDOR.SEND_QUOTE' | translate }}
+                      </button>
+
+                      <div *ngIf="hasSentQuote(rfq)"
+                        class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium border border-green-500 text-green-600 bg-transparent dark:text-green-400 dark:border-green-400 w-full sm:w-auto">
+                        {{ 'VENDOR.QUOTE_SENT' | translate }}
+                      </div>
+
+                      <button (click)="onViewDetails(rfq.id!)"
+                        class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-blue-500 text-white hover:bg-blue-600 w-full sm:w-auto">
+                        👁 {{ 'VENDOR.VIEW_DETAILS' | translate }}
+                      </button>
+                    </ng-container>
                   </div>
                 </div>
               </div>
