@@ -149,7 +149,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this._authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
-        if (user && (!this.currentUser || this.currentUser.id != user?.id)) {
+        if (user && (!this.currentUser || this.currentUser.id !== user?.id)) {
           this.currentUser = user;
           if (this.currentUser?.type == UserRole.CLIENT) {
             this.submissionListRequest.userId = this.currentUser.id;

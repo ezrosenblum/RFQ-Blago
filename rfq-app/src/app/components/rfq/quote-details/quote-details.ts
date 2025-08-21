@@ -192,22 +192,6 @@ export class QuoteDetails implements OnInit {
     this._messageService.downloadFile(file, format, this.previewImageInFullScreen.bind(this));
   }
 
-  extractIdsFromUrl(url: string): { typeId: number, entityId: number } | null {
-    try {
-      const parts = url.split('/documents/')[1]?.split('/');
-      if (!parts || parts.length < 2) return null;
-
-      const typeId = Number(parts[0]);
-      const entityId = Number(parts[1]);
-
-      if (isNaN(typeId) || isNaN(entityId)) return null;
-
-      return { typeId, entityId };
-    } catch {
-      return null;
-    }
-  }
-
   handleError(error: any): void {
     if (error.status === 401) {
       this.errorMessage = 'Your session has expired. Please log in again.';
