@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   FilterOptions,
   MyQuotesRequest,
@@ -7,12 +7,13 @@ import {
 } from '../../../models/my-quotes';
 import { QuoteService } from '../../../services/my-quotes';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { LookupValue, QuoteItem } from '../../../models/rfq.model';
 import { RfqService } from '../../../services/rfq';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: false,
@@ -20,7 +21,7 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './my-quotes.html',
   styleUrl: './my-quotes.scss',
 })
-export class MyQuotesComponent implements OnInit {
+export class MyQuotesComponent implements OnInit, OnDestroy {
   quotes: Quote[] = [];
   totalCount = 0;
   currentPage = 1;
@@ -40,13 +41,17 @@ export class MyQuotesComponent implements OnInit {
   viewMode: 'list' | 'grid' | 'table' = 'list';
   showFilters = false;
 
+  private destroy$ = new Subject<void>();
+  isQueryParamsChecked: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private quoteService: QuoteService,
     private route: ActivatedRoute,
     private router: Router,
     private rfqService: RfqService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private _translate: TranslateService,
   ) {
     this.filtersForm = this.fb.group({
       query: [''],
@@ -59,9 +64,33 @@ export class MyQuotesComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
-      this.loadFiltersFromParams(params);
-      this.searchQuotes();
+      if (!this.isQueryParamsChecked) {
+        this.loadFiltersFromParams(params);
+        this.searchQuotes();
+        this.isQueryParamsChecked = true;
+      }
     });
+
+    this.setupAutoFiltering();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupAutoFiltering() {
+    this.filtersForm.valueChanges
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.updateUrlParams();
+        this.searchQuotes();
+      });
   }
 
   getDisplayEnd(): number {
@@ -75,7 +104,7 @@ export class MyQuotesComponent implements OnInit {
       priceTo: params.priceTo ? +params.priceTo : null,
       minRating: params.minRating ? +params.minRating : 0,
       location: params.location || '',
-    });
+    }, { emitEvent: false }); 
 
     this.currentPage = params.page ? +params.page : 1;
     this.pageSize = params.size ? +params.size : 10;
@@ -176,7 +205,6 @@ export class MyQuotesComponent implements OnInit {
       location: '',
       minRating: 0,
     });
-    this.onSearch();
   }
 
   statusStyles: Record<number, string> = {
@@ -296,7 +324,7 @@ export class MyQuotesComponent implements OnInit {
     } else {
       const dialogRef = this.dialog.open(QuoteSendMessageDialog, {
         width: '500px',
-        maxWidth: '500px',
+        maxWidth: '90%',
         height: 'auto',
         panelClass: 'send-quote-message-dialog',
         autoFocus: false,
@@ -320,4 +348,21 @@ export class MyQuotesComponent implements OnInit {
       });
     }
   }
+
+  toggleDescription(id: string, event: Event) {
+    const desc = document.getElementById(id);
+    const btn = event.target as HTMLButtonElement;
+    if (!desc) return;
+
+    if (desc.classList.contains('description-collapsed')) {
+      desc.classList.remove('description-collapsed');
+      desc.classList.add('description-expanded');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_LESS');
+    } else {
+      desc.classList.remove('description-expanded');
+      desc.classList.add('description-collapsed');
+      btn.textContent = this._translate.instant('VENDOR.SHOW_MORE');
+    }
+  }
+
 }

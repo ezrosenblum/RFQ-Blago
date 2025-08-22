@@ -11,6 +11,8 @@ import { VerifyComponent } from './verify/verify.component';
 import { TranslateModule  } from '@ngx-translate/core';
 import { ServiceAreasComponent } from "../components/profile/service-areas/service-areas.component";
 import { MaterialCategoriesSelectionComponent } from '../components/profile/material-categories-selection/material-categories-selection.component';
+import { FilePondModule } from 'ngx-filepond';
+
 
 @NgModule({
   declarations: [
@@ -27,7 +29,8 @@ import { MaterialCategoriesSelectionComponent } from '../components/profile/mate
     AuthRoutingModule,
     TranslateModule,
     ServiceAreasComponent,
-    MaterialCategoriesSelectionComponent
+    MaterialCategoriesSelectionComponent,
+    FilePondModule
 ]
 })
 export class AuthModule { }

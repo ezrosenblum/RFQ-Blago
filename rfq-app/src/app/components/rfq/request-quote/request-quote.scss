@@ -175,6 +175,37 @@
   animation: spin 1s linear infinite;
 }
 
+.w-100 {
+  width: 100%;
+}
+
+:host::ng-deep {
+  .ql-editor {
+    min-height: 100px;
+  }
+
+  .ql-toolbar.ql-snow {
+    border: 1px solid #c5d1e5 !important;
+    border-top-left-radius: 5px !important;
+    border-top-right-radius: 5px !important;
+  }
+
+  .ql-container.ql-snow {
+    border-left: 1px solid #c5d1e5 !important;
+    border-right: 1px solid #c5d1e5 !important;
+    border-bottom: 1px solid #c5d1e5 !important;
+    border-bottom-left-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+  }
+
+  .ql-editor.ql-blank::before {
+    font-style: normal !important;
+    color: #94a3b8 !important;
+    font-size: 16px !important;
+  }
+}
+
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

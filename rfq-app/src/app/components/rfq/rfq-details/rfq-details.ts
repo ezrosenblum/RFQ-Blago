@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RfqService } from '../../../services/rfq';
 import { Subject, take, takeUntil } from 'rxjs';
-import { QuoteItem, QuoteSearchRequest, QuoteSearchResponse, Rfq } from '../../../models/rfq.model';
+import { MediaItem, QuoteItem, QuoteSearchRequest, QuoteSearchResponse, Rfq } from '../../../models/rfq.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
@@ -11,7 +11,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { QuoteFormDialog } from '../vendor-rfqs/quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
-
+import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
+import { MessagesService } from '../../../services/messages';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-rfq-details',
@@ -47,7 +49,9 @@ export class RfqDetails implements OnInit, OnDestroy {
     private _authService: Auth,
     private _dialog: MatDialog,
     private _translate: TranslateService,
-    private _alert: AlertService
+    private _alert: AlertService,
+    private _messageService: MessagesService,
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {
@@ -143,7 +147,7 @@ export class RfqDetails implements OnInit, OnDestroy {
     } else {
       const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
         width: '500px',
-        maxWidth: '500px',
+        maxWidth: '90%',
         height: 'auto',
         panelClass: 'send-quote-message-dialog',
         autoFocus: false,
@@ -272,12 +276,12 @@ export class RfqDetails implements OnInit, OnDestroy {
   getVendorStatus(rfq: Rfq): string | null {
     if (!rfq?.statusHistory) return null;
 
-    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
     const hasEngaged = rfq.statusHistory.some((s: any) => s.status?.id === 4);
+    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
     const hasViewed = rfq.statusHistory.some((s: any) => s.status?.id === 2);
 
-    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
     if (hasEngaged) return this._translate.instant('VENDOR.ENGAGED');
+    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
     if (hasViewed) return this._translate.instant('VENDOR.VIEWED');
 
     return null;
@@ -289,9 +293,15 @@ export class RfqDetails implements OnInit, OnDestroy {
   }
 
   openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
+    let width = '60%';
+
+    if (this.breakpointObserver.isMatched(Breakpoints.Handset)) {
+      width = '90%';
+    }
+
     const dialogRef = this._dialog.open(QuoteFormDialog, {
-      width: '60%',
-      maxWidth: '60%',
+      width,
+      maxWidth: '90%',
       height: 'auto',
       panelClass: 'add-quote-dialog',
       autoFocus: false,
@@ -308,6 +318,24 @@ export class RfqDetails implements OnInit, OnDestroy {
         this.getDetails(id);
       }
     });
+  }
+
+  previewImageInFullScreen(url: string, format: string){
+    const dialogRef = this._dialog.open(ImagePreviewDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      panelClass: 'preview-image-dialog',
+      autoFocus: false,
+      data: {
+        url: url,
+        format: format
+      },
+    });
+  }
+
+  downloadFile(file: MediaItem, format: string) {
+    this._messageService.downloadFile(file, format, this.previewImageInFullScreen.bind(this));
   }
 
   ngOnDestroy(): void {

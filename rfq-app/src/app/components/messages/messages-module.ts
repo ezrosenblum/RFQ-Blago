@@ -19,7 +19,7 @@ import { FileViewComponent } from '../../shared/file-view/file-view.component';
 @NgModule({
   declarations: [
     MessagesComponent,
-    ImagePreviewDialog,
+    ImagePreviewDialog
   ],
   imports: [
     CommonModule,

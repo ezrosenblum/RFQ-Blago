@@ -32,7 +32,16 @@ export interface User {
       id: number;
       name: string;
     };
-    certificateUrl?: string;
+    certificate?: {
+      id: string;
+      name: string;
+      isMain: boolean;
+      sortOrder: number;
+      size: number;
+      url: string;
+      type: number;
+      extension: string;
+    };
   };
 }
 

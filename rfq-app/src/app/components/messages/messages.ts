@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry } from '../../models/messages.model';
+import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry, MessageMediaEntry } from '../../models/messages.model';
 import { MessagesService } from '../../services/messages';
 import { find, map, Observable, of, startWith, take } from 'rxjs';
 import {
@@ -442,7 +442,7 @@ export class MessagesComponent implements OnInit {
 
   // Filtering and Selection functions
 
-  previewImageInFullScreen(url: string){
+  previewImageInFullScreen(url: string, format: string){
     const dialogRef = this._dialog.open(ImagePreviewDialog, {
       width: '100%',
       maxWidth: '100%',
@@ -451,6 +451,7 @@ export class MessagesComponent implements OnInit {
       autoFocus: false,
       data: {
         url: url,
+        format: format
       },
     });
 
@@ -459,6 +460,10 @@ export class MessagesComponent implements OnInit {
       .subscribe((result: any) => {
 
       });
+  }
+
+  downloadFile(file: MessageMediaEntry, format: string) {
+    this._messageService.downloadFile(file, format, this.previewImageInFullScreen.bind(this));
   }
 
   displayFn(user: ConversationUserEntry): string {

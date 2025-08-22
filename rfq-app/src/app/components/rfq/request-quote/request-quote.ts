@@ -27,6 +27,8 @@ import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 import { MaterialCategoriesSelectionComponent } from '../../profile/material-categories-selection/material-categories-selection.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FilePondComponent } from 'ngx-filepond';
+import { AlertService } from '../../../services/alert.service';
+import { ContentChange, QuillEditorComponent } from 'ngx-quill';
 
 FilePond.registerPlugin(
   FilePondPluginFileValidateType,
@@ -57,6 +59,15 @@ export class RequestQuote implements OnInit, OnDestroy {
   options: any;
   @ViewChild(MaterialCategoriesSelectionComponent)
   categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
+  @ViewChild('messageInput') messageInput!: QuillEditorComponent;
+  toolbarOptions = [
+  [{ 'header': [1, 2, 3, false] }], 
+  ['bold', 'italic', 'underline'] 
+  ];
+
+  modules = {
+    toolbar: this.toolbarOptions
+  };
 
   private destroy$ = new Subject<void>();
 
@@ -94,7 +105,8 @@ export class RequestQuote implements OnInit, OnDestroy {
     private rfqService: RfqService,
     private router: Router,
     private ngZone: NgZone,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private alertService: AlertService,
   ) {
     this.initializeForm();
   }
@@ -273,12 +285,10 @@ export class RequestQuote implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             this.isSubmitting = false;
-            this.successMessage = this.translate.instant(
-              'VENDOR.SUBMIT_SUCCESS'
-            );
+            this.alertService.success('VENDOR.SUBMIT_SUCCESS');
 
             this.resetForm();
-
+            
             setTimeout(() => {
               const successElement = document.querySelector('.alert-success');
               if (successElement) {
@@ -288,10 +298,12 @@ export class RequestQuote implements OnInit, OnDestroy {
                 });
               }
             }, 1000);
-
+            
             setTimeout(() => {
               this.successMessage = '';
             }, 5000);
+
+            this.router.navigate(['/vendor-rfqs']);
           },
           error: (error) => {
             this.isSubmitting = false;

@@ -50,7 +50,8 @@
               "filepond-plugin-file-validate-type",
               "filepond-plugin-file-validate-size",
               "sweetalert2",
-              "google-libphonenumber"
+              "google-libphonenumber",
+              "quill-delta"
             ]
           },
           "configurations": {

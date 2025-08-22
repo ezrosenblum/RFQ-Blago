@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceAreasComponent } from './service-areas/service-areas.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { ProfileSettingsChangePasswordComponent } from './profile-settings/profile-settings-change-password/profile-settings-change-password.component';
+import { FilePondModule } from 'ngx-filepond';
 
 const routes: Routes = [
   {
@@ -37,7 +38,8 @@ const routes: Routes = [
     ServiceAreasComponent,
     TranslateModule,
     RouterModule.forChild(routes),
-    MaterialCategoriesSelectionComponent
+    MaterialCategoriesSelectionComponent,
+    FilePondModule,
 ]
 })
 export class ProfileModule {}

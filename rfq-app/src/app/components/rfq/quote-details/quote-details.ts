@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RfqService } from '../../../services/rfq';
 import { Subject, take, takeUntil } from 'rxjs';
-import { QuoteItem } from '../../../models/rfq.model';
+import { MediaItem, QuoteItem } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { User } from '../../../models/user.model';
 import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
@@ -10,6 +10,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
 import { TranslateService } from '@ngx-translate/core';
+import { ImagePreviewDialog } from '../../messages/image-preview-dialog/image-preview-dialog';
+import { MessagesService } from '../../../services/messages';
+import { MessageMediaEntry } from '../../../models/messages.model';
 
 @Component({
   selector: 'app-quote-details',
@@ -30,7 +33,8 @@ export class QuoteDetails implements OnInit {
     private _authService: Auth,
     private _dialog: MatDialog,
     private _alert: AlertService,
-    private _translate: TranslateService
+    private _translate: TranslateService,
+    private _messageService: MessagesService
   ) {}
 
   ngOnInit() {
@@ -89,7 +93,7 @@ export class QuoteDetails implements OnInit {
     } else {
       const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
         width: '500px',
-        maxWidth: '500px',
+        maxWidth: '90%',
         height: 'auto',
         panelClass: 'send-quote-message-dialog',
         autoFocus: false,
@@ -168,6 +172,24 @@ export class QuoteDetails implements OnInit {
       default:
         return 'bg-secondary-100 text-secondary-800 dark:bg-dark-700 dark:text-secondary-300';
     }
+  }
+
+  previewImageInFullScreen(url: string, format: string){
+    const dialogRef = this._dialog.open(ImagePreviewDialog, {
+      width: '100%',
+      maxWidth: '100%',
+      height: '100%',
+      panelClass: 'preview-image-dialog',
+      autoFocus: false,
+      data: {
+        url: url,
+        format: format,
+      },
+    });
+  }
+
+  downloadFile(file: MediaItem, format: string) {
+    this._messageService.downloadFile(file, format, this.previewImageInFullScreen.bind(this));
   }
 
   handleError(error: any): void {

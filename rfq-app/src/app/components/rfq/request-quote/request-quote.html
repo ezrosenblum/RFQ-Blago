@@ -155,15 +155,15 @@
               ({{ getCharacterCount('description') }}/{{ getMaxLength('description') }})
             </span>
           </label>
-          <textarea
-            id="description"
-            name="description"
-            rows="4"
+          <quill-editor
+            #messageInput
             formControlName="description"
-            class="form-textarea"
             [class.border-error-500]="isFieldInvalid('description')"
+            [modules]="modules"
             placeholder="Describe your project in detail. Include materials, specifications, timeline, and any special requirements..."
-          ></textarea>
+            class="m-0 w-100 bg-transparent"
+          >
+          </quill-editor>
           <div *ngIf="isFieldInvalid('description')" class="form-error">
             {{ getFieldError('description') }}
           </div>
@@ -285,7 +285,7 @@
             type="button"
             (click)="clearForm()"
             [disabled]="isSubmitting"
-            class="btn btn-outline px-6 py-3 text-base"
+            class="btn btn-outline px-6 py-3 text-base mb-4 md:mb-0"
           >
             {{ 'REQUEST.CLEAR_FORM' | translate }}
           </button>

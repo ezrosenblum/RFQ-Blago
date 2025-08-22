@@ -21,6 +21,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { QuoteFormDialog } from './quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -32,7 +33,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   rfqs: Rfq[] = [];
   filteredRfqs: Rfq[] = [];
   currentUser: User | null = null;
-  isLoading = false;
+  isLoading = true;
   isUpdating = false;
   errorMessage = '';
   successMessage = '';
@@ -139,7 +140,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
     private _router: Router,
     private _translate: TranslateService,
     private _dialog: MatDialog,
-    private _alert: AlertService
+    private _alert: AlertService,
+    private breakpointObserver: BreakpointObserver
   ) {
     this.initializeFilterForm();
   }
@@ -149,26 +151,29 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this._authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
-        this.currentUser = user;
-        if (this.currentUser?.type == UserRole.CLIENT) {
-          this.submissionListRequest.userId = this.currentUser.id;
-        }
-
-        if (user) {
-          if (user.type === UserRole.CLIENT) {
-            this.userId = user.id;
+        if (user && (!this.currentUser || this.currentUser.id !== user?.id)) {
+          this.currentUser = user;
+          if (this.currentUser?.type == UserRole.CLIENT) {
+            this.submissionListRequest.userId = this.currentUser.id;
           }
-          this.applyFilters();
-          this.loadStatistics();
-          this.loadStatuses();
-          this.loadCategories();
 
-          this.filterForm
-            .get('category')!
-            .valueChanges.pipe(takeUntil(this.destroy$))
-            .subscribe((categoryId) => {
-              this.onCategoryChange(Number(categoryId));
-            });
+          if (user) {
+            if (user.type === UserRole.CLIENT) {
+              this.userId = user.id;
+            }
+
+            this.applyFilters();
+            this.loadStatistics();
+            this.loadStatuses();
+            this.loadCategories();
+
+            this.filterForm
+              .get('category')!
+              .valueChanges.pipe(takeUntil(this.destroy$))
+              .subscribe((categoryId) => {
+                this.onCategoryChange(Number(categoryId));
+              });
+          }
         }
       });
 
@@ -270,22 +275,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
       });
 
     this.filterForm
-      .get('category')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.currentPage = 1;
-        this.applyFilters();
-      });
-
-    this.filterForm
-      .get('subcategory')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.currentPage = 1;
-        this.applyFilters();
-      });
-
-    this.filterForm
       .get('dateFrom')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe(() => {
@@ -303,7 +292,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   loadRfqs(): void {
-    this.isLoading = true;
     this.errorMessage = '';
     this._rfqService
       .getAllRfqs(this.submissionListRequest)
@@ -317,11 +305,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
             : [];
           this.totalItems = response.totalCount!;
           this.totalPages = response.totalPages!;
-          this.applyFilters();
-          this.isLoading = false;
         },
         error: (error) => {
-          this.isLoading = false;
           this.handleError(error);
         },
       });
@@ -358,6 +343,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
       this.filterForm.get('dateTo')?.value.trim() || undefined;
     this.submissionListRequest.paging.pageNumber = this.currentPage;
     this.submissionListRequest.paging.pageSize = this.pageSize;
+    this.isLoading = true;
     this._rfqService
       .getAllRfqs(this.submissionListRequest)
       .pipe(takeUntil(this.destroy$))
@@ -371,9 +357,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
           this.totalItems = response.totalCount!;
           this.totalPages = response.totalPages!;
           this.initializeCarouselStates();
+          this.isLoading = false;
         },
         error: (error) => {
           this.handleError(error);
+          this.isLoading = false;
         },
       });
   }
@@ -644,6 +632,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
     this.filterForm.get('category')?.setValue([...selected]);
     this.updateSubcategoriesFromSelected();
+    this.applyFilters();
   }
 
   onSubcategoryCheckboxChange(event: any): void {
@@ -658,6 +647,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
     }
 
     this.filterForm.get('subcategory')?.setValue([...selected]);
+    this.applyFilters();
   }
 
   updateSubcategoriesFromSelected(): void {
@@ -734,9 +724,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
   }
 
   openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
+    let width = '60%';
+
+    if (this.breakpointObserver.isMatched(Breakpoints.Handset)) {
+      width = '90%';
+    }
+
     const dialogRef = this._dialog.open(QuoteFormDialog, {
-      width: '60%',
-      maxWidth: '60%',
+      width,
+      maxWidth: '90%',
       height: 'auto',
       panelClass: 'add-quote-dialog',
       autoFocus: false,
@@ -958,12 +954,12 @@ export class VendorRfqs implements OnInit, OnDestroy {
   getVendorStatus(rfq: Rfq): string | null {
     if (!rfq?.statusHistory) return null;
 
-    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
     const hasEngaged = rfq.statusHistory.some((s: any) => s.status?.id === 4);
+    const hasQuoted = rfq.statusHistory.some((s: any) => s.status?.id === 3);
     const hasViewed = rfq.statusHistory.some((s: any) => s.status?.id === 2);
 
-    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
     if (hasEngaged) return this._translate.instant('VENDOR.ENGAGED');
+    if (hasQuoted) return this._translate.instant('VENDOR.QUOTE_SENT');
     if (hasViewed) return this._translate.instant('VENDOR.VIEWED');
 
     return null;

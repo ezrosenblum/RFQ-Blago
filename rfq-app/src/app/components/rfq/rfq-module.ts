@@ -16,6 +16,8 @@ import { MyQuotesComponent } from './my-quotes/my-quotes';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { QuoteSendMessageDialog } from './quote-send-message-dialog/quote-send-message-dialog';
 import { QuoteDetails } from './quote-details/quote-details';
+import { QuillModule } from 'ngx-quill';
+
 @NgModule({
   declarations: [
     RequestQuote,
@@ -36,7 +38,8 @@ import { QuoteDetails } from './quote-details/quote-details';
     FileViewComponent,
     MaterialCategoriesSelectionComponent,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    QuillModule
   ],
   providers: [
     CurrencyPipe 
