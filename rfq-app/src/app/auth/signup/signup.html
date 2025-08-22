@@ -1,4 +1,3 @@
-<!-- src/app/auth/signup/signup.component.html -->
 <div
   class="min-h-screen flex items-center justify-center bg-secondary-50 dark:bg-dark-900 py-12 px-4 sm:px-6 lg:px-8"
 >
@@ -11,8 +10,10 @@
       <h2
         class="mt-6 text-2xl font-semibold text-secondary-800 dark:text-secondary-200"
       >
-        {{ isVendorDetailsStep ? ('AUTH.COMPANY_INFORMATION' | translate) :
-        ('AUTH.CREATE_YOUR_ACCOUNT' | translate) }}
+        {{ currentStep === 'basic' ? ('AUTH.CREATE_YOUR_ACCOUNT' | translate) :
+        currentStep === 'vendor' ? ('AUTH.COMPANY_INFORMATION' | translate) :
+        currentStep === 'location' ? ('AUTH.LOCATION_AND_CATEGORIES' |
+        translate) : ('AUTH.CREATE_YOUR_ACCOUNT' | translate) }}
       </h2>
       <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
         {{ message }}
@@ -58,7 +59,7 @@
       </div>
 
       <!-- Step 1: Basic User Information -->
-      <div *ngIf="!isVendorDetailsStep" class="w-full sm:w-auto max-w-md">
+      <div *ngIf="currentStep === 'basic'" class="max-w-md space-y-3">
         <!-- Name Fields -->
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <!-- First Name -->
@@ -78,9 +79,8 @@
               {{ getFieldError('firstName') }}
             </div>
           </div>
-
           <!-- Last Name -->
-          <div class="mb-4 sm:mb-0">
+          <div>
             <label for="lastName" class="form-label"
               >{{ 'AUTH.LAST_NAME' | translate }}
             </label>
@@ -97,9 +97,8 @@
             </div>
           </div>
         </div>
-
         <!-- Email Field -->
-        <div class="mb-4 sm:mb-0">
+        <div>
           <label for="email" class="form-label"
             >{{'AUTH.EMAIL' | translate}}</label
           >
@@ -145,9 +144,8 @@
             {{ getFieldError('email') }}
           </div>
         </div>
-
         <!-- Role Selection -->
-        <div class="mb-4 sm:mb-0">
+        <div>
           <label for="role" class="form-label"
             >{{ 'AUTH.ACCOUNT_TYPE' | translate }} *</label
           >
@@ -168,9 +166,8 @@
             {{ getFieldError('role') }}
           </div>
         </div>
-
         <!-- Password Field -->
-        <div class="mb-4 sm:mb-0">
+        <div>
           <label for="password" class="form-label"
             >{{ 'AUTH.PASSWORD' | translate }} *</label
           >
@@ -224,7 +221,6 @@
               </svg>
             </button>
           </div>
-
           <!-- Password Strength Indicator -->
           <div *ngIf="signupForm.get('password')?.value" class="mt-2">
             <div class="flex items-center space-x-2">
@@ -258,9 +254,8 @@
             {{ getFieldError('password') }}
           </div>
         </div>
-
         <!-- Confirm Password Field -->
-        <div class="mb-4 sm:mb-0">
+        <div>
           <label for="confirmPassword" class="form-label">
             {{ 'AUTH.CONFIRM_PASSWORD' | translate }} *
           </label>
@@ -321,7 +316,7 @@
       </div>
 
       <!-- Step 2: Vendor Details (only shown for vendors) -->
-      <div *ngIf="isVendorDetailsStep" class="space-y-6">
+      <div *ngIf="currentStep === 'vendor'" class="space-y-6 max-w-md w-full">
         <!-- Back Button -->
         <div class="flex justify-start">
           <button
@@ -345,10 +340,9 @@
             {{ 'AUTH.BACK_TO_ACCOUNT_DETAILS' | translate }}
           </button>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 gap-8">
           <!-- Left Column - Company Details -->
-          <div class="space-y-6">
+          <div class="space-y-3">
             <!-- Company Name -->
             <div>
               <label for="CompanyName" class="form-label"
@@ -365,7 +359,6 @@
                 {{ getFieldError('name') }}
               </div>
             </div>
-
             <!-- Contact Person -->
             <div>
               <label for="contactPersonFirstName" class="form-label">
@@ -385,9 +378,8 @@
                 {{ getFieldError('contactPersonFirstName') }}
               </div>
             </div>
-
             <!-- Contact Person Last Name -->
-            <div class="mb-4 sm:mb-0">
+            <div>
               <label for="contactPersonLastName" class="form-label">
                 {{ 'AUTH.CONTACT_PERSON_LAST_NAME' | translate }} *
               </label>
@@ -405,45 +397,7 @@
                 {{ getFieldError('contactPersonLastName') }}
               </div>
             </div>
-
-            <!-- Contact Details -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <!-- Contact Email -->
-              <div class="mb-4 sm:mb-0">
-                <label for="contactEmail" class="form-label">
-                  {{ 'AUTH.CONTACT_EMAIL_OPTIONAL' | translate }}
-                </label>
-                <input
-                  type="email"
-                  formControlName="contactEmail"
-                  class="form-input"
-                  placeholder="{{ 'AUTH.ENTER_CONTACT_EMAIL' | translate }}"
-                />
-                <p class="mt-1 text-xs text-secondary-500">
-                  {{'AUTH.DEFAULTS_TO_YOUR_EMAIL_IF_NOT_PROVIDED' | translate}}
-                </p>
-              </div>
-
-              <!-- Contact Phone -->
-              <div class="mb-4 sm:mb-0">
-                <label for="contactPhone" class="form-label">
-                  {{ 'AUTH.CONTACT_PHONE_OPTIONAL' | translate }}
-                </label>
-                <input
-                  type="text"
-                  formControlName="contactPhone"
-                  class="form-input"
-                  placeholder="{{ 'AUTH.ENTER_CONTACT_PHONE' | translate }}"
-                />
-                <p class="mt-1 text-xs text-secondary-500">
-                  {{ 'AUTH.DEFAULTS_TO_YOUR_PHONE_IF_NOT_PROVIDED' | translate
-                  }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Phone Number -->
-            <div class="mb-4 sm:mb-0">
+            <div>
               <label for="phoneNumber" class="form-label">
                 {{ 'AUTH.PHONE_NUMBER' | translate }} *
               </label>
@@ -458,9 +412,40 @@
                 {{ getFieldError('phoneNumber') }}
               </div>
             </div>
+            <!-- Contact Email -->
+            <div>
+              <label for="contactEmail" class="form-label">
+                {{ 'AUTH.CONTACT_EMAIL_OPTIONAL' | translate }}
+              </label>
+              <input
+                type="email"
+                formControlName="contactEmail"
+                class="form-input"
+                placeholder="{{ 'AUTH.ENTER_CONTACT_EMAIL' | translate }}"
+              />
+              <p class="mt-1 text-xs text-secondary-500">
+                {{'AUTH.DEFAULTS_TO_YOUR_EMAIL_IF_NOT_PROVIDED' | translate}}
+              </p>
+            </div>
+            <!-- Contact Phone -->
+            <div>
+              <label for="contactPhone" class="form-label">
+                {{ 'AUTH.CONTACT_PHONE_OPTIONAL' | translate }}
+              </label>
+              <input
+                type="text"
+                formControlName="contactPhone"
+                class="form-input"
+                placeholder="{{ 'AUTH.ENTER_CONTACT_PHONE' | translate }}"
+              />
+              <p class="mt-1 text-xs text-secondary-500">
+                {{ 'AUTH.DEFAULTS_TO_YOUR_PHONE_IF_NOT_PROVIDED' | translate }}
+              </p>
+            </div>
+            <!-- Phone Number -->
 
             <!-- Business Description -->
-            <div class="mb-4 sm:mb-0">
+            <div>
               <label for="businessDescription" class="form-label">
                 {{ 'AUTH.BUSINESS_DESCRIPTION_SPECIALTIES' | translate }} *
               </label>
@@ -478,7 +463,6 @@
                 {{ getFieldError('businessDescription') }}
               </div>
             </div>
-
             <!-- Company Size -->
             <div>
               <label for="companySize" class="form-label">
@@ -493,22 +477,18 @@
                 </option>
               </select>
             </div>
-
             <!-- Business License Upload -->
             <div>
               <label for="businessLicense" class="form-label">
                 {{ 'AUTH.BUSINESS_LICENSE_CERTIFICATION_OPTIONAL' | translate }}
               </label>
-              <file-pond
-                #pond
-                [options]="pondOptions"
-                [files]="pondFiles"
-                (onaddfile)="onFilePondAddFile($event)"
-                (onremovefile)="onFilePondRemoveFile($event)"
-                (onerror)="onFilePondError($event)"
-                class="certificate-upload"
-              >
-              </file-pond>
+              <input
+                formControlName="businessLicense"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                (change)="onFileSelected($event)"
+                class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+              />
               <p class="mt-1 text-xs text-secondary-500">
                 {{ 'AUTH.ACCEPTED_FORMATS' | translate }}: PDF, JPG, PNG, DOC,
                 DOCX (Max 5MB)
@@ -521,12 +501,63 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Right side -->
-          <div class="space-y-6">
+      <!-- Step 3: Location and Categories (only for vendors) -->
+      <div *ngIf="currentStep === 'location'" class="w-full space-y-6">
+        <!-- Back Button -->
+        <div class="flex justify-start">
+          <button
+            type="button"
+            (click)="goBackToVendorInfo()"
+            class="flex items-center text-sm text-secondary-600 hover:text-secondary-800 dark:text-secondary-400 dark:hover:text-secondary-200"
+          >
+            <svg
+              class="h-4 w-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            {{ 'AUTH.BACK_TO_COMPANY_INFO' | translate }}
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8">
+          <!-- Left side - Service Area -->
+          <div>
+            <h3
+              class="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-4"
+            >
+              {{ 'AUTH.SERVICE_AREA' | translate }}
+            </h3>
             <app-service-areas
               (serviceAreaChange)="handleServiceAreaChange($event)"
             ></app-service-areas>
+          </div>
+
+          <!-- Right side - Material Categories -->
+          <div>
+            <h3
+              class="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-4"
+            >
+              {{ 'AUTH.MATERIAL_CATEGORIES' | translate }}
+            </h3>
+            <p class="text-sm text-secondary-600 dark:text-secondary-400 mb-4">
+              {{ 'AUTH.SELECT_CATEGORIES_DESCRIPTION' | translate }}
+            </p>
+            <app-material-categories-selection
+              #materialCategoriesComponent
+              [isRequestQuote]="true"
+            >
+            </app-material-categories-selection>
           </div>
         </div>
       </div>
@@ -542,13 +573,12 @@
           <div *ngIf="isLoading" class="flex items-center">
             <div class="spinner mr-2"></div>
             <span>
-              {{ isVendorDetailsStep ? ('AUTH.CREATING_ACCOUNT' | translate) :
-              ('AUTH.PROCESSING' | translate) }}
+              {{ currentStep === 'location' ? ('AUTH.CREATING_ACCOUNT' |
+              translate) : ('AUTH.PROCESSING' | translate) }}
             </span>
           </div>
         </button>
       </div>
-
       <!-- Login Link -->
       <div class="text-center">
         <p class="text-sm text-secondary-600 dark:text-secondary-400">
@@ -563,7 +593,6 @@
         </p>
       </div>
     </form>
-
     <!-- Additional Info -->
     <div class="mt-8 text-center">
       <p class="text-xs text-secondary-500 dark:text-secondary-400">
@@ -572,3 +601,4 @@
     </div>
   </div>
 </div>
+

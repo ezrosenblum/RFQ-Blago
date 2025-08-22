@@ -2,7 +2,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
 import { Login } from './login/login';
 import { Signup} from './signup/signup';
 import { AuthRoutingModule } from './auth-routing-module';
@@ -11,7 +10,9 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { VerifyComponent } from './verify/verify.component';
 import { TranslateModule  } from '@ngx-translate/core';
 import { ServiceAreasComponent } from "../components/profile/service-areas/service-areas.component";
+import { MaterialCategoriesSelectionComponent } from '../components/profile/material-categories-selection/material-categories-selection.component';
 import { FilePondModule } from 'ngx-filepond';
+
 
 @NgModule({
   declarations: [
@@ -19,7 +20,7 @@ import { FilePondModule } from 'ngx-filepond';
     Signup,
     ResetPasswordComponent,
     ForgotPasswordComponent,
-    VerifyComponent
+    VerifyComponent, 
   ],
   imports: [
     CommonModule,
@@ -28,6 +29,7 @@ import { FilePondModule } from 'ngx-filepond';
     AuthRoutingModule,
     TranslateModule,
     ServiceAreasComponent,
+    MaterialCategoriesSelectionComponent,
     FilePondModule
 ]
 })
