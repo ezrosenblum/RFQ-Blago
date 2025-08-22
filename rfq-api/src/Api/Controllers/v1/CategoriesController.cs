@@ -3,6 +3,7 @@ using Application.Features.Categories.Queries;
 using AutoMapper;
 using DTO.Categories;
 using DTO.Categories.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.v1;
@@ -30,6 +31,7 @@ public class CategoriesController : ApiControllerBase
         return await Mediator.Send(command);
     }
 
+    [AllowAnonymous]
     [HttpGet("categories")]
     public async Task<IReadOnlyCollection<CategoryResponse>> GetAllCategories()
     {
@@ -56,6 +58,7 @@ public class CategoriesController : ApiControllerBase
         return await Mediator.Send(command);
     }
 
+    [AllowAnonymous]
     [HttpGet("subcategories")]
     public async Task<IReadOnlyCollection<SubcategoryResponse>> GetAllSubcategories()
     {
