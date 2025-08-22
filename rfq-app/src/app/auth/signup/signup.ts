@@ -36,6 +36,7 @@ export class Signup implements OnInit {
   @ViewChild('materialCategoriesComponent')
   materialCategoriesComponent!: MaterialCategoriesSelectionComponent;
   clearCategoriesSubject = new Subject<boolean>();
+  registeredEmail: string | null = null;
   constructor(
     private fb: FormBuilder,
     private userService: Auth,
@@ -274,63 +275,72 @@ export class Signup implements OnInit {
     return standardInvalid;
   }
   getFieldError(fieldName: string): string {
-    const field = this.signupForm.get(fieldName);
-    if (!field || !field.errors) return '';
-    const errors = field.errors;
-    if (errors['required']) {
-      return this.translate.instant('AUTH.VALIDATION.REQUIRED', {
-        field: this.getFieldLabel(fieldName),
-      });
+  const field = this.signupForm.get(fieldName);
+  
+  if (fieldName === 'confirmPassword') {
+    if (this.signupForm.errors?.['passwordMismatch']) {
+      return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
     }
-    if (errors['email']) {
-      return this.translate.instant('AUTH.VALIDATION.EMAIL');
+    const password = this.signupForm.get('password')?.value;
+    const confirmPassword = this.signupForm.get('confirmPassword')?.value;
+    if (password && confirmPassword && password !== confirmPassword) {
+      return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
     }
-    if (errors['minlength']) {
-      return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
-        field: this.getFieldLabel(fieldName),
-        min: errors['minlength'].requiredLength,
-      });
-    }
-    if (fieldName === 'password' && errors['passwordStrength']) {
-      const strength = errors['passwordStrength'];
-      const requirements: string[] = [];
-      if (!strength.hasUpperCase) {
-        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.UPPER'));
-      }
-      if (!strength.hasLowerCase) {
-        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.LOWER'));
-      }
-      if (!strength.hasNumeric) {
-        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.NUMBER'));
-      }
-      if (!strength.hasSpecial) {
-        requirements.push(
-          this.translate.instant('AUTH.PASSWORD_RULES.SPECIAL')
-        );
-      }
-      if (!strength.minLength) {
-        requirements.push(
-          this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH')
-        );
-      }
-      return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
-        rules: requirements.join(', '),
-      });
-    }
-    if (fieldName === 'confirmPassword') {
-      if (this.signupForm.errors?.['passwordMismatch']) {
-        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
-      }
-      const password = this.signupForm.get('password')?.value;
-      const confirmPassword = this.signupForm.get('confirmPassword')?.value;
-      if (password && confirmPassword && password !== confirmPassword) {
-        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
-      }
-    }
-    return this.translate.instant('AUTH.VALIDATION.PATTERN', {
+  }
+  
+  if (!field || !field.errors) return '';
+
+  const errors = field.errors;
+
+  if (errors['required']) {
+    return this.translate.instant('AUTH.VALIDATION.REQUIRED', {
       field: this.getFieldLabel(fieldName),
     });
   }
+
+  if (errors['email']) {
+    return this.translate.instant('AUTH.VALIDATION.EMAIL');
+  }
+
+  if (errors['minlength']) {
+    return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
+      field: this.getFieldLabel(fieldName),
+      min: errors['minlength'].requiredLength,
+    });
+  }
+
+  if (fieldName === 'password' && errors['passwordStrength']) {
+    const strength = errors['passwordStrength'];
+    const requirements: string[] = [];
+    if (!strength.hasUpperCase) {
+      requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.UPPER'));
+    }
+    if (!strength.hasLowerCase) {
+      requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.LOWER'));
+    }
+    if (!strength.hasNumeric) {
+      requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.NUMBER'));
+    }
+    if (!strength.hasSpecial) {
+      requirements.push(
+        this.translate.instant('AUTH.PASSWORD_RULES.SPECIAL')
+      );
+    }
+    if (!strength.minLength) {
+      requirements.push(
+        this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH')
+      );
+    }
+    return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
+      rules: requirements.join(', '),
+    });
+  }
+
+  return this.translate.instant('AUTH.VALIDATION.PATTERN', {
+    field: this.getFieldLabel(fieldName),
+  });
+}
+
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
       firstName: 'First name',
@@ -463,6 +473,7 @@ export class Signup implements OnInit {
       password: formValue.password,
       phoneNumber: formValue.phoneNumber || '',
     };
+    this.registeredEmail = formValue.email;
     this.userService.createUser(userRequest).subscribe({
       next: (userResponse) => {
         if (isVendor && userResponse.id) {
@@ -551,7 +562,7 @@ export class Signup implements OnInit {
     const isVendor = this.isVendorRole(roleName);
 
     if (!isVendor || this.currentStep === 'location') {
-      setTimeout(() => this.navigateToLogin(), 2000);
+      setTimeout(() => this.navigateToLogin(true), 2000);
     }
   }
   private handleError(error: any): void {
@@ -582,9 +593,20 @@ export class Signup implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
   }
-  navigateToLogin(): void {
-    this.router.navigate(['/auth/login']);
+  navigateToLogin(setParams: boolean): void {
+    if (!setParams) {
+      this.router.navigate(['/auth/login']);
+    } 
+    else {
+      this.router.navigate(['/auth/login'], {
+        queryParams: {
+          waitingVerification: setParams,
+          email: this.registeredEmail
+        },
+      });
+    }
   }
+
   handleServiceAreaChange(data: {
     streetAddress: string;
     latitude: number;
