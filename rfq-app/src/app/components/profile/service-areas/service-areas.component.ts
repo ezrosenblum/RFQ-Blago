@@ -25,7 +25,7 @@ export class ServiceAreasComponent implements OnInit {
   }>();
 
   selectedLocation: string = '';
-  rangeMiles: number = 10;
+  rangeMiles: number = 0;
   
   private map: any;
   private autocomplete: any;
@@ -57,7 +57,6 @@ export class ServiceAreasComponent implements OnInit {
     });
   }
 
-
   private loadGoogleMaps() {
     if (typeof google !== 'undefined') {
       this.initializeMap();
@@ -75,91 +74,14 @@ export class ServiceAreasComponent implements OnInit {
   }
 
   private initializeMap() {
+    const address = this.currentUser?.companyDetails?.streetAddress || '';
+    this.selectedLocation = address;
+    this.rangeMiles = this.currentUser?.companyDetails?.operatingRadius || 10;
     const defaultLocation = { lat: this.currentUser?.companyDetails?.latitudeAddress || 41.9981, lng: this.currentUser?.companyDetails?.longitudeAddress || 21.4254 }; // Skopje, Macedonia
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: defaultLocation,
-      zoom: 8,
-      styles: [
-        { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-        {
-          featureType: "administrative.locality",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#d59563" }]
-        },
-        {
-          featureType: "poi",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#d59563" }]
-        },
-        {
-          featureType: "poi.park",
-          elementType: "geometry",
-          stylers: [{ color: "#263c3f" }]
-        },
-        {
-          featureType: "poi.park",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#6b9a76" }]
-        },
-        {
-          featureType: "road",
-          elementType: "geometry",
-          stylers: [{ color: "#38414e" }]
-        },
-        {
-          featureType: "road",
-          elementType: "geometry.stroke",
-          stylers: [{ color: "#212a37" }]
-        },
-        {
-          featureType: "road",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#9ca5b3" }]
-        },
-        {
-          featureType: "road.highway",
-          elementType: "geometry",
-          stylers: [{ color: "#746855" }]
-        },
-        {
-          featureType: "road.highway",
-          elementType: "geometry.stroke",
-          stylers: [{ color: "#1f2835" }]
-        },
-        {
-          featureType: "road.highway",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#f3d19c" }]
-        },
-        {
-          featureType: "transit",
-          elementType: "geometry",
-          stylers: [{ color: "#2f3948" }]
-        },
-        {
-          featureType: "transit.station",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#d59563" }]
-        },
-        {
-          featureType: "water",
-          elementType: "geometry",
-          stylers: [{ color: "#17263c" }]
-        },
-        {
-          featureType: "water",
-          elementType: "labels.text.fill",
-          stylers: [{ color: "#515c6d" }]
-        },
-        {
-          featureType: "water",
-          elementType: "labels.text.stroke",
-          stylers: [{ color: "#17263c" }]
-        }
-      ]
+      zoom: 10,
     });
 
     this.autocomplete = new google.maps.places.Autocomplete(
@@ -219,15 +141,12 @@ export class ServiceAreasComponent implements OnInit {
 
   onRangeChange() {
     if (this.circle && this.rangeMiles) {
-      this.circle.setRadius(this.rangeMiles * 1609.34);
-
-      let zoom = 12;
-      if (this.rangeMiles <= 5) zoom = 14;
-      else if (this.rangeMiles <= 15) zoom = 12;
-      else if (this.rangeMiles <= 50) zoom = 10;
-      else zoom = 8;
-      
-      this.map.setZoom(zoom);
+      const radiusInMeters = this.rangeMiles * 1609.34;
+      this.circle.setRadius(radiusInMeters);
+      const bounds = this.circle.getBounds();
+      if (bounds) {
+        this.map.fitBounds(bounds);
+      }
     }
   }
 
