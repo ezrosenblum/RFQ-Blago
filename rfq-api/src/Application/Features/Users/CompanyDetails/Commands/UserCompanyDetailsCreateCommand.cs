@@ -52,10 +52,6 @@ public sealed class UserCompanyDetailsCreateCommandHandler : ICommandHandler<Use
 
     public async Task<UserCompanyDetails> Handle(UserCompanyDetailsCreateCommand command, CancellationToken cancellationToken)
     {
-        var company = UserCompanyDetails.Create(
-            command,
-            command.Certificate);
-
         var user = await _dbContext.User
             .Include(u => u.Categories)
             .Include(u => u.Subcategories)
@@ -65,6 +61,10 @@ public sealed class UserCompanyDetailsCreateCommandHandler : ICommandHandler<Use
 
         if (user == null)
             throw new NotFoundException(_localizationService.GetValue("user.notFound.error.message"));
+
+        var company = UserCompanyDetails.Create(
+            command,
+            command.Certificate);
 
         var categories = await _dbContext.Category
             .Where(c => command.CategoriesIds.Contains(c.Id))
@@ -105,13 +105,7 @@ public sealed class UserCompanyDetailsCreateCommandValidator : AbstractValidator
             })
             .WithLocalizationKey("user.companyDetails.alreadyExists.message");
 
-        RuleFor(cmd => cmd.UserId)
-            .MustAsync(async (UserId, cancellationToken) =>
-            {
-                var result = await dbContext.User.AnyAsync(s => s.Id == UserId, cancellationToken);
-                return result;
-            })
-            .WithLocalizationKey("user.notFound.error.message");
-
+        RuleFor(cmd => cmd.CategoriesIds)
+            .Must(c => c == null || c.Count <= 5);
     }
 }
