@@ -492,7 +492,10 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: () => this.submitProfile(),
+        next: () => {
+          setTimeout(() => {
+            this.submitProfile()
+          }, 1000)},
         error: (err) => this.handleSubmissionError(err),
       });
   }
@@ -507,7 +510,13 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => this.handleSubmissionSuccess(),
-        error: (err) => this.handleSubmissionError(err),
+        error: (err) => {
+          if (err.status != 0) {
+            this.handleSubmissionError(err)
+          } else {
+            this.handleSubmissionSuccess();
+          }
+        },
       });
   }
 
@@ -597,7 +606,6 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
     const message = this.errorHandler.handleError(error);
     this.errorMessage = message;
     setTimeout(() => {

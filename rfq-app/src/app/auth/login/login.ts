@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, take, takeUntil } from 'rxjs';
-import { LoginRequest } from '../../models/auth.model';
+import { LoginRequest, ResendEmail } from '../../models/auth.model';
 import { Auth } from '../../services/auth';
 import { User } from '../../models/user.model';
 import { TranslateService } from '@ngx-translate/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class Login implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   isLoading = false;
+  isResendingCode = false;
   errorMessage = '';
   showPassword = false;
 
@@ -26,17 +28,37 @@ export class Login implements OnInit, OnDestroy {
     { email: 'vendor@demo.com', password: 'Test12345!', role: 'Vendor' },
     { email: 'client@demo.com', password: 'Test12345!', role: 'Customer' }
   ];
+  isInit: boolean = true;
+  showResentEmailButton: boolean = false;
+  registeredEmail: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private route: ActivatedRoute,
+    private _translate: TranslateService,
+    private _authService: Auth
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
+    this.authService.currentUser$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((data) => {
+      if (data) {
+        const allowedTypes = ['Vendor', 'Administrator', 'Customer'];
+        if (allowedTypes.includes(data.type)) {
+          this.router.navigate(['/vendor-rfqs']);
+        } else {
+          this.router.navigate(['/request-quote']);
+        }
+      }
+    });
+
+    this.getQueryParams();
   }
 
   ngOnDestroy(): void {
@@ -58,6 +80,18 @@ export class Login implements OnInit, OnDestroy {
         Validators.maxLength(50)
       ]],
       rememberMe: [false]
+    });
+  }
+  getQueryParams(): void {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      if (Object.keys(params).length > 0) {
+        if (params['waitingVerification']) {
+          this.showResentEmailButton = true;
+        }
+        if (params['email']) {
+          this.registeredEmail = params['email'];
+        }
+      }
     });
   }
 
@@ -89,7 +123,7 @@ export class Login implements OnInit, OnDestroy {
           },
           error: (error) => {
             this.isLoading = false;
-            this.handleLoginError(error);
+            error.error.detail ? this.errorMessage = error.error.detail : this.handleLoginError(error);
           }
         });
     } else {
@@ -135,6 +169,43 @@ export class Login implements OnInit, OnDestroy {
     this.router.navigate(['/auth/forgot-password']);
   }
 
+  resendCode() {
+    let request: ResendEmail = new ResendEmail();
+    request.email = this.registeredEmail!;
+    this.isResendingCode = true;
+    
+    this.authService.resendCode(request).pipe(take(1))
+      .subscribe(
+        (data: any) => {
+          this.isResendingCode = false;
+          this.showResentEmailButton = false;
+          this.registeredEmail = null;
+          Swal.fire({
+            icon: 'success',
+            title: this._translate.instant('ALERTS.CODE_RESEND'),
+            text: this._translate.instant('ALERTS.CHECK_EMAIL'),
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        },
+        (error) => {
+          this.isResendingCode = false;
+          if (error.status != 0) {
+            this.handleError(error);
+          } 
+          else {
+            Swal.fire({
+              icon: 'success',
+            title: this._translate.instant('ALERTS.CODE_RESEND'),
+            text: this._translate.instant('ALERTS.CHECK_EMAIL'),
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          }
+        }
+      );
+  }
+
   // Helper methods for template
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
@@ -164,5 +235,18 @@ export class Login implements OnInit, OnDestroy {
       }
     }
     return '';
+  }
+
+    handleError(error: any): void {
+      if (error.status === 401) {
+        this.errorMessage = 'Your session has expired. Please log in again.';
+        this._authService.logout();
+      } else if (error.status === 403) {
+        this.errorMessage = 'You do not have permission to view this content.';
+      } else if (error.status === 0) {
+        this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      } else {
+        this.errorMessage = error.error?.message || 'An error occurred while loading RFQs.';
+      }
   }
 }

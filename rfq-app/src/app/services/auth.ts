@@ -21,6 +21,7 @@ import {
   UserRequest,
   UserResponse,
   CompanyDetails,
+  ResendEmail,
 } from '../models/auth.model';
 import { ApiResponse } from '../models/api-response';
 
@@ -162,6 +163,16 @@ export class Auth {
   public putVerify(postDataResetPass: VerifyData): Observable<VerifyData> {
     return this.http
       .put<VerifyData>(`${this.API_URL}Authenticate/verify`, postDataResetPass)
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
+
+  public resendCode(request: ResendEmail): Observable<VerifyData> {
+    return this.http
+      .put<VerifyData>(`${this.API_URL}Authenticate/verify/resend-code`, request)
       .pipe(
         catchError((err) => {
           return throwError(() => err);
