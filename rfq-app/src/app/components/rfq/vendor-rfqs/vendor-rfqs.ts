@@ -303,8 +303,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
             : response.items
             ? [response.items]
             : [];
+          this.filteredRfqs = Array.isArray(response.items)
+            ? response.items
+            : response.items
+            ? [response.items]
+            : [];
           this.totalItems = response.totalCount!;
           this.totalPages = response.totalPages!;
+          this.initializeCarouselStates();
+          this.isLoading = false;
         },
         error: (error) => {
           this.handleError(error);
@@ -787,7 +794,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
         const approveRfq = 2;
         this._rfqService.rfqChangeStatus(rfqId, approveRfq).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
+            this.rfqs = [];
+            this.filteredRfqs = [];
+            this.isLoading = true;
             this.loadRfqs();
+            this.loadStatistics();
             Swal.fire({
               icon: 'success',
               title: this._translate.instant('ALERTS.SUCCESS_TITLE'),

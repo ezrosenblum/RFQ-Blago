@@ -32,6 +32,17 @@
       </div>
     </div>
 
+    <p *ngIf="showResentEmailButton && registeredEmail" class="text-center mb--20">{{'ALERTS.VERIFICATION_EMAIL_SENT' | translate}}</p>
+    <button *ngIf="showResentEmailButton && registeredEmail" (click)="resendCode()"
+      class="btn btn-primary w-full flex justify-center py-3 px-4"
+    >
+      <span *ngIf="!isResendingCode">{{'AUTH.RESEND_EMAIL' | translate}}</span>
+      <div *ngIf="isResendingCode" class="flex items-center">
+        <div class="spinner mr-2"></div>
+        <span>{{'AUTH.SENDING_CODE' | translate}}</span>
+      </div>
+    </button>
+
     <!-- Login Form -->
     <form class="mt-8 space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <!-- Error Message -->

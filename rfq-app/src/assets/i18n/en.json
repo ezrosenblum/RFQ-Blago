@@ -90,6 +90,7 @@
     "BACK_TO_COMPANY_INFO": "Back to company info",
     "SERVICE_AREA": "Service Area",
     "GO_TO_LOGIN": "Go to login",
+    "ERROR_GENERIC": "An unexpected error has occurred. Please try again later.",
     "DRAG_DROP_CERTIFICATE": "Drag and drop your business certificate here",
     "BROWSE": "Browse",
     "VALIDATION": {
@@ -107,7 +108,9 @@
       "LOWER": "one lowercase letter",
       "SPECIAL": "one special character",
       "MIN_LENGTH": "at least 8 characters"
-    }
+    },
+    "RESEND_EMAIL": "Resend verification email",
+    "SENDING_CODE": "Email sending..."
   },
 
   "FIELDS": {
@@ -536,7 +539,14 @@
     "RFQ_APPROVED": "RFQ has been approved successfully.",
     "RFQ_APPROVE_FAILED": "Failed to approve RFQ. Please try again.",
     "RFQ_DECLINED": "RFQ has been declined successfully.",
-    "RFQ_DECLINE_FAILED": "Failed to decline RFQ. Please try again."
+    "RFQ_DECLINE_FAILED": "Failed to decline RFQ. Please try again.",
+    "INVALID_VERIFICATION_REQUEST": "Invalid or missing token/uid. Please check your link.",
+    "VERIFIED_SUCCESSFULLY": "Successfully verified!",
+    "REDIRECT_LOGIN": "You will be redirected to login soon",
+    "CODE_RESEND": "The code has been sent!",
+    "CHECK_EMAIL": "Please check your inbox",
+    "CODE_RESEND_FAILED": "The code sending failed",
+    "VERIFICATION_EMAIL_SENT": "A verification email was sent to your inbox. If you didn’t receive it, you can resend it."
   },
   "MESSAGES": {
     "NO_CONVERSATIONS_FOUND": "No conversations found",

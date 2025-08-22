@@ -13,5 +13,11 @@
         <div class="spinner mr-2"></div>
         <p class="mt-2 text-sm text-secondary-600 dark:text-secondary-400">{{'AUTH.PLEASE_WAIT_WHILE_WE_VERIFY_YOUR_EMAIL_ADDRESS' | translate}}</p>
       </div>
+
+      <button
+        class="btn btn-primary w-full flex justify-center py-3 px-4 mt-5" (click)="navigateToLogin()"
+      >
+        <span>{{'AUTH.SIGN_IN' | translate}}</span>
+      </button>
     </div>
 </div>
