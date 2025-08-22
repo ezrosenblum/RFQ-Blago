@@ -81,9 +81,9 @@ export class HttpHeaderInterceptor implements HttpInterceptor {
         this._authService.saveTokens(newTokens);
         return next.handle(this.addTokenHeader(request, newTokens.accessToken));
       }),
-      catchError((_refreshErr) => {
+      catchError((error) => {
         this._authService.logout();
-        return throwError(() => originalError);
+        return throwError(() => error);
       })
     );
   }
