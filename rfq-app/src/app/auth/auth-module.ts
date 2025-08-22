@@ -2,7 +2,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-
 import { Login } from './login/login';
 import { Signup} from './signup/signup';
 import { AuthRoutingModule } from './auth-routing-module';
@@ -11,6 +10,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { VerifyComponent } from './verify/verify.component';
 import { TranslateModule  } from '@ngx-translate/core';
 import { ServiceAreasComponent } from "../components/profile/service-areas/service-areas.component";
+import { MaterialCategoriesSelectionComponent } from '../components/profile/material-categories-selection/material-categories-selection.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,7 @@ import { ServiceAreasComponent } from "../components/profile/service-areas/servi
     Signup,
     ResetPasswordComponent,
     ForgotPasswordComponent,
-    VerifyComponent
+    VerifyComponent, 
   ],
   imports: [
     CommonModule,
@@ -26,7 +26,8 @@ import { ServiceAreasComponent } from "../components/profile/service-areas/servi
     FormsModule,
     AuthRoutingModule,
     TranslateModule,
-    ServiceAreasComponent
+    ServiceAreasComponent,
+    MaterialCategoriesSelectionComponent
 ]
 })
 export class AuthModule { }

@@ -6,37 +6,36 @@ import { Signup } from './signup/signup';
 import { ResetPasswordComponent } from './reset-password/reset-password';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { VerifyComponent } from './verify/verify.component';
-
 const routes: Routes = [
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'login',
-    component: Login
+    component: Login,
   },
   {
     path: 'signup',
-    component: Signup
+    component: Signup,
   },
   {
     path: 'forgot-password',
-    component: ForgotPasswordComponent
+    component: ForgotPasswordComponent,
   },
   {
     path: 'verification',
-    component: VerifyComponent
+    component: VerifyComponent,
   },
   {
     path: 'reset-password',
-    component: ResetPasswordComponent
+    component: ResetPasswordComponent,
   },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AuthRoutingModule { }
+export class AuthRoutingModule {}

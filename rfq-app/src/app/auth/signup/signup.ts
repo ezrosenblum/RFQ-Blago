@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -10,6 +10,8 @@ import { Auth } from '../../services/auth';
 import { LookupValue } from '../../models/user.model';
 import { CompanyDetails, UserRequest } from '../../models/auth.model';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { MaterialCategoriesSelectionComponent } from '../../components/profile/material-categories-selection/material-categories-selection.component';
 
 @Component({
   selector: 'app-signup',
@@ -19,32 +21,31 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class Signup implements OnInit {
   signupForm!: FormGroup;
-
   errorMessage: string = '';
   successMessage: string = '';
   selectedFileName: string = '';
-
   isLoading: boolean = false;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
-  isVendorDetailsStep: boolean = false;
-  selectedFile: File | null = null;
 
+  currentStep: 'basic' | 'vendor' | 'location' = 'basic';
+  selectedFile: File | null = null;
   companySizes: LookupValue[] = [];
   userRoles: LookupValue[] = [];
 
+  @ViewChild('materialCategoriesComponent')
+  materialCategoriesComponent!: MaterialCategoriesSelectionComponent;
+  clearCategoriesSubject = new Subject<boolean>();
   constructor(
     private fb: FormBuilder,
     private userService: Auth,
     private router: Router,
     private translate: TranslateService
   ) {}
-
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookupData();
   }
-
   private loadLookupData(): void {
     this.userService.getUserRoles().subscribe({
       next: (roles) => {
@@ -54,7 +55,6 @@ export class Signup implements OnInit {
         this.userRoles = [];
       },
     });
-
     this.userService.getCompanySizes().subscribe({
       next: (sizes) => {
         this.companySizes = sizes;
@@ -64,15 +64,24 @@ export class Signup implements OnInit {
       },
     });
   }
-
   get message(): string {
-    return this.translate.instant(
-      this.isVendorDetailsStep
-        ? 'AUTH.PROVIDE_COMPANY_INFO_TO_REGISTER'
-        : 'AUTH.JOIN_PLATFORM_TO_MANAGE_RFQS'
-    );
+    switch (this.currentStep) {
+      case 'basic':
+        return this.translate.instant('AUTH.JOIN_PLATFORM_TO_MANAGE_RFQS');
+      case 'vendor':
+        return this.translate.instant('AUTH.PROVIDE_COMPANY_INFO_TO_REGISTER');
+      case 'location':
+        return this.translate.instant('AUTH.SET_LOCATION_AND_CATEGORIES');
+      default:
+        return '';
+    }
   }
-
+  get isVendorDetailsStep(): boolean {
+    return this.currentStep === 'vendor';
+  }
+  get isLocationStep(): boolean {
+    return this.currentStep === 'location';
+  }
   private initializeForm(): void {
     this.signupForm = this.fb.group(
       {
@@ -110,7 +119,6 @@ export class Signup implements OnInit {
       this.updateVendorFieldValidation(isVendor);
     });
   }
-
   private updateVendorFieldValidation(isVendor: boolean): void {
     const vendorFields = [
       'phoneNumber',
@@ -121,7 +129,6 @@ export class Signup implements OnInit {
       'businessDescription',
       'companySize',
     ];
-
     vendorFields.forEach((field) => {
       const control = this.signupForm.get(field);
       if (control) {
@@ -134,25 +141,21 @@ export class Signup implements OnInit {
       }
     });
   }
-
   private passwordValidator(
     control: AbstractControl
   ): { [key: string]: any } | null {
     const password = control.value;
     if (!password) return null;
-
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumeric = /[0-9]/.test(password);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
     const valid =
       hasUpperCase &&
       hasLowerCase &&
       hasNumeric &&
       hasSpecial &&
       password.length >= 8;
-
     if (!valid) {
       return {
         passwordStrength: {
@@ -166,50 +169,53 @@ export class Signup implements OnInit {
     }
     return null;
   }
-
   private passwordMatchValidator(
     group: AbstractControl
   ): { [key: string]: any } | null {
     const password = group.get('password')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
-
+    const confirmPasswordControl = group.get('confirmPassword');
     if (password && confirmPassword && password !== confirmPassword) {
+      if (confirmPasswordControl) {
+        confirmPasswordControl.setErrors({
+          ...confirmPasswordControl.errors,
+          passwordMismatch: true,
+        });
+      }
       return { passwordMismatch: true };
+    } else {
+      if (confirmPasswordControl && confirmPasswordControl.errors) {
+        delete confirmPasswordControl.errors['passwordMismatch'];
+        if (Object.keys(confirmPasswordControl.errors).length === 0) {
+          confirmPasswordControl.setErrors(null);
+        }
+      }
+      return null;
     }
-    return null;
   }
-
   onRoleChange(): void {
     const roleName = this.signupForm.get('role')?.value;
     const isVendor = this.isVendorRole(roleName);
-
-    this.isVendorDetailsStep = false;
     this.clearErrorMessages();
     this.updateVendorFieldValidation(isVendor);
   }
-
-  private isVendorRole(roleName: string): boolean {
+  isVendorRole(roleName: string): boolean {
     return roleName?.toLowerCase() === 'vendor';
   }
-
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
-
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
-
   getPasswordStrength(): string {
     const password = this.signupForm.get('password')?.value;
     if (!password) return '';
-
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumeric = /[0-9]/.test(password);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     const isLongEnough = password.length >= 8;
-
     const strength = [
       hasUpperCase,
       hasLowerCase,
@@ -217,12 +223,10 @@ export class Signup implements OnInit {
       hasSpecial,
       isLongEnough,
     ].filter(Boolean).length;
-
     if (strength <= 2) return 'weak';
     if (strength <= 4) return 'medium';
     return 'strong';
   }
-
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -240,7 +244,6 @@ export class Signup implements OnInit {
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       ];
-
       if (!allowedTypes.includes(file.type)) {
         this.translate
           .get('AUTH.INVALID_FILE_TYPE')
@@ -249,45 +252,48 @@ export class Signup implements OnInit {
           });
         return;
       }
-
       this.selectedFile = file;
       this.selectedFileName = file.name;
       this.clearErrorMessages();
     }
   }
-
   isFieldInvalid(fieldName: string): boolean {
     const field = this.signupForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
+    const standardInvalid = !!(
+      field &&
+      field.invalid &&
+      (field.dirty || field.touched)
+    );
+    if (fieldName === 'confirmPassword') {
+      const hasPasswordMismatch = this.signupForm.errors?.['passwordMismatch'];
+      const confirmPasswordTouched = field?.touched;
+      return (
+        standardInvalid || !!(hasPasswordMismatch && confirmPasswordTouched)
+      );
+    }
+    return standardInvalid;
   }
-
   getFieldError(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
     if (!field || !field.errors) return '';
-
     const errors = field.errors;
-
     if (errors['required']) {
       return this.translate.instant('AUTH.VALIDATION.REQUIRED', {
         field: this.getFieldLabel(fieldName),
       });
     }
-
     if (errors['email']) {
       return this.translate.instant('AUTH.VALIDATION.EMAIL');
     }
-
     if (errors['minlength']) {
       return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
         field: this.getFieldLabel(fieldName),
         min: errors['minlength'].requiredLength,
       });
     }
-
     if (fieldName === 'password' && errors['passwordStrength']) {
       const strength = errors['passwordStrength'];
       const requirements: string[] = [];
-
       if (!strength.hasUpperCase) {
         requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.UPPER'));
       }
@@ -303,26 +309,28 @@ export class Signup implements OnInit {
         );
       }
       if (!strength.minLength) {
-        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH'));
+        requirements.push(
+          this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH')
+        );
       }
-
       return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
         rules: requirements.join(', '),
       });
     }
-
-    if (
-      fieldName === 'confirmPassword' &&
-      this.signupForm.errors?.['passwordMismatch']
-    ) {
-      return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
+    if (fieldName === 'confirmPassword') {
+      if (this.signupForm.errors?.['passwordMismatch']) {
+        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
+      }
+      const password = this.signupForm.get('password')?.value;
+      const confirmPassword = this.signupForm.get('confirmPassword')?.value;
+      if (password && confirmPassword && password !== confirmPassword) {
+        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
+      }
     }
-
     return this.translate.instant('AUTH.VALIDATION.PATTERN', {
       field: this.getFieldLabel(fieldName),
     });
   }
-
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
       firstName: 'First name',
@@ -341,80 +349,112 @@ export class Signup implements OnInit {
     };
     return labels[fieldName] || fieldName;
   }
-
   isFormValidForCurrentStep(): boolean {
-    if (!this.isVendorDetailsStep) {
-      const basicFields = [
-        'firstName',
-        'lastName',
-        'email',
-        'role',
-        'password',
-        'confirmPassword',
-      ];
-      return (
-        basicFields.every((field) => {
+    switch (this.currentStep) {
+      case 'basic':
+        const basicFields = [
+          'firstName',
+          'lastName',
+          'email',
+          'role',
+          'password',
+          'confirmPassword',
+        ];
+        return (
+          basicFields.every((field) => {
+            const control = this.signupForm.get(field);
+            return control && control.valid;
+          }) && !this.signupForm.errors?.['passwordMismatch']
+        );
+      case 'vendor':
+        const requiredVendorFields = [
+          'phoneNumber',
+          'name',
+          'contactPersonFirstName',
+          'contactPersonLastName',
+          'businessDescription',
+        ];
+        const requiredFieldsValid = requiredVendorFields.every((field) => {
           const control = this.signupForm.get(field);
-          return control && control.valid;
-        }) && !this.signupForm.errors?.['passwordMismatch']
-      );
-    } else {
-      const vendorFields = [
-        'phoneNumber',
-        'name',
-        'businessAddress',
-        'contactPersonFirstName',
-        'contactPersonLastName',
-        'businessDescription',
-        'companySize',
-      ];
-      return vendorFields.every((field) => {
-        const control = this.signupForm.get(field);
-        return control && control.valid;
-      });
+          const value = control?.value;
+          return (
+            control && value && value.toString().trim() !== '' && control.valid
+          );
+        });
+        return requiredFieldsValid;
+      case 'location':
+        const latitude = this.signupForm.get('latitude')?.value;
+        const longitude = this.signupForm.get('longitude')?.value;
+        const businessAddress = this.signupForm.get('businessAddress')?.value;
+        return !!(latitude && longitude && businessAddress);
+      default:
+        return false;
     }
   }
-
   getSubmitButtonText(): string {
-    if (!this.isVendorDetailsStep) {
-      const roleName = this.signupForm.get('role')?.value;
-      const isVendor = this.isVendorRole(roleName);
-      return this.translate.instant(
-        isVendor ? 'AUTH.CONTINUE' : 'AUTH.CREATE_ACCOUNT'
-      );
+    switch (this.currentStep) {
+      case 'basic':
+        const roleName = this.signupForm.get('role')?.value;
+        const isVendor = this.isVendorRole(roleName);
+        return this.translate.instant(
+          isVendor ? 'AUTH.CONTINUE' : 'AUTH.CREATE_ACCOUNT'
+        );
+      case 'vendor':
+        return this.translate.instant('AUTH.CONTINUE');
+      case 'location':
+        return this.translate.instant('AUTH.CREATE_ACCOUNT');
+      default:
+        return this.translate.instant('AUTH.CONTINUE');
     }
-    return this.translate.instant('AUTH.CREATE_ACCOUNT');
   }
-
   goBackToBasicInfo(): void {
-    this.isVendorDetailsStep = false;
+    this.currentStep = 'basic';
     this.clearErrorMessages();
   }
-
+  goBackToVendorInfo(): void {
+    this.currentStep = 'vendor';
+    this.clearErrorMessages();
+  }
   onSubmit(): void {
     if (!this.isFormValidForCurrentStep()) {
       this.markAllFieldsAsTouched();
+
+      if (this.currentStep === 'location') {
+        const latitude = this.signupForm.get('latitude')?.value;
+        const longitude = this.signupForm.get('longitude')?.value;
+        const businessAddress = this.signupForm.get('businessAddress')?.value;
+
+        if (!latitude || !longitude || !businessAddress) {
+          this.errorMessage =
+            this.translate.instant('AUTH.LOCATION_REQUIRED_ERROR') ||
+            'Please set your service area location before proceeding.';
+        }
+      }
       return;
     }
-
     const roleName = this.signupForm.get('role')?.value;
     const isVendor = this.isVendorRole(roleName);
-
-    if (isVendor && !this.isVendorDetailsStep) {
-      this.isVendorDetailsStep = true;
-      return;
+    switch (this.currentStep) {
+      case 'basic':
+        if (isVendor) {
+          this.currentStep = 'vendor';
+        } else {
+          this.createUserAccount();
+        }
+        break;
+      case 'vendor':
+        this.currentStep = 'location';
+        break;
+      case 'location':
+        this.createUserAccount();
+        break;
     }
-
-    this.createUserAccount();
   }
-
   private createUserAccount(): void {
     this.isLoading = true;
     this.clearErrorMessages();
-
     const formValue = this.signupForm.value;
     const isVendor = this.isVendorRole(formValue.role);
-
     const userRequest: UserRequest = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
@@ -423,7 +463,6 @@ export class Signup implements OnInit {
       password: formValue.password,
       phoneNumber: formValue.phoneNumber || '',
     };
-
     this.userService.createUser(userRequest).subscribe({
       next: (userResponse) => {
         if (isVendor && userResponse.id) {
@@ -438,13 +477,11 @@ export class Signup implements OnInit {
       },
     });
   }
-
   private createCompanyDetails(
     userId: number,
     formValue: CompanyDetails
   ): void {
     const formData = new FormData();
-
     formData.append('UserId', userId.toString());
     formData.append('Name', formValue.name || '');
     formData.append('StreetAddress', formValue.businessAddress || '');
@@ -454,7 +491,6 @@ export class Signup implements OnInit {
       'OperatingRadius',
       formValue.operatingRadius?.toString() || ''
     );
-
     formData.append(
       'ContactPersonFirstName',
       formValue.contactPersonFirstName || ''
@@ -463,26 +499,25 @@ export class Signup implements OnInit {
       'ContactPersonLastName',
       formValue.contactPersonLastName || ''
     );
-    formData.append(
-      'ContactPersonEmail',
-      formValue.contactEmail || ''
-    );
-    formData.append(
-      'ContactPersonPhone',
-      formValue.contactPhone || ''
-    );
+    formData.append('ContactPersonEmail', formValue.contactEmail || '');
+    formData.append('ContactPersonPhone', formValue.contactPhone || '');
     formData.append('Description', formValue.businessDescription || '');
     formData.append('CompanySize', formValue.companySize?.toString() || '1');
-
     if (this.selectedFile) {
       formData.append('Certificate', this.selectedFile, this.selectedFile.name);
     } else {
       formData.append('Certificate', '');
     }
-
     this.userService.createCompanyDetails(formData).subscribe({
       next: (response) => {
-        this.handleSuccessfulRegistration();
+        if (
+          this.currentStep === 'location' &&
+          this.materialCategoriesComponent
+        ) {
+          this.saveCategoriesAndComplete();
+        } else {
+          this.handleSuccessfulRegistration();
+        }
       },
       error: (error) => {
         this.isLoading = false;
@@ -490,26 +525,40 @@ export class Signup implements OnInit {
       },
     });
   }
-
+  private saveCategoriesAndComplete(): void {
+    try {
+      const selectedData = this.materialCategoriesComponent.getSelectedData();
+      if (
+        selectedData.subcategoriesIds.length > 0 ||
+        selectedData.categoriesIds.length > 0
+      ) {
+        console.log('Selected categories:', selectedData);
+      }
+      this.handleSuccessfulRegistration();
+    } catch (error) {
+      console.log('No categories selected, completing registration');
+      this.handleSuccessfulRegistration();
+    }
+  }
   private handleSuccessfulRegistration(): void {
     this.isLoading = false;
-
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 0);
-
     this.successMessage = this.translate.instant(
       'AUTH.ACCOUNT_CREATED_SUCCESS'
     );
+    const roleName = this.signupForm.get('role')?.value;
+    const isVendor = this.isVendorRole(roleName);
 
-    setTimeout(() => this.navigateToLogin(), 2000);
+    if (!isVendor || this.currentStep === 'location') {
+      setTimeout(() => this.navigateToLogin(), 2000);
+    }
   }
-
   private handleError(error: any): void {
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 0);
-
     if (error.status === 400 && error.error?.errors) {
       const errorsObj = error.error.errors;
       const firstKey = Object.keys(errorsObj)[0];
@@ -522,7 +571,6 @@ export class Signup implements OnInit {
       this.errorMessage = this.translate.instant('AUTH.ERROR_GENERIC');
     }
   }
-
   private markAllFieldsAsTouched(): void {
     Object.keys(this.signupForm.controls).forEach((key) => {
       const control = this.signupForm.get(key);
@@ -531,16 +579,13 @@ export class Signup implements OnInit {
       }
     });
   }
-
   private clearErrorMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
   }
-
   navigateToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
-
   handleServiceAreaChange(data: {
     streetAddress: string;
     latitude: number;
@@ -552,6 +597,6 @@ export class Signup implements OnInit {
       latitude: data.latitude,
       longitude: data.longitude,
       operatingRadius: data.radius,
-    })
+    });
   }
 }

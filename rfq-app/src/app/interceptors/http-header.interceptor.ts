@@ -15,26 +15,24 @@ import { Token } from '../models/auth.model';
 export class HttpHeaderInterceptor implements HttpInterceptor {
   constructor(private _authService: Auth, private _router: Router) {}
 
-  intercept(
-    request: HttpRequest<unknown>,
-    next: HttpHandler
-  ): Observable<HttpEvent<unknown>> {
-    let token = this._authService.getToken();
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const token = this._authService.getToken();
 
-    // ===== Skip Content-Type / Accept logic =====
     const skipContentType = request.headers.get('Skip-Content-Type') === 'true';
-
     let headers = request.headers;
 
-    if (!skipContentType) {
-      headers = headers
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json');
-    } else {
-      headers = headers.delete('Skip-Content-Type'); // remove custom header
+    const isFormData = request.body instanceof FormData;
+    const shouldSetJson =
+      !skipContentType && !isFormData && request.method !== 'GET';
+
+    if (shouldSetJson) {
+      headers = headers.set('Content-Type', 'application/json')
+                       .set('Accept', 'application/json');
+    }
+    if (skipContentType) {
+      headers = headers.delete('Skip-Content-Type');
     }
 
-    // ===== Token logic with excludeUrls =====
     const excludeUrls = [
       { url: 'Authenticate/login', methods: ['POST'] },
       { url: 'Authenticate/verify', methods: ['PUT'] },
@@ -42,13 +40,11 @@ export class HttpHeaderInterceptor implements HttpInterceptor {
       { url: 'Authenticate/refresh-token', methods: ['POST'] },
       { url: 'User', methods: ['POST'] },
       { url: 'User/forgot-password', methods: ['POST'] },
-      { url: 'User/reset-password', methods: ['POST'] }
+      { url: 'User/reset-password', methods: ['POST'] },
     ];
 
     const isExcluded = excludeUrls.some(
-      entry =>
-        request.url.endsWith(entry.url) &&
-        entry.methods.includes(request.method)
+      e => request.url.endsWith(e.url) && e.methods.includes(request.method)
     );
 
     if (!isExcluded && token) {
@@ -58,55 +54,53 @@ export class HttpHeaderInterceptor implements HttpInterceptor {
     const cloned = request.clone({ headers });
 
     return next.handle(cloned).pipe(
-      catchError((errordata) => {
+      catchError((originalError: HttpErrorResponse) => {
+        const hasRefresh = !!this._authService.getRefreshToken?.();
+        const isRefreshCall = request.url.endsWith('Authenticate/refresh-token');
+
         if (
-          errordata.status == 401 &&
-          !errordata.url.includes('Authenticate/refresh-token')
+          originalError.status === 401 &&
+          !isExcluded &&              
+          !isRefreshCall &&
+          hasRefresh
         ) {
-          return this.handleUnauthorizedError(request, next);
+          return this.handleUnauthorizedError(request, next, originalError);
         }
-        return throwError(() => errordata);
+        return throwError(() => originalError);
       })
     );
   }
 
   private handleUnauthorizedError(
     request: HttpRequest<unknown>,
-    next: HttpHandler
+    next: HttpHandler,
+    originalError: HttpErrorResponse
   ): Observable<HttpEvent<any>> {
     return this._authService.generateRefreshToken().pipe(
       switchMap((newTokens: Token) => {
         this._authService.saveTokens(newTokens);
-        return next.handle(
-          this.addTokenHeader(request, newTokens.accessToken)
-        );
+        return next.handle(this.addTokenHeader(request, newTokens.accessToken));
       }),
-      catchError((error) => {
+      catchError((_refreshErr) => {
         this._authService.logout();
-        return throwError(() => error);
+        return throwError(() => originalError);
       })
     );
   }
 
-  private addTokenHeader(
-    request: HttpRequest<unknown>,
-    accessToken: string
-  ): HttpRequest<unknown> {
-    // reapply skip-content-type logic if needed
+  private addTokenHeader(request: HttpRequest<unknown>, accessToken: string): HttpRequest<unknown> {
     const skipContentType = request.headers.get('Skip-Content-Type') === 'true';
+    const isFormData = request.body instanceof FormData;
+    const shouldSetJson = !skipContentType && !isFormData && request.method !== 'GET';
 
-    let headers = request.headers;
-
-    if (!skipContentType) {
-      headers = headers
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json');
-    } else {
+    let headers = request.headers.set('Authorization', `Bearer ${accessToken}`);
+    if (shouldSetJson) {
+      headers = headers.set('Content-Type', 'application/json')
+                       .set('Accept', 'application/json');
+    } else if (skipContentType) {
       headers = headers.delete('Skip-Content-Type');
     }
 
-    return request.clone({
-      headers: headers.set('Authorization', `Bearer ${accessToken}`),
-    });
+    return request.clone({ headers });
   }
 }
