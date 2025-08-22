@@ -62,6 +62,7 @@ export class Signup implements OnInit {
   };
 
   pondFiles: any[] = [];
+  registeredEmail: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -541,6 +542,8 @@ export class Signup implements OnInit {
       phoneNumber: formValue.phoneNumber || '',
     };
 
+    this.registeredEmail = formValue.email;
+
     this.userService.createUser(userRequest).subscribe({
       next: (userResponse) => {
         if (isVendor && userResponse.id) {
@@ -618,7 +621,7 @@ export class Signup implements OnInit {
       'AUTH.ACCOUNT_CREATED_SUCCESS'
     );
 
-    setTimeout(() => this.navigateToLogin(), 2000);
+    setTimeout(() => this.navigateToLogin(true), 2000);
   }
 
   private handleError(error: any): void {
@@ -653,8 +656,17 @@ export class Signup implements OnInit {
     this.successMessage = '';
   }
 
-  navigateToLogin(): void {
-    this.router.navigate(['/auth/login']);
+  navigateToLogin(withParams: boolean = false): void {
+    if (withParams) {
+      this.router.navigate(['/auth/login'], {
+        queryParams: {
+          waitingVerification: true,
+          email: this.registeredEmail
+        }
+      });
+    } else {
+      this.router.navigate(['/auth/login']);
+    }
   }
 
   handleServiceAreaChange(data: {

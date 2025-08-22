@@ -61,7 +61,8 @@ export class HttpHeaderInterceptor implements HttpInterceptor {
       catchError((errordata) => {
         if (
           errordata.status == 401 &&
-          !errordata.url.includes('Authenticate/refresh-token')
+          !errordata.url.includes('Authenticate/refresh-token') &&
+          !errordata.url.includes('Authenticate/login')
         ) {
           return this.handleUnauthorizedError(request, next);
         }

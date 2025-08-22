@@ -36,6 +36,12 @@ export class VerifyData {
   uid?: string | null | undefined;
 }
 
+export class ResendEmail {
+  constructor(
+    public email ?: string
+  ){}
+}
+
 export interface UserRequest {
   firstName: string;
   lastName: string;
