@@ -536,7 +536,6 @@ export class Signup implements OnInit {
       }
       this.handleSuccessfulRegistration();
     } catch (error) {
-      console.log('No categories selected, completing registration');
       this.handleSuccessfulRegistration();
     }
   }
