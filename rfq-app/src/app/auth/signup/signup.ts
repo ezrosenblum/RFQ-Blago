@@ -37,16 +37,19 @@ export class Signup implements OnInit {
   materialCategoriesComponent!: MaterialCategoriesSelectionComponent;
   clearCategoriesSubject = new Subject<boolean>();
   registeredEmail: string | null = null;
+
   constructor(
     private fb: FormBuilder,
     private userService: Auth,
     private router: Router,
     private translate: TranslateService
   ) {}
+
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookupData();
   }
+
   private loadLookupData(): void {
     this.userService.getUserRoles().subscribe({
       next: (roles) => {
@@ -65,6 +68,7 @@ export class Signup implements OnInit {
       },
     });
   }
+
   get message(): string {
     switch (this.currentStep) {
       case 'basic':
@@ -77,12 +81,15 @@ export class Signup implements OnInit {
         return '';
     }
   }
+
   get isVendorDetailsStep(): boolean {
     return this.currentStep === 'vendor';
   }
+
   get isLocationStep(): boolean {
     return this.currentStep === 'location';
   }
+
   private initializeForm(): void {
     this.signupForm = this.fb.group(
       {
@@ -120,6 +127,7 @@ export class Signup implements OnInit {
       this.updateVendorFieldValidation(isVendor);
     });
   }
+
   private updateVendorFieldValidation(isVendor: boolean): void {
     const vendorFields = [
       'phoneNumber',
@@ -142,6 +150,7 @@ export class Signup implements OnInit {
       }
     });
   }
+
   private passwordValidator(
     control: AbstractControl
   ): { [key: string]: any } | null {
@@ -170,6 +179,7 @@ export class Signup implements OnInit {
     }
     return null;
   }
+
   private passwordMatchValidator(
     group: AbstractControl
   ): { [key: string]: any } | null {
@@ -194,21 +204,26 @@ export class Signup implements OnInit {
       return null;
     }
   }
+
   onRoleChange(): void {
     const roleName = this.signupForm.get('role')?.value;
     const isVendor = this.isVendorRole(roleName);
     this.clearErrorMessages();
     this.updateVendorFieldValidation(isVendor);
   }
+
   isVendorRole(roleName: string): boolean {
     return roleName?.toLowerCase() === 'vendor';
   }
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
+
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
+
   getPasswordStrength(): string {
     const password = this.signupForm.get('password')?.value;
     if (!password) return '';
@@ -228,6 +243,7 @@ export class Signup implements OnInit {
     if (strength <= 4) return 'medium';
     return 'strong';
   }
+
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -258,6 +274,7 @@ export class Signup implements OnInit {
       this.clearErrorMessages();
     }
   }
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.signupForm.get(fieldName);
     const standardInvalid = !!(
@@ -274,90 +291,97 @@ export class Signup implements OnInit {
     }
     return standardInvalid;
   }
+
   getFieldError(fieldName: string): string {
-  const field = this.signupForm.get(fieldName);
-  
-  if (fieldName === 'confirmPassword') {
-    if (this.signupForm.errors?.['passwordMismatch']) {
-      return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
-    }
-    const password = this.signupForm.get('password')?.value;
-    const confirmPassword = this.signupForm.get('confirmPassword')?.value;
-    if (password && confirmPassword && password !== confirmPassword) {
-      return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
-    }
-  }
-  
-  if (!field || !field.errors) return '';
+    const field = this.signupForm.get(fieldName);
 
-  const errors = field.errors;
+    if (fieldName === 'confirmPassword') {
+      if (this.signupForm.errors?.['passwordMismatch']) {
+        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
+      }
+      const password = this.signupForm.get('password')?.value;
+      const confirmPassword = this.signupForm.get('confirmPassword')?.value;
+      if (password && confirmPassword && password !== confirmPassword) {
+        return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
+      }
+    }
 
-  if (errors['required']) {
-    return this.translate.instant('AUTH.VALIDATION.REQUIRED', {
+    if (!field || !field.errors) return '';
+
+    const errors = field.errors;
+
+    if (errors['required']) {
+      return this.translate.instant('AUTH.VALIDATION.REQUIRED', {
+        field: this.getFieldLabel(fieldName),
+      });
+    }
+
+    if (errors['email']) {
+      return this.translate.instant('AUTH.VALIDATION.EMAIL');
+    }
+
+    if (errors['minlength']) {
+      return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
+        field: this.getFieldLabel(fieldName),
+        min: errors['minlength'].requiredLength,
+      });
+    }
+
+    if (fieldName === 'password' && errors['passwordStrength']) {
+      const strength = errors['passwordStrength'];
+      const requirements: string[] = [];
+      if (!strength.hasUpperCase) {
+        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.UPPER'));
+      }
+      if (!strength.hasLowerCase) {
+        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.LOWER'));
+      }
+      if (!strength.hasNumeric) {
+        requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.NUMBER'));
+      }
+      if (!strength.hasSpecial) {
+        requirements.push(
+          this.translate.instant('AUTH.PASSWORD_RULES.SPECIAL')
+        );
+      }
+      if (!strength.minLength) {
+        requirements.push(
+          this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH')
+        );
+      }
+      return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
+        rules: requirements.join(', '),
+      });
+    }
+
+    return this.translate.instant('AUTH.VALIDATION.PATTERN', {
       field: this.getFieldLabel(fieldName),
     });
   }
-
-  if (errors['email']) {
-    return this.translate.instant('AUTH.VALIDATION.EMAIL');
-  }
-
-  if (errors['minlength']) {
-    return this.translate.instant('AUTH.VALIDATION.MIN_LENGTH', {
-      field: this.getFieldLabel(fieldName),
-      min: errors['minlength'].requiredLength,
-    });
-  }
-
-  if (fieldName === 'password' && errors['passwordStrength']) {
-    const strength = errors['passwordStrength'];
-    const requirements: string[] = [];
-    if (!strength.hasUpperCase) {
-      requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.UPPER'));
-    }
-    if (!strength.hasLowerCase) {
-      requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.LOWER'));
-    }
-    if (!strength.hasNumeric) {
-      requirements.push(this.translate.instant('AUTH.PASSWORD_RULES.NUMBER'));
-    }
-    if (!strength.hasSpecial) {
-      requirements.push(
-        this.translate.instant('AUTH.PASSWORD_RULES.SPECIAL')
-      );
-    }
-    if (!strength.minLength) {
-      requirements.push(
-        this.translate.instant('AUTH.PASSWORD_RULES.MIN_LENGTH')
-      );
-    }
-    return this.translate.instant('AUTH.VALIDATION.PASSWORD_STRENGTH', {
-      rules: requirements.join(', '),
-    });
-  }
-
-  return this.translate.instant('AUTH.VALIDATION.PATTERN', {
-    field: this.getFieldLabel(fieldName),
-  });
-}
 
   private getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
-      firstName: 'First name',
-      lastName: 'Last name',
-      email: 'Email',
-      role: 'Role',
-      password: 'Password',
-      confirmPassword: 'Confirm password',
-      phoneNumber: 'Phone number',
-      name: 'Company name',
-      businessAddress: 'Business address',
-      contactPersonFirstName: 'Contact person first name',
-      contactPersonLastName: 'Contact person last name',
-      businessDescription: 'Business description',
-      companySize: 'Company size',
+    const labelKeys: { [key: string]: string } = {
+      firstName: 'PROFILE.FIRST_NAME',
+      lastName: 'PROFILE.LAST_NAME',
+      email: 'PROFILE.EMAIL_ADDRESS',
+      role: 'PROFILE.ROLE',
+      password: 'PROFILE.PASSWORD',
+      confirmPassword: 'PROFILE.CONFIRM_PASSWORD',
+      phoneNumber: 'PROFILE.PHONE_NUMBER',
+      name: 'PROFILE.COMPANY_NAME',
+      businessAddress: 'PROFILE.BUSINESS_ADDRESS',
+      contactPersonFirstName: 'PROFILE.CONTACT_FIRST_NAME',
+      contactPersonLastName: 'PROFILE.CONTACT_LAST_NAME',
+      businessDescription: 'PROFILE.BUSINESS_DESCRIPTION',
+      companySize: 'PROFILE.COMPANY_SIZE',
     };
-    return labels[fieldName] || fieldName;
+
+    const translationKey = labelKeys[fieldName];
+    if (translationKey) {
+      return this.translate.instant(translationKey);
+    }
+
+    return fieldName;
   }
   isFormValidForCurrentStep(): boolean {
     switch (this.currentStep) {
@@ -401,6 +425,7 @@ export class Signup implements OnInit {
         return false;
     }
   }
+
   getSubmitButtonText(): string {
     switch (this.currentStep) {
       case 'basic':
@@ -417,14 +442,17 @@ export class Signup implements OnInit {
         return this.translate.instant('AUTH.CONTINUE');
     }
   }
+
   goBackToBasicInfo(): void {
     this.currentStep = 'basic';
     this.clearErrorMessages();
   }
+
   goBackToVendorInfo(): void {
     this.currentStep = 'vendor';
     this.clearErrorMessages();
   }
+
   onSubmit(): void {
     if (!this.isFormValidForCurrentStep()) {
       this.markAllFieldsAsTouched();
@@ -435,15 +463,17 @@ export class Signup implements OnInit {
         const businessAddress = this.signupForm.get('businessAddress')?.value;
 
         if (!latitude || !longitude || !businessAddress) {
-          this.errorMessage =
-            this.translate.instant('AUTH.LOCATION_REQUIRED_ERROR') ||
-            'Please set your service area location before proceeding.';
+          this.errorMessage = this.translate.instant(
+            'AUTH.LOCATION_REQUIRED_ERROR'
+          );
         }
       }
       return;
     }
+
     const roleName = this.signupForm.get('role')?.value;
     const isVendor = this.isVendorRole(roleName);
+
     switch (this.currentStep) {
       case 'basic':
         if (isVendor) {
@@ -460,11 +490,13 @@ export class Signup implements OnInit {
         break;
     }
   }
+
   private createUserAccount(): void {
     this.isLoading = true;
     this.clearErrorMessages();
     const formValue = this.signupForm.value;
     const isVendor = this.isVendorRole(formValue.role);
+
     const userRequest: UserRequest = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
@@ -473,7 +505,9 @@ export class Signup implements OnInit {
       password: formValue.password,
       phoneNumber: formValue.phoneNumber || '',
     };
+
     this.registeredEmail = formValue.email;
+
     this.userService.createUser(userRequest).subscribe({
       next: (userResponse) => {
         if (isVendor && userResponse.id) {
@@ -488,6 +522,7 @@ export class Signup implements OnInit {
       },
     });
   }
+
   private createCompanyDetails(
     userId: number,
     formValue: CompanyDetails
@@ -514,21 +549,40 @@ export class Signup implements OnInit {
     formData.append('ContactPersonPhone', formValue.contactPhone || '');
     formData.append('Description', formValue.businessDescription || '');
     formData.append('CompanySize', formValue.companySize?.toString() || '1');
+
     if (this.selectedFile) {
       formData.append('Certificate', this.selectedFile, this.selectedFile.name);
     } else {
       formData.append('Certificate', '');
     }
+
+    if (this.currentStep === 'location' && this.materialCategoriesComponent) {
+      try {
+        const selectedData = this.materialCategoriesComponent.getSelectedData();
+        if (
+          selectedData.categoriesIds &&
+          selectedData.categoriesIds.length > 0
+        ) {
+          selectedData.categoriesIds.forEach((id) => {
+            formData.append('CategoriesIds', id.toString());
+          });
+        }
+        if (
+          selectedData.subcategoriesIds &&
+          selectedData.subcategoriesIds.length > 0
+        ) {
+          selectedData.subcategoriesIds.forEach((id) => {
+            formData.append('SubcategoriesIds', id.toString());
+          });
+        }
+      } catch (error) {
+        console.warn('Could not get selected categories data:', error);
+      }
+    }
+
     this.userService.createCompanyDetails(formData).subscribe({
       next: (response) => {
-        if (
-          this.currentStep === 'location' &&
-          this.materialCategoriesComponent
-        ) {
-          this.saveCategoriesAndComplete();
-        } else {
-          this.handleSuccessfulRegistration();
-        }
+        this.handleSuccessfulRegistration();
       },
       error: (error) => {
         this.isLoading = false;
@@ -536,6 +590,7 @@ export class Signup implements OnInit {
       },
     });
   }
+
   private saveCategoriesAndComplete(): void {
     try {
       const selectedData = this.materialCategoriesComponent.getSelectedData();
@@ -550,6 +605,7 @@ export class Signup implements OnInit {
       this.handleSuccessfulRegistration();
     }
   }
+
   private handleSuccessfulRegistration(): void {
     this.isLoading = false;
     setTimeout(() => {
@@ -565,6 +621,7 @@ export class Signup implements OnInit {
       setTimeout(() => this.navigateToLogin(true), 2000);
     }
   }
+
   private handleError(error: any): void {
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -581,6 +638,7 @@ export class Signup implements OnInit {
       this.errorMessage = this.translate.instant('AUTH.ERROR_GENERIC');
     }
   }
+
   private markAllFieldsAsTouched(): void {
     Object.keys(this.signupForm.controls).forEach((key) => {
       const control = this.signupForm.get(key);
@@ -589,19 +647,20 @@ export class Signup implements OnInit {
       }
     });
   }
+
   private clearErrorMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
   }
+
   navigateToLogin(setParams: boolean): void {
     if (!setParams) {
       this.router.navigate(['/auth/login']);
-    } 
-    else {
+    } else {
       this.router.navigate(['/auth/login'], {
         queryParams: {
           waitingVerification: setParams,
-          email: this.registeredEmail
+          email: this.registeredEmail,
         },
       });
     }
@@ -621,5 +680,3 @@ export class Signup implements OnInit {
     });
   }
 }
-
-

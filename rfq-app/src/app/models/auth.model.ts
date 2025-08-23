@@ -64,6 +64,8 @@ export interface CompanyDetails {
   contactPhone: string;
   businessDescription: string;
   companySize: number;
+  categoriesIds?: number[]; 
+  subcategoriesIds?: number[]; 
 }
 
 export interface UserResponse {

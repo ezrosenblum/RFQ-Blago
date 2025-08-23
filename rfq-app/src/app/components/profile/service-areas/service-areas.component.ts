@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, EventEmitter, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  NgZone,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
@@ -12,7 +21,7 @@ declare var google: GoogleMapsApi;
   selector: 'app-service-areas',
   imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './service-areas.component.html',
-  styleUrl: './service-areas.component.scss'
+  styleUrl: './service-areas.component.scss',
 })
 export class ServiceAreasComponent implements OnInit {
   @ViewChild('locationInput') locationInput!: ElementRef;
@@ -26,7 +35,7 @@ export class ServiceAreasComponent implements OnInit {
 
   selectedLocation: string = '';
   rangeMiles: number = 0;
-  
+
   private map: any;
   private autocomplete: any;
   private marker: any;
@@ -41,19 +50,16 @@ export class ServiceAreasComponent implements OnInit {
   isSubmitting: boolean = false;
   coordinatesChanged: boolean = false;
 
-  constructor(
-    private ngZone: NgZone,
-    private _authService: Auth
-  ) {}
+  constructor(private ngZone: NgZone, private _authService: Auth) {}
 
   ngOnInit(): void {
+    this.loadGoogleMaps();
     this._authService.currentUserSubject.subscribe({
       next: (user) => {
         if (user) {
           this.currentUser = user;
-          this.loadGoogleMaps();
         }
-      }
+      },
     });
   }
 
@@ -77,7 +83,10 @@ export class ServiceAreasComponent implements OnInit {
     const address = this.currentUser?.companyDetails?.streetAddress || '';
     this.selectedLocation = address;
     this.rangeMiles = this.currentUser?.companyDetails?.operatingRadius || 10;
-    const defaultLocation = { lat: this.currentUser?.companyDetails?.latitudeAddress || 41.9981, lng: this.currentUser?.companyDetails?.longitudeAddress || 21.4254 }; // Skopje, Macedonia
+    const defaultLocation = {
+      lat: this.currentUser?.companyDetails?.latitudeAddress || 41.9981,
+      lng: this.currentUser?.companyDetails?.longitudeAddress || 21.4254,
+    }; // Skopje, Macedonia
 
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: defaultLocation,
@@ -88,7 +97,13 @@ export class ServiceAreasComponent implements OnInit {
       this.locationInput.nativeElement,
       {
         types: ['geocode'],
-        fields: ['place_id', 'geometry', 'name', 'formatted_address', 'address_components']
+        fields: [
+          'place_id',
+          'geometry',
+          'name',
+          'formatted_address',
+          'address_components',
+        ],
       }
     );
 
@@ -100,7 +115,7 @@ export class ServiceAreasComponent implements OnInit {
 
     this.marker = new google.maps.Marker({
       map: this.map,
-      position: defaultLocation
+      position: defaultLocation,
     });
 
     this.circle = new google.maps.Circle({
@@ -111,7 +126,7 @@ export class ServiceAreasComponent implements OnInit {
       fillOpacity: 0.1,
       strokeColor: '#3B82F6',
       strokeOpacity: 0.3,
-      strokeWeight: 2
+      strokeWeight: 2,
     });
   }
 
@@ -158,11 +173,11 @@ export class ServiceAreasComponent implements OnInit {
     return this.rangeMiles;
   }
 
-  getLocationCoordinates(): { lat: number, lng: number } | null {
+  getLocationCoordinates(): { lat: number; lng: number } | null {
     if (this.selectedPlaceDetails?.geometry?.location) {
       return {
         lat: this.selectedPlaceDetails.geometry.location.lat(),
-        lng: this.selectedPlaceDetails.geometry.location.lng()
+        lng: this.selectedPlaceDetails.geometry.location.lng(),
       };
     }
     return null;
