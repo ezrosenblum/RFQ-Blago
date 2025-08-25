@@ -31,7 +31,7 @@ public class UserController : ApiControllerBase
         _localizationService = localizationService;
     }
 
-    [HttpPost]
+    [HttpPost] 
     [AllowAnonymous]
     public async Task<UserResponse> Create([FromBody] UserCreateCommand request)
     {
