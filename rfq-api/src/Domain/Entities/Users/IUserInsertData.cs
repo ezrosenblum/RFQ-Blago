@@ -7,4 +7,5 @@ public interface IUserInsertData
     string Email { get; }
     string Password { get; }
     string? PhoneNumber { get; }
+    string? PublicUsername { get; }
 }
