@@ -35,7 +35,7 @@ public sealed class SubmissionQuoteAlertForNewMessageConsumer : IConsumer<Submis
 
         await _emailSender.SendAsync(new MailMessageRequest(
             context.Message.Email,
-            "RFQSubmission - New Quote Submitted",
+            "Supply Streamline - New Quote Submitted",
             htmlTemplateContent,
             $"{context.Message.FirstName} {context.Message.LastName}"));
     }

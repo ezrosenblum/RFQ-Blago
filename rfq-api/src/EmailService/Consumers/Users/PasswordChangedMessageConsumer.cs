@@ -35,7 +35,7 @@ public sealed class PasswordChangedMessageConsumer : IConsumer<PasswordChangedMe
 
         await _emailSender.SendAsync(new MailMessageRequest(
        context.Message.Email,
-       "RFQSubmission - Password Changed",
+       "Supply Streamline - Password Changed",
        htmlTemplateContent,
        $"{context.Message.FirstName} {context.Message.LastName}"));
     }
