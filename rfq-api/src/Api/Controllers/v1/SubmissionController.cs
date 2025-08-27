@@ -126,10 +126,9 @@ namespace Api.Controllers.v1
         }
 
         [HttpPut("{id:int}/file")]
-        public async Task<IActionResult> UploadFile([FromForm] IFormFile file, [FromRoute] int id)
+        public async Task<Guid> UploadFile([FromForm] IFormFile file, [FromRoute] int id)
         {
-            await Mediator.Send(new SubmissionFileUploadCommand(id, file));
-            return Ok();
+            return await Mediator.Send(new SubmissionFileUploadCommand(id, file));
         }
 
         [HttpDelete("{id:int}/file/{fileId:guid}")]
