@@ -37,6 +37,7 @@ public sealed class UserMapperProfile : Profile
                 src.LastName,
                 src.Email,
                 src.PhoneNumber,
+                src.PublicUsername,
                 src.CompanyDetails));
     }
 }
