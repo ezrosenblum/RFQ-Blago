@@ -57,7 +57,7 @@
           [modules]="modules"
           placeholder="Enter detailed description..."
           [class.border-red-500]="isFieldInvalid('description')"
-          class="m-0 w-100 bg-transparent"
+          class="m-0 w-100 bg-transparent dark:text-white"
         >
         </quill-editor>
 
@@ -282,15 +282,15 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Files -->
     <div class="pt-28 md:grid-cols-2">
       <label for="timelineIntervalType" class="form-label">
         {{ 'VENDOR.ADD_FILE' | translate }} <span class="text-red-500">*</span>
       </label>
-      <file-pond 
-        #myPond 
-        [options]="pondOptions" 
+      <file-pond
+        #myPond
+        [options]="pondOptions"
         [files]="pondFiles"
         (onaddfile)="pondHandleAddFile($event)"
         (onremovefile)="onFileRemoved($event)">
