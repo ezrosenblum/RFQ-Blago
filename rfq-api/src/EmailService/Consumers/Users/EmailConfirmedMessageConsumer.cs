@@ -34,7 +34,7 @@ public sealed class EmailConfirmedMessageConsumer : IConsumer<EmailConfirmedMess
 
        await _emailSender.SendAsync(new MailMessageRequest(
            context.Message.Email,
-           "RFQSubmission - Email confirmed", 
+           "Supply Streamline - Email confirmed", 
            htmlTemplateContent,
            $"{context.Message.FirstName} {context.Message.LastName}"));
     }
