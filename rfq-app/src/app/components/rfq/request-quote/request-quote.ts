@@ -1,22 +1,10 @@
 import { ActualFileObject, FilePondInitialFile } from 'filepond';
-// src/app/rfq/request-quote/request-quote.component.ts
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ElementRef,
-  ViewChild,
-  NgZone,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import { User, UserRole } from '../../../models/user.model';
-import {
-  GoogleMapsApi,
-  LookupValue,
-  RfqRequest,
-} from '../../../models/rfq.model';
+import { LookupValue } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
 import { RfqService } from '../../../services/rfq';
 import { FileItem } from '../../../models/form-validation';
@@ -28,7 +16,7 @@ import { MaterialCategoriesSelectionComponent } from '../../profile/material-cat
 import { TranslateService } from '@ngx-translate/core';
 import { FilePondComponent } from 'ngx-filepond';
 import { AlertService } from '../../../services/alert.service';
-import { ContentChange, QuillEditorComponent } from 'ngx-quill';
+import { QuillEditorComponent } from 'ngx-quill';
 
 FilePond.registerPlugin(
   FilePondPluginFileValidateType,
@@ -50,6 +38,9 @@ export class RequestQuote implements OnInit, OnDestroy {
   currentUser: User | null = null;
   selectedLocation: string = '';
   clearData: Subject<boolean> = new Subject<boolean>();
+  rfqId?: number;
+  rfqCategoriesIds = new Set<number>();
+  rfqSubcategoriesIds = new Set<number>();
 
   private isGoogleMapsLoaded = false;
   private autocomplete: any;
@@ -61,8 +52,8 @@ export class RequestQuote implements OnInit, OnDestroy {
   categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
   @ViewChild('messageInput') messageInput!: QuillEditorComponent;
   toolbarOptions = [
-  [{ 'header': [1, 2, 3, false] }], 
-  ['bold', 'italic', 'underline'] 
+  [{ 'header': [1, 2, 3, false] }],
+  ['bold', 'italic', 'underline']
   ];
 
   modules = {
@@ -77,11 +68,28 @@ export class RequestQuote implements OnInit, OnDestroy {
     allowMultiple: true,
     maxFiles: 5,
     labelIdle: '',
+    beforeRemoveFile: async (file: any) => {
+      const { isConfirmed } = await this.alertService.confirm(
+        'ALERTS.CONFIRM_DELETE',
+        'warning'
+      );
+
+      if (isConfirmed) {
+        this.translate.get('ALERTS.DELETED_SUCCESSFULLY').subscribe(msg => {
+          this.successMessage = msg;
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        });
+      }
+
+      return isConfirmed;
+    }
   };
 
   pondFiles: (string | FilePondInitialFile | Blob | ActualFileObject)[] = [];
   @ViewChild('myPond') myPond!: FilePondComponent;
-  
+
   attachedFiles: FileItem[] = [
     {
       id: '1',
@@ -107,11 +115,52 @@ export class RequestQuote implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private translate: TranslateService,
     private alertService: AlertService,
+    private route: ActivatedRoute
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
+    this.rfqId = Number(this.route.snapshot.paramMap.get('id'));
+    if (this.rfqId) {
+      this.rfqService.getRfqDetails(this.rfqId).pipe(take(1)).subscribe({
+        next: (result) => {
+          if (result) {
+            console.log(result);
+            this.rfqForm.patchValue({
+              title: result.title,
+              description: result.description,
+              quantity: result.quantity,
+              unit: result.unit?.id,
+              jobLocation: result.jobLocation,
+              latitude: result.latitudeAddress,
+              longitude: result.longitudeAddress,
+              streetAddress: result.streetAddress
+            });
+            this.rfqCategoriesIds = new Set(result.categories?.map(c => c.id));
+            this.rfqSubcategoriesIds = new Set(result.subcategories?.map(s => s.id));
+
+            this.pondFiles = result.media?.items.map(item => ({
+              source: item.url,
+              options: {
+                type: 'local',
+                file: {
+                  name: item.name,
+                  size: item.size,
+                  type: 'application/pdf'
+                },
+                metadata: {
+                  id: item.id
+                }
+              }
+            })) || [];
+          }
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+    }
     this.loadData();
     this.setLabelIdleTranslations();
 
@@ -233,88 +282,89 @@ export class RequestQuote implements OnInit, OnDestroy {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const rfqFormData: FormData = new FormData();
-      this.pondFiles.forEach((fileItem: any) => {
-        let file: File | Blob;
+      let request$: Observable<boolean | null>;
 
-        if (fileItem.file) {
-          file = fileItem.file;
-        } else if (fileItem instanceof File || fileItem instanceof Blob) {
-          file = fileItem;
-        } else {
-          return;
-        }
-        rfqFormData.append('files', file, (file as File).name);
-      });
+      if (this.rfqId) {
+        const updatePayload = {
+          title: this.rfqForm.value.title || '',
+          description: this.rfqForm.value.description || '',
+          quantity: this.rfqForm.value.quantity || 0,
+          unit: this.rfqForm.get('unit')?.value || 0,
+          jobLocation: this.rfqForm.value.jobLocation || '',
+          streetAddress: this.rfqForm.value.streetAddress || '',
+          latitudeAddress: this.rfqForm.value.latitude || 0,
+          longitudeAddress: this.rfqForm.value.longitude || 0,
+          categoriesIds: selection.categoriesIds,
+          subcategoriesIds: selection.subcategoriesIds
+        };
 
-      selection.categoriesIds.forEach((id: number, index) => {
-        rfqFormData.append(`CategoriesIds[${index}]`, id.toString());
-      });
+        request$ = this.rfqService.updateRfq(this.rfqId, updatePayload);
 
-      selection.subcategoriesIds.forEach((id: number, index) => {
-        rfqFormData.append(`SubcategoriesIds[${index}]`, id.toString());
-      });
+      } else {
+        const rfqFormData: FormData = new FormData();
 
-      rfqFormData.append('Title', this.rfqForm.value.title || '');
-      rfqFormData.append(
-        'Description',
-        `${this.rfqForm.value.description}` || ''
-      );
-      rfqFormData.append(
-        'Quantity',
-        `${this.rfqForm.value.quantity?.toString()}` || '0'
-      );
-      rfqFormData.append('Unit', this.rfqForm.get('unit')?.value || 0);
-      rfqFormData.append('JobLocation', this.rfqForm.value.jobLocation || '');
-      rfqFormData.append(
-        'StreetAddress',
-        `${this.rfqForm.value.jobLocation}` || ''
-      );
-      rfqFormData.append(
-        'LatitudeAddress',
-        this.rfqForm.value.latitude?.toString() || '0'
-      );
-      rfqFormData.append(
-        'LongitudeAddress',
-        this.rfqForm.value.longitude?.toString() || '0'
-      );
-
-      this.rfqService
-        .createRfq(rfqFormData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            this.isSubmitting = false;
-            this.alertService.success('VENDOR.SUBMIT_SUCCESS');
-
-            this.resetForm();
-            
-            setTimeout(() => {
-              const successElement = document.querySelector('.alert-success');
-              if (successElement) {
-                successElement.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'center',
-                });
-              }
-            }, 1000);
-            
-            setTimeout(() => {
-              this.successMessage = '';
-            }, 5000);
-
-            this.router.navigate(['/vendor-rfqs']);
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            this.handleSubmissionError(error);
-          },
+        this.pondFiles.forEach((fileItem: any) => {
+          let file: File | Blob;
+          if (fileItem.file) {
+            file = fileItem.file;
+          } else if (fileItem instanceof File || fileItem instanceof Blob) {
+            file = fileItem;
+          } else {
+            return;
+          }
+          rfqFormData.append('files', file, (file as File).name);
         });
+
+        selection.categoriesIds.forEach((id: number, index) => {
+          rfqFormData.append(`CategoriesIds[${index}]`, id.toString());
+        });
+
+        selection.subcategoriesIds.forEach((id: number, index) => {
+          rfqFormData.append(`SubcategoriesIds[${index}]`, id.toString());
+        });
+
+        rfqFormData.append('Title', this.rfqForm.value.title || '');
+        rfqFormData.append('Description', this.rfqForm.value.description || '');
+        rfqFormData.append('Quantity', this.rfqForm.value.quantity?.toString() || '0');
+        rfqFormData.append('Unit', this.rfqForm.get('unit')?.value || 0);
+        rfqFormData.append('JobLocation', this.rfqForm.value.jobLocation || '');
+        rfqFormData.append('StreetAddress', this.rfqForm.value.streetAddress || '');
+        rfqFormData.append('LatitudeAddress', this.rfqForm.value.latitude?.toString() || '0');
+        rfqFormData.append('LongitudeAddress', this.rfqForm.value.longitude?.toString() || '0');
+
+        request$ = this.rfqService.createRfq(rfqFormData);
+      }
+
+      request$.pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.alertService.success('VENDOR.SUBMIT_SUCCESS');
+          this.resetForm();
+
+          setTimeout(() => {
+            const successElement = document.querySelector('.alert-success');
+            if (successElement) {
+              successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 1000);
+
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 5000);
+
+          this.router.navigate(['/vendor-rfqs']);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          this.handleSubmissionError(error);
+        }
+      });
     } else {
       this.markFormGroupTouched();
       this.scrollToFirstError();
     }
   }
+
 
   private handleSubmissionError(error: any): void {
     if (error.status === 401) {
@@ -488,15 +538,29 @@ export class RequestQuote implements OnInit, OnDestroy {
   }
 
   pondHandleAddFile(event: any) {
-    if (event?.file?.file) {
+    if (this.rfqId) {
+      this.rfqService.addFileToRfq(this.rfqId, event.file.file).subscribe({
+        next: (res: any) => {
+          if (res) {
+            event.file.setMetadata('id', res);
+          }
+          this.alertService.success(this.translate.instant('REQUEST.FILE_UPLOADED'));
+        },
+        error: () => this.alertService.error(this.translate.instant('REQUEST.FILE_UPLOAD_FAILED'))
+      });
+    } else {
       this.pondFiles.push(event.file.file as File);
     }
   }
 
   onFileRemoved(event: any) {
-    if (event?.file?.file) {
-      const removedFile = event.file.file as File;
-      this.pondFiles = this.pondFiles.filter(f => f != removedFile);
+    const file = event.file;
+    const fileId = file.getMetadata('id');
+    if (fileId) {
+      this.rfqService.deleteFileFromRfq(this.rfqId!, fileId).subscribe({
+        next: () => this.alertService.success(this.translate.instant('REQUEST.FILE_DELETED')),
+        error: () => this.alertService.error(this.translate.instant('REQUEST.FILE_DELETE_FAILED'))
+      });
     }
   }
 

@@ -266,11 +266,12 @@
           </div>
         </div>
 
-        <app-material-categories-selection [isRequestQuote]="true" [clearData]="clearData"></app-material-categories-selection>
+        <app-material-categories-selection [isRequestQuote]="true" [clearData]="clearData"  [initialSelectedCategoryIds]="rfqCategoriesIds"
+        [initialSelectedSubcategoryIds]="rfqSubcategoriesIds"></app-material-categories-selection>
 
         <!-- FilePond drag and drop input -->
         <file-pond
-          #myPond 
+          #myPond
           class="mt-5"
           name="file"
           [options]="pondOptions"

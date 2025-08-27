@@ -312,3 +312,14 @@
     background: transparent;
   }
 }
+
+::ng-deep .swal2-confirm {
+  order: 2;
+  border-radius: 0.65rem;
+}
+
+::ng-deep .swal2-cancel {
+  order: 1;
+  color: black;
+  border-radius: 0.65rem;
+}
