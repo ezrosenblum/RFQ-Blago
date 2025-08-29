@@ -88,6 +88,7 @@ export class Signup implements OnInit {
       {
         firstName: ['', [Validators.required, Validators.minLength(2)]],
         lastName: ['', [Validators.required, Validators.minLength(2)]],
+        publicUsername: [''],
         email: ['', [Validators.required, Validators.email]],
         role: ['', Validators.required],
         password: [
@@ -276,7 +277,7 @@ export class Signup implements OnInit {
   }
   getFieldError(fieldName: string): string {
   const field = this.signupForm.get(fieldName);
-  
+
   if (fieldName === 'confirmPassword') {
     if (this.signupForm.errors?.['passwordMismatch']) {
       return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
@@ -287,7 +288,7 @@ export class Signup implements OnInit {
       return this.translate.instant('AUTH.VALIDATION.PASSWORD_MISMATCH');
     }
   }
-  
+
   if (!field || !field.errors) return '';
 
   const errors = field.errors;
@@ -345,6 +346,7 @@ export class Signup implements OnInit {
     const labels: { [key: string]: string } = {
       firstName: 'First name',
       lastName: 'Last name',
+      publicUsername: 'Username',
       email: 'Email',
       role: 'Role',
       password: 'Password',
@@ -365,6 +367,7 @@ export class Signup implements OnInit {
         const basicFields = [
           'firstName',
           'lastName',
+          'publicUsername',
           'email',
           'role',
           'password',
@@ -468,6 +471,7 @@ export class Signup implements OnInit {
     const userRequest: UserRequest = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
+      publicUsername: formValue.publicUsername,
       email: formValue.email,
       role: formValue.role,
       password: formValue.password,
@@ -596,7 +600,7 @@ export class Signup implements OnInit {
   navigateToLogin(setParams: boolean): void {
     if (!setParams) {
       this.router.navigate(['/auth/login']);
-    } 
+    }
     else {
       this.router.navigate(['/auth/login'], {
         queryParams: {

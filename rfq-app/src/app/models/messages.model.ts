@@ -55,6 +55,7 @@ export interface MessageEntry {
       id: number,
       firstName: string,
       lastName: string,
+      publicUsername: string | null,
       email: string | null,
       picture: string | null,
       receiveEmailNotifications: boolean,
@@ -80,4 +81,5 @@ export interface ConversationUserEntry {
   firstName: string;
   lastName: string;
   picture: string | null;
+  publicUsername: string | null;
 }

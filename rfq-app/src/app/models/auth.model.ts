@@ -45,6 +45,7 @@ export class ResendEmail {
 export interface UserRequest {
   firstName: string;
   lastName: string;
+  publicUsername: string;
   email: string;
   password: string;
   phoneNumber: string;

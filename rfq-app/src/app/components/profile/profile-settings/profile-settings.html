@@ -143,6 +143,30 @@
         </div>
       </div>
 
+      <!-- Username -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <label
+          for="publicUsername"
+          class="md:col-span-4 font-semibold text-sm text-gray-700 dark:text-gray-300"
+        >
+          {{ 'AUTH.USERNAME' | translate }}
+        </label>
+        <div class="md:col-span-8 relative">
+          <input
+            type="text"
+            placeholder="{{ 'AUTH.ENTER_USERNAME' | translate }}"
+            class="form-input dark:bg-dark-800 dark:text-white dark:border-gray-700"
+            [class.border-error-500]="isFieldInvalid('publicUsername')"
+          />
+        </div>
+        <div
+          *ngIf="isFieldInvalid('publicUsername')"
+          class="form-error text-red-500 text-xs"
+        >
+          {{ getFieldError("publicUsername") }}
+        </div>
+      </div>
+
       <!-- Email -->
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
         <label

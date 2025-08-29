@@ -32,7 +32,7 @@
       </div>
 
       <div class="relative flex align-items-center mb-2" *ngIf="isAdmin">
-          <p class="mb-0 mr-10 flex-1">Vendor</p>       
+          <p class="mb-0 mr-10 flex-1">Vendor</p>
           <mat-form-field appearance="outline" class="flex-2">
             <svg
               class="absolute left-3 top-20 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
@@ -51,14 +51,16 @@
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onVendorSelected($event)">
               <mat-option [value]="null">All</mat-option>
               @for (option of filteredVendorOptions | async; track option) {
-                <mat-option [value]="option">{{option.firstName}} {{option.lastName}}</mat-option>
+                <mat-option [value]="option">
+                  {{ option.publicUsername || (option.firstName + ' ' + option.lastName) }}
+                </mat-option>
               }
             </mat-autocomplete>
           </mat-form-field>
       </div>
 
       <div class="relative flex align-items-center" *ngIf="isAdmin">
-          <p class="mb-0 mr-10 flex-1">Customer</p>       
+          <p class="mb-0 mr-10 flex-1">Customer</p>
           <mat-form-field appearance="outline" class="flex-2">
             <svg
               class="absolute left-3 top-20 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
@@ -77,7 +79,9 @@
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onCustomerSelected($event)">
               <mat-option [value]="null">All</mat-option>
               @for (option of filteredCustomerOptions | async; track option) {
-                <mat-option [value]="option">{{option.firstName}} {{option.lastName}}</mat-option>
+                <mat-option [value]="option">
+                  {{ option.publicUsername || (option.firstName + ' ' + option.lastName) }}
+                </mat-option>
               }
             </mat-autocomplete>
           </mat-form-field>
@@ -120,21 +124,31 @@
         "
       >
         <div class="flex flex-wrap items-start space-x-3">
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.submission.user.firstName }} {{ conv.submission.user.lastName }}" *ngIf="currentUser?.type == 'Vendor' && !conv.submission.user.picture"
-            [class]="
-              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
-              mapLetterToElement(conv.submission.user.firstName)
-            ">
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)"
+          matTooltip="{{ conv.submission.user.publicUsername || (conv.submission.user.firstName + ' ' + conv.submission.user.lastName) }}"
+          *ngIf="currentUser?.type == 'Vendor' && !conv.submission.user.picture"
+          [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+            mapLetterToElement(conv.submission.user.publicUsername || conv.submission.user.firstName)">
+          <ng-container *ngIf="conv.submission.user.publicUsername; else nameFallback">
+            {{ transform(conv.submission.user.publicUsername) }}
+          </ng-container>
+          <ng-template #nameFallback>
             {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
-          </div>
+          </ng-template>
+        </div>
           <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Vendor' && conv.submission.user.picture" [style.background-image]="'url(' + conv.submission.user.picture + ')'"></div>
 
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}" *ngIf="currentUser?.type == 'Customer' && !conv.vendor.picture"
-            [class]="
-              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
-              mapLetterToElement(conv.vendor.firstName)
-            ">
-            {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)"
+            matTooltip="{{ conv.vendor.publicUsername || (conv.vendor.firstName + ' ' + conv.vendor.lastName) }}"
+            *ngIf="currentUser?.type == 'Customer' && !conv.vendor.picture"
+            [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              mapLetterToElement(conv.vendor.publicUsername || conv.vendor.firstName)">
+            <ng-container *ngIf="conv.vendor.publicUsername; else vendorNameFallback">
+              {{ transform(conv.vendor.publicUsername) }}
+            </ng-container>
+            <ng-template #vendorNameFallback>
+              {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
+            </ng-template>
           </div>
           <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Customer' && conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div>
 
@@ -194,22 +208,33 @@
         "
       >
         <div class="flex flex-wrap items-start space-x-3">
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" *ngIf="!conv.vendor.picture" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}"
-            [class]="
-              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
-              mapLetterToElement(conv.vendor.firstName)
-            ">
-            {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)"
+            *ngIf="!conv.vendor.picture"
+            matTooltip="{{ conv.vendor.publicUsername || (conv.vendor.firstName + ' ' + conv.vendor.lastName) }}"
+            [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' + mapLetterToElement(conv.vendor.publicUsername || conv.vendor.firstName)">
+            <ng-container *ngIf="conv.vendor.publicUsername; else vendorNameFallback">
+              {{ transform(conv.vendor.publicUsername) }}
+            </ng-container>
+            <ng-template #vendorNameFallback>
+              {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
+            </ng-template>
           </div>
+
           <div class="user-avatar bg-round" *ngIf="conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div>
 
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" *ngIf="isAdmin && !conv.submission.user.picture"  matTooltip="{{ conv.submission.user.firstName }} {{ conv.submission.user.lastName }}"
-            [class]="
-              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
-              mapLetterToElement(conv.submission.user.firstName)
-            ">
-            {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)"
+            *ngIf="isAdmin && !conv.submission.user.picture"
+            matTooltip="{{ conv.submission.user.publicUsername || (conv.submission.user.firstName + ' ' + conv.submission.user.lastName) }}"
+            [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              mapLetterToElement(conv.submission.user.publicUsername || conv.submission.user.firstName)">
+            <ng-container *ngIf="conv.submission.user.publicUsername; else submissionUserNameFallback">
+              {{ transform(conv.submission.user.publicUsername) }}
+            </ng-container>
+            <ng-template #submissionUserNameFallback>
+              {{ transform(conv.submission.user.firstName) }} {{ transform(conv.submission.user.lastName) }}
+            </ng-template>
           </div>
+
           <div class="user-avatar bg-round" *ngIf="isAdmin && conv.submission.user.picture" [style.background-image]="'url(' + conv.submission.user.picture + ')'"></div>
 
           <div class="flex-1 min-w-0">
@@ -275,7 +300,7 @@
   <!-- Main Chat Area -->
   <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 messages-panel" [@messagesSidenavMobile]="sidenavTrigger">
     <!-- Chat Header -->
-    <div  
+    <div
       class="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
     >
       <div class="flex items-center justify-between">
@@ -287,47 +312,65 @@
                   <polyline points="12 19 5 12 12 5"/>
                 </svg>
               </div>
-            <div *ngIf="currentUser?.type == 'Customer' && !selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" 
-              [class]="
-                'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-                mapLetterToElement(selectedConversation.vendor.firstName)
-              "
-            >
-              {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
+              <div
+              *ngIf="currentUser?.type == 'Customer' && !selectedConversation.submission.user.picture"
+              matTooltip="{{ selectedConversation.vendor.publicUsername || (selectedConversation.vendor.firstName + ' ' + selectedConversation.vendor.lastName) }}"
+              [class]="'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
+                mapLetterToElement(selectedConversation.vendor.publicUsername || selectedConversation.vendor.firstName)">
+              <ng-container *ngIf="selectedConversation.vendor.publicUsername; else vendorNameFallback">
+                {{ transform(selectedConversation.vendor.publicUsername) }}
+              </ng-container>
+              <ng-template #vendorNameFallback>
+                {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
+              </ng-template>
             </div>
+
             <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Customer' && selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
-            <div *ngIf="currentUser?.type == 'Vendor' && !selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}" 
-              [class]="
-                'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-                mapLetterToElement(selectedConversation.submission.user.firstName)
-              "
-            >
-              {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
+            <div  *ngIf="currentUser?.type == 'Vendor' && !selectedConversation.submission.user.picture"
+              matTooltip="{{ selectedConversation.submission.user.publicUsername || (selectedConversation.submission.user.firstName + ' ' + selectedConversation.submission.user.lastName) }}"
+              [class]="'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
+                mapLetterToElement(selectedConversation.submission.user.publicUsername || selectedConversation.submission.user.firstName)">
+              <ng-container *ngIf="selectedConversation.submission.user.publicUsername; else submissionUserFallback">
+                {{ transform(selectedConversation.submission.user.publicUsername) }}
+              </ng-container>
+              <ng-template #submissionUserFallback>
+                {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
+              </ng-template>
             </div>
+
             <div class="user-avatar bg-round" *ngIf="currentUser?.type == 'Vendor' && selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
           </div>
 
           <div class="flex" *ngIf="selectedConversation && isAdmin">
-            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
-              [class]="
-                'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-                mapLetterToElement(selectedConversation.vendor.firstName)
-              "
-            >
-              {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
+            <div *ngIf="!selectedConversation.submission.user.picture"
+              matTooltip="{{ selectedConversation.vendor.publicUsername || (selectedConversation.vendor.firstName + ' ' + selectedConversation.vendor.lastName) }}"
+              [class]="'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
+                mapLetterToElement(selectedConversation.vendor.publicUsername || selectedConversation.vendor.firstName)">
+              <ng-container *ngIf="selectedConversation.vendor.publicUsername; else vendorNameFallback">
+                {{ transform(selectedConversation.vendor.publicUsername) }}
+              </ng-container>
+              <ng-template #vendorNameFallback>
+                {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
+              </ng-template>
             </div>
+
+
             <div class="user-avatar bg-round" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
-            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
-              [class]="
-                'w-10 h-10 ml-2 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-                mapLetterToElement(selectedConversation.submission.user.firstName)
-              "
-            >
-              {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
+            <div *ngIf="!selectedConversation.submission.user.picture"
+              matTooltip="{{ selectedConversation.vendor.publicUsername || (selectedConversation.vendor.firstName + ' ' + selectedConversation.vendor.lastName) }}"
+              [class]="'w-10 h-10 ml-2 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
+                mapLetterToElement(selectedConversation.submission.user.publicUsername || selectedConversation.submission.user.firstName)">
+              <ng-container *ngIf="selectedConversation.submission.user.publicUsername; else submissionUserFallback">
+                {{ transform(selectedConversation.submission.user.publicUsername) }}
+              </ng-container>
+              <ng-template #submissionUserFallback>
+                {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
+              </ng-template>
             </div>
+
             <div class="user-avatar bg-round" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
           </div>
@@ -350,24 +393,27 @@
         *ngFor="let msg of currentMessages; let j = index"
         class="flex items-start space-x-3"
       >
-        <div *ngIf="!msg.sender.picture"
-          [class]="
-            'w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0 ' +
-            mapLetterToElement(msg.sender.firstName)
-          "
-        >
+      <div *ngIf="!msg.sender.picture"
+        [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0 ' +
+          mapLetterToElement(msg.sender.publicUsername || msg.sender.firstName)">
+        <ng-container *ngIf="msg.sender.publicUsername; else nameFallback">
+          {{ transform(msg.sender.publicUsername) }}
+        </ng-container>
+        <ng-template #nameFallback>
           {{ transform(msg.sender.firstName) }} {{ transform(msg.sender.lastName) }}
-        </div>
+        </ng-template>
+      </div>
         <div class="user-avatar bg-round" *ngIf="msg.sender.picture" [style.background-image]="'url(' + msg.sender.picture + ')'"></div>
 
         <div class="flex-1" [ngClass]="{'quoted-msg' : j == 0}">
-          <span class="font-medium text-gray-900 dark:text-white mr-10"
-            >{{ msg.sender.firstName }} {{ msg.sender.lastName }}</span>
+          <span class="font-medium text-gray-900 dark:text-white mr-10">
+            {{ msg.sender.publicUsername || (msg.sender.firstName + ' ' + msg.sender.lastName) }}
+          </span>
           <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 max-w-2xl mr-10" *ngIf="msg.content">
             <p class="text-gray-800 dark:text-gray-200" *ngIf="j !== 0">{{ msg.content }}</p>
             <div [innerHTML]="msg.content" class="quill-content" *ngIf="j === 0"></div>
           </div>
-            <div class="file mt-3" *ngFor="let file of msg.media.items; let i = index">  
+            <div class="file mt-3" *ngFor="let file of msg.media.items; let i = index">
               <!-- Images -->
               <div
                 (click)="previewImageInFullScreen(file.url, 'img')"
@@ -395,13 +441,13 @@
     <div
       class="border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-900 relative"
     >
-      <div 
+      <div
         class="upload-files-panel bg-white dark:bg-gray-900"
         *ngIf="showUploadFilesPanel"
       >
-        <file-pond 
-          #myPond 
-          [options]="pondOptions" 
+        <file-pond
+          #myPond
+          [options]="pondOptions"
           [files]="pondFiles"
           (onaddfile)="pondHandleAddFile($event)"
           (onremovefile)="onFileRemoved($event)">
@@ -459,13 +505,16 @@
     >
       <div class="text-center">
         <div *ngIf="!selectedConversation.submission.user.picture"
-          [class]="
-            'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium ' +
-            mapLetterToElement(selectedConversation.vendor.firstName)
-          "
-        >
-          {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
+          [class]="'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium ' +
+            mapLetterToElement(selectedConversation.vendor.publicUsername || selectedConversation.vendor.firstName)">
+          <ng-container *ngIf="selectedConversation.vendor.publicUsername; else vendorNameFallback">
+            {{ transform(selectedConversation.vendor.publicUsername) }}
+          </ng-container>
+          <ng-template #vendorNameFallback>
+            {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
+          </ng-template>
         </div>
+
         <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium bg-round right-sidenav-img" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
         <h3 class="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
@@ -489,7 +538,7 @@
         {{'VENDOR.DOCUMENTS' | translate}}
       </p>
 
-      <div class="file-sidebar border-b border-gray-200 dark:border-gray-700" *ngFor="let file of selectedConversation?.media?.items; let i = index">  
+      <div class="file-sidebar border-b border-gray-200 dark:border-gray-700" *ngFor="let file of selectedConversation?.media?.items; let i = index">
 
         <!-- IMAGE -->
         <div *ngIf="['.png', '.jpg', '.jpeg', '.gif'].includes(file.extension)" class="file-img pointer" (click)="previewImageInFullScreen(file.url, 'img')">

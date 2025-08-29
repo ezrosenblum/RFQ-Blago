@@ -119,6 +119,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
     return this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
+      publicUsername: [''],
       email: [{ value: '', disabled: true }],
       phoneNumber: ['', [usPhoneValidator()]],
       picture: [''],
@@ -163,6 +164,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
     this.userForm.patchValue({
       firstName: user.firstName,
       lastName: user.lastName,
+      publicUsername: user.publicUsername,
       email: user.email,
       phoneNumber: user.phoneNumber,
       picture: user.picture,
@@ -524,6 +526,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     this.appendFormField(formData, 'FirstName', 'firstName');
     this.appendFormField(formData, 'LastName', 'lastName');
+    this.appendFormField(formData, 'PublicUsername', 'publicUsername');
     this.appendFormField(formData, 'Email', 'email');
     this.appendPhoneNumber(formData);
 

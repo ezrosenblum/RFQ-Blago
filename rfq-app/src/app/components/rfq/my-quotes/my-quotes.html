@@ -276,8 +276,7 @@
                     </div>
                     <div class="flex items-center space-x-2">
                       <h3 class="text-md font-semibold">
-                        {{ quote.submission.user.firstName }} {{
-                        quote.submission.user.lastName }}
+                        {{ quote.submission.user.publicUsername || (quote.submission.user.firstName + ' ' + quote.submission.user.lastName) }}
                       </h3>
                     </div>
                   </div>
@@ -297,7 +296,7 @@
               <!-- Info Grid Section -->
               <div class="px-4 py-3 bg-white dark:bg-gray-800">
                 <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                  
+
                   <!-- TIMELINE -->
                   <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
                     <div class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">

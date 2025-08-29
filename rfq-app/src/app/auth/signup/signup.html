@@ -97,6 +97,24 @@
             </div>
           </div>
         </div>
+        <!-- Username Field -->
+        <div>
+          <label for="publicUsername" class="form-label"
+            >{{'AUTH.USERNAME' | translate}}</label
+          >
+          <div class="relative">
+            <input
+              type="text"
+              formControlName="publicUsername"
+              class="form-input"
+              [class.border-error-500]="isFieldInvalid('publicUsername')"
+              placeholder="{{ 'AUTH.ENTER_USERNAME' | translate }}"
+            />
+          </div>
+          <div *ngIf="isFieldInvalid('publicUsername')" class="form-error">
+            {{ getFieldError('publicUsername') }}
+          </div>
+        </div>
         <!-- Email Field -->
         <div>
           <label for="email" class="form-label"

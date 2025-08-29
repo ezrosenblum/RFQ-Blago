@@ -82,7 +82,6 @@
     "ERROR_INVALID_DATA": "Invalid registration data. Please check your inputs.",
     "ERROR_EMAIL_EXISTS": "An account with this email already exists.",
     "ERROR_CHECK_FIELDS": "Please check all required fields and try again.",
-    "ERROR_GENERIC": "Registration failed. Please try again later.",
     "LOCATION_AND_CATEGORIES": "Location and Categories",
     "SET_LOCATION_AND_CATEGORIES": "Set location and categories",
     "MATERIAL_CATEGORIES": "Material Categories",
@@ -110,7 +109,9 @@
       "MIN_LENGTH": "at least 8 characters"
     },
     "RESEND_EMAIL": "Resend verification email",
-    "SENDING_CODE": "Email sending..."
+    "SENDING_CODE": "Email sending...",
+    "USERNAME": "Username",
+    "ENTER_USERNAME": "Enter username"
   },
 
   "FIELDS": {
