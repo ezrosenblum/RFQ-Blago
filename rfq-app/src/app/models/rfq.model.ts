@@ -31,7 +31,7 @@ export interface TableResponse<T> {
 export interface SubmissionTableRequest {
   query?: string;
   userId?: number;
-  status?: number;
+  status: number[];
   unit?: number;
   category?: number;
   subcategory?: number;

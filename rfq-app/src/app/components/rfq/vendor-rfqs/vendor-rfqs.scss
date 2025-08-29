@@ -511,7 +511,6 @@
   max-height: none;
 }
 
-
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
@@ -527,6 +526,10 @@
 
 .fade-in {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 @keyframes fadeIn {
@@ -553,6 +556,11 @@
   word-wrap: break-word;      
   overflow-wrap: anywhere;     
   line-height: 1.5;           
+}
+
+.active-chip {
+  background: #f9fafb;
+  font-weight: bold !important;
 }
 
 @media (max-width: 1024px) {
