@@ -19,7 +19,6 @@ public sealed class UserChangeStatusCommandHandler : ICommandHandler<UserChangeS
     private readonly IApplicationDbContext _dbContext;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUserService;
-    private readonly ICacheService _cacheService;
     private readonly ILocalizationService _localizationService;
 
 
@@ -27,13 +26,11 @@ public sealed class UserChangeStatusCommandHandler : ICommandHandler<UserChangeS
         IApplicationDbContext dbContext,
         IUnitOfWork unitOfWork, 
         ICurrentUserService currentUserService,
-        ICacheService cacheService,
         ILocalizationService localizationService)
     {
         _dbContext = dbContext;
         _unitOfWork = unitOfWork;
         _currentUserService = currentUserService;
-        _cacheService = cacheService;
         _localizationService = localizationService;
     }
     public async Task Handle(UserChangeStatusCommand command, CancellationToken cancellationToken)

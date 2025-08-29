@@ -7,14 +7,11 @@ namespace Application.Features.Notifications.EventHandlers;
 
 public sealed class NotificationStatusUpdatedEventHandler : INotificationHandler<NotificationStatusUpdatedEvent>
 {
-    private readonly ICacheService _cacheService;
     private readonly IMediator _mediatr;
 
     public NotificationStatusUpdatedEventHandler(
-        ICacheService cacheService,
         IMediator mediatr)
     {
-        _cacheService = cacheService;
         _mediatr = mediatr;
     }
 
