@@ -236,12 +236,13 @@ public class ElasticSearchClient<T> : ISearchClient<T> where T : class, ISearcha
             };
         }
 
-        if (criteria.Status.HasValue)
+        if (criteria.Status != null && 
+            criteria.Status.Any())
         {
-            combinedQuery &= new TermQuery
+            combinedQuery &= new TermsQuery
             {
                 Field = "status.id",
-                Value = criteria.Status.Value
+                Terms = criteria.Status.Select(id => (object)id)
             };
         }
 
