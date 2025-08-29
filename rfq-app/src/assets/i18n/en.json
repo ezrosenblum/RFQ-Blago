@@ -394,7 +394,12 @@
     "MI": "mi",
     "MI_RADIUS": "mi radius",
     "SELECT_LOCATION": "Select Location",
-    "SELECTED_AREA": "Selected Area"
+    "SELECTED_AREA": "Selected Area",
+    "SAVE": "Save",
+    "SAVING": "Saving...",
+    "SERVICE_AREA_UPDATED_SUCCESS": "Service area updated successfully",
+    "SERVICE_AREA_UPDATE_FAILED": "Failed to update service area",
+    "SERVICE_AREA_UPDATE_NETWORK_ERROR": "Failed to update service area. Please check your internet connection."
   },
   "PROFILE": {
     "ACCOUNT_SETTINGS": "Account Settings",

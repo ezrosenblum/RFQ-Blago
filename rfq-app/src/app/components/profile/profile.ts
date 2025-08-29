@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { Subject, takeUntil } from 'rxjs';
 import { User, UserRole } from '../../models/user.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ServiceAreasComponent } from './service-areas/service-areas.component';
 
 @Component({
   standalone: false,
@@ -10,13 +11,15 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, AfterViewInit {
+  @ViewChild(ServiceAreasComponent) serviceAreasComponent!: ServiceAreasComponent;
   currentUser: User | null = null;
 
   editMode = false;
   imageError = false;
   selectedTab: string = 'Overview';
   private destroy$ = new Subject<void>();
+  private previousTab: string = 'Overview';
 
   constructor(
     private authService: Auth,
@@ -40,9 +43,36 @@ export class ProfileComponent implements OnInit {
           tab === 'Materials' ||
           tab === 'Service_Areas'
         ) {
+          this.previousTab = this.selectedTab;
           this.selectedTab = tab;
+          this.handleTabSwitch();
         }
       });
+  }
+
+  ngAfterViewInit(): void {
+    if (this.selectedTab === 'Service_Areas') {
+      this.reinitializeServiceAreasMap();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private handleTabSwitch(): void {
+    if (this.selectedTab === 'Service_Areas' && this.previousTab !== 'Service_Areas') {
+      setTimeout(() => {
+        this.reinitializeServiceAreasMap();
+      }, 100);
+    }
+  }
+
+  private reinitializeServiceAreasMap(): void {
+    if (this.serviceAreasComponent) {
+      this.serviceAreasComponent.onTabFocus();
+    }
   }
 
   toggleEditMode(): void {
@@ -84,12 +114,15 @@ export class ProfileComponent implements OnInit {
   }
 
  onTabChange(event: any) {
+    this.previousTab = this.selectedTab;
     this.selectedTab = this.tabLabels[event.index];
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: this.selectedTab },
       queryParamsHandling: 'merge',
     });
+
+    this.handleTabSwitch();
   }
 
   get selectedIndex(): number {
