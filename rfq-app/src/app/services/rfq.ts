@@ -159,4 +159,18 @@ export class RfqService {
   viewedRfq(id:number): Observable<string> {
     return this.http.put<string>(`${this.API_URL}Submission/${id}/viewed`, null)
   }
+
+  updateRfq(rfqId: number, rfqData: any): Observable<boolean | null> {
+    return this.http.put<boolean>(`${this.API_URL}Submission/${rfqId}`, rfqData)
+      .pipe(map(() => true));
+  }
+  addFileToRfq(rfqId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.put(`${this.API_URL}Submission/${rfqId}/file`, formData);
+  }
+
+  deleteFileFromRfq(rfqId: number, fileId: number): Observable<any> {
+    return this.http.delete(`${this.API_URL}Submission/${rfqId}/file/${fileId}`);
+  }
 }

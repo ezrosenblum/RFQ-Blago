@@ -975,4 +975,11 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
     return null;
   }
+
+  isEditable(rfq: Rfq): boolean {
+    if (rfq.user?.id !== this.currentUser?.id) {
+      return false;
+    }
+    return !rfq.statusHistoryCount?.some((s: any) => s.status?.id === 3 || s.status?.id === 4);
+  }
 }

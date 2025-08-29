@@ -368,7 +368,7 @@
 
                 <!-- Footer -->
                 <div
-                  class="lg:px-6 lg:py-5 lg:bg-gray-50 dark:bg-gray-900 lg:border-t border-gray-100 dark:border-gray-700 
+                  class="lg:px-6 lg:py-5 lg:bg-gray-50 dark:bg-gray-900 lg:border-t border-gray-100 dark:border-gray-700
                         flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
 
                   <!-- Left section -->
@@ -460,9 +460,22 @@
                         {{ 'VENDOR.QUOTE_SENT' | translate }}
                       </div>
 
+                      <button
+                      *ngIf="isEditable(rfq)"
+                        [routerLink]="['/request-quote', rfq.id]"
+                        class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-yellow-500 text-white hover:bg-yellow-600 w-full sm:w-auto">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 20h9"></path>
+                          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg> {{ 'VENDOR.EDIT_RFQ' | translate }}
+                      </button>
+
                       <button (click)="onViewDetails(rfq.id!)"
                         class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-blue-500 text-white hover:bg-blue-600 w-full sm:w-auto">
-                        👁 {{ 'VENDOR.VIEW_DETAILS' | translate }}
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg> {{ 'VENDOR.VIEW_DETAILS' | translate }}
                       </button>
                     </ng-container>
                   </div>
