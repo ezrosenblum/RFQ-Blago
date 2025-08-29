@@ -19,7 +19,7 @@ namespace Application.Features.Submissions.Queries;
 public sealed record SubmissionFullSearchQuery(
     string? Query,
     int? UserId,
-    int? Status,
+    List<int>? Status,
     int? Unit,
     DateTime? DateFrom,
     DateTime? DateTo,
@@ -64,7 +64,7 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
             response = SetVendorStatuses(response);
         }
 
-        if(_currentUserService.UserRole == UserRole.Administrator)
+        if (_currentUserService.UserRole == UserRole.Administrator)
             response = await _searchClient.SearchSubmissionsAsync(query);
 
         response = RemoveHistoryItems(response);
@@ -105,6 +105,11 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
         var categories = query.Category;
         var subcategories = query.Subcategory;
 
+        var approvedStatusList = new List<int>()
+        {
+            (int)SubmissionStatus.Approved
+        };
+
         if (query.Subcategory == null || query.Subcategory.Count == 0)
             subcategories = await FetchVendorSubcategories(cancellationToken);
 
@@ -117,7 +122,7 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
             {
                 Category = categories,
                 Subcategory = subcategories,
-                Status = (int)SubmissionStatus.Approved,
+                Status = approvedStatusList,
                 Paging = new PaginationOptions(1, 10000)
             });
 
@@ -139,7 +144,7 @@ public sealed class SubmissionFullSearchQueryHandler : IQueryHandler<SubmissionF
         {
             Category = categories,
             Subcategory = subcategories,
-            Status = (int)SubmissionStatus.Approved
+            Status = approvedStatusList
         });
     }
     private PaginatedList<SubmissionSearchable> SetVendorStatuses(PaginatedList<SubmissionSearchable> response)
