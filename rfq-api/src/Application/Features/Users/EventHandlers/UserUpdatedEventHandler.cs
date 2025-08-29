@@ -6,6 +6,7 @@ using Domain.Entities.Notifications;
 using Domain.Events.Users;
 using DTO.MessageBroker.Messages.Search;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Threading;
 
 namespace Application.Features.Users.EventHandlers;
@@ -37,7 +38,7 @@ public sealed class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEv
     }
     private async Task IndexUserSubmissions(int userId, CancellationToken cancellationToken = default)
     {
-        var submissions = _dbContext.Submission.Where(s => s.UserId == userId).ToList();
+        var submissions = await _dbContext.Submission.Where(s => s.UserId == userId).ToListAsync(cancellationToken);
 
         foreach (var submission in submissions)
         {
@@ -47,7 +48,7 @@ public sealed class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEv
 
     private async Task IndexUserSubmissionQuotes(int userId, CancellationToken cancellationToken = default)
     {
-        var submissionQuotes = _dbContext.SubmissionQuote.Where(s => s.VendorId == userId).ToList();
+        var submissionQuotes = await _dbContext.SubmissionQuote.Where(s => s.VendorId == userId).ToListAsync(cancellationToken);
 
         foreach (var submissionQuote in submissionQuotes)
         {
@@ -57,7 +58,7 @@ public sealed class UserUpdatedEventHandler : INotificationHandler<UserUpdatedEv
 
     private async Task IndexUserQuoteMessages(int userId, CancellationToken cancellationToken = default)
     {
-        var quoteMessages = _dbContext.QuoteMessage.Where(s => s.SenderId == userId).ToList();
+        var quoteMessages = await _dbContext.QuoteMessage.Where(s => s.SenderId == userId).ToListAsync(cancellationToken);
 
         foreach (var quoteMessage in quoteMessages)
         {
