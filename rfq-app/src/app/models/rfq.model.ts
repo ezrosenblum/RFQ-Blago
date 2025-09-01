@@ -137,6 +137,11 @@ export interface GoogleMapsApi {
     places: {
       Autocomplete: new (input: HTMLInputElement, options: any) => any;
     };
+    event: {
+      clearInstanceListeners: (instance: any) => void;
+      addListener: (instance: any, eventName: string, handler: Function) => any;
+      removeListener: (listener: any) => void;
+    };
   };
 }
 
