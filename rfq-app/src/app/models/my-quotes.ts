@@ -9,6 +9,7 @@ export interface SubmissionUser {
   firstName: string;
   lastName: string;
   picture: string;
+  publicUsername: string;
 }
 
 export interface Submission {

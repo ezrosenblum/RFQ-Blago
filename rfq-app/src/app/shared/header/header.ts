@@ -154,6 +154,10 @@ export class Header implements OnInit, OnDestroy {
   getUserDisplayName(): string {
     if (!this.currentUser) return '';
 
+    if (this.currentUser.publicUsername) {
+      return this.currentUser.publicUsername;
+    }
+
     if (this.currentUser.firstName || this.currentUser.lastName) {
       return `${this.currentUser.firstName || ''} ${
         this.currentUser.lastName || ''
@@ -165,6 +169,17 @@ export class Header implements OnInit, OnDestroy {
 
   getUserInitials(): string {
     if (!this.currentUser) return '';
+
+    if (this.currentUser.publicUsername) {
+      const parts = this.currentUser.publicUsername.trim().split(' ').filter(Boolean);
+      if (parts.length > 1 && parts[0].length > 0 && parts[1].length > 0) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      if (parts.length > 0 && parts[0].length > 0) {
+        return parts[0][0].toUpperCase();
+      }
+      return this.currentUser.email.charAt(0).toUpperCase();
+    }
 
     const firstName = this.currentUser.firstName || '';
     const lastName = this.currentUser.lastName || '';

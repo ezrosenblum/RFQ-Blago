@@ -23,6 +23,7 @@ public sealed record UserUpdateCommand(
     string LastName,
     string Email,
     string? PhoneNumber,
+    string? PublicUsername,
     UserCompanyDetailsUpdateRequest? CompanyDetails
     ) : IUserUpdateData, ICommand<UserResponse>;
 
@@ -122,6 +123,7 @@ public sealed class UserUpdateCommandValidator : AbstractValidator<UserUpdateCom
 {
     public UserUpdateCommandValidator(
         UserEmailUniqueValidator emailUniqueValidator,
+        UserPublicUsernameUniqueValidator publicUsernameUniqueValidator,
         ICurrentUserService currentUserService)
     {
         RuleFor(cmd => cmd.FirstName)
@@ -145,5 +147,9 @@ public sealed class UserUpdateCommandValidator : AbstractValidator<UserUpdateCom
                         .SetValidator(emailUniqueValidator)
                         .OverridePropertyName(nameof(UserUpdateCommand.Email));
                 });
+
+        RuleFor(cmd => new UserPublicUsernameUniqueValidatorData(cmd.PublicUsername, currentUserService.UserId))
+            .SetValidator(publicUsernameUniqueValidator)
+            .OverridePropertyName(nameof(UserUpdateCommand.PublicUsername));
     }
 }

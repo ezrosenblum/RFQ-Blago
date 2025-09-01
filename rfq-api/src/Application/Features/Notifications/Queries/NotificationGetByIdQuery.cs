@@ -16,16 +16,13 @@ public sealed class NotificationGetByIdQueryHandler : IQueryHandler<Notification
 {
     private readonly IRepository<Notification> _repository;
     private readonly IMapper _mapper;
-    private readonly ICacheService _cacheService;
 
     public NotificationGetByIdQueryHandler(
         IRepository<Notification> repository,
-        IMapper mapper,
-        ICacheService cacheService)
+        IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
-        _cacheService = cacheService;
     }
 
     public async Task<NotificationResponse> Handle(NotificationGetByIdQuery query, CancellationToken cancellationToken)

@@ -1,5 +1,6 @@
 ﻿{
   "userEmailUniqueValidator.message": "Provided email is already in use",
+  "userPublicUsernameUniqueValidator.message": "Provided public username is already in use",
   "disallowedFileExtensionValidator.message": "File extension: {0} is disallowed",
   "fileSizeValidator.message": "File size: {0} exceed limit of {1}",
   "userStatusAllowed.message": "Status '{0}' is not allowed. Allowed statuses are: {1}",

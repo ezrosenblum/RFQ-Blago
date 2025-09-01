@@ -36,7 +36,7 @@ public sealed class ForgotPasswordMessageConsumer : IConsumer<ForgotPasswordMess
 
         await _emailSender.SendAsync(new MailMessageRequest(
             context.Message.Email,
-            "RFQSubmission - Reset your password",
+            "Supply Streamline - Reset your password",
             htmlTemplateContent,
             $"{context.Message.FirstName} {context.Message.LastName}"));
     }

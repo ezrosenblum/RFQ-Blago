@@ -6,4 +6,5 @@ public interface IUserUpdateData
     string LastName { get; }
     string Email { get; }
     string? PhoneNumber { get; }
+    string? PublicUsername { get; }
 }

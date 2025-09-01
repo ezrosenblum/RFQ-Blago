@@ -110,7 +110,9 @@
       "MIN_LENGTH": "at least 8 characters"
     },
     "RESEND_EMAIL": "Resend verification email",
-    "SENDING_CODE": "Email sending..."
+    "SENDING_CODE": "Email sending...",
+    "USERNAME": "Username",
+    "ENTER_USERNAME": "Enter username"
   },
 
   "FIELDS": {
@@ -163,7 +165,11 @@
     "RECEIVE": "Receive",
     "RECEIVE_DESCRIPTION": "Get competitive quotes within 24-48 hours",
     "TITLE": "Title",
-    "TITLE_PLACEHOLDER": "Enter a title for your project"
+    "TITLE_PLACEHOLDER": "Enter a title for your project",
+    "FILE_UPLOADED": "File uploaded successfully",
+    "FILE_UPLOAD_FAILED": "Failed to upload file",
+    "FILE_DELETED": "File deleted successfully",
+    "FILE_DELETE_FAILED": "Failed to delete file"
   },
 
   "VENDOR": {
@@ -348,7 +354,8 @@
     "VIEWED": "Viewed",
     "TOTAL_PROJECT_COST": "Total Project Cost",
     "FILE_PREVIEW_ERROR": "Download failed",
-    "ADD_FILE": "Attach file(s)"
+    "ADD_FILE": "Attach file(s)",
+    "EDIT_RFQ": "Edit RFQ"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

@@ -88,7 +88,7 @@ export class MessagesComponent implements OnInit {
   pondFiles: File[] = [];
   @ViewChild('myPond') myPond!: FilePondComponent;
   uploadedFilesCount = 0;
-  
+
   isMessageSending: boolean = false;
 
   constructor(
@@ -142,21 +142,21 @@ export class MessagesComponent implements OnInit {
           this.quoteIdQuery = Number(params['quoteId']);
         }
       }
-      switch(this.currentUser?.type) { 
-        case 'Vendor': { 
+      switch(this.currentUser?.type) {
+        case 'Vendor': {
             this.loadConversations();
-            break; 
-        } 
-        case 'Customer': { 
+            break;
+        }
+        case 'Customer': {
             this.loadConversations();
-            break; 
-        } 
-        case 'Administrator': { 
+            break;
+        }
+        case 'Administrator': {
             this.loadUsersListsAndSubscribeChanges();
             this.loadAdminConversations();
-            break; 
-        } 
-      } 
+            break;
+        }
+      }
     });
   }
 
@@ -314,13 +314,14 @@ export class MessagesComponent implements OnInit {
             id: this.selectedConversation!.vendor.id,
             firstName: this.selectedConversation!.vendor.firstName,
             lastName: this.selectedConversation!.vendor.lastName,
+            publicUsername: this.selectedConversation!.vendor.publicUsername,
             email: '',
             picture: this.selectedConversation!.vendor.picture,
             receiveEmailNotifications: false,
             receivePushNotifications: false,
           }
         };
-        
+
         if (Array.isArray(data?.items)) {
           data.items.unshift(quotetMessage);
         }
@@ -430,7 +431,7 @@ export class MessagesComponent implements OnInit {
 
             if (!this.isAdmin) {
               this.loadMessagesForConversation(this.selectedConversation?.id || 0);
-            }            
+            }
           },
           error: (error) => {
             this.handleError(error)
@@ -502,7 +503,7 @@ export class MessagesComponent implements OnInit {
       } else {
         this.filteredConversations = this.conversations
       }
-    } 
+    }
     else {
       if (this.searchTerm) {
         this.filteredAdminConversations = this.adminConversations.filter(
@@ -547,7 +548,7 @@ export class MessagesComponent implements OnInit {
   }
 
 
-  // Upload files 
+  // Upload files
   toggleFileUploadPanel(){
     this.showUploadFilesPanel = !this.showUploadFilesPanel;
   }
@@ -574,7 +575,7 @@ export class MessagesComponent implements OnInit {
         this.sidenavTrigger = 'in';
       }
     }
-  } 
+  }
 
   transform(value: string | undefined | null) {
     if (value) {

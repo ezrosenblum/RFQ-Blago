@@ -10,6 +10,7 @@ import { QuoteDetails } from './quote-details/quote-details';
 const routes: Routes = [
   { path: '', redirectTo: 'request-quote', pathMatch: 'full' },
   { path: 'request-quote', component: RequestQuote },
+  { path: 'request-quote/:id', component: RequestQuote, canActivate: [AuthGuard] },
   { path: 'vendor-rfqs', component: VendorRfqs, canActivate: [AuthGuard] },
   { path: 'vendor-rfqs/:id', component: RfqDetails, canActivate: [AuthGuard] },
   { path: 'my-quotes', component: MyQuotesComponent, canActivate: [AuthGuard] },

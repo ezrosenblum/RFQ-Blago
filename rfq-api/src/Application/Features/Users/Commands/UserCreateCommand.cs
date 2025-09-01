@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Identity;
+﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Identity;
 using Application.Common.Interfaces.Request;
 using Application.Common.Interfaces.Request.Handlers;
 using Application.Features.Users.Validators;
@@ -18,6 +19,7 @@ public sealed record UserCreateCommand(
     string Email,
     string Password,
     string? PhoneNumber,
+    string? PublicUsername,
     string Role) : ICommand<UserResponse>, IUserInsertData;
 
 public sealed class UserCreateCommandHandler : ICommandHandler<UserCreateCommand, UserResponse>
@@ -54,7 +56,9 @@ public sealed class UserCreateCommandHandler : ICommandHandler<UserCreateCommand
 
 public sealed class UserCreateCommandValidator : AbstractValidator<UserCreateCommand>
 {
-    public UserCreateCommandValidator(UserEmailUniqueValidator emailUniqueValidator)
+    public UserCreateCommandValidator(
+        UserEmailUniqueValidator emailUniqueValidator,
+        UserPublicUsernameUniqueValidator publicUsernameUniqueValidator)
     {
         RuleFor(cmd => cmd.FirstName)
             .NotEmpty()
@@ -77,5 +81,9 @@ public sealed class UserCreateCommandValidator : AbstractValidator<UserCreateCom
                         .SetValidator(emailUniqueValidator)
                         .OverridePropertyName(nameof(UserCreateCommand.Email));
                 });
+
+        RuleFor(cmd => new UserPublicUsernameUniqueValidatorData(cmd.PublicUsername, default))
+            .SetValidator(publicUsernameUniqueValidator)
+            .OverridePropertyName(nameof(UserCreateCommand.PublicUsername));
     }
 }

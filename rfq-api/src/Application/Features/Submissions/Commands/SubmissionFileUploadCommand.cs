@@ -17,9 +17,9 @@ using Microsoft.Extensions.Options;
 
 namespace Application.Features.Submissions.Commands;
 
-public sealed record SubmissionFileUploadCommand(int SubmissionId, IFormFile File) : ICommand;
+public sealed record SubmissionFileUploadCommand(int SubmissionId, IFormFile File) : ICommand<Guid>;
 
-public sealed record SubmissionFileUploadCommandHandler : ICommandHandler<SubmissionFileUploadCommand>
+public sealed record SubmissionFileUploadCommandHandler : ICommandHandler<SubmissionFileUploadCommand, Guid>
 {
     private readonly IMediaStorage _mediaStorage;
     private readonly IRepository<Submission> _submissionRepository;
@@ -35,14 +35,20 @@ public sealed record SubmissionFileUploadCommandHandler : ICommandHandler<Submis
         _unitOfWork = unitOfWork;
     }
 
-    public async Task Handle(SubmissionFileUploadCommand command, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(SubmissionFileUploadCommand command, CancellationToken cancellationToken)
     {
         var submission = await _submissionRepository.GetSafeAsync(command.SubmissionId, cancellationToken);
+
+        var existingMediaIds = submission.Media.Items.Select(s => s.Id).ToList();
 
         await submission.UploadFile(new MediaCreateData(command.File, false, 1), _mediaStorage);
 
         _submissionRepository.Update(submission);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var newMediaId = submission.Media.Items.Select(s => s.Id).Where(d => !existingMediaIds.Contains(d)).FirstOrDefault();
+
+        return newMediaId;
     }
 }
 

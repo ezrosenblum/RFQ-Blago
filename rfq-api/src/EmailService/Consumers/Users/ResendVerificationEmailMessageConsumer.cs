@@ -36,7 +36,7 @@ public sealed class ResendVerificationEmailMessageConsumer : IConsumer<ResendVer
 
         await _emailSender.SendAsync(new MailMessageRequest(
             context.Message.Email,
-            "RFQSubmission - Please verify your email",
+            "Supply Streamline - Please verify your email",
             htmlTemplateContent,
             $"{context.Message.FirstName} {context.Message.LastName}"));
     }

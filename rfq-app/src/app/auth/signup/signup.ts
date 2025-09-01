@@ -95,6 +95,7 @@ export class Signup implements OnInit {
       {
         firstName: ['', [Validators.required, Validators.minLength(2)]],
         lastName: ['', [Validators.required, Validators.minLength(2)]],
+        publicUsername: [''],
         email: ['', [Validators.required, Validators.email]],
         role: ['', Validators.required],
         password: [
@@ -291,7 +292,6 @@ export class Signup implements OnInit {
     }
     return standardInvalid;
   }
-
   getFieldError(fieldName: string): string {
     const field = this.signupForm.get(fieldName);
 
@@ -389,6 +389,7 @@ export class Signup implements OnInit {
         const basicFields = [
           'firstName',
           'lastName',
+          'publicUsername',
           'email',
           'role',
           'password',
@@ -500,6 +501,7 @@ export class Signup implements OnInit {
     const userRequest: UserRequest = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
+      publicUsername: formValue.publicUsername,
       email: formValue.email,
       role: formValue.role,
       password: formValue.password,

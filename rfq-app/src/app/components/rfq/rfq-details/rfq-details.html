@@ -10,7 +10,7 @@
       <div class="text-lg font-semibold text-gray-900 dark:text-white">
         {{ 'VENDOR.RFQ_DETAILS' | translate }}
       </div>
-      <div class="text-center ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide">
+      <div *ngIf="currentUser?.type === 'Customer' || currentUser?.type === 'Administrator'" class="text-center ml-auto px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-700 rounded-full text-xs font-medium uppercase tracking-wide">
         {{ quotes.length || 0 }} {{ 'VENDOR.QUOTES_RECEIVED' | translate }}
       </div>
     </div>
@@ -145,7 +145,7 @@
 
     <!-- Vendor Quotes Section -->
     <div class="bg-white dark:bg-gray-800 rounded-xl border-0 shadow-none sm:border sm:border-gray-200 sm:shadow-sm overflow-hidden">
-      <div class="bg-white shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-4 sm:mb-0 sm:shadow-none sm:border-0 flex justify-between items-center flex-wrap gap-4">
+      <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-4 sm:mb-0 sm:shadow-none sm:border-0 flex justify-between items-center flex-wrap gap-4">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
           {{ 'VENDOR.VENDOR_QUOTES' | translate }}
         </h2>

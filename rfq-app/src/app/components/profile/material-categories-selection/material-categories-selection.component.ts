@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import {
   Category,
   Subcategory,
@@ -29,10 +29,12 @@ import { CommonModule } from '@angular/common';
   templateUrl: './material-categories-selection.component.html',
   styleUrl: './material-categories-selection.component.scss',
 })
-export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
+export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, OnChanges {
   @Input() user: User | null = null;
   @Input() isRequestQuote: boolean = false;
   @Input() clearData: Subject<boolean> = new Subject<boolean>();
+  @Input() initialSelectedCategoryIds: Set<number> = new Set<number>();
+  @Input() initialSelectedSubcategoryIds: Set<number> = new Set<number>();
 
   categories: Category[] = [];
   filteredCategories: Category[] = [];
@@ -76,6 +78,18 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
       .subscribe(() => this.clearSelections());
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      (changes['initialSelectedCategoryIds'] && this.initialSelectedCategoryIds?.size) ||
+      (changes['initialSelectedSubcategoryIds'] && this.initialSelectedSubcategoryIds?.size)
+    ) {
+      if (this.categories?.length) {
+        this.applyInitialSelections();
+        this.updateFilteredCategories();
+      }
+    }
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -98,8 +112,33 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy {
     this.isLoading = false;
     this.categories = categories;
     this.rebuildIndexes(categories);
+    this.applyInitialSelections();
     this.initializeUserSelections();
     this.updateFilteredCategories();
+  }
+
+  private applyInitialSelections(): void {
+    if (this.initialSelectedCategoryIds?.size) {
+      for (const id of this.initialSelectedCategoryIds) {
+        this.selectedCategoryIds.add(id);
+        this.expandedCategories.add(id);
+      }
+    }
+
+    if (this.initialSelectedSubcategoryIds?.size) {
+      for (const subId of this.initialSelectedSubcategoryIds) {
+        this.selectedSubcategoryIds.add(subId);
+
+        const parentId = this.parentBySubId.get(subId);
+        if (parentId != null) {
+          this.selectedCategoryIds.add(parentId);
+          this.expandedCategories.add(parentId);
+        }
+      }
+    }
+
+    this.originalCategoryIds = new Set(this.selectedCategoryIds);
+    this.originalSubcategoryIds = new Set(this.selectedSubcategoryIds);
   }
 
   private rebuildIndexes(categories: Category[]): void {

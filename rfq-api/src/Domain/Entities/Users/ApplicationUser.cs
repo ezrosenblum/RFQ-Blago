@@ -51,6 +51,7 @@ namespace Domain.Entities.User
         public UserStatus Status { get; set; }
         public Guid Uid { get; private set; }
         public Media Media { get; set; } = null!;
+        public string? PublicUsername { get; private set; }
         public string? PasswordResetToken { get; private set; }
         public string? EmailVerificationToken { get; private set; }
         public string? SuspensionReason { get; private set; }
@@ -84,7 +85,8 @@ namespace Domain.Entities.User
                 Media = new Media(MediaEntityType.User),
                 PhoneNumber = data.PhoneNumber,
                 Status = UserStatus.AwaitingConfirmation,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                PublicUsername = data.PublicUsername
             };
 
             user.AddDomainEvent(new UserCreatedEvent(user));
@@ -104,6 +106,7 @@ namespace Domain.Entities.User
             Email = data.Email.ToLower();
             UserName = data.Email.ToLower();
             PhoneNumber = data.PhoneNumber;
+            PublicUsername = data.PublicUsername;
 
             AddDomainEvent(new UserUpdatedEvent(this));
         }

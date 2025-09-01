@@ -39,28 +39,29 @@ export class AlertService {
     });
   }
 
-  private open(message: string) {
+  private open(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') {
     this.snackBar.open(message, undefined, {
       duration: 3000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
+      panelClass: [`alert`, `alert-${type}`]
     });
   }
 
   success(key: string) {
-    this.translate.get(key).subscribe((msg) => this.open(msg));
+    this.translate.get(key).subscribe((msg) => this.open(msg, 'success'));
   }
 
   error(key: string) {
-    this.translate.get(key).subscribe((msg) => this.open(msg));
-  }
-
-  info(key: string) {
-    this.translate.get(key).subscribe((msg) => this.open(msg));
+    this.translate.get(key).subscribe((msg) => this.open(msg, 'error'));
   }
 
   warn(key: string) {
-    this.translate.get(key).subscribe((msg) => this.open(msg));
+    this.translate.get(key).subscribe((msg) => this.open(msg, 'warning'));
+  }
+
+  info(key: string) {
+    this.translate.get(key).subscribe((msg) => this.open(msg, 'info'));
   }
 
   openSnackBar(message: string) {
