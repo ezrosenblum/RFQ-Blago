@@ -38,6 +38,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
   submissionListRequest: SubmissionTableRequest = {
+    status: [],
     paging: {
       pageNumber: 1,
       pageSize: 10,
@@ -269,25 +270,31 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.filterForm
       .get('status')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.currentPage = 1;
-        this.applyFilters();
+      .subscribe((data) => {
+        if (data) {
+          this.currentPage = 1;
+          this.applyFilters();
+        }
       });
 
     this.filterForm
       .get('dateFrom')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.currentPage = 1;
-        this.applyFilters();
+      .subscribe((data) => {
+        if (data) {
+          this.currentPage = 1;
+          this.applyFilters();
+        }
       });
 
     this.filterForm
       .get('dateTo')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.currentPage = 1;
-        this.applyFilters();
+      .subscribe((data) => {
+        if (data) {
+          this.currentPage = 1;
+          this.applyFilters();
+        }
       });
   }
 
@@ -333,13 +340,95 @@ export class VendorRfqs implements OnInit, OnDestroy {
       });
   }
 
+selectStatisticsFilter(status: string) {
+  let findStatus;
+  let dateFrom;
+  let dateTo;
+  
+  let statusList = [];
+  if (
+    status === 'Pending Review' ||
+    status === 'Approved' ||
+    status === 'Rejected' ||
+    status === 'reviewed'
+  ) {
+    findStatus = this.statusOptions.find(el => el.name == status);
+    statusList.push(findStatus?.id)
+  } else if (status == 'last') {
+    dateTo = new Date();
+    dateFrom = new Date();
+    dateFrom.setHours(dateFrom.getHours() - 24);
+  } 
+  
+  if (status == 'Reviewed'){
+    let findApprovedStatus = this.statusOptions.find(el => el.name == 'Approved');
+    let findRejectedStatus = this.statusOptions.find(el => el.name == 'Rejected');
+    this.filterForm.get('status')?.setValue(null);
+     this.submissionListRequest.status = [];
+    let areFiltersEmpty = this.highlightTotalRfqs();
+    if (areFiltersEmpty) {
+      this.submissionListRequest.status = [findApprovedStatus!.id, findRejectedStatus!.id];
+      this.applyFilters();
+    }
+  } 
+
+  this.filterForm.setValue({
+    search: '',
+    status: status != 'Reviewed' && findStatus ? findStatus.id : null,
+    category: [],
+    subcategory: [],
+    dateFrom: dateFrom ? dateFrom.toISOString().slice(0, 10) : '',
+    dateTo: dateTo ? dateTo.toISOString().slice(0, 10) : '',
+  });
+
+  this.currentPage = 1;
+  this.isLoading = true;
+}
+
+highlightTotalRfqs() {
+  return  !this.filterForm.get('search')?.value && 
+          !this.filterForm.get('status')?.value && 
+          !this.filterForm.get('dateFrom')?.value && 
+          !this.filterForm.get('dateTo')?.value && 
+          (!this.filterForm.get('category')?.value || this.filterForm.get('category')?.value.length < 1) && 
+          (!this.filterForm.get('subcategory')?.value || this.filterForm.get('subcategory')?.value.length < 1) &&
+          (!this.submissionListRequest.status || this.submissionListRequest.status.length < 1)
+}
+
+highlightReviewedRfqs() {
+  return !this.filterForm.get('status')?.value && this.submissionListRequest.status && this.submissionListRequest.status.length == 2;
+}
+
+highlightStatusRfqs(status: string) {
+  let findStatus = this.statusOptions.find(el => el.name == status);
+  return this.filterForm.get('status')?.value == findStatus?.id;
+}
+
+highlightLastRfqs(): boolean {
+  const dateFrom = this.filterForm.get('dateFrom')?.value;
+  const dateTo = this.filterForm.get('dateTo')?.value;
+
+  if (!dateFrom || !dateTo) {
+    return false;
+  }
+
+  const from = new Date(dateFrom);
+  const to = new Date(dateTo);
+
+  const now = new Date();
+  const last24h = new Date();
+  last24h.setHours(last24h.getHours() - 24);
+  return from.toISOString().slice(0, 10) >= last24h.toISOString().slice(0, 10) && to.toISOString().slice(0, 10) <= now.toISOString().slice(0, 10);
+}
+
   applyFilters(): void {
     this.submissionListRequest.query =
       this.filterForm.get('search')?.value.trim() || undefined;
     this.submissionListRequest.userId = this.userId!;
     const statusVal = this.filterForm.get('status')?.value;
-    this.submissionListRequest.status =
-      typeof statusVal === 'number' ? statusVal : undefined;
+    if (typeof statusVal === 'number') {
+      this.submissionListRequest.status = [statusVal];
+    }
     this.submissionListRequest.category =
       this.filterForm.get('category')?.value || [];
     this.submissionListRequest.subcategory =
@@ -485,6 +574,20 @@ export class VendorRfqs implements OnInit, OnDestroy {
       dateTo: '',
     });
     this.currentPage = 1;
+
+    this.submissionListRequest = {
+      status: [],
+      paging: {
+        pageNumber: 1,
+        pageSize: 10,
+      },
+      sorting: {
+        field: 1,
+        sortOrder: 2,
+      },
+    };
+    this.isLoading = true;
+
     this.loadRfqs();
   }
 

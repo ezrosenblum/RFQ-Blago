@@ -25,9 +25,9 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8" *ngIf="currentUser?.type !== 'Vendor'">
       <div class="card">
-        <div class="card-body text-center">
+        <div class="card-body text-center pointer" (click)="clearFilters()" [ngClass]="{'active-chip' : highlightTotalRfqs()}">
           <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
             {{ statistics.submissionsCount }}
           </div>
@@ -38,7 +38,7 @@
       </div>
 
       <div class="card">
-        <div class="card-body text-center">
+        <div class="card-body text-center pointer" (click)="selectStatisticsFilter('Pending Review')" [ngClass]="{'active-chip' : highlightStatusRfqs('Pending Review')}">
           <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">
             {{ statistics.pendingSubmissionsCount }}
           </div>
@@ -49,7 +49,7 @@
       </div>
 
       <div class="card">
-        <div class="card-body text-center">
+        <div class="card-body text-center pointer" (click)="selectStatisticsFilter('Reviewed')" [ngClass]="{'active-chip' : highlightReviewedRfqs()}">
           <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
             {{ statistics.reviewedSubmissionsCount }}
           </div>
@@ -60,7 +60,7 @@
       </div>
 
       <div class="card">
-        <div class="card-body text-center">
+        <div class="card-body text-center pointer"  (click)="selectStatisticsFilter('Approved')" [ngClass]="{'active-chip' : highlightStatusRfqs('Approved')}">
           <div class="text-2xl font-bold text-success-600 dark:text-success-400">
             {{ statistics.acceptedSubmissionsCount }}
           </div>
@@ -71,7 +71,7 @@
       </div>
 
       <div class="card">
-        <div class="card-body text-center">
+        <div class="card-body text-center pointer"  (click)="selectStatisticsFilter('Rejected')" [ngClass]="{'active-chip' : highlightStatusRfqs('Rejected')}">
           <div class="text-2xl font-bold text-error-600 dark:text-error-400">
             {{ statistics.rejectedSubmissionsCount }}
           </div>
@@ -82,7 +82,7 @@
       </div>
 
       <div class="card">
-        <div class="card-body text-center">
+        <div class="card-body text-center pointer"  (click)="selectStatisticsFilter('last')" [ngClass]="{'active-chip' : highlightLastRfqs()}">
           <div class="text-2xl font-bold text-success-600 dark:text-success-400">
             {{ statistics.last24HoursSubmissionsCount }}
           </div>
@@ -218,7 +218,7 @@
               </div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" *ngIf="currentUser?.type !== 'Vendor'">
               <label for="status" class="form-label">{{ 'VENDOR.STATUS' | translate }}</label>
               <select id="status" formControlName="status" class="form-select">
                 <option *ngFor="let option of statusOptions" [value]="option.id">
