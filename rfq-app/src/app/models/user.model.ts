@@ -3,6 +3,7 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
+  publicUsername?: string;
   phoneNumber?: string;
   profilePicture?: string;
   status: LookupValue;
@@ -133,6 +134,7 @@ export interface MessageAdminConversationEntry {
       picture: string;
       receiveEmailNotifications: boolean;
       receivePushNotifications: boolean;
+      publicUsername: string;
     };
     submissionDate: string;
     isValid: boolean;
@@ -152,7 +154,7 @@ export interface MessageAdminConversationEntry {
     name: string;
   };
   quoteValidityInterval: number;
-  validUntil: string; 
+  validUntil: string;
   submissionId: number;
   vendorId: number;
   vendor: {
@@ -171,8 +173,9 @@ export interface MessageAdminConversationEntry {
     picture: string | null;
     receiveEmailNotifications: boolean;
     receivePushNotifications: boolean;
+    publicUsername: string | null;
   };
-  created: string; 
+  created: string;
   media: {
     items: any[];
   };

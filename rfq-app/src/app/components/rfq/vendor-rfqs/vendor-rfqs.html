@@ -378,13 +378,12 @@
                       <span
                         class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-[0.5px]">{{ 'VENDOR.SUBMITTED_BY' | translate }}</span>
                       <div class="flex items-center gap-2">
-                        <div
-                          class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
-                          {{ getInitials(rfq.user?.firstName, rfq.user?.lastName) }}
+                        <div class="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold text-sm">
+                          {{ getUserInitials(rfq.user) }}
                         </div>
                         <div class="flex flex-col">
                           <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                            {{ rfq.user?.firstName }} {{ rfq.user?.lastName }}
+                            {{ getUserDisplayName(rfq.user) }}
                           </span>
                         </div>
                       </div>
@@ -595,7 +594,7 @@
 
                     <td class="px-6 py-4">
                       <div class="text-xs text-secondary-900 dark:text-secondary-100 max-w-xs">
-                        {{ rfq.user?.firstName }} <br>
+                        {{ rfq.user?.publicUsername || rfq.user?.firstName }} <br>
                         {{ truncateText(rfq.jobLocation!, 40) }} <br>
                         {{ rfq.submissionDate! | date:'mediumDate' }}
                       </div>

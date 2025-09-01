@@ -686,10 +686,41 @@ highlightLastRfqs(): boolean {
     return rfq.id!;
   }
 
-  getInitials(firstName?: string, lastName?: string): string {
-    const first = firstName ? firstName.charAt(0).toUpperCase() : '';
-    const last = lastName ? lastName.charAt(0).toUpperCase() : '';
-    return first + last || '?';
+  getUserDisplayName(user: any): string {
+    if (!user) return '';
+
+    if (user.publicUsername) {
+      return user.publicUsername;
+    }
+
+    if (user.firstName || user.lastName) {
+      return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    }
+
+    return user.email;
+  }
+
+  getUserInitials(user: any): string {
+    if (!user) return '';
+
+    if (user.publicUsername) {
+      const parts = user.publicUsername.trim().split(' ').filter((p: string)  => p.length > 0); // remove empty strings
+
+      if (parts.length > 1) {
+        const firstInitial = parts[0][0] || '';
+        const secondInitial = parts[1][0] || '';
+        return (firstInitial + secondInitial).toUpperCase();
+      }
+
+      const firstInitial = parts[0]?.[0] || '';
+      return firstInitial.toUpperCase();
+    }
+
+    if (user.firstName || user.lastName) {
+      return `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || ''}`.toUpperCase();
+    }
+
+    return user.email?.charAt(0).toUpperCase() || '';
   }
 
   getUnitColor(unitName: string): string {
@@ -1045,16 +1076,17 @@ highlightLastRfqs(): boolean {
   }
 
   onViewDetails(id: number): void {
-    this._rfqService
-      .viewedRfq(id)
-      .pipe(take(1))
-      .subscribe({
+    if (this.currentUser?.type === 'Vendor') {
+      this._rfqService.viewedRfq(id).pipe(take(1)).subscribe({
         next: () => this._router.navigate(['/vendor-rfqs', id]),
         error: (err) => {
           this.handleError(err);
           this._router.navigate(['/vendor-rfqs', id]);
         },
       });
+    } else {
+      this._router.navigate(['/vendor-rfqs', id]);
+    }
   }
 
   getStatusCount(rfq: Rfq, statusName: string): number {
