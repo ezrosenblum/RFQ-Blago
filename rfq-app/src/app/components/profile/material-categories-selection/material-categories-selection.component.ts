@@ -56,6 +56,9 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
+  // Maximum categories allowed
+  readonly MAX_CATEGORIES = 5;
+
   private destroy$ = new Subject<void>();
   private searchInput$ = new BehaviorSubject<string>('');
 
@@ -70,7 +73,9 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
 
   ngOnInit(): void {
     this.loadCategories();
-    this.clearData.pipe(takeUntil(this.destroy$)).subscribe(() => this.clearSelections());
+    this.clearData
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.clearSelections());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -216,9 +221,12 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
 
   toggleSelection(itemId: number, type: ItemType): void {
     this.clearMessages();
-    type === 'category'
-      ? this.toggleCategorySelection(itemId)
-      : this.toggleSubcategorySelection(itemId);
+
+    if (type === 'category') {
+      this.toggleCategorySelection(itemId);
+    } else {
+      this.toggleSubcategorySelection(itemId);
+    }
   }
 
   private toggleCategorySelection(categoryId: number): void {
@@ -228,6 +236,10 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     if (this.selectedCategoryIds.has(categoryId)) {
       this.deselectCategory(category);
     } else {
+      if (this.selectedCategoryIds.size >= this.MAX_CATEGORIES) {
+        this.showMaxCategoriesError();
+        return;
+      }
       this.selectCategory(category);
     }
   }
@@ -251,6 +263,14 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     if (this.selectedSubcategoryIds.has(subcategoryId)) {
       this.deselectSubcategory(subcategoryId, parentCategoryId);
     } else {
+      // Check if adding this subcategory would add a new parent category and exceed the limit
+      if (
+        !this.selectedCategoryIds.has(parentCategoryId) &&
+        this.selectedCategoryIds.size >= this.MAX_CATEGORIES
+      ) {
+        this.showMaxCategoriesError();
+        return;
+      }
       this.selectSubcategory(subcategoryId, parentCategoryId);
     }
   }
@@ -272,6 +292,17 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     if (!anyRemaining) this.selectedCategoryIds.delete(parentCategoryId);
   }
 
+  private showMaxCategoriesError(): void {
+    this.scrollToTop();
+    this.translate
+      .get('PROFILE.MAX_CATEGORIES_ERROR', { max: this.MAX_CATEGORIES })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
+        this.errorMessage = message;
+        this.clearMessageAfterDelay(4000, 'error');
+      });
+  }
+
   getSelectionState(itemId: number, type: ItemType): SelectionState {
     if (type === 'subcategory')
       return this.selectedSubcategoryIds.has(itemId) ? 'full' : 'none';
@@ -290,6 +321,29 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     if (selectedCount === 0) return 'none';
     if (selectedCount === subs.length) return 'full';
     return 'partial';
+  }
+
+  canSelectCategory(categoryId: number): boolean {
+    if (this.selectedCategoryIds.has(categoryId)) {
+      return true; // Already selected, can be deselected
+    }
+    return this.selectedCategoryIds.size < this.MAX_CATEGORIES;
+  }
+
+
+  canSelectSubcategory(subcategoryId: number): boolean {
+    const parentCategoryId = this.parentBySubId.get(subcategoryId);
+    if (parentCategoryId == null) return false;
+
+    if (this.selectedSubcategoryIds.has(subcategoryId)) {
+      return true; 
+    }
+
+    if (this.selectedCategoryIds.has(parentCategoryId)) {
+      return true;
+    }
+
+    return this.selectedCategoryIds.size < this.MAX_CATEGORIES;
   }
 
   toggleExpanded(categoryId: number): void {
@@ -357,6 +411,10 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     return this.selectedSubcategoryIds.size;
   }
 
+  getSelectedCategoriesCount(): number {
+    return this.selectedCategoryIds.size;
+  }
+
   hasSelectionChanged(): boolean {
     return (
       !this.setsEqual(this.selectedCategoryIds, this.originalCategoryIds) ||
@@ -373,6 +431,7 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     for (const v of a) if (!b.has(v)) return false;
     return true;
   }
+
   onSaveSpecialties(): void {
     if (this.isSaving) return;
     this.clearMessages();
@@ -383,7 +442,8 @@ export class MaterialCategoriesSelectionComponent implements OnInit, OnDestroy, 
     const parentCategoriesFromSubs = new Set<number>();
     for (const subId of this.selectedSubcategoryIds) {
       const parentCategoryId = this.parentBySubId.get(subId);
-      if (parentCategoryId != null) parentCategoriesFromSubs.add(parentCategoryId);
+      if (parentCategoryId != null)
+        parentCategoriesFromSubs.add(parentCategoryId);
     }
 
     const allCategoryIds = new Set<number>([

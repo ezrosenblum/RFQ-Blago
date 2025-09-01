@@ -42,7 +42,6 @@
     <form
       class="mt-8 space-y-6 flex flex-col items-center"
       [formGroup]="signupForm"
-      (ngSubmit)="onSubmit()"
     >
       <!-- Error Message -->
       <div *ngIf="errorMessage" class="alert alert-error fade-in" role="alert">
@@ -586,6 +585,7 @@
           type="submit"
           class="btn btn-primary w-full flex justify-center py-3 px-4"
           [disabled]="isLoading || !isFormValidForCurrentStep()"
+          (click)="onSubmit()"
         >
           <span *ngIf="!isLoading">{{ getSubmitButtonText() }}</span>
           <div *ngIf="isLoading" class="flex items-center">
@@ -619,4 +619,3 @@
     </div>
   </div>
 </div>
-

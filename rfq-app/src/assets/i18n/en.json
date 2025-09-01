@@ -92,6 +92,7 @@
     "ERROR_GENERIC": "An unexpected error has occurred. Please try again later.",
     "DRAG_DROP_CERTIFICATE": "Drag and drop your business certificate here",
     "BROWSE": "Browse",
+    "LOCATION_REQUIRED_ERROR": "Please set your service area location before proceeding.",
     "VALIDATION": {
       "REQUIRED": "{{field}} is required",
       "EMAIL": "Please enter a valid email address",
@@ -517,7 +518,9 @@
     "CERTIFICATE_REMOVED": "Business certificate removed.",
     "CLICK_TO_UPLOAD": "Click to upload",
     "OR_DRAG_AND_DROP": "or drag and drop",
-    "REMOVE_FILE": "Remove File"
+    "REMOVE_FILE": "Remove File",
+    "MAX_CATEGORIES_ERROR": "You can select a maximum of 5 categories.",
+    "ROLE": "Role"
   },
   "ALERTS": {
     "CONFIRM": "Confirm",
