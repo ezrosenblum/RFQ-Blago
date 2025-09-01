@@ -6,8 +6,3 @@ public sealed record StatusDistributionData
     public int Count { get; init; }
     public decimal Percentage { get; init; }
 }
-
-public sealed record StatusDistributionResponse
-{
-    public IReadOnlyCollection<StatusDistributionData> StatusDistribution { get; init; } = new List<StatusDistributionData>();
-}

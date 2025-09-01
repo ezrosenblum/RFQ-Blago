@@ -7,8 +7,3 @@ public sealed record SubmissionTimelineData
     public int CompletedCount { get; init; }
     public decimal CompletionRate { get; init; }
 }
-
-public sealed record SubmissionTimelineResponse
-{
-    public IReadOnlyCollection<SubmissionTimelineData> Timeline { get; init; } = new List<SubmissionTimelineData>();
-}
