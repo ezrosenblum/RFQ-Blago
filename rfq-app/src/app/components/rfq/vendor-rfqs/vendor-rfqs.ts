@@ -235,13 +235,13 @@ export class VendorRfqs implements OnInit, OnDestroy {
     }
     
     if (queryParams['category']) {
-      (this.submissionListRequest as any).category = Array.isArray(queryParams['category']) ? 
+      (this.submissionListRequest as SubmissionTableRequest).category = Array.isArray(queryParams['category']) ? 
         queryParams['category'].map((id: string) => +id) : 
         [+queryParams['category']];
     }
     
     if (queryParams['subcategory']) {
-      (this.submissionListRequest as any).subcategory = Array.isArray(queryParams['subcategory']) ? 
+      (this.submissionListRequest as SubmissionTableRequest).subcategory = Array.isArray(queryParams['subcategory']) ? 
         queryParams['subcategory'].map((id: string) => +id) : 
         [+queryParams['subcategory']];
     }
