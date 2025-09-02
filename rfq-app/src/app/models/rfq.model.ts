@@ -33,8 +33,8 @@ export interface SubmissionTableRequest {
   userId?: number;
   status: number[];
   unit?: number;
-  category?: number;
-  subcategory?: number;
+  category?: number[];
+  subcategory?: number[];
   dateFrom?: Date;
   dateTo?: Date;
   paging: Paging;

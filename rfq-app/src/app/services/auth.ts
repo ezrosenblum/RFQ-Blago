@@ -75,7 +75,7 @@ export class Auth {
 
   resetPassword(data: PasswordResetRequest): Observable<void> {
     return this.http
-      .post<void>(`${this.API_URL}/User/reset-password`, data)
+      .post<void>(`${this.API_URL}User/reset-password`, data)
       .pipe(
         catchError((err) => {
           return throwError(() => err);
@@ -152,7 +152,7 @@ export class Auth {
 
   forgotPassword(forgotPassword: { email: string }): Observable<void> {
     return this.http
-      .post<void>(`${this.API_URL}/User/forgot-password`, forgotPassword)
+      .post<void>(`${this.API_URL}User/forgot-password`, forgotPassword)
       .pipe(
         catchError((err) => {
           return throwError(() => err);
