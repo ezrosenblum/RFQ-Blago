@@ -48,7 +48,9 @@ public sealed class ResetPasswordCommandHandler : ICommandHandler<ResetPasswordC
 
         var tokenDecoded = HttpUtility.UrlDecode(request.Token);
 
-        if (tokenDecoded != user.PasswordResetToken)
+        var passwordResetTokenDecoded = HttpUtility.UrlDecode(user.PasswordResetToken);
+
+        if (tokenDecoded != user.PasswordResetToken && tokenDecoded != passwordResetTokenDecoded)
             throw new ApplicationException("Invalid token");
 
         var removePasswordResult = await _userManager.RemovePasswordAsync(user);
