@@ -57,8 +57,6 @@ export class Login implements OnInit, OnDestroy {
         }
       }
     });
-
-    this.getQueryParams();
   }
 
   ngOnDestroy(): void {
@@ -80,18 +78,6 @@ export class Login implements OnInit, OnDestroy {
         Validators.maxLength(50)
       ]],
       rememberMe: [false]
-    });
-  }
-  getQueryParams(): void {
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      if (Object.keys(params).length > 0) {
-        if (params['waitingVerification']) {
-          this.showResentEmailButton = true;
-        }
-        if (params['email']) {
-          this.registeredEmail = params['email'];
-        }
-      }
     });
   }
 
@@ -123,6 +109,10 @@ export class Login implements OnInit, OnDestroy {
           },
           error: (error) => {
             this.isLoading = false;
+            if (error.error.detail && error.error.detail === 'Account not verified'){
+              this.showResentEmailButton = true;
+              this.registeredEmail = this.loginForm.value.email.trim().toLowerCase();
+            }
             error.error.detail ? this.errorMessage = error.error.detail : this.handleLoginError(error);
           }
         });

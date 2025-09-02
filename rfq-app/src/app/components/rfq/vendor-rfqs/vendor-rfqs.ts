@@ -1,7 +1,7 @@
 // src/app/rfq/vendor-rfqs/vendor-rfqs.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, take } from 'rxjs';
 import {
   Category,
@@ -133,6 +133,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
   };
   showFullDescription = false;
   isOverflowing: Record<string, boolean> = {};
+  private initialLoad = true;
 
   constructor(
     private _fb: FormBuilder,
@@ -142,12 +143,15 @@ export class VendorRfqs implements OnInit, OnDestroy {
     private _translate: TranslateService,
     private _dialog: MatDialog,
     private _alert: AlertService,
+    private _route: ActivatedRoute,
     private breakpointObserver: BreakpointObserver
   ) {
     this.initializeFilterForm();
   }
 
   ngOnInit(): void {
+    this.loadFiltersFromQueryParams();
+
     // Check authentication and user role
     this._authService.currentUser$
       .pipe(takeUntil(this.destroy$))
@@ -199,6 +203,151 @@ export class VendorRfqs implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  private loadFiltersFromQueryParams(): void {
+    const queryParams = this._route.snapshot.queryParams;
+    
+    // Create form values object
+    const formValues: any = {
+      search: queryParams['search'] || '',
+      status: queryParams['status'] ? +queryParams['status'] : null,
+      category: queryParams['category'] ? 
+        (Array.isArray(queryParams['category']) ? 
+          queryParams['category'].map((id: string) => +id) : 
+          [+queryParams['category']]) : [],
+      subcategory: queryParams['subcategory'] ? 
+        (Array.isArray(queryParams['subcategory']) ? 
+          queryParams['subcategory'].map((id: string) => +id) : 
+          [+queryParams['subcategory']]) : [],
+      dateFrom: queryParams['dateFrom'] || '',
+      dateTo: queryParams['dateTo'] || ''
+    };
+
+    // Update form with query param values
+    this.filterForm.patchValue(formValues);
+
+    // Update submission request with query params
+    if (queryParams['search']) {
+      this.submissionListRequest.query = queryParams['search'];
+    }
+    
+    if (queryParams['status']) {
+      this.submissionListRequest.status = [+queryParams['status']];
+    }
+    
+    if (queryParams['category']) {
+      (this.submissionListRequest as any).category = Array.isArray(queryParams['category']) ? 
+        queryParams['category'].map((id: string) => +id) : 
+        [+queryParams['category']];
+    }
+    
+    if (queryParams['subcategory']) {
+      (this.submissionListRequest as any).subcategory = Array.isArray(queryParams['subcategory']) ? 
+        queryParams['subcategory'].map((id: string) => +id) : 
+        [+queryParams['subcategory']];
+    }
+    
+    if (queryParams['dateFrom']) {
+      this.submissionListRequest.dateFrom = queryParams['dateFrom'];
+    }
+    
+    if (queryParams['dateTo']) {
+      this.submissionListRequest.dateTo = queryParams['dateTo'];
+    }
+
+    // Update pagination from query params
+    if (queryParams['page']) {
+      this.currentPage = +queryParams['page'];
+      this.submissionListRequest.paging.pageNumber = this.currentPage;
+    }
+
+    if (queryParams['pageSize']) {
+      this.pageSize = +queryParams['pageSize'];
+      this.submissionListRequest.paging.pageSize = this.pageSize;
+    }
+
+    // Update sorting from query params
+    if (queryParams['sortBy']) {
+      this.sortBy = +queryParams['sortBy'] as any;
+      this.submissionListRequest.sorting.field = this.sortBy;
+    }
+
+    if (queryParams['sortDirection']) {
+      this.sortDirection = queryParams['sortDirection'] as 'asc' | 'desc';
+      this.submissionListRequest.sorting.sortOrder = this.sortDirection === 'asc' ? 1 : 2;
+    }
+
+    // Update view mode from query params
+    if (queryParams['viewMode'] && ['card', 'table'].includes(queryParams['viewMode'])) {
+      this.viewMode = queryParams['viewMode'] as 'card' | 'table';
+    }
+  }
+
+  private updateUrlQueryParams(): void {
+    if (this.initialLoad) {
+      this.initialLoad = false;
+      return; // Don't update URL on initial load
+    }
+
+    const queryParams: any = {};
+    const formValues = this.filterForm.value;
+
+    // Add form values to query params if they have values
+    if (formValues.search?.trim()) {
+      queryParams.search = formValues.search.trim();
+    }
+
+    if (formValues.status) {
+      queryParams.status = formValues.status;
+    }
+
+    if (formValues.category?.length > 0) {
+      queryParams.category = formValues.category;
+    }
+
+    if (formValues.subcategory?.length > 0) {
+      queryParams.subcategory = formValues.subcategory;
+    }
+
+    if (formValues.dateFrom?.trim()) {
+      queryParams.dateFrom = formValues.dateFrom.trim();
+    }
+
+    if (formValues.dateTo?.trim()) {
+      queryParams.dateTo = formValues.dateTo.trim();
+    }
+
+    // Add pagination params if not default values
+    if (this.currentPage !== 1) {
+      queryParams.page = this.currentPage;
+    }
+
+    if (this.pageSize !== 10) {
+      queryParams.pageSize = this.pageSize;
+    }
+
+    // Add sorting params if not default values
+    if (this.sortBy !== 1) {
+      queryParams.sortBy = this.sortBy;
+    }
+
+    if (this.sortDirection !== 'desc') {
+      queryParams.sortDirection = this.sortDirection;
+    }
+
+    // Add view mode if not default
+    if (this.viewMode !== 'card') {
+      queryParams.viewMode = this.viewMode;
+    }
+
+    // Update URL without triggering navigation
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: queryParams,
+      queryParamsHandling: 'replace',
+      replaceUrl: true
+    });
+  }
+
   loadStatuses(): void {
     this._rfqService
       .getRfqStatuses()
@@ -219,7 +368,20 @@ export class VendorRfqs implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (categories) => {
-          this.categoryOptions = categories;
+          if (this.currentUser?.type == 'Vendor') {
+            if (this.currentUser?.categories) {
+              this.categoryOptions = categories.filter(category => 
+                this.currentUser!.categories.some(userCategory => 
+                  userCategory.id === category.id
+                )
+              );
+            } else {
+              this.categoryOptions = [];
+            }
+          } else {
+            this.categoryOptions = categories;
+          }
+
           this.updateSubcategoriesFromSelected();
         },
         error: () => {
@@ -263,18 +425,36 @@ export class VendorRfqs implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.currentPage = 1;
+        this.updateUrlQueryParams();
         this.applyFilters();
       });
 
-    // Other filters without debounce
+  // Other filters without debounce
+  this.filterForm
+    .get('status')
+    ?.valueChanges.pipe(takeUntil(this.destroy$))
+    .subscribe((data) => {
+      if (data) {
+        this.currentPage = 1;
+        this.updateUrlQueryParams();
+        this.applyFilters();
+      }
+    });
+
     this.filterForm
-      .get('status')
+      .get('category')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe((data) => {
-        if (data) {
-          this.currentPage = 1;
-          this.applyFilters();
-        }
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.updateUrlQueryParams();
+      });
+
+    this.filterForm
+      .get('subcategory')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.updateUrlQueryParams();
       });
 
     this.filterForm
@@ -283,6 +463,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
       .subscribe((data) => {
         if (data) {
           this.currentPage = 1;
+          this.updateUrlQueryParams();
           this.applyFilters();
         }
       });
@@ -293,6 +474,7 @@ export class VendorRfqs implements OnInit, OnDestroy {
       .subscribe((data) => {
         if (data) {
           this.currentPage = 1;
+          this.updateUrlQueryParams();
           this.applyFilters();
         }
       });
@@ -380,6 +562,8 @@ selectStatisticsFilter(status: string) {
     dateFrom: dateFrom ? dateFrom.toISOString().slice(0, 10) : '',
     dateTo: dateTo ? dateTo.toISOString().slice(0, 10) : '',
   });
+
+  this.updateUrlQueryParams();
 
   this.currentPage = 1;
   this.isLoading = true;
@@ -587,6 +771,13 @@ highlightLastRfqs(): boolean {
       },
     };
     this.isLoading = true;
+
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: {},
+      queryParamsHandling: 'replace',
+      replaceUrl: true
+    });
 
     this.loadRfqs();
   }

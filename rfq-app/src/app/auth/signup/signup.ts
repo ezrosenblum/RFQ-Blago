@@ -656,16 +656,7 @@ export class Signup implements OnInit {
   }
 
   navigateToLogin(setParams: boolean): void {
-    if (!setParams) {
-      this.router.navigate(['/auth/login']);
-    } else {
-      this.router.navigate(['/auth/login'], {
-        queryParams: {
-          waitingVerification: setParams,
-          email: this.registeredEmail,
-        },
-      });
-    }
+    this.router.navigate(['/auth/login']);
   }
 
   handleServiceAreaChange(data: {

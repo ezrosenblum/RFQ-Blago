@@ -31,9 +31,9 @@
         />
       </div>
 
-      <div class="relative flex align-items-center mb-2" *ngIf="isAdmin">
-          <p class="mb-0 mr-10 flex-1">Vendor</p>
-          <mat-form-field appearance="outline" class="flex-2">
+      <div class="relative mb-2" *ngIf="isAdmin">
+          <p class="mb-0 mr-10">Vendor</p>       
+          <mat-form-field appearance="outline" class="w-100">
             <svg
               class="absolute left-3 top-20 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
               fill="none"
@@ -47,7 +47,7 @@
                 d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               ></path>
             </svg>
-            <input type="text" matInput [formControl]="vendorSearchControl" [matAutocomplete]="auto" placeholder="Search" class="pl-35 bg-input-gray">
+            <input type="text" matInput [formControl]="vendorSearchControl" [matAutocomplete]="auto" placeholder="Find a vendor" class="pl-35 bg-input-gray">
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onVendorSelected($event)">
               <mat-option [value]="null">All</mat-option>
               @for (option of filteredVendorOptions | async; track option) {
@@ -59,9 +59,9 @@
           </mat-form-field>
       </div>
 
-      <div class="relative flex align-items-center" *ngIf="isAdmin">
-          <p class="mb-0 mr-10 flex-1">Customer</p>
-          <mat-form-field appearance="outline" class="flex-2">
+      <div class="relative align-items-center" *ngIf="isAdmin">
+          <p class="mb-0 mr-10">Customer</p>       
+          <mat-form-field appearance="outline" class="w-100">
             <svg
               class="absolute left-3 top-20 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
               fill="none"
@@ -75,7 +75,7 @@
                 d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               ></path>
             </svg>
-            <input type="text" matInput [formControl]="customerSearchControl" [matAutocomplete]="auto" placeholder="Search" class="pl-35 bg-input-gray">
+            <input type="text" matInput [formControl]="customerSearchControl" [matAutocomplete]="auto" placeholder="Find a customer" class="pl-35 bg-input-gray">
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onCustomerSelected($event)">
               <mat-option [value]="null">All</mat-option>
               @for (option of filteredCustomerOptions | async; track option) {
@@ -87,7 +87,7 @@
           </mat-form-field>
       </div>
 
-      <div class="relative mt-3" *ngIf="isAdmin">
+      <div class="relative" [ngClass]="isAdmin ? 'mt-7' : 'mt-3'" *ngIf="isAdmin">
         <svg
           class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4"
           fill="none"
@@ -207,17 +207,13 @@
             : '')
         "
       >
-        <div class="flex flex-wrap items-start space-x-3">
-          <div (click)="triggerMessagesMobile(); selectChat(conv, i)"
-            *ngIf="!conv.vendor.picture"
-            matTooltip="{{ conv.vendor.publicUsername || (conv.vendor.firstName + ' ' + conv.vendor.lastName) }}"
-            [class]="'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' + mapLetterToElement(conv.vendor.publicUsername || conv.vendor.firstName)">
-            <ng-container *ngIf="conv.vendor.publicUsername; else vendorNameFallback">
-              {{ transform(conv.vendor.publicUsername) }}
-            </ng-container>
-            <ng-template #vendorNameFallback>
-              {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
-            </ng-template>
+        <div class="flex flex-wrap items-start space-x-2">
+          <div (click)="triggerMessagesMobile(); selectChat(conv, i)" *ngIf="!conv.vendor.picture" matTooltip="{{ conv.vendor.firstName }} {{ conv.vendor.lastName }}"
+            [class]="
+              'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 ' +
+              mapLetterToElement(conv.vendor.firstName)
+            ">
+            {{ transform(conv.vendor.firstName) }} {{ transform(conv.vendor.lastName) }}
           </div>
 
           <div class="user-avatar bg-round" *ngIf="conv.vendor.picture" [style.background-image]="'url(' + conv.vendor.picture + ')'"></div>
@@ -344,34 +340,25 @@
           </div>
 
           <div class="flex" *ngIf="selectedConversation && isAdmin">
-            <div *ngIf="!selectedConversation.submission.user.picture"
-              matTooltip="{{ selectedConversation.vendor.publicUsername || (selectedConversation.vendor.firstName + ' ' + selectedConversation.vendor.lastName) }}"
-              [class]="'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-                mapLetterToElement(selectedConversation.vendor.publicUsername || selectedConversation.vendor.firstName)">
-              <ng-container *ngIf="selectedConversation.vendor.publicUsername; else vendorNameFallback">
-                {{ transform(selectedConversation.vendor.publicUsername) }}
-              </ng-container>
-              <ng-template #vendorNameFallback>
-                {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
-              </ng-template>
+            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
+              [class]="
+                'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
+                mapLetterToElement(selectedConversation.vendor.firstName)
+              "
+            >
+              {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
             </div>
+            <div class="user-avatar bg-round w-10 h-10" *ngIf="selectedConversation.vendor.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" [style.background-image]="'url(' + selectedConversation.vendor.picture + ')'"></div>
 
-
-            <div class="user-avatar bg-round" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
-
-            <div *ngIf="!selectedConversation.submission.user.picture"
-              matTooltip="{{ selectedConversation.vendor.publicUsername || (selectedConversation.vendor.firstName + ' ' + selectedConversation.vendor.lastName) }}"
-              [class]="'w-10 h-10 ml-2 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
-                mapLetterToElement(selectedConversation.submission.user.publicUsername || selectedConversation.submission.user.firstName)">
-              <ng-container *ngIf="selectedConversation.submission.user.publicUsername; else submissionUserFallback">
-                {{ transform(selectedConversation.submission.user.publicUsername) }}
-              </ng-container>
-              <ng-template #submissionUserFallback>
-                {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
-              </ng-template>
+            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}"
+              [class]="
+                'w-10 h-10 ml-2 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
+                mapLetterToElement(selectedConversation.submission.user.firstName)
+              "
+            >
+              {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
             </div>
-
-            <div class="user-avatar bg-round" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+            <div class="user-avatar ml-2 bg-round w-10 h-10" *ngIf="selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
           </div>
           <div *ngIf="selectedConversation">
