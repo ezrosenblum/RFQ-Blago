@@ -50,7 +50,7 @@
             <input type="text" matInput [formControl]="vendorSearchControl" [matAutocomplete]="auto" placeholder="Find a vendor" class="pl-35 bg-input-gray">
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onVendorSelected($event)">
               <mat-option [value]="null">All</mat-option>
-              @for (option of filteredVendorOptions | async; track option) {
+              @for (option of filteredVendors; track option) {
                 <mat-option [value]="option">
                   {{ option.publicUsername || (option.firstName + ' ' + option.lastName) }}
                 </mat-option>
@@ -78,7 +78,7 @@
             <input type="text" matInput [formControl]="customerSearchControl" [matAutocomplete]="auto" placeholder="Find a customer" class="pl-35 bg-input-gray">
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onCustomerSelected($event)">
               <mat-option [value]="null">All</mat-option>
-              @for (option of filteredCustomerOptions | async; track option) {
+                @for (option of filteredCustomers; track option) {
                 <mat-option [value]="option">
                   {{ option.publicUsername || (option.firstName + ' ' + option.lastName) }}
                 </mat-option>
@@ -340,7 +340,7 @@
           </div>
 
           <div class="flex" *ngIf="selectedConversation && isAdmin">
-            <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
+            <div *ngIf="!selectedConversation.vendor.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}"
               [class]="
                 'w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-medium ' +
                 mapLetterToElement(selectedConversation.vendor.firstName)
@@ -348,7 +348,7 @@
             >
               {{ transform(selectedConversation.vendor.firstName) }} {{ transform(selectedConversation.vendor.lastName) }}
             </div>
-            <div class="user-avatar bg-round w-10 h-10" *ngIf="selectedConversation.vendor.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" [style.background-image]="'url(' + selectedConversation.vendor.picture + ')'"></div>
+            <div class="bg-round w-10 h-10" *ngIf="selectedConversation.vendor.picture" matTooltip="{{ selectedConversation.vendor.firstName }} {{ selectedConversation.vendor.lastName }}" [style.background-image]="'url(' + selectedConversation.vendor.picture + ')'"></div>
 
             <div *ngIf="!selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}"
               [class]="
@@ -358,7 +358,7 @@
             >
               {{ transform(selectedConversation.submission.user.firstName) }} {{ transform(selectedConversation.submission.user.lastName) }}
             </div>
-            <div class="user-avatar ml-2 bg-round w-10 h-10" *ngIf="selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+            <div class="ml-2 bg-round w-10 h-10" *ngIf="selectedConversation.submission.user.picture" matTooltip="{{ selectedConversation.submission.user.firstName }} {{ selectedConversation.submission.user.lastName }}" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
 
           </div>
           <div *ngIf="selectedConversation">
@@ -491,7 +491,7 @@
       class="p-6 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
     >
       <div class="text-center">
-        <div *ngIf="!selectedConversation.submission.user.picture"
+        <div *ngIf="!selectedConversation.vendor.picture"
           [class]="'w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium ' +
             mapLetterToElement(selectedConversation.vendor.publicUsername || selectedConversation.vendor.firstName)">
           <ng-container *ngIf="selectedConversation.vendor.publicUsername; else vendorNameFallback">
@@ -502,7 +502,7 @@
           </ng-template>
         </div>
 
-        <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium bg-round right-sidenav-img" *ngIf="selectedConversation.submission.user.picture" [style.background-image]="'url(' + selectedConversation.submission.user.picture + ')'"></div>
+        <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-xl font-medium bg-round right-sidenav-img" *ngIf="selectedConversation.vendor.picture" [style.background-image]="'url(' + selectedConversation.vendor.picture + ')'"></div>
 
         <h3 class="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
           {{ selectedConversation.title }}

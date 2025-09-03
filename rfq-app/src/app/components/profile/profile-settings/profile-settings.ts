@@ -75,6 +75,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
   };
   pondFiles: any[] = [];
   private destroy$ = new Subject<void>();
+  currentUser: User | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -153,6 +154,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         if (data) {
+          this.currentUser = data;
           this.initializeUserData(data);
         }
       });
@@ -494,9 +496,12 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: () => {
+        next: (data) => {
           setTimeout(() => {
-            this.submitProfile()
+            this.submitProfile();
+            this.currentUser!.profilePicture = data.url;
+            this.currentUser!.picture = data.url;
+            this.auth.currentUserSubject.next(data);
           }, 1000)},
         error: (err) => this.handleSubmissionError(err),
       });
@@ -511,7 +516,9 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: () => this.handleSubmissionSuccess(),
+        next: (data) => {
+          this.handleSubmissionSuccess()
+        },
         error: (err) => {
           if (err.status != 0) {
             this.handleSubmissionError(err)

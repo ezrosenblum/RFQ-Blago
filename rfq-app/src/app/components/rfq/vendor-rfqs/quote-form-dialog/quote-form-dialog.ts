@@ -33,10 +33,7 @@ export class QuoteFormDialog implements OnInit {
   @ViewChild('myPond') myPond!: FilePondComponent;
   uploadedFilesCount = 0;
   @ViewChild('messageInput') messageInput!: QuillEditorComponent;
-  toolbarOptions = [
-    [{ 'header': [1, 2, 3, false] }], 
-    ['bold', 'italic', 'underline'] 
-  ];
+  toolbarOptions = [];
   modules = {
     toolbar: this.toolbarOptions
   };
