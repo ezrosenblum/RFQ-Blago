@@ -501,7 +501,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
             this.submitProfile();
             this.currentUser!.profilePicture = data.url;
             this.currentUser!.picture = data.url;
-            this.auth.currentUserSubject.next(data);
+            this.auth.currentUserSubject.next(this.currentUser);
           }, 1000)},
         error: (err) => this.handleSubmissionError(err),
       });

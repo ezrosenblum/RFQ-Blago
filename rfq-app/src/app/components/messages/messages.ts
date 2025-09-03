@@ -184,7 +184,7 @@ export class MessagesComponent implements OnInit {
     this._messageService.getAllConversationUsersByRole('Customer').pipe(take(1)).subscribe({
       next: (data: ConversationUserEntry[]) => {
         this.customerItems = data;
-        this.filteredCustomers = this.vendorItems.slice();
+        this.filteredCustomers = this.customerItems.slice();
       },
 
       error: (error) => {
