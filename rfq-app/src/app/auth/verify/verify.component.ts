@@ -18,6 +18,7 @@ export class VerifyComponent {
   timeOut: number = 10000;
   timeOutError: number = 3000;
   errorMessage = '';
+  isVerified: boolean = false;
 
   constructor(private _router: Router, private _authService: Auth, private _translate: TranslateService,) { this.getData();}
 
@@ -38,6 +39,7 @@ export class VerifyComponent {
         .subscribe(
           (data: any) => {
             this.showSpinner = false;
+            this.isVerified = true;
             Swal.fire({
               icon: 'success',
               title: this._translate.instant('ALERTS.VERIFIED_SUCCESSFULLY'),

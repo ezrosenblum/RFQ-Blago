@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { Activity, Conversation, ConversationUserEntry, CreateMessage, Message, MessageEntry, MessageMediaEntry } from '../../models/messages.model';
 import { MessagesService } from '../../services/messages';
-import { find, map, Observable, of, startWith, take } from 'rxjs';
+import { find, map, Observable, of, shareReplay, startWith, take, tap } from 'rxjs';
 import {
   MatDialog,
 } from '@angular/material/dialog';
@@ -59,11 +59,11 @@ export class MessagesComponent implements OnInit {
   // Autocomplete controls - Left sidenav
   vendorSearchControl = new FormControl();
   vendorItems: ConversationUserEntry[] = [];
-  filteredVendorOptions!: Observable<ConversationUserEntry[]>;
+  filteredVendors: ConversationUserEntry[] = [];
 
   customerSearchControl = new FormControl();
   customerItems: ConversationUserEntry[] = [];
-  filteredCustomerOptions!: Observable<ConversationUserEntry[]>;
+  filteredCustomers: ConversationUserEntry[] = [];
   usersCalledByDefault: boolean = false;
 
   customerIdQuery: number | null = null;
@@ -121,6 +121,14 @@ export class MessagesComponent implements OnInit {
         this.handleError(error);
       }
     });
+
+    this.vendorSearchControl.valueChanges.pipe().subscribe(data => {
+        this.filteredVendors = data ? this._filterVendors(data as string) : this.vendorItems.slice();
+    });
+
+    this.customerSearchControl.valueChanges.pipe().subscribe(data => {
+        this.filteredCustomers = data ? this._filterCustomers(data as string) : this.customerItems.slice();
+    });
   }
 
   ngAfterViewChecked() {
@@ -165,7 +173,7 @@ export class MessagesComponent implements OnInit {
     this._messageService.getAllConversationUsersByRole('Vendor').pipe(take(1)).subscribe({
       next: (data: ConversationUserEntry[]) => {
         this.vendorItems = data;
-        this.filteredVendorOptions = of(this.vendorItems.slice());
+        this.filteredVendors = this.vendorItems.slice();
       },
 
       error: (error) => {
@@ -176,29 +184,13 @@ export class MessagesComponent implements OnInit {
     this._messageService.getAllConversationUsersByRole('Customer').pipe(take(1)).subscribe({
       next: (data: ConversationUserEntry[]) => {
         this.customerItems = data;
-        this.filteredCustomerOptions = of(this.customerItems.slice());
+        this.filteredCustomers = this.customerItems.slice();
       },
 
       error: (error) => {
         this.handleError(error);
       },
     });
-
-    this.filteredVendorOptions = this.vendorSearchControl.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        const name = typeof value === 'string' ? value : value?.name;
-        return name ? this._filterVendors(name as string) : this.vendorItems.slice();
-      }),
-    );
-
-    this.filteredCustomerOptions = this.customerSearchControl.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        const name = typeof value === 'string' ? value : value?.name;
-        return name ? this._filterCustomers(name as string) : this.customerItems.slice();
-      }),
-    );
   }
 
   private loadAdminConversations(): void {
@@ -468,22 +460,31 @@ export class MessagesComponent implements OnInit {
   }
 
   displayFn(user: ConversationUserEntry): string {
-    return user && user.firstName ? `${user.firstName} ${user.lastName}` : '';
+    if (!user) return '';
+    return user.publicUsername || `${user.firstName} ${user.lastName}`;
   }
 
-  private _filterVendors(name: string): ConversationUserEntry[] {
-    const filterValue = name.toLowerCase();
+private _filterVendors(name: string): ConversationUserEntry[] {
+  const filterValue = name.toLowerCase();
 
-    return this.vendorItems.filter(option => option.firstName.toLowerCase().includes(filterValue) ||
-      option.lastName.toLowerCase().includes(filterValue))
-  }
+  const filtered = this.vendorItems.filter(option => 
+    option.firstName.toLowerCase().includes(filterValue) ||
+    option.lastName.toLowerCase().includes(filterValue)
+  );
 
-  private _filterCustomers(name: string): ConversationUserEntry[] {
-    const filterValue = name.toLowerCase();
+  return filtered;
+}
 
-    return this.customerItems.filter(option => option.firstName.toLowerCase().includes(filterValue) ||
-      option.lastName.toLowerCase().includes(filterValue))
-  }
+private _filterCustomers(name: string): ConversationUserEntry[] {
+  const filterValue = name.toLowerCase();
+
+  const filtered = this.customerItems.filter(option => 
+    option.firstName.toLowerCase().includes(filterValue) ||
+    option.lastName.toLowerCase().includes(filterValue)
+  );
+
+  return filtered;
+}
 
   onSearchChange(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -535,8 +536,19 @@ export class MessagesComponent implements OnInit {
   }
 
   selectChat(conv: MessageAdminConversationEntry, index: number): void {
-    this.selectedChatIndex = index;
-    this.loadMessagesForConversation(conv.id);
+    if (conv) {
+      this.selectedChatIndex = index;
+      this.loadMessagesForConversation(conv.id);
+    } else {
+      if (this.isAdmin) {
+        conv = this.adminConversations[0];
+        this.loadMessagesForConversation(conv.id);
+      } else {
+        conv = this.conversations[0];
+        this.loadMessagesForConversation(conv.id);
+      }
+    }
+
   }
 
   onVendorSelected(event: any): void {

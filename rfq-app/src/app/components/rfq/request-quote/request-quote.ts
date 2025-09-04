@@ -51,10 +51,7 @@ export class RequestQuote implements OnInit, OnDestroy {
   @ViewChild(MaterialCategoriesSelectionComponent)
   categoriesSelectionComp!: MaterialCategoriesSelectionComponent;
   @ViewChild('messageInput') messageInput!: QuillEditorComponent;
-  toolbarOptions = [
-  [{ 'header': [1, 2, 3, false] }],
-  ['bold', 'italic', 'underline']
-  ];
+  toolbarOptions = [];
 
   modules = {
     toolbar: this.toolbarOptions
