@@ -360,7 +360,7 @@
     "YOU_CONTACT_VENDOR": "Your Vendor Contact",
     "NO_PHONE_AVAILABLE": "not available",
     "TIMELINE_INTERVAL": "Timeline Interval",
-    "QUOUTE_VALIDITY": "Quote Validity"
+    "QUOTE_VALIDITY": "Quote Validity"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

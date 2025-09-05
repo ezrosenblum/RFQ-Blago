@@ -16,7 +16,7 @@ const routes: Routes = [
   { path: 'vendor-rfqs/:id', component: RfqDetails, canActivate: [AuthGuard] },
   { path: 'my-quotes', component: MyQuotesComponent, canActivate: [AuthGuard] },
   { path: 'quote-details/:id', component: QuoteDetails, canActivate: [AuthGuard] },
-  { path: 'approved-quote/:id', component: ApprovedQuoteDetails}
+{ path: 'approved-quote/:id', component: ApprovedQuoteDetails, canActivate: [AuthGuard]}
 ];
 
 @NgModule({
