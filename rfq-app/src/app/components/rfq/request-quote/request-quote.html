@@ -294,7 +294,7 @@
           <!-- Submit Button -->
           <button
             type="submit"
-            [disabled]="isSubmitting || rfqForm.invalid"
+            [disabled]="isSubmitting || rfqForm.invalid || !validateCategoriesAndSubcategories()"
             class="btn btn-primary flex-1 sm:flex-none px-8 py-3 text-base font-medium"
             (click)="onSubmit()"
           >

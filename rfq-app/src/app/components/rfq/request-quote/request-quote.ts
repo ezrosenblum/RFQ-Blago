@@ -272,9 +272,14 @@ export class RequestQuote implements OnInit, OnDestroy {
     return null;
   }
 
+  validateCategoriesAndSubcategories(){
+    const selection = this.categoriesSelectionComp.getSelectedData();
+    return selection && selection.categoriesIds.length > 0 && selection.subcategoriesIds.length > 0;
+  }
+
   onSubmit(): void {
     const selection = this.categoriesSelectionComp.getSelectedData();
-    if (this.rfqForm.valid && !this.isSubmitting) {
+    if (this.rfqForm.valid && !this.isSubmitting && (selection.categoriesIds.length > 0 && selection.subcategoriesIds.length > 0) ) {
       this.isSubmitting = true;
       this.errorMessage = '';
       this.successMessage = '';
