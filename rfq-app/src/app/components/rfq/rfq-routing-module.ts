@@ -6,6 +6,7 @@ import { RfqDetails } from './rfq-details/rfq-details';
 import { AuthGuard } from '../../guards/auth-guard';
 import { MyQuotesComponent } from './my-quotes/my-quotes';
 import { QuoteDetails } from './quote-details/quote-details';
+import { ApprovedQuoteDetails } from './approved-quote-details/approved-quote-details';
 
 const routes: Routes = [
   { path: '', redirectTo: 'request-quote', pathMatch: 'full' },
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'vendor-rfqs/:id', component: RfqDetails, canActivate: [AuthGuard] },
   { path: 'my-quotes', component: MyQuotesComponent, canActivate: [AuthGuard] },
   { path: 'quote-details/:id', component: QuoteDetails, canActivate: [AuthGuard] },
+{ path: 'approved-quote/:id', component: ApprovedQuoteDetails, canActivate: [AuthGuard]}
 ];
 
 @NgModule({

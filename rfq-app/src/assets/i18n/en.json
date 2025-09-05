@@ -356,7 +356,11 @@
     "TOTAL_PROJECT_COST": "Total Project Cost",
     "FILE_PREVIEW_ERROR": "Download failed",
     "ADD_FILE": "Attach file(s)",
-    "EDIT_RFQ": "Edit RFQ"
+    "EDIT_RFQ": "Edit RFQ",
+    "YOU_CONTACT_VENDOR": "Your Vendor Contact",
+    "NO_PHONE_AVAILABLE": "not available",
+    "TIMELINE_INTERVAL": "Timeline Interval",
+    "QUOTE_VALIDITY": "Quote Validity"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",

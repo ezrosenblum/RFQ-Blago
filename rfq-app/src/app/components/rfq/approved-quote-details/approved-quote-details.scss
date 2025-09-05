@@ -1,0 +1,48 @@
+.link {
+  @apply text-[#7197f0] no-underline;
+}
+
+/* small stat tiles under contact card */
+.stat-tile {
+  @apply rounded-xl border border-slate-200 p-3 text-center;
+}
+.stat-value {
+  @apply text-lg font-semibold text-slate-800;
+}
+.stat-label {
+  @apply text-[11px] uppercase tracking-wide text-slate-500;
+}
+
+/* numbered step rows */
+.card-step {
+  @apply flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-4;
+}
+.step-dot {
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white;
+}
+
+/* reminder tiles */
+.reminder-card {
+  @apply rounded-2xl p-4 ring-1 shadow-sm;
+}
+.reminder-kicker {
+  @apply text-xs font-semibold uppercase tracking-wide;
+}
+.reminder-title {
+  @apply mt-2 text-base font-semibold text-slate-800;
+}
+.reminder-text {
+  @apply mt-1 text-sm leading-5 text-slate-600;
+}
+
+.bg-green {
+    background-color: #319d70;
+}
+
+.text-green-light {
+    color: #3cb782;
+}
+
+.border-left-blue {
+    border-left: 4px solid #5181f3;
+}

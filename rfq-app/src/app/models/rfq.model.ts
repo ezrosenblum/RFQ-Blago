@@ -246,6 +246,7 @@ export interface Vendor {
   dateCreated: string;
   status: VendorStatus;
   companyDetails: CompanyDetails;
+  publicUsername: string | null | undefined;
   id: number;
   firstName: string;
   lastName: string;
