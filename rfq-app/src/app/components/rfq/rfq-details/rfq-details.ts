@@ -214,7 +214,6 @@ export class RfqDetails implements OnInit, OnDestroy {
       if (result.isConfirmed) {
         this._rfqService.quoteChangeStatus(quote.id, statusId).subscribe({
           next: () => {
-            this.loadQuotes();
             Swal.fire({
               icon: 'success',
               title: this._translate.instant('ALERTS.SUCCESS_TITLE'),
@@ -222,7 +221,14 @@ export class RfqDetails implements OnInit, OnDestroy {
               timer: 2000,
               showConfirmButton: false,
             });
+            
+            if (statusId === 2) {
+              this._router.navigate(['/approved-quote', quote.id])
+            } else {
+              this.loadQuotes();
+            }
           },
+
           error: (error) => {
             this.handleError(error);
             Swal.fire({

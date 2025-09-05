@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { QuoteSendMessageDialog } from './quote-send-message-dialog/quote-send-message-dialog';
 import { QuoteDetails } from './quote-details/quote-details';
 import { QuillModule } from 'ngx-quill';
+import { ApprovedQuoteDetails } from './approved-quote-details/approved-quote-details';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { QuillModule } from 'ngx-quill';
     QuoteFormDialog,
     MyQuotesComponent,
     QuoteSendMessageDialog,
-    QuoteDetails
+    QuoteDetails,
+    ApprovedQuoteDetails
   ],
   imports: [
     CommonModule,

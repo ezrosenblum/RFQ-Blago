@@ -1308,6 +1308,10 @@ highlightLastRfqs(): boolean {
     if (rfq.user?.id !== this.currentUser?.id && this.currentUser?.type !== 'Administrator') {
       return false;
     }
-    return !rfq.statusHistoryCount?.some((s: any) => s.status?.id === 3 || s.status?.id === 4);
+    if (this.currentUser?.type === 'Administrator') {
+      return rfq.status?.id != 2 && rfq.status?.id != 5;
+    } else {
+      return !rfq.statusHistoryCount?.some((s: any) => s.status?.id === 3 || s.status?.id === 4);
+    }
   }
 }
