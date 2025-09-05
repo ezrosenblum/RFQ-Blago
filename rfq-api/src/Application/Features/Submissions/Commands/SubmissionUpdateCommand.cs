@@ -7,6 +7,7 @@ using Application.Features.Validators;
 using Domain.Entities.Categories;
 using Domain.Entities.Submissions;
 using DTO.Enums.Submission;
+using DTO.User;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,7 +56,10 @@ public sealed class SubmissionUpdateCommandHandler : ICommandHandler<SubmissionU
         var submission = await _dbContext.Submission
             .Include(s => s.Categories)
             .Include(s => s.Subcategories)
-            .FirstOrDefaultAsync(s => s.Id == command.Id && s.UserId == _currentUserService.UserId, cancellationToken);
+            .FirstOrDefaultAsync(s => s.Id == command.Id && 
+                                      (_currentUserService.UserRole == UserRole.Administrator ||
+                                       s.UserId == _currentUserService.UserId), 
+                                       cancellationToken);
 
         if(submission == null)
             throw new UnauthorizedAccessException(_localizationService.GetValue("submission.unauthorized.error.message"));
