@@ -187,7 +187,7 @@ export class RequestQuote implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((user) => {
         this.currentUser = user;
-        if (this.currentUser?.type == 'Administrator' || this.currentUser?.type == 'Vendor') {
+        if ((this.currentUser?.type == 'Administrator' && !this.rfqId) || this.currentUser?.type == 'Vendor') {
           this.router.navigate(['/vendor-rfqs']);
         }
         if (this.currentUser?.type === UserRole.CLIENT) {
@@ -331,7 +331,6 @@ export class RequestQuote implements OnInit, OnDestroy {
 
         request$ = this.rfqService.createRfq(rfqFormData);
       }
-
       request$.pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.isSubmitting = false;
@@ -348,7 +347,6 @@ export class RequestQuote implements OnInit, OnDestroy {
           setTimeout(() => {
             this.successMessage = '';
           }, 5000);
-
           this.router.navigate(['/vendor-rfqs']);
         },
         error: (error) => {

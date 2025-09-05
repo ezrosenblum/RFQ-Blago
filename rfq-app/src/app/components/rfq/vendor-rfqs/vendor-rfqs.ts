@@ -527,6 +527,10 @@ selectStatisticsFilter(status: string) {
   let dateFrom;
   let dateTo;
   
+  this.submissionListRequest.status = [];
+  this.submissionListRequest.dateFrom = undefined;
+  this.submissionListRequest.dateTo = undefined;
+
   let statusList = [];
   if (
     status === 'Pending Review' ||
@@ -546,14 +550,12 @@ selectStatisticsFilter(status: string) {
     let findApprovedStatus = this.statusOptions.find(el => el.name == 'Approved');
     let findRejectedStatus = this.statusOptions.find(el => el.name == 'Rejected');
     this.filterForm.get('status')?.setValue(null);
-     this.submissionListRequest.status = [];
     let areFiltersEmpty = this.highlightTotalRfqs();
     if (areFiltersEmpty) {
       this.submissionListRequest.status = [findApprovedStatus!.id, findRejectedStatus!.id];
       this.applyFilters();
     }
   } 
-
   this.filterForm.setValue({
     search: '',
     status: status != 'Reviewed' && findStatus ? findStatus.id : null,
@@ -1303,7 +1305,7 @@ highlightLastRfqs(): boolean {
   }
 
   isEditable(rfq: Rfq): boolean {
-    if (rfq.user?.id !== this.currentUser?.id) {
+    if (rfq.user?.id !== this.currentUser?.id && this.currentUser?.type !== 'Administrator') {
       return false;
     }
     return !rfq.statusHistoryCount?.some((s: any) => s.status?.id === 3 || s.status?.id === 4);
