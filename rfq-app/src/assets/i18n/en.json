@@ -406,7 +406,8 @@
     "SAVING": "Saving...",
     "SERVICE_AREA_UPDATED_SUCCESS": "Service area updated successfully",
     "SERVICE_AREA_UPDATE_FAILED": "Failed to update service area",
-    "SERVICE_AREA_UPDATE_NETWORK_ERROR": "Failed to update service area. Please check your internet connection."
+    "SERVICE_AREA_UPDATE_NETWORK_ERROR": "Failed to update service area. Please check your internet connection.",
+    "RETRIEVE_USER_FAILED": "Failed to retrieve user information. Please try again."
   },
   "PROFILE": {
     "ACCOUNT_SETTINGS": "Account Settings",
