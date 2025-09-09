@@ -28,7 +28,7 @@ export class ServiceAreasComponent implements OnInit {
 
   selectedLocation: string = '';
   rangeMiles: number = 0;
-  
+
   private map: any;
   private autocomplete: any;
   private marker: any;
@@ -54,22 +54,41 @@ export class ServiceAreasComponent implements OnInit {
 
   private destroy$ = new Subject<void>();
 
+  DEFAULT_LOCATION = {
+    lat: 41.9981,
+    lng: 21.4254
+  };
+
   constructor(
     private ngZone: NgZone,
     private _authService: Auth,
     private _alertService: AlertService
   ) {}
 
-  ngOnInit(): void {
-    this._authService.currentUserSubject.subscribe({
-      next: (user) => {
-        if (user) {
-          this.currentUser = user;
-          this.loadGoogleMaps();
-        }
+ngOnInit(): void {
+  this.loadGoogleMaps();
+  this._authService.currentUserSubject
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(user => {
+      this.currentUser = user ?? null;
+
+      if (this.isMapInitialized && this.currentUser?.companyDetails) {
+        const { latitudeAddress, longitudeAddress } = this.currentUser.companyDetails;
+        const center = {
+          lat: latitudeAddress ??this. DEFAULT_LOCATION.lat,
+          lng: longitudeAddress ?? this.DEFAULT_LOCATION.lng
+        };
+        this.map.setCenter(center);
+        this.marker?.setPosition(center);
+        this.circle?.setCenter(center);
       }
+    },
+    error => {
+      this._alertService.error('SERVICE_AREA.RETRIEVE_USER_FAILED');
+      this.currentUser = null;
     });
-  }
+}
+
 
   ngAfterViewInit(): void {
     if (this.isGoogleMapsLoaded && !this.isMapInitialized) {
