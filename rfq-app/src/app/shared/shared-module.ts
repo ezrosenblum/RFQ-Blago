@@ -10,6 +10,8 @@ import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { PhoneInputComponent } from './phone-input/phone-input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
+import { PieChartComponent } from './pie-chart/pie-chart';
+import { LineChartComponent } from './line-chart/line-chart';
 
 
 @NgModule({
@@ -18,6 +20,8 @@ import { MatMenuModule } from '@angular/material/menu';
     Footer,
     LoadingSpinner,
     PhoneInputComponent,
+    PieChartComponent,
+    LineChartComponent,
   ],
   imports: [
     CommonModule,
@@ -34,6 +38,8 @@ import { MatMenuModule } from '@angular/material/menu';
     Footer,
     LoadingSpinner,
     PhoneInputComponent,
+    PieChartComponent,
+    LineChartComponent,
     MatTooltipModule,
   ],
 })

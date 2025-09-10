@@ -108,6 +108,27 @@ export interface RfqStatistics {
   last24HoursSubmissionsCount: number;
 }
 
+export interface StatusDistributionData {
+  statusName: string;
+  count: number;
+  percentage: number;
+}
+
+export interface StatusDistributionResponse {
+  statusDistribution: StatusDistributionData[];
+}
+
+export interface SubmissionTimelineData {
+  date: string;
+  submissionsCount: number;
+  completedCount: number;
+  completionRate: number;
+}
+
+export interface SubmissionTimelineResponse {
+  timeline: SubmissionTimelineData[];
+}
+
 export enum UnitType {
   LF = 'LF', // Linear Feet
   SF = 'SF', // Square Feet

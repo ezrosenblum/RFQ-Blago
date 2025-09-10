@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Category, LookupValue, QuoteRequest, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, QuoteSearchRequest, QuoteSearchResponse, QuoteItem } from '../models/rfq.model';
+import { Category, LookupValue, QuoteRequest, Rfq, RfqStatistics, RfqStatus, SubmissionTableRequest, TableResponse, QuoteSearchRequest, QuoteSearchResponse, QuoteItem, StatusDistributionResponse, SubmissionTimelineResponse } from '../models/rfq.model';
 import { Auth } from './auth';
 import { ApiResponse } from '../models/api-response';
 
@@ -75,6 +75,32 @@ export class RfqService {
             return response;
           }
           throw new Error('Failed to get statistics');
+        })
+      );
+  }
+
+  // Get status distribution for pie chart
+  getStatusDistribution(): Observable<StatusDistributionResponse> {
+    return this.http.get<StatusDistributionResponse>(`${this.API_URL}Submission/charts/status-distribution`)
+      .pipe(
+        map(response => {
+          if (response) {
+            return response;
+          }
+          throw new Error('Failed to get status distribution');
+        })
+      );
+  }
+
+  // Get submission timeline for line chart
+  getSubmissionTimeline(daysBack: number = 30): Observable<SubmissionTimelineResponse> {
+    return this.http.get<SubmissionTimelineResponse>(`${this.API_URL}Submission/charts/timeline?daysBack=${daysBack}`)
+      .pipe(
+        map(response => {
+          if (response) {
+            return response;
+          }
+          throw new Error('Failed to get submission timeline');
         })
       );
   }

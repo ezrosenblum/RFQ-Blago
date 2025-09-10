@@ -12,6 +12,8 @@ import {
   Subcategory,
   SubmissionTableRequest,
   TableResponse,
+  StatusDistributionResponse,
+  SubmissionTimelineResponse,
 } from '../../../models/rfq.model';
 import { User, UserRole } from '../../../models/user.model';
 import { Auth } from '../../../services/auth';
@@ -22,6 +24,8 @@ import { QuoteFormDialog } from './quote-form-dialog/quote-form-dialog';
 import { AlertService } from '../../../services/alert.service';
 import Swal from 'sweetalert2';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { PieChartData } from '../../../shared/pie-chart/pie-chart';
+import { LineChartData } from '../../../shared/line-chart/line-chart';
 
 @Component({
   selector: 'app-vendor-rfqs',
@@ -72,6 +76,17 @@ export class VendorRfqs implements OnInit, OnDestroy {
     rejectedSubmissionsCount: 0,
     last24HoursSubmissionsCount: 0,
   };
+
+  // Chart data
+  pieChartData: PieChartData[] = [];
+  lineChartData: LineChartData[] = [];
+  statusColors: string[] = [
+    '#F59E0B', // Pending - Yellow
+    '#10B981', // Approved - Green
+    '#EF4444', // Rejected - Red
+    '#6B7280', // Archived - Gray
+    '#3B82F6', // Completed - Blue
+  ];
 
   private destroy$ = new Subject<void>();
 
@@ -161,7 +176,6 @@ export class VendorRfqs implements OnInit, OnDestroy {
           if (this.currentUser?.type == UserRole.CLIENT) {
             this.submissionListRequest.userId = this.currentUser.id;
           }
-
           if (user) {
             if (user.type === UserRole.CLIENT) {
               this.userId = user.id;
@@ -179,6 +193,17 @@ export class VendorRfqs implements OnInit, OnDestroy {
                 this.onCategoryChange(Number(categoryId));
               });
           }
+          // Load chart data for admin users
+          if (user.type === UserRole.ADMIN) {
+            this.loadChartData();
+          }
+
+          this.filterForm
+            .get('category')!
+            .valueChanges.pipe(takeUntil(this.destroy$))
+            .subscribe((categoryId) => {
+              this.onCategoryChange(Number(categoryId));
+            });
         }
       });
 
@@ -205,18 +230,18 @@ export class VendorRfqs implements OnInit, OnDestroy {
 
   private loadFiltersFromQueryParams(): void {
     const queryParams = this._route.snapshot.queryParams;
-    
+
     // Create form values object
     const formValues: any = {
       search: queryParams['search'] || '',
       status: queryParams['status'] ? +queryParams['status'] : null,
-      category: queryParams['category'] ? 
-        (Array.isArray(queryParams['category']) ? 
-          queryParams['category'].map((id: string) => +id) : 
+      category: queryParams['category'] ?
+        (Array.isArray(queryParams['category']) ?
+          queryParams['category'].map((id: string) => +id) :
           [+queryParams['category']]) : [],
-      subcategory: queryParams['subcategory'] ? 
-        (Array.isArray(queryParams['subcategory']) ? 
-          queryParams['subcategory'].map((id: string) => +id) : 
+      subcategory: queryParams['subcategory'] ?
+        (Array.isArray(queryParams['subcategory']) ?
+          queryParams['subcategory'].map((id: string) => +id) :
           [+queryParams['subcategory']]) : [],
       dateFrom: queryParams['dateFrom'] || '',
       dateTo: queryParams['dateTo'] || ''
@@ -229,27 +254,27 @@ export class VendorRfqs implements OnInit, OnDestroy {
     if (queryParams['search']) {
       this.submissionListRequest.query = queryParams['search'];
     }
-    
+
     if (queryParams['status']) {
       this.submissionListRequest.status = [+queryParams['status']];
     }
-    
+
     if (queryParams['category']) {
-      (this.submissionListRequest as SubmissionTableRequest).category = Array.isArray(queryParams['category']) ? 
-        queryParams['category'].map((id: string) => +id) : 
+      (this.submissionListRequest as SubmissionTableRequest).category = Array.isArray(queryParams['category']) ?
+        queryParams['category'].map((id: string) => +id) :
         [+queryParams['category']];
     }
-    
+
     if (queryParams['subcategory']) {
-      (this.submissionListRequest as SubmissionTableRequest).subcategory = Array.isArray(queryParams['subcategory']) ? 
-        queryParams['subcategory'].map((id: string) => +id) : 
+      (this.submissionListRequest as SubmissionTableRequest).subcategory = Array.isArray(queryParams['subcategory']) ?
+        queryParams['subcategory'].map((id: string) => +id) :
         [+queryParams['subcategory']];
     }
-    
+
     if (queryParams['dateFrom']) {
       this.submissionListRequest.dateFrom = queryParams['dateFrom'];
     }
-    
+
     if (queryParams['dateTo']) {
       this.submissionListRequest.dateTo = queryParams['dateTo'];
     }
@@ -370,8 +395,8 @@ export class VendorRfqs implements OnInit, OnDestroy {
         next: (categories) => {
           if (this.currentUser?.type == 'Vendor') {
             if (this.currentUser?.categories) {
-              this.categoryOptions = categories.filter(category => 
-                this.currentUser!.categories.some(userCategory => 
+              this.categoryOptions = categories.filter(category =>
+                this.currentUser!.categories.some(userCategory =>
                   userCategory.id === category.id
                 )
               );
@@ -526,7 +551,7 @@ selectStatisticsFilter(status: string) {
   let findStatus;
   let dateFrom;
   let dateTo;
-  
+
   this.submissionListRequest.status = [];
   this.submissionListRequest.dateFrom = undefined;
   this.submissionListRequest.dateTo = undefined;
@@ -544,8 +569,8 @@ selectStatisticsFilter(status: string) {
     dateTo = new Date();
     dateFrom = new Date();
     dateFrom.setHours(dateFrom.getHours() - 24);
-  } 
-  
+  }
+
   if (status == 'Reviewed'){
     let findApprovedStatus = this.statusOptions.find(el => el.name == 'Approved');
     let findRejectedStatus = this.statusOptions.find(el => el.name == 'Rejected');
@@ -555,7 +580,7 @@ selectStatisticsFilter(status: string) {
       this.submissionListRequest.status = [findApprovedStatus!.id, findRejectedStatus!.id];
       this.applyFilters();
     }
-  } 
+  }
   this.filterForm.setValue({
     search: '',
     status: status != 'Reviewed' && findStatus ? findStatus.id : null,
@@ -572,11 +597,11 @@ selectStatisticsFilter(status: string) {
 }
 
 highlightTotalRfqs() {
-  return  !this.filterForm.get('search')?.value && 
-          !this.filterForm.get('status')?.value && 
-          !this.filterForm.get('dateFrom')?.value && 
-          !this.filterForm.get('dateTo')?.value && 
-          (!this.filterForm.get('category')?.value || this.filterForm.get('category')?.value.length < 1) && 
+  return  !this.filterForm.get('search')?.value &&
+          !this.filterForm.get('status')?.value &&
+          !this.filterForm.get('dateFrom')?.value &&
+          !this.filterForm.get('dateTo')?.value &&
+          (!this.filterForm.get('category')?.value || this.filterForm.get('category')?.value.length < 1) &&
           (!this.filterForm.get('subcategory')?.value || this.filterForm.get('subcategory')?.value.length < 1) &&
           (!this.submissionListRequest.status || this.submissionListRequest.status.length < 1)
 }
@@ -606,6 +631,48 @@ highlightLastRfqs(): boolean {
   last24h.setHours(last24h.getHours() - 24);
   return from.toISOString().slice(0, 10) >= last24h.toISOString().slice(0, 10) && to.toISOString().slice(0, 10) <= now.toISOString().slice(0, 10);
 }
+
+  loadChartData(): void {
+    this.loadStatusDistribution();
+    this.loadSubmissionTimeline();
+  }
+
+  loadStatusDistribution(): void {
+    this._rfqService
+      .getStatusDistribution()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.pieChartData = response.statusDistribution.map(item => ({
+            label: item.statusName,
+            value: item.count,
+            percentage: item.percentage
+          }));
+        },
+        error: () => {
+          console.error('Failed to load status distribution data');
+        },
+      });
+  }
+
+  loadSubmissionTimeline(): void {
+    this._rfqService
+      .getSubmissionTimeline(30)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.lineChartData = response.timeline.map(item => ({
+            date: new Date(item.date),
+            submissionsCount: item.submissionsCount,
+            completedCount: item.completedCount,
+            completionRate: item.completionRate
+          }));
+        },
+        error: () => {
+          console.error('Failed to load submission timeline data');
+        },
+      });
+  }
 
   applyFilters(): void {
     this.submissionListRequest.query =
@@ -787,6 +854,9 @@ highlightLastRfqs(): boolean {
   refreshData(): void {
     this.loadRfqs();
     this.loadStatistics();
+    if (this.currentUser?.type === UserRole.ADMIN) {
+      this.loadChartData();
+    }
   }
 
   getStatusColor(status: LookupValue): string {

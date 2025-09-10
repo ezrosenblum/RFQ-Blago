@@ -113,6 +113,20 @@ namespace Api.Controllers.v1
             return await Mediator.Send(new SubmissionCountReportQuery());
         }
 
+        [Authorize(Roles = "Administrator")]
+        [HttpGet("charts/status-distribution")]
+        public async Task<StatusDistributionResponse> GetStatusDistribution()
+        {
+            return await Mediator.Send(new SubmissionStatusDistributionQuery());
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpGet("charts/timeline")]
+        public async Task<SubmissionTimelineResponse> GetTimeline([FromQuery] int daysBack = 30)
+        {
+            return await Mediator.Send(new SubmissionTimelineQuery(daysBack));
+        }
+
         [HttpGet("units")]
         public IReadOnlyCollection<ListItemBaseResponse> GetUnits()
         {

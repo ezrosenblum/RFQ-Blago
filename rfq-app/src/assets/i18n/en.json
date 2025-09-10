@@ -575,5 +575,9 @@
     "ARCHIVE": "Archive",
     "MESSAGES": "Messages",
     "VIEW_CONVERSATION": "View Conversation"
+  },
+  "ADMIN": {
+    "STATUS_DISTRIBUTION": "Status Distribution",
+    "SUBMISSIONS_TIMELINE": "Submissions Timeline"
   }
 }
