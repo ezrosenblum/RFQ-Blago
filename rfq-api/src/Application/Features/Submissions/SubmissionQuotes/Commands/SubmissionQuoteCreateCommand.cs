@@ -21,14 +21,10 @@ public sealed record SubmissionQuoteCreateCommand(
     decimal Price,
     GlobalIntervalType QuoteValidityIntervalType,
     int QuoteValidityInterval,
-    GlobalIntervalType? TimelineIntervalType,
-    int? MinimumTimelineDuration,
-    int? MaximumTimelineDuration,
-    GlobalIntervalType? WarantyIntervalType,
-    int? WarantyDuration,
+    string? TimelineDescription,
     int SubmissionId,
     int VendorId,
-    IReadOnlyCollection<IFormFile> Files) : ISubmissionQuoteInsertData, ICommand;
+    IReadOnlyCollection<IFormFile>? Files) : ISubmissionQuoteInsertData, ICommand;
 
 public sealed class SubmissionQuoteCreateCommandHandler : ICommandHandler<SubmissionQuoteCreateCommand>
 {

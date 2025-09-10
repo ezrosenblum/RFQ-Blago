@@ -3,7 +3,6 @@ using Domain.Entities.Medias;
 using Domain.Entities.Submissions.SubmissionQuotes.QuoteMessages;
 using Domain.Entities.User;
 using Domain.Events;
-using Domain.Events.Submissions;
 using Domain.Events.Submissions.SubmissionQuotes;
 using Domain.Interfaces;
 using DTO.Enums.Media;
@@ -25,6 +24,7 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
     public GlobalIntervalType? TimelineIntervalType { get; private set; }
     public int? MinimumTimelineDuration { get; private set; }
     public int? MaximumTimelineDuration { get; private set; }
+    public string? TimelineDescription { get; private set; }
     public GlobalIntervalType? WarantyIntervalType { get; private set; }
     public int? WarantyDuration { get; private set; }
 
@@ -47,11 +47,7 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         VendorId = data.VendorId;
         Media = new Media(MediaEntityType.SubmissionQuote);
         Status = SubmissionQuoteStatus.Pending;
-        TimelineIntervalType = data.TimelineIntervalType;
-        MinimumTimelineDuration = data.MinimumTimelineDuration;
-        MaximumTimelineDuration = data.MaximumTimelineDuration;
-        WarantyIntervalType = data.WarantyIntervalType;
-        WarantyDuration = data.WarantyDuration;
+        TimelineDescription = data.TimelineDescription;
 
         AddDomainEvent(new SubmissionQuoteCreatedEvent(this, files));
     }
@@ -66,11 +62,7 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         Price = data.Price;
         QuoteValidityIntervalType = data.QuoteValidityIntervalType;
         QuoteValidityInterval = data.QuoteValidityInterval;
-        TimelineIntervalType = data.TimelineIntervalType;
-        MinimumTimelineDuration = data.MinimumTimelineDuration;
-        MaximumTimelineDuration = data.MaximumTimelineDuration;
-        WarantyIntervalType = data.WarantyIntervalType;
-        WarantyDuration = data.WarantyDuration;
+        TimelineDescription = data.TimelineDescription;
 
         AddDomainEvent(new SubmissionQuoteUpdatedEvent(this));
     }
