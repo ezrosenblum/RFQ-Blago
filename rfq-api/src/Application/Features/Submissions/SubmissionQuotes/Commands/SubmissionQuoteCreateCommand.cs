@@ -19,6 +19,8 @@ public sealed record SubmissionQuoteCreateCommand(
     string Title,
     string Description,
     decimal Price,
+    SubmissionQuotePriceType? PriceType,
+    string? PriceTypeOther,
     GlobalIntervalType QuoteValidityIntervalType,
     int QuoteValidityInterval,
     string? TimelineDescription,

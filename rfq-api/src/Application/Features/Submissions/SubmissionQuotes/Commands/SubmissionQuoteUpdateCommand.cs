@@ -17,6 +17,8 @@ public sealed record SubmissionQuoteUpdateCommand(
     string Title,
     string Description,
     decimal Price,
+    SubmissionQuotePriceType? PriceType,
+    string? PriceTypeOther,
     GlobalIntervalType QuoteValidityIntervalType,
     int QuoteValidityInterval,
     string? TimelineDescription) : ISubmissionQuoteUpdateData, ICommand;
