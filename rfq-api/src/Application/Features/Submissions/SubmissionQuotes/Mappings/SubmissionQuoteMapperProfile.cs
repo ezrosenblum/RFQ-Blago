@@ -41,6 +41,8 @@ public sealed class SubmissionQuoteMapperProfile : Profile
                 src.Title,
                 src.Description,
                 src.Price,
+                src.PriceType,
+                src.PriceTypeOther,
                 src.QuoteValidityIntervalType,
                 src.QuoteValidityInterval,
                 src.TimelineDescription));
