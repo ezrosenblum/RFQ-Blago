@@ -25,4 +25,5 @@ public record SubmissionQuoteBaseResponse
     public int? MaximumTimelineDuration { get; init; }
     public ListItemBaseResponse? WarantyIntervalType { get; init; }
     public int? WarantyDuration { get; init; }
+    public string? TimelineDescription { get; init; }
 }
