@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpHeaderInterceptor } from './interceptors/http-header.interceptor';
+import { ChartDemoComponent } from './components/chart-demo/chart-demo';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -16,7 +17,8 @@ export function HttpLoaderFactory(http: HttpClient) {
 
 @NgModule({
   declarations: [
-    App
+    App,
+    ChartDemoComponent
   ],
   imports: [
     BrowserModule,

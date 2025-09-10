@@ -18,6 +18,7 @@ import { QuoteSendMessageDialog } from './quote-send-message-dialog/quote-send-m
 import { QuoteDetails } from './quote-details/quote-details';
 import { QuillModule } from 'ngx-quill';
 import { ApprovedQuoteDetails } from './approved-quote-details/approved-quote-details';
+import { SharedModule } from '../../shared/shared-module';
 
 @NgModule({
   declarations: [
@@ -41,10 +42,11 @@ import { ApprovedQuoteDetails } from './approved-quote-details/approved-quote-de
     MaterialCategoriesSelectionComponent,
     MatDialogModule,
     MatTooltipModule,
-    QuillModule
+    QuillModule,
+    SharedModule
   ],
   providers: [
-    CurrencyPipe 
+    CurrencyPipe
   ]
 })
 

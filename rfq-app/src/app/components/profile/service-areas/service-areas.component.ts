@@ -317,9 +317,9 @@ ngOnInit(): void {
     const companyDetails = {
       ...this.currentUser?.companyDetails,
       streetAddress: this.StreetAddress,
-      latitude: this.LatitudeAddress,
-      longitude: this.LongitudeAddress,
-      radius: this.rangeMiles,
+      latitudeAddress: this.LatitudeAddress,
+      longitudeAddress: this.LongitudeAddress,
+      operatingRadius: this.rangeMiles,
     };
 
     const formData = this.buildFormData(this.currentUser, companyDetails);
