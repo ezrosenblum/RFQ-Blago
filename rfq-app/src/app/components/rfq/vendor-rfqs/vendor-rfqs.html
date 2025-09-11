@@ -94,10 +94,8 @@
     </div>
 
     <!-- Charts Section (Admin Only) -->
-    <div *ngIf="currentUser?.type === 'Administrator'" class="mb-8">
+    <!-- <div *ngIf="currentUser?.type === 'Administrator'" class="mb-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Status Distribution Pie Chart -->
-        <div class="card">
           <div class="card-header">
             <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 flex items-center">
               <i class="ki ki-chart-pie-simple ki-outline mr-2"></i>
@@ -113,7 +111,6 @@
           </div>
         </div>
 
-        <!-- Submissions Timeline Line Chart -->
         <div class="card">
           <div class="card-header">
             <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 flex items-center">
@@ -129,7 +126,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Error Message -->
     <div *ngIf="errorMessage" class="alert alert-error mb-6 fade-in" role="alert">

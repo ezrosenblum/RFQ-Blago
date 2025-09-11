@@ -81,17 +81,12 @@
           <div class="space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.TIMELINE' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.minimumTimelineDuration}} - {{quote.maximumTimelineDuration}} {{quote.timelineIntervalType?.name}}</span>
+              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.timelineDescription}}</span>
             </div>
             <hr class="border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center">
               <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.START_DATE' | translate}}</span>
               <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.created | date:'MMM dd, yyyy' }}</span>
-            </div>
-            <hr class="border-gray-100 dark:border-gray-700">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-500 dark:text-gray-400 font-medium text-sm">{{'VENDOR.WARRANTY' | translate}}</span>
-              <span class="font-semibold text-gray-800 dark:text-white text-sm">{{quote.warantyDuration}} {{quote.warantyIntervalType?.name}}</span>
             </div>
             <hr class="border-gray-100 dark:border-gray-700">
             <div class="flex justify-between items-center">
