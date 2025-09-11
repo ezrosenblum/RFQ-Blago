@@ -1127,7 +1127,7 @@ highlightLastRfqs(): boolean {
     );
   }
 
-  openQuoteFormDialog(id: number, customerId: number, edit: boolean) {
+  openQuoteFormDialog(id: number, customerId: number, edit: boolean, title: string, description: string) {
     let width = '60%';
 
     if (this.breakpointObserver.isMatched(Breakpoints.Handset)) {
@@ -1145,6 +1145,8 @@ highlightLastRfqs(): boolean {
         rfqId: id,
         customerId: customerId,
         vendorId: this.currentUser?.id,
+        title: title,
+        description: description
       },
     });
 
