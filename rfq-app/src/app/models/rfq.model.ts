@@ -300,6 +300,7 @@ export interface QuoteItem {
   maximumTimelineDuration?: number;
   warantyIntervalType?: LookupValue;
   warantyDuration?: number;
+  timelineDescription?: string;
 }
 
 export interface QuoteSearchResponse {

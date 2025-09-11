@@ -1128,15 +1128,11 @@ highlightLastRfqs(): boolean {
   }
 
   openQuoteFormDialog(id: number, customerId: number, edit: boolean, title: string, description: string) {
-    let width = '60%';
-
-    if (this.breakpointObserver.isMatched(Breakpoints.Handset)) {
-      width = '90%';
-    }
+    let width = '50%';
 
     const dialogRef = this._dialog.open(QuoteFormDialog, {
       width,
-      maxWidth: '90%',
+      maxWidth: '50%',
       height: 'auto',
       panelClass: 'add-quote-dialog',
       autoFocus: false,

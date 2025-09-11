@@ -233,22 +233,13 @@
 
           <!-- Quote Details Grid -->
           <div class="p-6">
-            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
               <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
                 <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
                   {{ 'VENDOR.TIMELINE' | translate }}
                 </div>
                 <div class="text-base font-bold text-gray-900 dark:text-white">
-                  {{quote.minimumTimelineDuration}} - {{quote.maximumTimelineDuration}} {{quote.timelineIntervalType?.name}}
-                </div>
-              </div>
-
-              <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
-                <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
-                  {{ 'VENDOR.WARRANTY' | translate }}
-                </div>
-                <div class="text-base font-bold text-gray-900 dark:text-white">
-                  {{quote.warantyDuration}} {{quote.warantyIntervalType?.name}}
+                  {{quote.timelineDescription}}
                 </div>
               </div>
 

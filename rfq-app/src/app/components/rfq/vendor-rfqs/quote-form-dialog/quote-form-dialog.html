@@ -11,21 +11,21 @@
 </div>
 <div class="dialog-scroll-container">
   <div class="bg-secondary-50 dark:bg-dark-900 p-4 border-b border-secondary-200 dark:border-gray-700">
-    <div class="text-secondary-500 dark:text-secondary-500 text-sm font-medium mb-2 tracking-wide">
-      {{ 'VENDOR.FOR' | translate }}
-    </div>
     <h2 class="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-4 leading-tight">
       {{ rfqTitle }}
     </h2>
 
     <div class="project-description">
       <div
-        class="description-text quill-content text-secondary-700 dark:text-secondary-300 transition-all duration-300 ease-in-out"
-        [class.description-collapsed]="!isDescriptionExpanded"
-        [class.description-expanded]="isDescriptionExpanded"
+        class="description-text quill-content text-secondary-700 dark:text-secondary-300 transition-all duration-300 ease-in-out relative"
+        [class]="!isDescriptionExpanded ?
+          'max-h-12 overflow-hidden after:content-[\'\'] after:absolute after:bottom-0 after:right-0 after:w-full after:h-6 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:pointer-events-none dark:after:from-gray-900' :
+          'max-h-none'"
         [innerHTML]="rfqDescription">
       </div>
-      <button  class="bg-none border-0 text-blue-500 text-sm font-medium cursor-pointer py-1 px-0 transition-colors duration-200 ease-in-out hover:text-blue-700 hover:underline" (click)="toggleDescription()">
+      <button
+        class="bg-none border-0 text-blue-500 text-sm font-medium cursor-pointer py-1 px-0 transition-colors duration-200 ease-in-out hover:text-blue-700 hover:underline"
+        (click)="toggleDescription()">
         {{ isDescriptionExpanded ? ('VENDOR.SHOW_LESS' | translate) : ('VENDOR.SHOW_MORE' | translate) }}
       </button>
     </div>
