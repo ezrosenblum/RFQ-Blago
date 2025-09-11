@@ -1,5 +1,5 @@
-<div class="flex justify-between pl-25 pr-25 bg-secondary-50 dark:bg-dark-900">
-  <h1 mat-dialog-title>
+<div class="flex justify-between items-center pr-6 py-4 bg-secondary-50 dark:bg-dark-900  border-b border-secondary-200 dark:border-gray-700">
+  <h1 mat-dialog-title class="text-xl font-semibold m-0">
     <span *ngIf="action === 'Add'" class="text-secondary-900 dark:text-secondary-100">
       {{ "VENDOR.SEND_QUOTE" | translate }}
     </span>
@@ -7,266 +7,198 @@
       {{ "VENDOR.EDIT_QUOTE" | translate }}
     </span>
   </h1>
-
   <i class="ki-outline ki-abstract-11 text-base me-1 mr-2 text-secondary-900 dark:text-secondary-100" [mat-dialog-close]="false"></i>
 </div>
+<div class="dialog-scroll-container">
+  <div class="bg-secondary-50 dark:bg-dark-900 p-4 border-b border-secondary-200 dark:border-gray-700">
+    <div class="text-secondary-500 dark:text-secondary-500 text-sm font-medium mb-2 tracking-wide">
+      {{ 'VENDOR.FOR' | translate }}
+    </div>
+    <h2 class="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-4 leading-tight">
+      {{ rfqTitle }}
+    </h2>
 
-<mat-dialog-content class="p-relative bg-secondary-50 dark:bg-dark-900">
-  <form [formGroup]="quoteForm" class="card-body p-0 sm:p-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-      <!-- Title -->
-      <div class="md:col-span-2">
-        <label for="title" class="form-label">
-          {{ 'REQUEST.TITLE' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <input
-          id="title"
-          type="text"
-          formControlName="title"
-          class="form-input"
-          [class.border-red-500]="isFieldInvalid('title')"
-          placeholder="Enter quote title..."
-        />
-        <div *ngIf="isFieldInvalid('title')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('title')?.errors?.['required']">
-            {{ 'VENDOR.TITLE_REQUIRED' | translate }}
-          </span>
-          <span *ngIf="quoteForm.get('title')?.errors?.['maxlength']">
-            {{ 'VENDOR.TITLE_MAX_LENGTH' | translate }}
-          </span>
-        </div>
+    <div class="project-description">
+      <div
+        class="description-text quill-content text-secondary-700 dark:text-secondary-300 transition-all duration-300 ease-in-out"
+        [class.description-collapsed]="!isDescriptionExpanded"
+        [class.description-expanded]="isDescriptionExpanded"
+        [innerHTML]="rfqDescription">
       </div>
+      <button  class="bg-none border-0 text-blue-500 text-sm font-medium cursor-pointer py-1 px-0 transition-colors duration-200 ease-in-out hover:text-blue-700 hover:underline" (click)="toggleDescription()">
+        {{ isDescriptionExpanded ? ('VENDOR.SHOW_LESS' | translate) : ('VENDOR.SHOW_MORE' | translate) }}
+      </button>
+    </div>
+  </div>
 
-      <!-- Description -->
-      <div class="md:col-span-2">
-        <label for="description" class="form-label">
-          {{ 'VENDOR.DESCRIPTION' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <!-- <textarea
-          id="description"
-          formControlName="description"
-          rows="4"
-          class="form-input resize-none"
+  <mat-dialog-content class="p-relative bg-secondary-50 dark:bg-dark-900">
+    <form [formGroup]="quoteForm" class="card-body p-0 sm:p-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          placeholder="Enter detailed description..."
-        ></textarea> -->
-        <quill-editor
-          #messageInput
-          formControlName="description"
-          [modules]="modules"
-          placeholder="Enter detailed description..."
-          [class.border-red-500]="isFieldInvalid('description')"
-          class="m-0 w-100 bg-white dark:bg-gray-800 dark:text-white"
-        >
-        </quill-editor>
-
-        <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('description')?.errors?.['required']">
-            {{ 'VENDOR.DESCRIPTION_REQUIRED' | translate }}
-          </span>
-          <span *ngIf="quoteForm.get('description')?.errors?.['maxlength']">
-            {{ 'VENDOR.DESCRIPTION_MAX_LENGTH' | translate }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Price -->
-       <div class="md:col-span-2 grid grid-cols-3 gap-4">
-        <div class="col-span-3 md:col-span-1">
-          <label for="price" class="form-label">
-            {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
+        <!-- Title -->
+        <!-- <div class="md:col-span-2">
+          <label for="title" class="form-label">
+            {{ 'REQUEST.TITLE' | translate }} <span class="text-red-500">*</span>
           </label>
-          <div class="relative">
           <input
-            #priceInput
-            id="price"
+            id="title"
             type="text"
-            formControlName="price"
+            formControlName="title"
             class="form-input"
-            [class.border-red-500]="isFieldInvalid('price')"
-            placeholder="0.00"
-            (blur)="onBlurPrice()"
-            (focus)="onFocusPrice()"
-  />
-          </div>
-          <div *ngIf="isFieldInvalid('price')" class="mt-1 text-sm text-red-500">
-            <span *ngIf="quoteForm.get('price')?.errors?.['required']">
-              {{ 'VENDOR.PRICE_REQUIRED' | translate }}
+            [class.border-red-500]="isFieldInvalid('title')"
+            placeholder="Enter quote title..."
+          />
+          <div *ngIf="isFieldInvalid('title')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('title')?.errors?.['required']">
+              {{ 'VENDOR.TITLE_REQUIRED' | translate }}
             </span>
-            <span *ngIf="quoteForm.get('price')?.errors?.['min']">
-              {{ 'VENDOR.PRICE_MIN' | translate }}
+            <span *ngIf="quoteForm.get('title')?.errors?.['maxlength']">
+              {{ 'VENDOR.TITLE_MAX_LENGTH' | translate }}
             </span>
           </div>
-        </div>
-       </div>
+        </div> -->
 
+        <!-- Description -->
+        <div class="md:col-span-2">
+          <label for="description" class="form-label">
+            {{ 'VENDOR.VENDOR_MESSAGE' | translate }} <span class="text-red-500">*</span>
+          </label>
+          <!-- <textarea
+            id="description"
+            formControlName="description"
+            rows="4"
+            class="form-input resize-none"
 
-      <!-- Quote Validity Interval -->
-      <div>
-        <label for="quoteValidityInterval" class="form-label">
-          {{ 'VENDOR.VALIDITY_INTERVAL' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <input
-          id="quoteValidityInterval"
-          type="number"
-          formControlName="quoteValidityInterval"
-          class="form-input"
-          [class.border-red-500]="isFieldInvalid('quoteValidityInterval')"
-          placeholder="Enter number..."
-          min="1"
-        />
-        <div *ngIf="isFieldInvalid('quoteValidityInterval')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['required']">
-            {{ 'VENDOR.VALIDITY_INTERVAL_REQUIRED' | translate }}
-          </span>
-          <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['min']">
-            {{ 'VENDOR.VALIDITY_INTERVAL_MIN' | translate }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Quote Validity Interval Type -->
-      <div>
-        <label for="quoteValidityIntervalType" class="form-label">
-          {{ 'VENDOR.VALIDITY_TYPE' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <select
-          id="quoteValidityIntervalType"
-          formControlName="quoteValidityIntervalType"
-          class="form-select"
-          [class.border-red-500]="isFieldInvalid('quoteValidityIntervalType')"
-        >
-          <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_VALIDITY_TYPE' | translate }}</option>
-          <option
-            *ngFor="let option of validityTypeOptions"
-            [ngValue]="option.id"
+            placeholder="Enter detailed description..."
+          ></textarea> -->
+          <quill-editor
+            #messageInput
+            formControlName="description"
+            [modules]="modules"
+            placeholder="{{ 'VENDOR.DESCRIPTION_PLACEHOLDER' | translate }}"
+            [class.border-red-500]="isFieldInvalid('description')"
+            class="m-0 w-100 bg-white dark:bg-gray-800 dark:text-white"
           >
-            {{ option.name }}
-          </option>
-        </select>
-        <div *ngIf="isFieldInvalid('quoteValidityIntervalType')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('quoteValidityIntervalType')?.errors?.['required']">
-            {{ 'VENDOR.VALIDITY_TYPE_REQUIRED' | translate }}
-          </span>
+          </quill-editor>
+
+          <div *ngIf="isFieldInvalid('description')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('description')?.errors?.['required']">
+              {{ 'VENDOR.DESCRIPTION_REQUIRED' | translate }}
+            </span>
+            <span *ngIf="quoteForm.get('description')?.errors?.['maxlength']">
+              {{ 'VENDOR.DESCRIPTION_MAX_LENGTH' | translate }}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <!-- Warrany Validity Interval -->
-      <div>
-        <label for="warantyDuration" class="form-label">
-          {{ 'VENDOR.WARRANTY_INTERVAL' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <input
-          id="warantyDuration"
-          type="number"
-          formControlName="warantyDuration"
-          class="form-input"
-          [class.border-red-500]="isFieldInvalid('warantyDuration')"
-          placeholder="Enter number..."
-          min="1"
-        />
-        <div *ngIf="isFieldInvalid('warantyDuration')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('warantyDuration')?.errors?.['required']">
-            {{ 'VENDOR.WARRANTY_INTERVAL_REQUIRED' | translate }}
-          </span>
-          <span *ngIf="quoteForm.get('warantyDuration')?.errors?.['min']">
-            {{ 'VENDOR.WARRANTY_INTERVAL_MIN' | translate }}
-          </span>
+        <div class="md:col-span-2 grid grid-cols-3 gap-4">
+          <div class="col-span-3 md:col-span-1">
+            <label for="price" class="form-label">
+              {{ 'VENDOR.PRICE' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                #priceInput
+                id="price"
+                type="text"
+                formControlName="price"
+                class="form-input"
+                [class.border-red-500]="isFieldInvalid('price')"
+                placeholder="0.00"
+                (blur)="onBlurPrice()"
+                (focus)="onFocusPrice()"
+              />
+            </div>
+            <div *ngIf="isFieldInvalid('price')" class="mt-1 text-sm text-red-500">
+              <span *ngIf="quoteForm.get('price')?.errors?.['required']">
+                {{ 'VENDOR.PRICE_REQUIRED' | translate }}
+              </span>
+              <span *ngIf="quoteForm.get('price')?.errors?.['min']">
+                {{ 'VENDOR.PRICE_MIN' | translate }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Types -->
+          <div class="col-span-3 md:col-span-1">
+            <label for="priceType" class="form-label">
+              {{ 'VENDOR.PRICE_TYPES' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="priceType"
+              class="form-select"
+              formControlName="priceType"
+              (change)="onTypeChange($event)"
+            >
+              <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_PRICE_TYPE' | translate }}</option>
+              <option
+                *ngFor="let type of priceTypes"
+                [ngValue]="type.id"
+              >
+                {{ type.name }}
+              </option>
+              <option [ngValue]="'other'">{{ 'VENDOR.OTHER' | translate }}</option>
+            </select>
+          </div>
+
+          <!-- Custom Price Type Input - Shows only when "Other" is selected -->
+          <div class="col-span-3 md:col-span-1" [class.invisible]="!isOtherTypeSelected">
+            <label for="priceTypeOther" class="form-label">
+              {{ 'VENDOR.CUSTOM_PRICE_TYPE' | translate }} <span class="text-red-500" *ngIf="isOtherTypeSelected">*</span>
+            </label>
+            <input
+              id="priceTypeOther"
+              type="text"
+              formControlName="priceTypeOther"
+              class="form-input"
+              [class.border-red-500]="isFieldInvalid('priceTypeOther')"
+              [disabled]="!isOtherTypeSelected"
+              placeholder="{{ 'VENDOR.CUSTOM_TYPE_PLACEHOLDER' | translate }}"
+            />
+            <div *ngIf="isFieldInvalid('priceTypeOther') && isOtherTypeSelected" class="mt-1 text-sm text-red-500">
+              <span *ngIf="quoteForm.get('priceTypeOther')?.errors?.['required']">
+                {{ 'VENDOR.CUSTOM_PRICE_TYPE_REQUIRED' | translate }}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Warrany Validity Interval Type -->
-      <div>
-        <label for="warantyIntervalType" class="form-label">
-          {{ 'VENDOR.WARRANTY_TYPE' | translate }} <span class="text-red-500">*</span>
-        </label>
-        <select
-          id="warantyIntervalType"
-          formControlName="warantyIntervalType"
-          class="form-select"
-          [class.border-red-500]="isFieldInvalid('warantyIntervalType')"
-        >
-          <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_WARRANTY_TYPE' | translate }}</option>
-          <option
-            *ngFor="let option of validityTypeOptions"
-            [ngValue]="option.id"
-          >
-            {{ option.name }}
-          </option>
-        </select>
-        <div *ngIf="isFieldInvalid('warantyIntervalType')" class="mt-1 text-sm text-red-500">
-          <span *ngIf="quoteForm.get('warantyIntervalType')?.errors?.['required']">
-            {{ 'VENDOR.WARRANTY_TYPE_REQUIRED' | translate }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Quote Timeline Row -->
-      <div class="md:col-span-2 grid grid-cols-3 gap-4">
-
-        <!-- Minimum Interval -->
-        <div  class="col-span-3 md:col-span-1">
-          <label for="minimumTimelineDuration" class="form-label">
-            {{ 'VENDOR.TIMELINE_MIN' | translate }} <span class="text-red-500">*</span>
+        <!-- Quote Validity Interval -->
+        <div>
+          <label for="quoteValidityInterval" class="form-label">
+            {{ 'VENDOR.VALIDITY_INTERVAL' | translate }} <span class="text-red-500">*</span>
           </label>
           <input
-            id="minimumTimelineDuration"
+            id="quoteValidityInterval"
             type="number"
-            formControlName="minimumTimelineDuration"
+            formControlName="quoteValidityInterval"
             class="form-input"
-            [class.border-red-500]="isFieldInvalid('minimumTimelineDuration')"
-            placeholder="Enter min..."
-            min="0"
+            [class.border-red-500]="isFieldInvalid('quoteValidityInterval')"
+            placeholder="Enter number..."
+            min="1"
           />
-          <div *ngIf="isFieldInvalid('minimumTimelineDuration')" class="mt-1 text-sm text-red-500">
-            <span *ngIf="quoteForm.get('minimumTimelineDuration')?.errors?.['required']">
-              {{ 'VENDOR.TIMELINE_MIN_REQUIRED' | translate }}
+          <div *ngIf="isFieldInvalid('quoteValidityInterval')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['required']">
+              {{ 'VENDOR.VALIDITY_INTERVAL_REQUIRED' | translate }}
             </span>
-            <span *ngIf="quoteForm.get('minimumTimelineDuration')?.errors?.['min']">
-              {{ 'VENDOR.TIMELINE_MIN_ZERO' | translate }}
-            </span>
-            <span *ngIf="quoteForm.get('minimumTimelineDuration')?.errors?.['minGreater']">
-              {{ 'VENDOR.MIN_GREATER_THAN_MAX' | translate }}
+            <span *ngIf="quoteForm.get('quoteValidityInterval')?.errors?.['min']">
+              {{ 'VENDOR.VALIDITY_INTERVAL_MIN' | translate }}
             </span>
           </div>
         </div>
 
-        <!-- Maximum Interval -->
-        <div  class="col-span-3 md:col-span-1">
-          <label for="maximumTimelineDuration" class="form-label">
-            {{ 'VENDOR.TIMELINE_MAX' | translate }} <span class="text-red-500">*</span>
-          </label>
-          <input
-            id="maximumTimelineDuration"
-            type="number"
-            formControlName="maximumTimelineDuration"
-            class="form-input"
-            [class.border-red-500]="isFieldInvalid('maximumTimelineDuration')"
-            placeholder="Enter max..."
-            min="0"
-          />
-          <div *ngIf="isFieldInvalid('maximumTimelineDuration')" class="mt-1 text-sm text-red-500">
-            <span *ngIf="quoteForm.get('maximumTimelineDuration')?.errors?.['required']">
-              {{ 'VENDOR.TIMELINE_MAX_REQUIRED' | translate }}
-            </span>
-          </div>
-        </div>
-
-        <!-- Quote Timeline Interval Type -->
-        <div  class="col-span-3 md:col-span-1">
-          <label for="timelineIntervalType" class="form-label">
-            {{ 'VENDOR.TIMELINE_TYPE' | translate }} <span class="text-red-500">*</span>
+        <!-- Quote Validity Interval Type -->
+        <div>
+          <label for="quoteValidityIntervalType" class="form-label">
+            {{ 'VENDOR.VALIDITY_TYPE' | translate }} <span class="text-red-500">*</span>
           </label>
           <select
-            id="timelineIntervalType"
-            formControlName="timelineIntervalType"
+            id="quoteValidityIntervalType"
+            formControlName="quoteValidityIntervalType"
             class="form-select"
-            [class.border-red-500]="isFieldInvalid('timelineIntervalType')"
+            [class.border-red-500]="isFieldInvalid('quoteValidityIntervalType')"
           >
-            <option [ngValue]="null" disabled>
-              {{ 'VENDOR.SELECT_TIMELINE_TYPE' | translate }}
-            </option>
+            <option [ngValue]="null" disabled>{{ 'VENDOR.SELECT_VALIDITY_TYPE' | translate }}</option>
             <option
               *ngFor="let option of validityTypeOptions"
               [ngValue]="option.id"
@@ -274,30 +206,52 @@
               {{ option.name }}
             </option>
           </select>
-          <div *ngIf="isFieldInvalid('timelineIntervalType')" class="mt-1 text-sm text-red-500">
-            <span *ngIf="quoteForm.get('timelineIntervalType')?.errors?.['required']">
-              {{ 'VENDOR.TIMELINE_TYPE_REQUIRED' | translate }}
+          <div *ngIf="isFieldInvalid('quoteValidityIntervalType')" class="mt-1 text-sm text-red-500">
+            <span *ngIf="quoteForm.get('quoteValidityIntervalType')?.errors?.['required']">
+              {{ 'VENDOR.VALIDITY_TYPE_REQUIRED' | translate }}
             </span>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Files -->
-    <div class="pt-28 md:grid-cols-2">
-      <label for="timelineIntervalType" class="form-label">
-        {{ 'VENDOR.ADD_FILE' | translate }} <span class="text-red-500">*</span>
-      </label>
-      <file-pond
-        #myPond
-        [options]="pondOptions"
-        [files]="pondFiles"
-        (onaddfile)="pondHandleAddFile($event)"
-        (onremovefile)="onFileRemoved($event)">
-      </file-pond>
-    </div>
-  </form>
-</mat-dialog-content>
+        <!-- Quote Timeline Row -->
+        <div class="md:col-span-2">
+          <div>
+            <label for="timelineDescription" class="form-label">
+              {{ 'VENDOR.DELIVERY_TIMEFRAME' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="timelineDescription"
+              type="text"
+              formControlName="timelineDescription"
+              class="form-input"
+              [class.border-red-500]="isFieldInvalid('timelineDescription')"
+              placeholder="{{ 'VENDOR.DELIVERY_TIMEFRAME_PLACEHOLDER' | translate }}"
+            />
+            <div *ngIf="isFieldInvalid('timelineDescription')" class="mt-1 text-sm text-red-500">
+              <span *ngIf="quoteForm.get('timelineDescription')?.errors?.['required']">
+                {{'VENDOR.DELIVERY_TIMEFRAME_REQUIRED' | translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Files -->
+      <div class="pt-28 md:grid-cols-2">
+        <label for="timelineIntervalType" class="form-label">
+          {{ 'VENDOR.ADD_FILE' | translate }}
+        </label>
+        <file-pond
+          #myPond
+          [options]="pondOptions"
+          [files]="pondFiles"
+          (onaddfile)="pondHandleAddFile($event)"
+          (onremovefile)="onFileRemoved($event)">
+        </file-pond>
+      </div>
+    </form>
+  </mat-dialog-content>
+</div>
 
 <mat-dialog-actions class=" bg-secondary-50 dark:bg-dark-900">
   <div class="w-100 flex justify-between">
@@ -306,7 +260,7 @@
     </button>
 
 
-    <button (click)="onSubmit()" [disabled]="!quoteForm.valid || !pondFiles || pondFiles.length < 1"
+    <button (click)="onSubmit()" [disabled]="!quoteForm.valid"
         class="btn btn-success ml-5"
     >
       <span *ngIf="!isSubmitting">{{ 'AUTH.SUBMIT' | translate }}</span>

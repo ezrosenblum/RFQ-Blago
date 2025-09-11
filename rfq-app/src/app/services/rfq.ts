@@ -199,4 +199,8 @@ export class RfqService {
   deleteFileFromRfq(rfqId: number, fileId: number): Observable<any> {
     return this.http.delete(`${this.API_URL}Submission/${rfqId}/file/${fileId}`);
   }
+
+  getPriceTypes(): Observable<LookupValue[]> {
+    return this.http.get<LookupValue[]>(`${this.API_URL}Submission/quote/price/types`);
+  }
 }

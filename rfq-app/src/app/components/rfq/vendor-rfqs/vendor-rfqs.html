@@ -105,7 +105,7 @@
             </h3>
           </div>
           <div class="card-body">
-            <app-pie-chart 
+            <app-pie-chart
               [data]="pieChartData"
               [title]="'Status Distribution'"
               [colors]="statusColors">
@@ -122,7 +122,7 @@
             </h3>
           </div>
           <div class="card-body">
-            <app-line-chart 
+            <app-line-chart
               [data]="lineChartData"
               [title]="'RFQ Submissions Over Time'">
             </app-line-chart>
@@ -487,7 +487,7 @@
                         {{ 'VENDOR.REJECT' | translate }}
                       </button>
 
-                      <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                      <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false, rfq.title!, rfq.description!)"
                         class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-green-500 text-white hover:bg-green-600 w-full sm:w-auto">
                         {{ 'VENDOR.SEND_QUOTE' | translate }}
                       </button>
@@ -656,7 +656,7 @@
                         </button>
 
                         <!-- Send Quote button (Envelope Icon) -->
-                        <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                        <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false, rfq.title!, rfq.description!)"
                           class="inline-flex items-center justify-center p-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 transition-transform bg-green-500 text-white hover:bg-green-600"
                           title="{{ 'VENDOR.SEND_QUOTE' | translate }}">
                           <!-- Envelope Icon -->

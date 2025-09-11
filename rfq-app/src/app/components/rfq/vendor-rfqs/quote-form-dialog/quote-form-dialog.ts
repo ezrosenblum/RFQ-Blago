@@ -7,6 +7,7 @@ import { AlertService } from '../../../../services/alert.service';
 import { CurrencyPipe } from '@angular/common';
 import { FilePondComponent } from 'ngx-filepond';
 import { QuillEditorComponent } from 'ngx-quill';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-quote-form-dialog',
@@ -37,20 +38,28 @@ export class QuoteFormDialog implements OnInit {
   modules = {
     toolbar: this.toolbarOptions
   };
-  
+  priceTypes: LookupValue[] = [];
+  rfqTitle: string = '';
+  rfqDescription: string = '';
+  isOtherTypeSelected: boolean = false;
+  isDescriptionExpanded = false;
+
   constructor(
     private _dialogRef: MatDialogRef<QuoteFormDialog>,
     @Inject(MAT_DIALOG_DATA) public _data: any,
     private formBuilder: FormBuilder,
     private rfqService: RfqService,
     private alertService: AlertService,
-    private currencyPipe: CurrencyPipe
+    private currencyPipe: CurrencyPipe,
+    private _translate: TranslateService
   ){
     if (this._data) {
       this.action = this._data.action || 'Add';
       this.customerId = this._data.customerId || null;
       this.vendorId = this._data.vendorId || null;
       this.rfqId = this._data.rfqId || null;
+      this.rfqTitle = this._data.title || '';
+      this.rfqDescription = this._data.description || '';
     }
 
     this.quoteForm = this.initializeForm();
@@ -68,25 +77,21 @@ export class QuoteFormDialog implements OnInit {
         console.error('Error fetching validity types:', error);
       }
     })
+    this.loadPriceTypes();
   }
 
   private initializeForm(): FormGroup {
     return this.formBuilder.group({
-      title: ['', [Validators.required, Validators.maxLength(200)]],
+      title: [''],
       description: ['', [Validators.required, Validators.maxLength(5000)]],
       price: [0, [Validators.required, Validators.min(0)]],
+      priceType: [null, [Validators.required]],
+      priceTypeOther: [''],
       quoteValidityInterval: [0, [Validators.required, Validators.min(1)]],
       quoteValidityIntervalType: [null, [Validators.required]],
-      warantyDuration: [0, [Validators.required, Validators.min(1)]],
-      warantyIntervalType: [null, [Validators.required]],
-      timelineIntervalType: [null, [Validators.required]],
-      minimumTimelineDuration: [0, [Validators.required, Validators.min(0)]],
-      maximumTimelineDuration: [0, [Validators.required, Validators.min(0)]],
+      timelineDescription: [null, [Validators.required]],
       vendorId: [],
       submissionId: []
-    },
-    {
-      validators: this.timelineMinMaxValidator()
     });
   }
 
@@ -96,33 +101,34 @@ export class QuoteFormDialog implements OnInit {
   }
 
   onSubmit(): void {
-  if (this.quoteForm.valid && (this.pondFiles && this.pondFiles.length > 0)) {
+  if (this.quoteForm.valid) {
     this.isSubmitting = true;
 
     const quoteEntry = this.quoteForm.value;
     quoteEntry.vendorId = this.vendorId;
     quoteEntry.submissionId = this.rfqId;
-    
+
     // Create FormData object
     const formData = new FormData();
     const formValues = this.quoteForm.value;
-    formData.append('title', formValues.title || '');
+    formData.append('title', this.rfqTitle || '');
     formData.append('description', formValues.description || '');
     formData.append('price', String(formValues.price || 0));
     formData.append('quoteValidityInterval', String(formValues.quoteValidityInterval || 0));
     formData.append('quoteValidityIntervalType', String(formValues.quoteValidityIntervalType || ''));
-    formData.append('warantyDuration', String(formValues.warantyDuration || 0));
-    formData.append('warantyIntervalType', String(formValues.warantyIntervalType || ''));
-    formData.append('timelineIntervalType', String(formValues.timelineIntervalType || ''));
-    formData.append('minimumTimelineDuration', String(formValues.minimumTimelineDuration || 0));
-    formData.append('maximumTimelineDuration', String(formValues.maximumTimelineDuration || 0));
+    formData.append('timelineDescription', String(formValues.timelineDescription || ''));
     formData.append('vendorId', String(this.vendorId || ''));
     formData.append('submissionId', String(this.rfqId || ''));
-    
+
     this.pondFiles.forEach(file => {
       formData.append('Files', file, file.name);
     });
 
+    if (this.isOtherTypeSelected && formValues.priceTypeOther) {
+      formData.append('priceTypeOther', formValues.priceTypeOther);
+    } else if (formValues.priceType && formValues.priceType !== 'other') {
+      formData.append('priceType', String(formValues.priceType));
+    }
     this.rfqService.saveQuote(formData).subscribe({
       next: (response) => {
         if (this.action === 'Add') {
@@ -132,7 +138,7 @@ export class QuoteFormDialog implements OnInit {
         }
 
         this.isSubmitting = false;
-        
+
         this.pondFiles = [];
         this.uploadedFilesCount = 0;
         setTimeout(() => {
@@ -150,28 +156,6 @@ export class QuoteFormDialog implements OnInit {
     });
   }
 }
-
-  private timelineMinMaxValidator() {
-  return (formGroup: FormGroup) => {
-    const min = formGroup.get('minimumTimelineDuration')?.value;
-    const max = formGroup.get('maximumTimelineDuration')?.value;
-
-    if (min != null && max != null && min > max) {
-      formGroup.get('minimumTimelineDuration')?.setErrors({ minGreater: true });
-    } else {
-      if (formGroup.get('minimumTimelineDuration')?.hasError('minGreater')) {
-        const errors = { ...formGroup.get('minimumTimelineDuration')?.errors };
-        delete errors['minGreater'];
-        if (Object.keys(errors).length === 0) {
-          formGroup.get('minimumTimelineDuration')?.setErrors(null);
-        } else {
-          formGroup.get('minimumTimelineDuration')?.setErrors(errors);
-        }
-      }
-    }
-    return null;
-  };
-  }
 
   onBlurPrice() {
     const rawValue = this.priceInput.nativeElement.value;
@@ -209,4 +193,34 @@ export class QuoteFormDialog implements OnInit {
     }
   }
 
+  loadPriceTypes() {
+    this.rfqService.getPriceTypes().subscribe({
+      next: (types) => {
+        this.priceTypes = types;
+      },
+      error: (error) => {
+        console.error('Error loading price types:', error);
+      }
+    });
+  }
+
+  onTypeChange(event: any): void {
+    const selectedValue = event.target.value;
+    this.isOtherTypeSelected = selectedValue === '1: other';
+
+    const priceTypeOtherControl = this.quoteForm.get('priceTypeOther');
+
+    if (this.isOtherTypeSelected) {
+      priceTypeOtherControl?.setValidators([Validators.required]);
+      this.quoteForm.get('priceType')?.setValue('other');
+    } else {
+      priceTypeOtherControl?.clearValidators();
+      priceTypeOtherControl?.setValue('');
+    }
+    priceTypeOtherControl?.updateValueAndValidity();
+  }
+
+  toggleDescription(): void {
+    this.isDescriptionExpanded = !this.isDescriptionExpanded;
+  }
 }
