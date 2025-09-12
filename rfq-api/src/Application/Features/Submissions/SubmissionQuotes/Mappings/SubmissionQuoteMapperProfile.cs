@@ -41,13 +41,11 @@ public sealed class SubmissionQuoteMapperProfile : Profile
                 src.Title,
                 src.Description,
                 src.Price,
+                src.PriceType,
+                src.PriceTypeOther,
                 src.QuoteValidityIntervalType,
                 src.QuoteValidityInterval,
-                src.TimelineIntervalType,
-                src.MinimumTimelineDuration,
-                src.MaximumTimelineDuration,
-                src.WarantyIntervalType,
-                src.WarantyDuration));
+                src.TimelineDescription));
     }
 
     private static DateTime CalculateValidUntil(SubmissionQuote s) =>

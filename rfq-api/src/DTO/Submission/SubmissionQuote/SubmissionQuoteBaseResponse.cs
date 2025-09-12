@@ -11,6 +11,8 @@ public record SubmissionQuoteBaseResponse
     public string Title { get; init; } = null!;
     public string Description { get; init; } = null!;
     public decimal Price { get; init; }
+    public ListItemBaseResponse? PriceType { get; init; }
+    public string? PriceTypeOther { get; init; }
     public ListItemBaseResponse Status { get; init; } = new();
     public ListItemBaseResponse QuoteValidityIntervalType { get; init; } = new();
     public int QuoteValidityInterval { get; init; }
@@ -25,4 +27,5 @@ public record SubmissionQuoteBaseResponse
     public int? MaximumTimelineDuration { get; init; }
     public ListItemBaseResponse? WarantyIntervalType { get; init; }
     public int? WarantyDuration { get; init; }
+    public string? TimelineDescription { get; init; }
 }

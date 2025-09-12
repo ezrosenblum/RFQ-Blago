@@ -28,8 +28,8 @@
                     </div>
                 </div>
 
-                <div class="flex-1" style="flex: 0.4;" *ngIf="shouldShowSaveButton()">
-                    <button 
+                <div class="flex-1" style="flex: 0.4;" *ngIf="shouldShowSaveButton() && currentUser">
+                    <button
                         (click)="saveServiceArea()"
                         [disabled]="!isValidData() || isSubmitting"
                         [class]="getSaveButtonClasses()"

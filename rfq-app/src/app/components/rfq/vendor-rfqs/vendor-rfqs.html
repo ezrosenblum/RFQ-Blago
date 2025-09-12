@@ -93,6 +93,41 @@
       </div>
     </div>
 
+    <!-- Charts Section (Admin Only) -->
+    <!-- <div *ngIf="currentUser?.type === 'Administrator'" class="mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card-header">
+            <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 flex items-center">
+              <i class="ki ki-chart-pie-simple ki-outline mr-2"></i>
+              {{ 'ADMIN.STATUS_DISTRIBUTION' | translate }}
+            </h3>
+          </div>
+          <div class="card-body">
+            <app-pie-chart
+              [data]="pieChartData"
+              [title]="'Status Distribution'"
+              [colors]="statusColors">
+            </app-pie-chart>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="text-lg font-medium text-secondary-900 dark:text-secondary-100 flex items-center">
+              <i class="ki ki-chart-line ki-outline mr-2"></i>
+              {{ 'ADMIN.SUBMISSIONS_TIMELINE' | translate }}
+            </h3>
+          </div>
+          <div class="card-body">
+            <app-line-chart
+              [data]="lineChartData"
+              [title]="'RFQ Submissions Over Time'">
+            </app-line-chart>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
     <!-- Error Message -->
     <div *ngIf="errorMessage" class="alert alert-error mb-6 fade-in" role="alert">
       <div class="flex">
@@ -449,7 +484,7 @@
                         {{ 'VENDOR.REJECT' | translate }}
                       </button>
 
-                      <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                      <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false, rfq.title!, rfq.description!)"
                         class="inline-flex items-center justify-center gap-[6px] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 bg-green-500 text-white hover:bg-green-600 w-full sm:w-auto">
                         {{ 'VENDOR.SEND_QUOTE' | translate }}
                       </button>
@@ -618,7 +653,7 @@
                         </button>
 
                         <!-- Send Quote button (Envelope Icon) -->
-                        <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false)"
+                        <button *ngIf="canSendQuote(rfq)" (click)="openQuoteFormDialog(rfq.id!, rfq.user!.id!, false, rfq.title!, rfq.description!)"
                           class="inline-flex items-center justify-center p-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out hover:-translate-y-1 transition-transform bg-green-500 text-white hover:bg-green-600"
                           title="{{ 'VENDOR.SEND_QUOTE' | translate }}">
                           <!-- Envelope Icon -->

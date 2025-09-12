@@ -6,7 +6,6 @@ using Application.Common.Localization;
 using Application.Common.Validation;
 using Application.Features.Validators;
 using Domain.Entities.Submissions.SubmissionQuotes;
-using Domain.Interfaces;
 using DTO.Enums.Submission.SubmissionQuote;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +17,11 @@ public sealed record SubmissionQuoteUpdateCommand(
     string Title,
     string Description,
     decimal Price,
+    SubmissionQuotePriceType? PriceType,
+    string? PriceTypeOther,
     GlobalIntervalType QuoteValidityIntervalType,
     int QuoteValidityInterval,
-    GlobalIntervalType? TimelineIntervalType,
-    int? MinimumTimelineDuration,
-    int? MaximumTimelineDuration,
-    GlobalIntervalType? WarantyIntervalType,
-    int? WarantyDuration) : ISubmissionQuoteUpdateData, ICommand;
+    string? TimelineDescription) : ISubmissionQuoteUpdateData, ICommand;
 
 public sealed class SubmissionQuoteUpdateCommandHandler : ICommandHandler<SubmissionQuoteUpdateCommand>
 {

@@ -3,7 +3,6 @@ using Domain.Entities.Medias;
 using Domain.Entities.Submissions.SubmissionQuotes.QuoteMessages;
 using Domain.Entities.User;
 using Domain.Events;
-using Domain.Events.Submissions;
 using Domain.Events.Submissions.SubmissionQuotes;
 using Domain.Interfaces;
 using DTO.Enums.Media;
@@ -17,6 +16,8 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
     public string Title { get; private set; } = null!;
     public string Description { get; private set; } = null!;
     public decimal Price { get; private set; }
+    public SubmissionQuotePriceType? PriceType { get; private set; }
+    public string? PriceTypeOther { get; private set; }
     public GlobalIntervalType QuoteValidityIntervalType { get; private set; }
     public SubmissionQuoteStatus Status { get; private set; } = SubmissionQuoteStatus.Pending;
     public int QuoteValidityInterval { get; private set; }
@@ -25,10 +26,11 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
     public GlobalIntervalType? TimelineIntervalType { get; private set; }
     public int? MinimumTimelineDuration { get; private set; }
     public int? MaximumTimelineDuration { get; private set; }
+    public string? TimelineDescription { get; private set; }
     public GlobalIntervalType? WarantyIntervalType { get; private set; }
     public int? WarantyDuration { get; private set; }
 
-    public Media Media { get; private set; }
+    public Media Media { get; private set; } = null!;
 
     public Submission Submission { get; private set; } = null!;
     public ApplicationUser Vendor { get; private set; } = null!;
@@ -41,17 +43,15 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         Title = data.Title;
         Description = data.Description;
         Price = data.Price;
+        PriceType = data.PriceType;
+        PriceTypeOther = data.PriceTypeOther;
         QuoteValidityIntervalType = data.QuoteValidityIntervalType;
         QuoteValidityInterval = data.QuoteValidityInterval;
         SubmissionId = data.SubmissionId;
         VendorId = data.VendorId;
         Media = new Media(MediaEntityType.SubmissionQuote);
         Status = SubmissionQuoteStatus.Pending;
-        TimelineIntervalType = data.TimelineIntervalType;
-        MinimumTimelineDuration = data.MinimumTimelineDuration;
-        MaximumTimelineDuration = data.MaximumTimelineDuration;
-        WarantyIntervalType = data.WarantyIntervalType;
-        WarantyDuration = data.WarantyDuration;
+        TimelineDescription = data.TimelineDescription;
 
         AddDomainEvent(new SubmissionQuoteCreatedEvent(this, files));
     }
@@ -64,13 +64,11 @@ public class SubmissionQuote : BaseAuditableEntity, IHasDomainEvents, IWithMedia
         Title = data.Title;
         Description = data.Description;
         Price = data.Price;
+        PriceType = data.PriceType;
+        PriceTypeOther = data.PriceTypeOther;
         QuoteValidityIntervalType = data.QuoteValidityIntervalType;
         QuoteValidityInterval = data.QuoteValidityInterval;
-        TimelineIntervalType = data.TimelineIntervalType;
-        MinimumTimelineDuration = data.MinimumTimelineDuration;
-        MaximumTimelineDuration = data.MaximumTimelineDuration;
-        WarantyIntervalType = data.WarantyIntervalType;
-        WarantyDuration = data.WarantyDuration;
+        TimelineDescription = data.TimelineDescription;
 
         AddDomainEvent(new SubmissionQuoteUpdatedEvent(this));
     }

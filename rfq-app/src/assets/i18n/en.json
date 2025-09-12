@@ -356,7 +356,22 @@
     "TOTAL_PROJECT_COST": "Total Project Cost",
     "FILE_PREVIEW_ERROR": "Download failed",
     "ADD_FILE": "Attach file(s)",
-    "EDIT_RFQ": "Edit RFQ"
+    "EDIT_RFQ": "Edit RFQ",
+    "YOU_CONTACT_VENDOR": "Your Vendor Contact",
+    "NO_PHONE_AVAILABLE": "not available",
+    "TIMELINE_INTERVAL": "Timeline Interval",
+    "QUOTE_VALIDITY": "Quote Validity",
+    "SELECT_PRICE_TYPE": "Select price type",
+    "DELIVERY_TIMEFRAME": "Delivery time frame",
+    "DELIVERY_TIMEFRAME_REQUIRED": "Delivery time frame is required",
+    "PRICE_TYPES": "Price Types",
+    "OTHER": "Other",
+    "CUSTOM_PRICE_TYPE": "Custom price type",
+    "CUSTOM_PRICE_TYPE_REQUIRED": "Custom price type is required",
+    "CUSTOM_TYPE_PLACEHOLDER": "Enter custom price type...",
+    "DELIVERY_TIMEFRAME_PLACEHOLDER": "Enter delivery time frame...",
+    "DESCRIPTION_PLACEHOLDER": "Detail how you will fulfill the requirements: your approach, deliverables, timeline, key benefits, and any important considerations or assumptions...",
+    "VENDOR_MESSAGE": "Vendor Message"
   },
   "ERROR": {
     "SESSION_EXPIRED": "Your session has expired. Please log in again.",
@@ -402,7 +417,8 @@
     "SAVING": "Saving...",
     "SERVICE_AREA_UPDATED_SUCCESS": "Service area updated successfully",
     "SERVICE_AREA_UPDATE_FAILED": "Failed to update service area",
-    "SERVICE_AREA_UPDATE_NETWORK_ERROR": "Failed to update service area. Please check your internet connection."
+    "SERVICE_AREA_UPDATE_NETWORK_ERROR": "Failed to update service area. Please check your internet connection.",
+    "RETRIEVE_USER_FAILED": "Failed to retrieve user information. Please try again."
   },
   "PROFILE": {
     "ACCOUNT_SETTINGS": "Account Settings",
@@ -570,5 +586,9 @@
     "ARCHIVE": "Archive",
     "MESSAGES": "Messages",
     "VIEW_CONVERSATION": "View Conversation"
+  },
+  "ADMIN": {
+    "STATUS_DISTRIBUTION": "Status Distribution",
+    "SUBMISSIONS_TIMELINE": "Submissions Timeline"
   }
 }

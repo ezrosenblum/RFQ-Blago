@@ -1,6 +1,7 @@
 ﻿using Application.Common.Helpers;
 using Application.Common.Interfaces;
 using Application.Common.Localization;
+using Application.Features.Enums.Queries;
 using Application.Features.Submissions.Commands;
 using Application.Features.Submissions.Queries;
 using Application.Features.Submissions.Search;
@@ -12,6 +13,7 @@ using Application.Features.Submissions.SubmissionQuotes.QuoteMessages.Search;
 using Application.Features.Submissions.SubmissionQuotes.Search;
 using AutoMapper;
 using DTO.Authentication;
+using DTO.Enums.Company;
 using DTO.Enums.Submission;
 using DTO.Enums.Submission.SubmissionQuote;
 using DTO.Pagination;
@@ -111,6 +113,20 @@ namespace Api.Controllers.v1
         public async Task<SubmissionReportResponse> GetCountReport()
         {
             return await Mediator.Send(new SubmissionCountReportQuery());
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpGet("charts/status-distribution")]
+        public async Task<StatusDistributionResponse> GetStatusDistribution()
+        {
+            return await Mediator.Send(new SubmissionStatusDistributionQuery());
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpGet("charts/timeline")]
+        public async Task<SubmissionTimelineResponse> GetTimeline([FromQuery] int daysBack = 30)
+        {
+            return await Mediator.Send(new SubmissionTimelineQuery(daysBack));
         }
 
         [HttpGet("units")]
@@ -253,6 +269,12 @@ namespace Api.Controllers.v1
         public async Task<PaginatedList<QuoteMessageSearchable>> FullQuoteMessageSearch([FromBody] QuoteMessageFullSearchQuery request)
         {
             return await Mediator.Send(request);
+        }
+
+        [HttpGet("quote/price/types")]
+        public async Task<IReadOnlyCollection<ListItemBaseResponse>> GetQuotePriceTypes()
+        {
+            return await Mediator.Send(new GetEnumValuesQuery(typeof(SubmissionQuotePriceType)));
         }
 
         [Authorize(Roles = "Administrator")]
