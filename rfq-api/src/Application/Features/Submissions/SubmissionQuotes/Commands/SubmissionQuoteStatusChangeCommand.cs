@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Request.Handlers;
 using Application.Common.Localization;
 using Application.Features.Validators;
 using Domain.Entities.Submissions.SubmissionQuotes;
+using DTO.Enums.Submission;
 using DTO.Enums.Submission.SubmissionQuote;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Application.Features.Submissions.SubmissionQuotes.Commands;
 
 public sealed record SubmissionQuoteStatusChangeCommand(
-    int Id, 
+    int Id,
     SubmissionQuoteStatus Status) : ICommand;
 
 public sealed class SubmissionQuoteStatusChangeCommandHandler : ICommandHandler<SubmissionQuoteStatusChangeCommand>
@@ -32,9 +33,13 @@ public sealed class SubmissionQuoteStatusChangeCommandHandler : ICommandHandler<
     public async Task Handle(SubmissionQuoteStatusChangeCommand command, CancellationToken cancellationToken)
     {
         var submissionQuote = await _dbContext.SubmissionQuote
+            .Include(s => s.Submission)
             .FirstAsync(s => s.Id == command.Id, cancellationToken);
 
         submissionQuote.ChangeStatus(command.Status);
+
+        if (command.Status == SubmissionQuoteStatus.Accepted)
+            submissionQuote.Submission.ChangeStatus(SubmissionStatus.Completed);
 
         _dbContext.SubmissionQuote.Update(submissionQuote);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
