@@ -72,7 +72,10 @@
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-lg border dark:border-gray-700 transition-colors duration-200 overflow-hidden">
         <!-- Price Section -->
         <div class="bg-gradient-to-r from-green-200 to-green-100 dark:from-green-900/30 dark:to-green-800/30 text-green-900 dark:text-green-200 p-6 text-center">
-          <div class="text-3xl font-bold mb-1">${{quote.price}}</div>
+          <div class="text-3xl font-bold mb-1">${{ quote.price | number:'1.0-0' }}
+            <span *ngIf="quote?.priceType?.name || quote?.priceTypeOther">
+              / {{quote?.priceType?.name || quote?.priceTypeOther}}
+            </span></div>
           <div class="font-medium">{{'VENDOR.PROPOSED_BID' | translate}}</div>
         </div>
 

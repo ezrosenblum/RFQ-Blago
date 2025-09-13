@@ -223,6 +223,9 @@
               <div class="text-right">
                 <div class="text-3xl font-extrabold mb-1">
                   ${{ quote.price | number:'1.0-0' }}
+                  <span *ngIf="quote?.priceType?.name || quote?.priceTypeOther">
+                    / {{quote?.priceType?.name || quote?.priceTypeOther}}
+                  </span>
                 </div>
                 <div class="text-xs opacity-80 uppercase">
                   {{ 'VENDOR.TOTAL_COST' | translate }}

@@ -301,6 +301,8 @@ export interface QuoteItem {
   warantyIntervalType?: LookupValue;
   warantyDuration?: number;
   timelineDescription?: string;
+  priceType?: LookupValue;
+  priceTypeOther?: string;
 }
 
 export interface QuoteSearchResponse {

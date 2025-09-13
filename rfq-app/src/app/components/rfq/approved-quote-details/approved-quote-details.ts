@@ -4,6 +4,8 @@ import { Subject, take, takeUntil } from 'rxjs';
 import { RfqService } from '../../../services/rfq';
 import { QuoteItem } from '../../../models/rfq.model';
 import { Auth } from '../../../services/auth';
+import { QuoteSendMessageDialog } from '../quote-send-message-dialog/quote-send-message-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-approved-quote-details',
@@ -16,12 +18,14 @@ export class ApprovedQuoteDetails implements OnInit, OnDestroy {
   quote!: QuoteItem;
   quoteId: number | null = null;
   errorMessage = '';
-  
+  customerId: number | null = null;
+
   constructor(
     private _route: ActivatedRoute,
     private _rfqService: RfqService,
     private _authService: Auth,
     private _router: Router,
+    private _dialog: MatDialog,
   ){}
 
   ngOnInit(): void {
@@ -36,6 +40,7 @@ export class ApprovedQuoteDetails implements OnInit, OnDestroy {
     .pipe(takeUntil(this.destroy$))
     .subscribe((data) => {
       if (data) {
+        this.customerId = data.id;
         const allowedTypes = ['Customer'];
         if (!allowedTypes.includes(data.type)) {
           this._router.navigate(['/vendor-rfqs']);
@@ -61,6 +66,43 @@ export class ApprovedQuoteDetails implements OnInit, OnDestroy {
         },
       });
     }
+
+  sendQuoteFirstMessage(quote: QuoteItem) {
+    if (quote.lastMessage) {
+      this._router.navigate(['/messages'], {
+        queryParams: {
+          quoteId: quote.id,
+          customerId: this.customerId,
+          vendorId: quote?.vendorId,
+        },
+      });
+    } else {
+      const dialogRef = this._dialog.open(QuoteSendMessageDialog, {
+        width: '500px',
+        maxWidth: '90%',
+        height: 'auto',
+        panelClass: 'send-quote-message-dialog',
+        autoFocus: false,
+        data: {
+          quote: quote,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result) {
+          setTimeout(() => {
+            this._router.navigate(['/messages'], {
+              queryParams: {
+                quoteId: quote.id,
+                customerId: this.customerId,
+                vendorId: quote?.vendorId,
+              },
+            });
+          }, 1000);
+        }
+      });
+    }
+  }
 
   handleError(error: any): void {
     if (error.status === 401) {

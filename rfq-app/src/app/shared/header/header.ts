@@ -3,9 +3,9 @@ import {
   Component,
   OnInit,
   OnDestroy,
-  Signal,
   ViewChild,
   ElementRef,
+  HostListener
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -39,6 +39,21 @@ export class Header implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   @ViewChild('notifContainer') notifContainer!: ElementRef;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (this.showNotificationsDropdown) {
+      const clickedElement = event.target as HTMLElement;
+      const isClickInsideDropdown = this.notifContainer?.nativeElement?.contains(clickedElement);
+      const notificationButtons = document.querySelectorAll('[aria-label="Notifications"]');
+      const isClickOnButton = Array.from(notificationButtons).some(button =>
+        button.contains(clickedElement)
+      );
+
+      if (!isClickInsideDropdown && !isClickOnButton) {
+        this.showNotificationsDropdown = false;
+      }
+    }
+  }
 
   // Expose UserRole enum to template
   UserRole = UserRole;
@@ -143,7 +158,7 @@ export class Header implements OnInit, OnDestroy {
   }
   navigateToHome(): void {
     this.closeMenu();
-    this.router.navigate(['/']);
+    this.router.navigate(['/vendor-rfqs']);
   }
 
   logout(): void {

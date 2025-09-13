@@ -259,7 +259,7 @@
     "WARRANTY_TYPE": "Warranty type",
     "SELECT_VALIDITY_TYPE": "Select validity type",
     "SELECT_WARRANTY_TYPE": "Select warranty type",
-    "VALIDITY_INTERVAL": "Validity Interval",
+    "VALIDITY_INTERVAL": "This quote is valid for",
     "VALIDITY_INTERVAL_REQUIRED": "Validity interval is required",
     "VALIDITY_INTERVAL_MIN": "Validity interval must be at least 1 day",
     "VALIDITY_INTERVAL_MAX": "Validity interval must not exceed {max} days",
