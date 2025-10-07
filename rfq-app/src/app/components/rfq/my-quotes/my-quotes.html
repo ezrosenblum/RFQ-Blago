@@ -295,7 +295,7 @@
 
               <!-- Info Grid Section -->
               <div class="px-4 py-3 bg-white dark:bg-gray-800">
-                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
 
                   <!-- TIMELINE -->
                   <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
@@ -303,17 +303,7 @@
                       {{ 'VENDOR.TIMELINE' | translate }}
                     </div>
                     <div class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100">
-                      {{quote.minimumTimelineDuration}} - {{quote.maximumTimelineDuration}} {{quote.timelineIntervalType.name}}
-                    </div>
-                  </div>
-
-                  <!-- WARRANTY -->
-                  <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg text-center border border-gray-200 dark:border-gray-600">
-                    <div class="text-[11px] font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">
-                      {{ 'VENDOR.WARRANTY' | translate }}
-                    </div>
-                    <div class="mt-1 text-md font-semibold text-gray-900 dark:text-gray-100">
-                      {{quote.warantyDuration}} {{quote.warantyIntervalType.name}}
+                      {{quote.timelineDescription}}
                     </div>
                   </div>
 

@@ -106,6 +106,7 @@ export interface Quote {
   warantyIntervalType: LookupValue;
   warantyDuration: number;
   lastMessage: string | null;
+  timelineDescription: string;
 }
 
 export interface QuotesResponse {
