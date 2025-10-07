@@ -27,7 +27,7 @@ jobs:
         docker volume create rfqsubmission_documents_data || true
         docker volume create rfqsubmission_kibana_config || true
         docker volume create rfqsubmission_elasticsearch_data || true
-        docker volume create postgres_data || true
+        docker volume create github-runner_postgres_data || true
 
     - name: Start infrastructure containers if missing
       run: |
@@ -38,7 +38,7 @@ jobs:
           -e POSTGRES_USER=admin \
           -e POSTGRES_PASSWORD=passw123 \
           -e POSTGRES_DB=rfqsubmission \
-          -v postgres_data:/var/lib/postgresql/data \
+          -v github-runner_postgres_data:/var/lib/postgresql/data \
           -p 5432:5432 \
           postgres:14
 
