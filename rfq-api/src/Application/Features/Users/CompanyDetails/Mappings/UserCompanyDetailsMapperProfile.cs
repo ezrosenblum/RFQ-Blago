@@ -49,8 +49,6 @@ public sealed class UserCompanyDetailsMapperProfile : Profile
                 new List<int>(),
                 new List<int>()));
 
-        CreateMap<UserCompanyDetailsUpdateRequest, UserCompanyDetailsCreateCommand>();
-
         CreateMap<UserCompanyDetailsUpdateCommand, UserCompanyDetailsResponse>();
     }
 }
