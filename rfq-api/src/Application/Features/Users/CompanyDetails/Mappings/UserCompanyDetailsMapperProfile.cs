@@ -14,6 +14,8 @@ public sealed class UserCompanyDetailsMapperProfile : Profile
 
         CreateMap<UserCompanyDetailsUpdateRequest, UserCompanyDetailsUpdateCommand>();
 
+        CreateMap<UserCompanyDetailsUpdateRequest, UserCompanyDetailsCreateCommand>();
+
         CreateMap<UserCompanyDetailsUpdateCommand, UserCompanyDetailsResponse>();
     }
 }
