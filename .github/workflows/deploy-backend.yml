@@ -1,4 +1,4 @@
-name: Deploy .NET Core Backend
+name: Deploy RFQSubmission Services
 
 on:
   push:
@@ -11,7 +11,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Stop existing containers
+    - name: Create Docker network
+      run: docker network create rfq-network || true
+
+    - name: Stop and remove existing backend containers
       run: |
         docker stop rfqsubmission_api rfqsubmission_worker rfqsubmission_emailservice rfqsubmission_notificationservice || true
         docker rm rfqsubmission_api rfqsubmission_worker rfqsubmission_emailservice rfqsubmission_notificationservice || true
@@ -22,6 +25,53 @@ jobs:
       run: |
         docker volume create rfqsubmission_media_data || true
         docker volume create rfqsubmission_documents_data || true
+        docker volume create rfqsubmission_kibana_config || true
+        docker volume create rfqsubmission_elasticsearch_data || true
+        docker volume create postgres_data || true
+
+    - name: Start infrastructure containers if missing
+      run: |
+        # Postgres
+        docker ps -a --format '{{.Names}}' | grep -qw rfqsubmission_postgres || \
+        docker run -d --name rfqsubmission_postgres --hostname rfqsubmission-postgres-host \
+          --network rfq-network \
+          -e POSTGRES_USER=admin \
+          -e POSTGRES_PASSWORD=passw123 \
+          -e POSTGRES_DB=rfqsubmission \
+          -v postgres_data:/var/lib/postgresql/data \
+          -p 5432:5432 \
+          postgres:14
+
+        # RabbitMQ
+        docker ps -a --format '{{.Names}}' | grep -qw rfqsubmission_rabbitmq || \
+        docker run -d --name rfqsubmission_rabbitmq --hostname rfqsubmission-rabbitmq-host \
+          --network rfq-network \
+          -e RABBITMQ_DEFAULT_USER=admin \
+          -e RABBITMQ_DEFAULT_PASS=passw123 \
+          -e RABBITMQ_DEFAULT_VHOST=/ \
+          -p 5672:5672 -p 15672:15672 \
+          rabbitmq:3.11-management
+
+        # Redis
+        docker ps -a --format '{{.Names}}' | grep -qw rfqsubmission_redis || \
+        docker run -d --name rfqsubmission_redis --network rfq-network -p 6379:6379 redis:latest
+
+        # Elasticsearch
+        docker ps -a --format '{{.Names}}' | grep -qw rfqsubmission_elasticsearch || \
+        docker run -d --name rfqsubmission_elasticsearch --network rfq-network \
+          -e discovery.type=single-node \
+          -e xpack.security.enabled=false \
+          -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+          -v rfqsubmission_elasticsearch_data:/usr/share/elasticsearch/data \
+          -p 9202:9200 \
+          docker.elastic.co/elasticsearch/elasticsearch:7.17.4
+
+        # Kibana
+        docker ps -a --format '{{.Names}}' | grep -qw rfqsubmission_kibana || \
+        docker run -d --name rfqsubmission_kibana --network rfq-network \
+          -v rfqsubmission_kibana_config:/usr/share/kibana/config \
+          -p 5605:5601 \
+          docker.elastic.co/kibana/kibana:7.17.4
 
     - name: Build and run backend services
       run: |
