@@ -45,12 +45,12 @@ public sealed class SubmissionQuoteFullSearchQueryHandler : IQueryHandler<Submis
 
         if (_currentUserService.UserRole == UserRole.Vendor)
         {
-            return await _searchClient.SearchSubmissionQuotesAsync(query with { VendorId = _currentUserService.UserId, ValidFrom = validFrom });
+            return await _searchClient.SearchSubmissionQuotesAsync(query with { VendorId = _currentUserService.UserId });
         }
 
         if(_currentUserService.UserRole == UserRole.Customer)
         {
-            return await _searchClient.SearchSubmissionQuotesAsync(query with { SubmissionUserId = _currentUserService.UserId, ValidFrom = validFrom });
+            return await _searchClient.SearchSubmissionQuotesAsync(query with { SubmissionUserId = _currentUserService.UserId });
         }
 
         return await _searchClient.SearchSubmissionQuotesAsync(query);
